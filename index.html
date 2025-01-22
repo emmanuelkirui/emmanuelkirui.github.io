@@ -110,7 +110,11 @@
         // Share as image
         document.getElementById('share-btn').addEventListener('click', function () {
             const container = document.getElementById('quote-container');
-            html2canvas(container, { scale: 2 }).then(canvas => {
+            html2canvas(container, {
+                scale: 2, // Increase resolution
+                useCORS: true, // Allow cross-origin images
+                backgroundColor: null, // Retain the container's original background
+            }).then(canvas => {
                 const imageURL = canvas.toDataURL('image/png');
                 const previewWindow = window.open('', '_blank');
                 previewWindow.document.write(`<img src="${imageURL}" style="width:100%;"/>`);
@@ -120,7 +124,11 @@
         // Download image
         document.getElementById('download-btn').addEventListener('click', function () {
             const container = document.getElementById('quote-container');
-            html2canvas(container, { scale: 2 }).then(canvas => {
+            html2canvas(container, {
+                scale: 2, // Increase resolution
+                useCORS: true, // Allow cross-origin images
+                backgroundColor: null, // Retain the container's original background
+            }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
                 link.download = `quote_${new Date().toISOString().split('T')[0]}.png`;
