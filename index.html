@@ -28,49 +28,43 @@
             padding: 20px;
             max-width: 500px;
             width: 100%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
         }
 
-        /* Black 3D Shadows */
+        /* Black 3D Text Effect */
         h1, .quote, .info, .signature, .footer {
             color: #2d3436;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 4px 4px 8px rgba(0, 0, 0, 0.4);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 4px 4px 8px rgba(0, 0, 0, 0.4); /* Black shadows for 3D effect */
             transform: perspective(500px) rotateX(5deg) rotateY(5deg);
         }
 
         h1 {
             font-size: 2.5em;
             font-weight: bold;
-            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5), 6px 6px 12px rgba(0, 0, 0, 0.4);
         }
 
         .quote {
             font-style: italic;
             margin: 20px 0;
             font-size: 1.5em;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5), 6px 6px 15px rgba(0, 0, 0, 0.4);
         }
 
         .info {
             font-size: 1.2em;
             margin: 10px 0;
-            color: #2d3436;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4), 5px 5px 10px rgba(0, 0, 0, 0.3);
         }
 
         .signature {
             font-size: 1em;
             margin-top: 10px;
             color: #555;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3), 2px 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .footer {
             font-size: 0.9em;
             margin-top: 10px;
             color: #555;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3), 2px 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .icon-buttons {
@@ -104,20 +98,31 @@
         </div>
         <h1>Daily Quote</h1>
         <p class="info" id="date-info"></p>
-        <p class="info" id="day-info"></p>
+        <p class="info" id="time-info"></p>
         <p class="quote" id="quote"></p>
-        <p class="signature">#manuraj#emmanuelkirui</p>
+        <p class="signature">#manuraj #emmanuelkirui</p>
         <p class="footer" id="footer"></p>
     </div>
 
     <script>
+        // Display the current date and time in East Africa Time (EAT)
+        function updateDateTime() {
+            const options = { timeZone: "Africa/Nairobi", year: 'numeric', month: 'long', day: 'numeric' };
+            const timeOptions = { timeZone: "Africa/Nairobi", hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const currentDate = new Date();
+            const dateFormatter = new Intl.DateTimeFormat('en-KE', options);
+            const timeFormatter = new Intl.DateTimeFormat('en-KE', timeOptions);
+            document.getElementById('date-info').textContent = `Date: ${dateFormatter.format(currentDate)}`;
+            document.getElementById('time-info').textContent = `Time: ${timeFormatter.format(currentDate)}`;
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000); // Update every second
+
         // Fetch and display the daily quote
         fetch('quotes.json')
             .then(response => response.json())
             .then(quotes => {
                 const currentDate = new Date();
-                const options = { timeZone: 'Africa/Nairobi', year: 'numeric', month: 'long', day: 'numeric' };
-
                 const currentDayOfYear = Math.floor(
                     (currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
                 );
@@ -127,12 +132,7 @@
                 const quoteIndex = currentDayOfYear % quotes.length;
                 const dailyQuote = quotes[quoteIndex].quote;
 
-                // Convert the current date to EAT
-                const dateInEAT = new Date().toLocaleString('en-KE', options);
-
                 // Populate the HTML
-                document.getElementById('date-info').textContent = `Date (EAT): ${dateInEAT}`;
-                document.getElementById('day-info').textContent = `Day: ${currentDayOfYear} / ${totalDaysOfYear}`;
                 document.getElementById('quote').textContent = `"${dailyQuote}"`;
 
                 // Add footer with current year and copyright
@@ -155,17 +155,19 @@
             });
         });
 
-        // Download high-quality image
+        // Download high-quality image with date-based filename
         document.getElementById('download-btn').addEventListener('click', function () {
             const container = document.getElementById('quote-container');
             html2canvas(container, {
-                scale: 4, // Increased scale for higher resolution
-                useCORS: true, // Allow cross-origin images
-                backgroundColor: "#ffffff", // Set solid background for image capture
+                scale: 4,
+                useCORS: true,
+                backgroundColor: "#ffffff",
             }).then(canvas => {
+                const options = { timeZone: "Africa/Nairobi", year: 'numeric', month: '2-digit', day: '2-digit' };
+                const currentDate = new Intl.DateTimeFormat('en-KE', options).format(new Date());
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
-                link.download = `quote_${new Date().toISOString().split('T')[0]}.png`;
+                link.download = `quote_${currentDate}.png`; // Use current date in filename
                 link.click();
             });
         });
