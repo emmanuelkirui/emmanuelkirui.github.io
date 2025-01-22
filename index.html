@@ -4,126 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Quote</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
-            margin: 0;
             font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #2c3e50, #4ca1af);
-            color: #fff;
             text-align: center;
+            padding: 20px;
+            margin: 0;
+            background: linear-gradient(135deg, #74b9ff, #a29bfe);
+            color: #333;
+            min-height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
-            height: 100vh;
-            overflow: hidden;
+            align-items: center;
         }
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 15px;
             padding: 20px;
-            width: 90%;
-            max-width: 600px;
-            margin: auto;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            position: relative;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2d3436;
         }
         .quote {
-            font-size: 1.5rem;
             font-style: italic;
             margin: 20px 0;
+            font-size: 1.2em;
         }
-        .meta-info {
-            font-size: 1rem;
-            margin-top: 10px;
-            color: #dfe6e9;
-        }
-        .countdown {
-            font-size: 1.2rem;
-            margin-top: 10px;
-        }
-        .share-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #4ca1af;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .share-btn:hover {
-            background: #3b8895;
-        }
-        footer {
-            margin-top: auto;
-            font-size: 0.9rem;
-            opacity: 0.7;
+        .info {
+            font-size: 1em;
+            margin: 10px 0;
+            color: #2d3436;
         }
     </style>
 </head>
 <body>
-    <div class="container" id="quote-container">
-        <h1>Daily Inspiration</h1>
-        <div class="quote" id="quote">Loading today's quote...</div>
-        <div class="meta-info" id="meta-info">
-            <!-- Placeholder for date and count -->
-        </div>
-        <div>#manuraj#emmanuelkirui</div>
-        <div class="countdown" id="countdown"></div>
+    <div class="container">
+        <h1>Daily Quote</h1>
+        <p class="info" id="date-info"></p>
+        <p class="info" id="day-info"></p>
+        <p class="quote" id="quote"></p>
     </div>
-    <button class="share-btn" id="share-btn">Share as Image</button>
-    <footer>
-        #manuraj#emmanuelkirui © <span id="year"></span> All rights reserved
-    </footer>
 
     <script>
-        // Fetch the current year for the footer
-        document.getElementById("year").textContent = new Date().getFullYear();
+        // Fetch the JSON file
+        fetch('quotes.json')
+            .then(response => response.json())
+            .then(quotes => {
+                // Get the current date and day of the year
+                const currentDate = new Date();
+                const currentDayOfYear = Math.floor(
+                    (currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
+                );
+                const totalDaysOfYear = currentDate.getFullYear() % 4 === 0 ? 366 : 365;
 
-        // Fetch and display the daily quote
-        async function loadQuote() {
-            const response = await fetch('quotes.json');
-            const quotes = await response.json();
-            const today = new Date();
-            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
-            
-            document.getElementById("quote").textContent = quotes[dayOfYear % quotes.length].quote;
+                // Select a quote based on the current day of the year
+                const quoteIndex = currentDayOfYear % quotes.length;
+                const dailyQuote = quotes[quoteIndex].quote;
 
-            // Add current date and day count
-            const dateString = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById("meta-info").textContent = `Today: ${dateString} | Day ${dayOfYear} of ${today.getFullYear()}`;
-        }
-
-        // Countdown Timer for the next day
-        function updateCountdown() {
-            const now = new Date();
-            const nextDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-            const diff = nextDay - now;
-
-            const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
-            const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-            const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
-
-            document.getElementById("countdown").textContent = `Time until the next quote: ${hours}:${minutes}:${seconds}`;
-        }
-
-        // Share as Image functionality
-        document.getElementById("share-btn").addEventListener("click", function() {
-            const container = document.getElementById("quote-container");
-            html2canvas(container).then(canvas => {
-                // Trigger download of the generated image
-                const link = document.createElement('a');
-                link.download = 'daily_quote.png';
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
-        });
-
-        // Initialize the app
-        loadQuote();
-        setInterval(updateCountdown, 1000);
+                // Update the HTML content
+                document.getElementById('date-info').textContent = `Date: ${currentDate.toISOString().split('T')[0]}`;
+                document.getElementById('day-info').textContent = `Day: ${currentDayOfYear} / ${totalDaysOfYear}`;
+                document.getElementById('quote').textContent = `Quote of the Day: "${dailyQuote}"`;
+            })
+            .catch(error => console.error('Error fetching quotes:', error));
     </script>
 </body>
 </html>
