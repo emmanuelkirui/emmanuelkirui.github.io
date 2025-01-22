@@ -30,7 +30,28 @@
             width: 100%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
+            animation: changeBackground 10s infinite alternate;
         }
+
+        /* Animation to change background color */
+        @keyframes changeBackground {
+            0% {
+                background-color: rgba(255, 255, 255, 0.3);
+            }
+            25% {
+                background-color: rgba(0, 255, 255, 0.3);
+            }
+            50% {
+                background-color: rgba(255, 0, 255, 0.3);
+            }
+            75% {
+                background-color: rgba(255, 255, 0, 0.3);
+            }
+            100% {
+                background-color: rgba(255, 165, 0, 0.3);
+            }
+        }
+
         h1 {
             color: #2d3436;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
@@ -123,7 +144,7 @@
             html2canvas(container, {
                 scale: 4, // Increased scale for higher resolution
                 useCORS: true, // Allow cross-origin images
-                backgroundColor: "#ffffff", // Optional: solid background for better visibility
+                backgroundColor: "#ffffff", // Set solid background for image capture
             }).then(canvas => {
                 const imageURL = canvas.toDataURL('image/png');
                 const previewWindow = window.open('', '_blank');
@@ -137,7 +158,7 @@
             html2canvas(container, {
                 scale: 4, // Increased scale for higher resolution
                 useCORS: true, // Allow cross-origin images
-                backgroundColor: "#ffffff", // Optional: solid background for better visibility
+                backgroundColor: "#ffffff", // Set solid background for image capture
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
