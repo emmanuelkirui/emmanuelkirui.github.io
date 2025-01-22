@@ -1,5 +1,3 @@
-// share.js
-
 // Function to share the image via the selected platform
 function shareImage(imageURL, platform) {
     let shareUrl = '';
@@ -28,8 +26,8 @@ function shareImage(imageURL, platform) {
             return;
     }
 
-    // Open the share link in a new window
-    window.open(shareUrl, '_blank');
+    // Open the share link in the current window
+    window.location.href = shareUrl;
 }
 
 // Function to handle the share button click
@@ -42,10 +40,22 @@ document.getElementById('share-btn').addEventListener('click', function () {
     }).then(canvas => {
         const imageURL = canvas.toDataURL('image/png'); // Convert to image URL
 
-        // Create a popup for selecting a platform
-        const platforms = ['whatsapp', 'facebook', 'twitter', 'instagram', 'tiktok', 'youtube'];
-        const sharePrompt = `
-            <div style="text-align:center; padding: 20px;">
+        // Create a modal for selecting a platform
+        const modal = document.createElement('div');
+        modal.id = 'share-modal';
+        modal.style.position = 'fixed';
+        modal.style.top = 0;
+        modal.style.left = 0;
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
+
+        modal.innerHTML = `
+            <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; max-width: 400px; width: 100%;">
                 <h2>Share this Quote</h2>
                 <button onclick="shareImage('${imageURL}', 'whatsapp')">Share on WhatsApp</button>
                 <button onclick="shareImage('${imageURL}', 'facebook')">Share on Facebook</button>
@@ -53,10 +63,17 @@ document.getElementById('share-btn').addEventListener('click', function () {
                 <button onclick="shareImage('${imageURL}', 'instagram')">Share on Instagram</button>
                 <button onclick="shareImage('${imageURL}', 'tiktok')">Share on TikTok</button>
                 <button onclick="shareImage('${imageURL}', 'youtube')">Share on YouTube</button>
+                <br><br>
+                <button onclick="closeModal()">Close</button>
             </div>
         `;
-
-        const popup = window.open('', '_blank', 'width=400,height=400');
-        popup.document.write(sharePrompt);
+        
+        document.body.appendChild(modal);
     });
 });
+
+// Function to close the modal
+function closeModal() {
+    const modal = document.getElementById('share-modal');
+    modal.style.display = 'none';
+}
