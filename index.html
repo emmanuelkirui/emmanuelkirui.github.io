@@ -115,13 +115,23 @@
             })
             .catch(error => console.error('Error fetching quotes:', error));
 
+        // Function to generate a random background color
+        function getRandomBackgroundColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
         // Share as image
         document.getElementById('share-btn').addEventListener('click', function () {
             const container = document.getElementById('quote-container');
             html2canvas(container, {
                 scale: 2, // High resolution
                 useCORS: true, // Allow cross-origin images
-                backgroundColor: null, // Retain transparency (important for blurred backgrounds)
+                backgroundColor: getRandomBackgroundColor(), // Random background color
             }).then(canvas => {
                 const imageURL = canvas.toDataURL('image/png');
                 const previewWindow = window.open('', '_blank');
@@ -135,7 +145,7 @@
             html2canvas(container, {
                 scale: 2, // High resolution
                 useCORS: true, // Allow cross-origin images
-                backgroundColor: null, // Retain transparency (important for blurred backgrounds)
+                backgroundColor: getRandomBackgroundColor(), // Random background color
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
