@@ -52,31 +52,47 @@
             }
         }
 
-        h1 {
+        /* 3D Text Effect */
+        h1, .quote, .info, .signature, .footer {
             color: #2d3436;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7), -1px -1px 5px rgba(0, 0, 0, 0.7);
+            transform: perspective(500px) rotateX(5deg) rotateY(5deg);
         }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7), -2px -2px 6px rgba(0, 0, 0, 0.6);
+        }
+
         .quote {
             font-style: italic;
             margin: 20px 0;
-            font-size: 1.2em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+            font-size: 1.5em;
+            text-shadow: 4px 4px 15px rgba(0, 0, 0, 0.6), -2px -2px 10px rgba(0, 0, 0, 0.5);
         }
+
         .info {
-            font-size: 1em;
+            font-size: 1.2em;
             margin: 10px 0;
             color: #2d3436;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.6);
         }
+
         .signature {
+            font-size: 1em;
+            margin-top: 10px;
+            color: #555;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        .footer {
             font-size: 0.9em;
             margin-top: 10px;
             color: #555;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         }
-        .footer {
-            font-size: 0.8em;
-            margin-top: 10px;
-            color: #555;
-        }
+
         .icon-buttons {
             position: absolute;
             top: 10px;
@@ -84,6 +100,7 @@
             display: flex;
             gap: 10px;
         }
+
         .icon {
             width: 40px;
             height: 40px;
@@ -91,6 +108,7 @@
             opacity: 0.8;
             font-size: 1.5em;
         }
+
         .icon:hover {
             opacity: 1;
         }
