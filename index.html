@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Quote</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            padding: 20px;
             margin: 0;
             background: linear-gradient(135deg, #74b9ff, #a29bfe);
             color: #333;
-            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            min-height: 100vh;
         }
         .container {
             background: rgba(255, 255, 255, 0.3);
@@ -39,38 +39,69 @@
             margin: 10px 0;
             color: #2d3436;
         }
+        .signature {
+            font-size: 0.9em;
+            margin-top: 10px;
+            color: #555;
+        }
+        .share-btn {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #0984e3;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .share-btn:hover {
+            background-color: #74b9ff;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="quote-container">
         <h1>Daily Quote</h1>
         <p class="info" id="date-info"></p>
         <p class="info" id="day-info"></p>
         <p class="quote" id="quote"></p>
+        <p class="signature">#manuraj#emmanuelkirui</p>
     </div>
+    <button class="share-btn" id="share-btn">Share as Image</button>
 
     <script>
-        // Fetch the JSON file
+        // Fetch and display the daily quote
         fetch('quotes.json')
             .then(response => response.json())
             .then(quotes => {
-                // Get the current date and day of the year
                 const currentDate = new Date();
                 const currentDayOfYear = Math.floor(
                     (currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
                 );
                 const totalDaysOfYear = currentDate.getFullYear() % 4 === 0 ? 366 : 365;
 
-                // Select a quote based on the current day of the year
+                // Get the quote for the day
                 const quoteIndex = currentDayOfYear % quotes.length;
                 const dailyQuote = quotes[quoteIndex].quote;
 
-                // Update the HTML content
+                // Populate the HTML
                 document.getElementById('date-info').textContent = `Date: ${currentDate.toISOString().split('T')[0]}`;
                 document.getElementById('day-info').textContent = `Day: ${currentDayOfYear} / ${totalDaysOfYear}`;
-                document.getElementById('quote').textContent = `Quote of the Day: "${dailyQuote}"`;
+                document.getElementById('quote').textContent = `"${dailyQuote}"`;
             })
             .catch(error => console.error('Error fetching quotes:', error));
+
+        // Share as image
+        document.getElementById('share-btn').addEventListener('click', function () {
+            const container = document.getElementById('quote-container');
+            html2canvas(container, { scale: 2 }).then(canvas => {
+                // Preview image
+                const imageURL = canvas.toDataURL('image/png');
+                const previewWindow = window.open('', '_blank');
+                previewWindow.document.write(`<img src="${imageURL}" style="width:100%;"/>`);
+            });
+        });
     </script>
 </body>
 </html>
