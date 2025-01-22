@@ -162,7 +162,7 @@
             html2canvas(container, {
                 scale: 4, // Increased scale for higher resolution
                 useCORS: true, // Allow cross-origin images
-                element.style.backgroundColor = "rgb(230, 245, 255)";
+                backgroundColor = "rgb(230, 245, 255)";
                 //backgroundColor: "#ffffff", // Set solid background for image capture
             }).then(canvas => {
                 const imageURL = canvas.toDataURL('image/png');
