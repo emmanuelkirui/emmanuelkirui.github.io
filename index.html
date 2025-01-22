@@ -9,27 +9,45 @@
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 20px;
-            background: #f4f4f9;
+            margin: 0;
+            background: linear-gradient(135deg, #74b9ff, #a29bfe);
             color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         h1 {
-            color: #007bff;
+            color: #2d3436;
         }
         .quote {
             font-style: italic;
             margin: 20px 0;
+            font-size: 1.2em;
         }
         .info {
-            font-size: 1.2em;
+            font-size: 1em;
             margin: 10px 0;
+            color: #2d3436;
         }
     </style>
 </head>
 <body>
-    <h1>Daily Quote</h1>
-    <p class="info" id="date-info"></p>
-    <p class="info" id="day-info"></p>
-    <p class="quote" id="quote"></p>
+    <div class="container">
+        <h1>Daily Quote</h1>
+        <p class="info" id="date-info"></p>
+        <p class="info" id="day-info"></p>
+        <p class="quote" id="quote"></p>
+    </div>
 
     <script>
         // Fetch the JSON file
