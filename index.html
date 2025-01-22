@@ -99,21 +99,36 @@
         <h1>Daily Quote</h1>
         <p class="info" id="date-info"></p>
         <p class="info" id="time-info"></p>
+        <p class="info" id="day-info"></p> <!-- Day count will appear here -->
         <p class="quote" id="quote"></p>
         <p class="signature">#manuraj #emmanuelkirui</p>
         <p class="footer" id="footer"></p>
     </div>
 
     <script>
-        // Display the current date and time in East Africa Time (EAT)
+        // Display the current date, time, and day of the year
         function updateDateTime() {
             const options = { timeZone: "Africa/Nairobi", year: 'numeric', month: 'long', day: 'numeric' };
             const timeOptions = { timeZone: "Africa/Nairobi", hour: '2-digit', minute: '2-digit', second: '2-digit' };
             const currentDate = new Date();
+
             const dateFormatter = new Intl.DateTimeFormat('en-KE', options);
             const timeFormatter = new Intl.DateTimeFormat('en-KE', timeOptions);
+
+            // Calculate the current day of the year
+            const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
+            const diff = currentDate - startOfYear;
+            const oneDay = 1000 * 60 * 60 * 24;
+            const dayOfYear = Math.floor(diff / oneDay);
+
+            // Total days in the year
+            const isLeapYear = (currentDate.getFullYear() % 4 === 0 && currentDate.getFullYear() % 100 !== 0) || currentDate.getFullYear() % 400 === 0;
+            const totalDaysInYear = isLeapYear ? 366 : 365;
+
+            // Update the date, time, and day info
             document.getElementById('date-info').textContent = `Date: ${dateFormatter.format(currentDate)}`;
             document.getElementById('time-info').textContent = `Time: ${timeFormatter.format(currentDate)}`;
+            document.getElementById('day-info').textContent = `Day: ${dayOfYear} of ${totalDaysInYear}`;
         }
         updateDateTime();
         setInterval(updateDateTime, 1000); // Update every second
