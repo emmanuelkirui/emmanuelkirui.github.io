@@ -162,7 +162,7 @@
             html2canvas(container, {
                 scale: 4, // Increased scale for higher resolution
                 useCORS: true, // Allow cross-origin images
-                backgroundColor: "#ffffff", // Set solid background for image capture
+                backgroundColor: "rgba(255, 255, 255, 0.3)", // Set solid background for image capture
             }).then(canvas => {
                 const imageURL = canvas.toDataURL('image/png');
                 const previewWindow = window.open('', '_blank');
@@ -176,7 +176,7 @@
             html2canvas(container, {
                 scale: 4,
                 useCORS: true,
-                backgroundColor: "#ffffff",
+                backgroundColor: "rgba(255, 255, 255, 0.3)",
             }).then(canvas => {
                 const options = { timeZone: "Africa/Nairobi", year: 'numeric', month: '2-digit', day: '2-digit' };
                 const currentDate = new Intl.DateTimeFormat('en-KE', options).format(new Date());
