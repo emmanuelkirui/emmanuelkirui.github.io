@@ -33,11 +33,13 @@
         }
         h1 {
             color: #2d3436;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
         }
         .quote {
             font-style: italic;
             margin: 20px 0;
             font-size: 1.2em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
         }
         .info {
             font-size: 1em;
@@ -115,23 +117,13 @@
             })
             .catch(error => console.error('Error fetching quotes:', error));
 
-        // Function to generate a random background color
-        function getRandomBackgroundColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        }
-
-        // Share as image
+        // Share as high-quality image
         document.getElementById('share-btn').addEventListener('click', function () {
             const container = document.getElementById('quote-container');
             html2canvas(container, {
-                scale: 2, // High resolution
+                scale: 4, // Increased scale for higher resolution
                 useCORS: true, // Allow cross-origin images
-                backgroundColor: getRandomBackgroundColor(), // Random background color
+                backgroundColor: "#ffffff", // Optional: solid background for better visibility
             }).then(canvas => {
                 const imageURL = canvas.toDataURL('image/png');
                 const previewWindow = window.open('', '_blank');
@@ -139,13 +131,13 @@
             });
         });
 
-        // Download image
+        // Download high-quality image
         document.getElementById('download-btn').addEventListener('click', function () {
             const container = document.getElementById('quote-container');
             html2canvas(container, {
-                scale: 2, // High resolution
+                scale: 4, // Increased scale for higher resolution
                 useCORS: true, // Allow cross-origin images
-                backgroundColor: getRandomBackgroundColor(), // Random background color
+                backgroundColor: "#ffffff", // Optional: solid background for better visibility
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
