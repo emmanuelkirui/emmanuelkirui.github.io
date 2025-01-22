@@ -35,42 +35,42 @@
         /* Sunlight-like 3D Text Effect */
         h1, .quote, .info, .signature, .footer {
             color: #2d3436;
-            text-shadow: 2px 2px 4px rgba(255, 223, 0, 0.5), 4px 4px 8px rgba(255, 165, 0, 0.4); /* Sunlight effect with warm tones */
+            text-shadow: 2px 2px 4px rgba(255, 223, 0, 0.5), 4px 4px 8px rgba(255, 165, 0, 0.4);
             transform: perspective(500px) rotateX(5deg) rotateY(5deg);
         }
 
         h1 {
             font-size: 2.5em;
             font-weight: bold;
-            text-shadow: 3px 3px 8px rgba(255, 223, 0, 0.5), 6px 6px 12px rgba(255, 165, 0, 0.4); /* Sunlight effect with warm tones */
+            text-shadow: 3px 3px 8px rgba(255, 223, 0, 0.5), 6px 6px 12px rgba(255, 165, 0, 0.4);
         }
 
         .quote {
             font-style: italic;
             margin: 20px 0;
             font-size: 1.5em;
-            text-shadow: 3px 3px 10px rgba(255, 223, 0, 0.5), 6px 6px 15px rgba(255, 165, 0, 0.4); /* Sunlight effect with warm tones */
+            text-shadow: 3px 3px 10px rgba(255, 223, 0, 0.5), 6px 6px 15px rgba(255, 165, 0, 0.4);
         }
 
         .info {
             font-size: 1.2em;
             margin: 10px 0;
             color: #2d3436;
-            text-shadow: 3px 3px 6px rgba(255, 223, 0, 0.4), 5px 5px 10px rgba(255, 165, 0, 0.3); /* Sunlight effect with warm tones */
+            text-shadow: 3px 3px 6px rgba(255, 223, 0, 0.4), 5px 5px 10px rgba(255, 165, 0, 0.3);
         }
 
         .signature {
             font-size: 1em;
             margin-top: 10px;
             color: #555;
-            text-shadow: 1px 1px 3px rgba(255, 223, 0, 0.3), 2px 2px 5px rgba(255, 165, 0, 0.2); /* Sunlight effect with warm tones */
+            text-shadow: 1px 1px 3px rgba(255, 223, 0, 0.3), 2px 2px 5px rgba(255, 165, 0, 0.2);
         }
 
         .footer {
             font-size: 0.9em;
             margin-top: 10px;
             color: #555;
-            text-shadow: 1px 1px 3px rgba(255, 223, 0, 0.3), 2px 2px 5px rgba(255, 165, 0, 0.2); /* Sunlight effect with warm tones */
+            text-shadow: 1px 1px 3px rgba(255, 223, 0, 0.3), 2px 2px 5px rgba(255, 165, 0, 0.2);
         }
 
         .icon-buttons {
@@ -116,10 +116,7 @@
             .then(response => response.json())
             .then(quotes => {
                 const currentDate = new Date();
-                
-                // Adjust to East Africa Time (EAT), UTC+3
-                const options = { timeZone: 'Africa/Nairobi', year: 'numeric', month: '2-digit', day: '2-digit' };
-                const currentDateFormatted = new Intl.DateTimeFormat('en-GB', options).format(currentDate);
+                const options = { timeZone: 'Africa/Nairobi', year: 'numeric', month: 'long', day: 'numeric' };
 
                 const currentDayOfYear = Math.floor(
                     (currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
@@ -130,8 +127,11 @@
                 const quoteIndex = currentDayOfYear % quotes.length;
                 const dailyQuote = quotes[quoteIndex].quote;
 
+                // Convert the current date to EAT
+                const dateInEAT = new Date().toLocaleString('en-KE', options);
+
                 // Populate the HTML
-                document.getElementById('date-info').textContent = `Date: ${currentDateFormatted}`;
+                document.getElementById('date-info').textContent = `Date (EAT): ${dateInEAT}`;
                 document.getElementById('day-info').textContent = `Day: ${currentDayOfYear} / ${totalDaysOfYear}`;
                 document.getElementById('quote').textContent = `"${dailyQuote}"`;
 
