@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            color: #007bff;
+        }
+        .quote {
+            font-style: italic;
+            margin: 20px 0;
+        }
+        .info {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Daily Quote</h1>
+    <p class="info" id="date-info"></p>
+    <p class="info" id="day-info"></p>
+    <p class="quote" id="quote"></p>
+
+    <script>
+        // Fetch the JSON file
+        fetch('quotes.json')
+            .then(response => response.json())
+            .then(quotes => {
+                // Get the current date and day of the year
+                const currentDate = new Date();
+                const currentDayOfYear = Math.floor(
+                    (currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
+                );
+                const totalDaysOfYear = currentDate.getFullYear() % 4 === 0 ? 366 : 365;
+
+                // Select a quote based on the current day of the year
+                const quoteIndex = currentDayOfYear % quotes.length;
+                const dailyQuote = quotes[quoteIndex].quote;
+
+                // Update the HTML content
+                document.getElementById('date-info').textContent = `Date: ${currentDate.toISOString().split('T')[0]}`;
+                document.getElementById('day-info').textContent = `Day: ${currentDayOfYear} / ${totalDaysOfYear}`;
+                document.getElementById('quote').textContent = `Quote of the Day: "${dailyQuote}"`;
+            })
+            .catch(error => console.error('Error fetching quotes:', error));
+    </script>
+</body>
+</html>
