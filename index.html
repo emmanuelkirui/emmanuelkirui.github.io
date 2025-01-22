@@ -116,6 +116,11 @@
             .then(response => response.json())
             .then(quotes => {
                 const currentDate = new Date();
+                
+                // Adjust to East Africa Time (EAT), UTC+3
+                const options = { timeZone: 'Africa/Nairobi', year: 'numeric', month: '2-digit', day: '2-digit' };
+                const currentDateFormatted = new Intl.DateTimeFormat('en-GB', options).format(currentDate);
+
                 const currentDayOfYear = Math.floor(
                     (currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
                 );
@@ -126,7 +131,7 @@
                 const dailyQuote = quotes[quoteIndex].quote;
 
                 // Populate the HTML
-                document.getElementById('date-info').textContent = `Date: ${currentDate.toISOString().split('T')[0]}`;
+                document.getElementById('date-info').textContent = `Date: ${currentDateFormatted}`;
                 document.getElementById('day-info').textContent = `Day: ${currentDayOfYear} / ${totalDaysOfYear}`;
                 document.getElementById('quote').textContent = `"${dailyQuote}"`;
 
