@@ -34,6 +34,11 @@
             font-style: italic;
             margin: 20px 0;
         }
+        .meta-info {
+            font-size: 1rem;
+            margin-top: 10px;
+            color: #dfe6e9;
+        }
         .countdown {
             font-size: 1.2rem;
             margin-top: 10px;
@@ -62,6 +67,10 @@
     <div class="container" id="quote-container">
         <h1>Daily Inspiration</h1>
         <div class="quote" id="quote">Loading today's quote...</div>
+        <div class="meta-info" id="meta-info">
+            <!-- Placeholder for date and count -->
+        </div>
+        <div>#manuraj#emmanuelkirui</div>
         <div class="countdown" id="countdown"></div>
     </div>
     <button class="share-btn" id="share-btn">Share as Image</button>
@@ -77,8 +86,14 @@
         async function loadQuote() {
             const response = await fetch('quotes.json');
             const quotes = await response.json();
-            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+            
             document.getElementById("quote").textContent = quotes[dayOfYear % quotes.length].quote;
+
+            // Add current date and day count
+            const dateString = today.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById("meta-info").textContent = `Today: ${dateString} | Day ${dayOfYear} of ${today.getFullYear()}`;
         }
 
         // Countdown Timer for the next day
