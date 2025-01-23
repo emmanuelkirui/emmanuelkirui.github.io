@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Quote</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -106,26 +105,6 @@
             color: inherit;
             transition: color 0.5s;
         }
-
-        .share-menu {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .share-menu a {
-            text-decoration: none;
-            color: var(--text-light);
-            margin: 10px;
-            font-size: 1.2em;
-            display: inline-block;
-        }
     </style>
 </head>
 <body>
@@ -150,14 +129,12 @@
     </div>
 
     <script>
-        // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
         let isDarkMode = false;
 
         themeToggle.addEventListener('click', () => {
             isDarkMode = !isDarkMode;
-
             if (isDarkMode) {
                 body.style.setProperty('--bg-light', 'var(--bg-dark)');
                 body.style.setProperty('--text-light', 'var(--text-dark)');
@@ -171,26 +148,12 @@
             }
         });
 
-        // Update Date, Time, and Quote (same as before)
         function updateDateTime() {
             const options = { timeZone: "Africa/Nairobi", year: 'numeric', month: 'long', day: 'numeric' };
             const timeOptions = { timeZone: "Africa/Nairobi", hour: '2-digit', minute: '2-digit', second: '2-digit' };
             const currentDate = new Date();
-
-            const dateFormatter = new Intl.DateTimeFormat('en-KE', options);
-            const timeFormatter = new Intl.DateTimeFormat('en-KE', timeOptions);
-
-            const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
-            const diff = currentDate - startOfYear;
-            const oneDay = 1000 * 60 * 60 * 24;
-            const dayOfYear = Math.floor(diff / oneDay);
-
-            const isLeapYear = (currentDate.getFullYear() % 4 === 0 && currentDate.getFullYear() % 100 !== 0) || currentDate.getFullYear() % 400 === 0;
-            const totalDaysInYear = isLeapYear ? 366 : 365;
-
-            document.getElementById('date-info').textContent = `Date: ${dateFormatter.format(currentDate)}`;
-            document.getElementById('time-info').textContent = `Time: ${timeFormatter.format(currentDate)}`;
-            document.getElementById('day-info').textContent = `Day: ${dayOfYear} of ${totalDaysInYear}`;
+            document.getElementById('date-info').textContent = `Date: ${currentDate.toLocaleDateString('en-KE', options)}`;
+            document.getElementById('time-info').textContent = `Time: ${currentDate.toLocaleTimeString('en-KE', timeOptions)}`;
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
@@ -199,16 +162,41 @@
             .then(response => response.json())
             .then(quotes => {
                 const currentDate = new Date();
-                const currentDayOfYear = Math.floor(
-                    (currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
-                );
-                const quoteIndex = currentDayOfYear % quotes.length;
-                const dailyQuote = quotes[quoteIndex].quote;
-
-                document.getElementById('quote').textContent = `"${dailyQuote}"`;
-                const currentYear = new Date().getFullYear();
-                document.getElementById('footer').textContent = `© ${currentYear} Manu All rights reserved`;
+                const currentDayOfYear = Math.floor((currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 86400000);
+                document.getElementById('quote').textContent = `"${quotes[currentDayOfYear % quotes.length].quote}"`;
+                document.getElementById('footer').textContent = `© ${currentDate.getFullYear()} Manu All rights reserved`;
             });
+
+        // Download image
+        const downloadBtn = document.getElementById('download-btn');
+        downloadBtn.addEventListener('click', () => {
+            const container = document.getElementById('quote-container');
+            html2canvas(container, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'daily-quote.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        });
+
+        // Share logic
+        const shareBtn = document.getElementById('share-btn');
+        shareBtn.addEventListener('click', async () => {
+            const container = document.getElementById('quote-container');
+            const canvas = await html2canvas(container, { scale: 2 });
+            canvas.toBlob(blob => {
+                const file = new File([blob], 'daily-quote.png', { type: 'image/png' });
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Daily Quote',
+                        text: 'Check out this amazing quote!',
+                        files: [file],
+                    });
+                } else {
+                    alert('Sharing is not supported on this browser.');
+                }
+            });
+        });
     </script>
 </body>
 </html>
