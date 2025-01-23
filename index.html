@@ -246,25 +246,32 @@
             });
         });
 
-        // Share Functionality
-        document.getElementById("share-btn").addEventListener("click", () => {
-            const quoteText = document.getElementById('quote').textContent;
+        // Share Content as Image
+document.getElementById("share-btn").addEventListener("click", () => {
+    const container = document.getElementById("quote-container");
+
+    html2canvas(container).then(canvas => {
+        canvas.toBlob(blob => {
             const shareData = {
                 title: 'Daily Quote',
-                text: quoteText,
-                url: window.location.href,
+                text: 'Check out this daily quote!',
+                files: [
+                    new File([blob], 'quote.png', { type: 'image/png' })
+                ],
             };
 
             if (navigator.share) {
                 navigator.share(shareData).then(() => {
-                    console.log('Quote shared successfully!');
+                    console.log('Quote image shared successfully!');
                 }).catch((error) => {
-                    console.log('Error sharing quote:', error);
+                    console.log('Error sharing quote image:', error);
                 });
             } else {
                 alert('Sharing not supported on this device/browser');
             }
         });
+    });
+});
     </script>
 </body>
 </html>
