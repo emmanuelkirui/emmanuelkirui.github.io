@@ -105,6 +105,25 @@
             color: inherit;
             transition: color 0.5s;
         }
+
+        /* Social Media Icons */
+        .social-media {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        .social-media a {
+            text-decoration: none;
+            color: inherit;
+            font-size: 1.8em;
+            transition: color 0.3s;
+        }
+
+        .social-media a:hover {
+            color: #3498db;
+        }
     </style>
 </head>
 <body>
@@ -126,6 +145,22 @@
         <p class="quote" id="quote"></p>
         <p class="signature">#manuraj #emmanuelkirui</p>
         <p class="footer" id="footer"></p>
+        
+        <!-- Social Media Links -->
+        <div class="social-media">
+            <a href="https://facebook.com" target="_blank" title="Facebook">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" title="Twitter">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://instagram.com" target="_blank" title="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://linkedin.com" target="_blank" title="LinkedIn">
+                <i class="fab fa-linkedin"></i>
+            </a>
+        </div>
     </div>
 
     <script>
@@ -194,14 +229,13 @@
         document.getElementById("download-btn").addEventListener("click", () => {
             const container = document.getElementById("quote-container");
 
-            // Get the current date
             const date = new Date();
-            const formattedDate = date.toISOString().split('T')[0]; // e.g., "2025-01-23"
+            const formattedDate = date.toISOString().split('T')[0];
 
             html2canvas(container).then(canvas => {
                 const link = document.createElement("a");
-                link.download = `daily-quote-${formattedDate}.png`; // Name the file by date
-                link.href = canvas.toDataURL("image/png", 1.0); // High-quality image
+                link.download = `daily-quote-${formattedDate}.png`;
+                link.href = canvas.toDataURL("image/png", 1.0);
                 link.click();
             });
         });
