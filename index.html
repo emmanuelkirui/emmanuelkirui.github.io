@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Quote & Bible Verse</title>
+    <title>Daily Quote</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -56,7 +56,7 @@
             font-weight: bold;
         }
 
-        .quote, .bible-verse {
+        .quote {
             font-style: italic;
             margin: 20px 0;
             font-size: 1.5em;
@@ -112,11 +112,10 @@
             <!-- Download Icon -->
             <i class="fas fa-download icon" id="download-btn" title="Download"></i>
         </div>
-        <h1>Daily Quote & Bible Verse</h1>
+        <h1>Daily Quote</h1>
         <p class="info" id="date-info"></p>
         <p class="info" id="time-info"></p>
         <p class="quote" id="quote"></p>
-        <p class="bible-verse" id="bible-verse"></p>
         <p class="signature">#manuraj #emmanuelkirui</p>
     </div>
 
@@ -143,7 +142,7 @@
         updateDateTime();
         setInterval(updateDateTime, 1000);
 
-        // Fetch and Display Quotes and Bible Verses
+        // Fetch and Display Quotes
         fetch('quotes.json')
             .then(response => response.json())
             .then(data => {
@@ -151,10 +150,8 @@
                 const dayOfYear = Math.floor((currentDate - new Date(currentDate.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
 
                 const quoteIndex = dayOfYear % data.quotes.length;
-                const verseIndex = dayOfYear % data.bibleVerses.length;
 
                 document.getElementById('quote').textContent = `"${data.quotes[quoteIndex]}"`;
-                document.getElementById('bible-verse').textContent = `Bible Verse: "${data.bibleVerses[verseIndex]}"`;
             });
 
         // Share as High-Quality Image
