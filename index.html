@@ -125,15 +125,16 @@
             color: #3498db;
         }
     .profile-pic {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 50px; /* Adjust size as needed */
-        height: 50px; /* Ensure a square shape */
+        position: absolute; /* Absolute positioning within the container */
+        top: 15px; /* Adjust the vertical position */
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Ensure the image is perfectly centered */
+        width: 60px; /* Adjust size as needed */
+        height: 60px; /* Keep it square */
         border-radius: 50%; /* Makes the image circular */
-        border: 2px solid #ffffff; /* Optional border for styling */
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Adds a slight shadow */
-        object-fit: cover; /* Ensures the image fits within the circle */
+        border: 3px solid #ffffff; /* Add a clean white border */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+        object-fit: cover; /* Ensure the image fits within the circle */
     }
     </style>
 </head>
