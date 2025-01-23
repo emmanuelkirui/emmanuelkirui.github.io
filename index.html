@@ -124,6 +124,16 @@
         .social-media a:hover {
             color: #3498db;
         }
+        .profile-pic {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%; /* Makes the image circular */
+    border: 2px solid white; /* Adds a white border for a polished look */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Adds a slight shadow */
+}
     </style>
 </head>
 <body>
@@ -132,6 +142,9 @@
     </button>
 
     <div class="container" id="quote-container">
+            <!-- Profile Picture -->
+    <img src="profile-pic.jpg" alt="Profile" class="profile-pic">
+        
         <div class="icon-buttons">
             <!-- Share Icon -->
             <i class="fas fa-share-alt icon" id="share-btn" title="Share"></i>
