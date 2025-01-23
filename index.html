@@ -245,6 +245,26 @@
                 link.click();
             });
         });
+
+        // Share Functionality
+        document.getElementById("share-btn").addEventListener("click", () => {
+            const quoteText = document.getElementById('quote').textContent;
+            const shareData = {
+                title: 'Daily Quote',
+                text: quoteText,
+                url: window.location.href,
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).then(() => {
+                    console.log('Quote shared successfully!');
+                }).catch((error) => {
+                    console.log('Error sharing quote:', error);
+                });
+            } else {
+                alert('Sharing not supported on this device/browser');
+            }
+        });
     </script>
 </body>
 </html>
