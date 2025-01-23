@@ -27,51 +27,21 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            transition: background 0.5s, color 0.5s;
         }
 
         .container {
             background: var(--container-light);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             border-radius: 15px;
             padding: 20px;
             max-width: 500px;
             width: 100%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
-            transition: background 0.5s;
         }
 
         h1, .quote, .info, .signature, .footer {
             color: inherit;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 4px 4px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        h1 {
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-
-        .quote {
-            font-style: italic;
-            margin: 20px 0;
-            font-size: 1.5em;
-        }
-
-        .info {
-            font-size: 1.2em;
-            margin: 10px 0;
-        }
-
-        .signature {
-            font-size: 1em;
-            margin-top: 10px;
-        }
-
-        .footer {
-            font-size: 0.9em;
-            margin-top: 10px;
         }
 
         .icon-buttons {
@@ -93,25 +63,9 @@
         .icon:hover {
             opacity: 1;
         }
-
-        .theme-toggle {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            cursor: pointer;
-            font-size: 1.5em;
-            background: none;
-            border: none;
-            color: inherit;
-            transition: color 0.5s;
-        }
     </style>
 </head>
 <body>
-    <button class="theme-toggle" id="theme-toggle">
-        <i class="fas fa-moon"></i>
-    </button>
-
     <div class="container" id="quote-container">
         <div class="icon-buttons">
             <!-- Share Icon -->
@@ -120,81 +74,45 @@
             <i class="fas fa-download icon" id="download-btn" title="Download"></i>
         </div>
         <h1>Daily Quote</h1>
-        <p class="info" id="date-info"></p>
-        <p class="info" id="time-info"></p>
-        <p class="info" id="day-info"></p>
-        <p class="quote" id="quote"></p>
+        <p class="info" id="date-info">Date: January 23, 2025</p>
+        <p class="info" id="time-info">Time: 10:00 AM</p>
+        <p class="info" id="day-info">Day: 23 of 365</p>
+        <p class="quote" id="quote">"This is your inspirational quote for the day!"</p>
         <p class="signature">#manuraj #emmanuelkirui</p>
-        <p class="footer" id="footer"></p>
+        <p class="footer" id="footer">© 2025 Manu All rights reserved</p>
     </div>
 
     <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        let isDarkMode = false;
-
-        themeToggle.addEventListener('click', () => {
-            isDarkMode = !isDarkMode;
-            if (isDarkMode) {
-                body.style.setProperty('--bg-light', 'var(--bg-dark)');
-                body.style.setProperty('--text-light', 'var(--text-dark)');
-                body.style.setProperty('--container-light', 'var(--container-dark)');
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                body.style.setProperty('--bg-light', 'linear-gradient(135deg, #74b9ff, #a29bfe)');
-                body.style.setProperty('--text-light', '#333');
-                body.style.setProperty('--container-light', 'rgba(255, 255, 255, 0.3)');
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        });
-
-        function updateDateTime() {
-            const options = { timeZone: "Africa/Nairobi", year: 'numeric', month: 'long', day: 'numeric' };
-            const timeOptions = { timeZone: "Africa/Nairobi", hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            const currentDate = new Date();
-            document.getElementById('date-info').textContent = `Date: ${currentDate.toLocaleDateString('en-KE', options)}`;
-            document.getElementById('time-info').textContent = `Time: ${currentDate.toLocaleTimeString('en-KE', timeOptions)}`;
-        }
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-
-        fetch('quotes.json')
-            .then(response => response.json())
-            .then(quotes => {
-                const currentDate = new Date();
-                const currentDayOfYear = Math.floor((currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 86400000);
-                document.getElementById('quote').textContent = `"${quotes[currentDayOfYear % quotes.length].quote}"`;
-                document.getElementById('footer').textContent = `© ${currentDate.getFullYear()} Manu All rights reserved`;
-            });
-
-        // Download image
-        const downloadBtn = document.getElementById('download-btn');
-        downloadBtn.addEventListener('click', () => {
-            const container = document.getElementById('quote-container');
-            html2canvas(container, { scale: 2 }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'daily-quote.png';
-                link.href = canvas.toDataURL('image/png');
+        // Download functionality
+        document.getElementById("download-btn").addEventListener("click", () => {
+            const container = document.getElementById("quote-container");
+            html2canvas(container).then(canvas => {
+                const link = document.createElement("a");
+                link.download = "daily-quote.png";
+                link.href = canvas.toDataURL("image/png", 1.0); // High-quality image
                 link.click();
             });
         });
 
-        // Share logic
-        const shareBtn = document.getElementById('share-btn');
-        shareBtn.addEventListener('click', async () => {
-            const container = document.getElementById('quote-container');
-            const canvas = await html2canvas(container, { scale: 2 });
-            canvas.toBlob(blob => {
-                const file = new File([blob], 'daily-quote.png', { type: 'image/png' });
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Daily Quote',
-                        text: 'Check out this amazing quote!',
-                        files: [file],
-                    });
-                } else {
-                    alert('Sharing is not supported on this browser.');
-                }
+        // Share functionality
+        document.getElementById("share-btn").addEventListener("click", () => {
+            const container = document.getElementById("quote-container");
+            html2canvas(container).then(canvas => {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], "daily-quote.png", { type: "image/png" });
+
+                    if (navigator.share) {
+                        navigator.share({
+                            files: [file],
+                            title: "Daily Quote",
+                            text: "Check out this inspirational quote!",
+                        }).catch(err => {
+                            console.error("Share failed:", err);
+                        });
+                    } else {
+                        alert("Sharing is not supported on this device.");
+                    }
+                });
             });
         });
     </script>
