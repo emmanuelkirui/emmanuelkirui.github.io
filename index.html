@@ -8,20 +8,31 @@
     <!-- Font Awesome CDN for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --bg-light: linear-gradient(135deg, #74b9ff, #a29bfe);
+            --bg-dark: linear-gradient(135deg, #2c3e50, #34495e);
+            --text-light: #333;
+            --text-dark: #ecf0f1;
+            --container-light: rgba(255, 255, 255, 0.3);
+            --container-dark: rgba(44, 62, 80, 0.7);
+        }
+
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 0;
-            background: linear-gradient(135deg, #74b9ff, #a29bfe);
-            color: #333;
+            background: var(--bg-light);
+            color: var(--text-light);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            transition: background 0.5s, color 0.5s;
         }
+
         .container {
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--container-light);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border-radius: 15px;
@@ -30,13 +41,12 @@
             width: 100%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
+            transition: background 0.5s;
         }
 
-        /* Black 3D Text Effect */
         h1, .quote, .info, .signature, .footer {
-            color: #2d3436;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 4px 4px 8px rgba(0, 0, 0, 0.4); /* Black shadows for 3D effect */
-            transform: perspective(500px) rotateX(5deg) rotateY(5deg);
+            color: inherit;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 4px 4px 8px rgba(0, 0, 0, 0.4);
         }
 
         h1 {
@@ -58,13 +68,11 @@
         .signature {
             font-size: 1em;
             margin-top: 10px;
-            color: #555;
         }
 
         .footer {
             font-size: 0.9em;
             margin-top: 10px;
-            color: #555;
         }
 
         .icon-buttons {
@@ -87,7 +95,18 @@
             opacity: 1;
         }
 
-        /* Popup Share Menu */
+        .theme-toggle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            cursor: pointer;
+            font-size: 1.5em;
+            background: none;
+            border: none;
+            color: inherit;
+            transition: color 0.5s;
+        }
+
         .share-menu {
             display: none;
             position: fixed;
@@ -102,7 +121,7 @@
 
         .share-menu a {
             text-decoration: none;
-            color: #333;
+            color: var(--text-light);
             margin: 10px;
             font-size: 1.2em;
             display: inline-block;
@@ -110,6 +129,10 @@
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
     <div class="container" id="quote-container">
         <div class="icon-buttons">
             <!-- Share Icon -->
@@ -120,38 +143,35 @@
         <h1>Daily Quote</h1>
         <p class="info" id="date-info"></p>
         <p class="info" id="time-info"></p>
-        <p class="info" id="day-info"></p> <!-- Day count will appear here -->
+        <p class="info" id="day-info"></p>
         <p class="quote" id="quote"></p>
         <p class="signature">#manuraj #emmanuelkirui</p>
         <p class="footer" id="footer"></p>
     </div>
 
-    <!-- Share Menu Popup -->
-    <div class="share-menu" id="share-menu">
-        <h3>Share on:</h3>
-        <a href="https://wa.me/?text=" target="_blank" id="whatsapp-link">
-            <i class="fab fa-whatsapp"></i> WhatsApp
-        </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u=" target="_blank" id="facebook-link">
-            <i class="fab fa-facebook"></i> Facebook
-        </a>
-        <a href="https://twitter.com/intent/tweet?url=" target="_blank" id="twitter-link">
-            <i class="fab fa-twitter"></i> Twitter
-        </a>
-        <a href="https://www.instagram.com/?url=" target="_blank" id="instagram-link">
-            <i class="fab fa-instagram"></i> Instagram
-        </a>
-        <a href="https://www.tiktok.com/share?url=" target="_blank" id="tiktok-link">
-            <i class="fab fa-tiktok"></i> TikTok
-        </a>
-        <a href="https://www.youtube.com/share?url=" target="_blank" id="youtube-link">
-            <i class="fab fa-youtube"></i> YouTube
-        </a>
-        <button id="close-share-menu">Close</button>
-    </div>
-
     <script>
-        // Display the current date, time, and day of the year
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        let isDarkMode = false;
+
+        themeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+
+            if (isDarkMode) {
+                body.style.setProperty('--bg-light', 'var(--bg-dark)');
+                body.style.setProperty('--text-light', 'var(--text-dark)');
+                body.style.setProperty('--container-light', 'var(--container-dark)');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                body.style.setProperty('--bg-light', 'linear-gradient(135deg, #74b9ff, #a29bfe)');
+                body.style.setProperty('--text-light', '#333');
+                body.style.setProperty('--container-light', 'rgba(255, 255, 255, 0.3)');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+
+        // Update Date, Time, and Quote (same as before)
         function updateDateTime() {
             const options = { timeZone: "Africa/Nairobi", year: 'numeric', month: 'long', day: 'numeric' };
             const timeOptions = { timeZone: "Africa/Nairobi", hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -160,25 +180,21 @@
             const dateFormatter = new Intl.DateTimeFormat('en-KE', options);
             const timeFormatter = new Intl.DateTimeFormat('en-KE', timeOptions);
 
-            // Calculate the current day of the year
             const startOfYear = new Date(currentDate.getFullYear(), 0, 0);
             const diff = currentDate - startOfYear;
             const oneDay = 1000 * 60 * 60 * 24;
             const dayOfYear = Math.floor(diff / oneDay);
 
-            // Total days in the year
             const isLeapYear = (currentDate.getFullYear() % 4 === 0 && currentDate.getFullYear() % 100 !== 0) || currentDate.getFullYear() % 400 === 0;
             const totalDaysInYear = isLeapYear ? 366 : 365;
 
-            // Update the date, time, and day info
             document.getElementById('date-info').textContent = `Date: ${dateFormatter.format(currentDate)}`;
             document.getElementById('time-info').textContent = `Time: ${timeFormatter.format(currentDate)}`;
             document.getElementById('day-info').textContent = `Day: ${dayOfYear} of ${totalDaysInYear}`;
         }
         updateDateTime();
-        setInterval(updateDateTime, 1000); // Update every second
+        setInterval(updateDateTime, 1000);
 
-        // Fetch and display the daily quote
         fetch('quotes.json')
             .then(response => response.json())
             .then(quotes => {
@@ -186,66 +202,13 @@
                 const currentDayOfYear = Math.floor(
                     (currentDate - new Date(currentDate.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24
                 );
-                const totalDaysOfYear = currentDate.getFullYear() % 4 === 0 ? 366 : 365;
-
-                // Get the quote for the day
                 const quoteIndex = currentDayOfYear % quotes.length;
                 const dailyQuote = quotes[quoteIndex].quote;
 
-                // Populate the HTML
                 document.getElementById('quote').textContent = `"${dailyQuote}"`;
-
-                // Add footer with current year and copyright
                 const currentYear = new Date().getFullYear();
                 document.getElementById('footer').textContent = `© ${currentYear} Manu All rights reserved`;
-            })
-            .catch(error => console.error('Error fetching quotes:', error));
-
-        // Share as high-quality image
-        document.getElementById('share-btn').addEventListener('click', function () {
-            const container = document.getElementById('quote-container');
-            html2canvas(container, {
-                scale: 4, // Increased scale for higher resolution
-                useCORS: true, // Allow cross-origin images
-                backgroundColor: "rgba(230, 245, 255, 0.9)", // Light blue solid background for image capture
-            }).then(canvas => {
-                const imageURL = canvas.toDataURL('image/png');
-                
-                // Display the share menu
-                document.getElementById('share-menu').style.display = 'block';
-                
-                // Add the image URL to the share links
-                document.getElementById('whatsapp-link').href += imageURL;
-                document.getElementById('facebook-link').href += imageURL;
-                document.getElementById('twitter-link').href += imageURL;
-                document.getElementById('instagram-link').href += imageURL;
-                document.getElementById('tiktok-link').href += imageURL;
-                document.getElementById('youtube-link').href += imageURL;
             });
-        });
-
-        // Close share menu
-        document.getElementById('close-share-menu').addEventListener('click', function () {
-            document.getElementById('share-menu').style.display = 'none';
-        });
-
-        // Download high-quality image with date-based filename
-        document.getElementById('download-btn').addEventListener('click', function () {
-            const container = document.getElementById('quote-container');
-            html2canvas(container, {
-                scale: 4,
-                useCORS: true,
-                backgroundColor: "rgba(230, 245, 255, 0.9)", // Light blue solid background for image capture
-            }).then(canvas => {
-                const options = { timeZone: "Africa/Nairobi", year: 'numeric', month: '2-digit', day: '2-digit' };
-                const currentDate = new Intl.DateTimeFormat('en-KE', options).format(new Date());
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/png');
-                link.download = `quote_${currentDate}.png`; // Use current date in filename
-                link.click();
-            });
-        });
     </script>
-     <script src="share.js"></script>
 </body>
 </html>
