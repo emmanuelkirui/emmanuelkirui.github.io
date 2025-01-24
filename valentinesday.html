@@ -35,29 +35,14 @@
         }
 
         h1 {
-    font-size: 3.5em;
-    font-family: 'Sacramento', cursive;
-    font-weight: normal;
-    color: #ffffff;
-    text-shadow: 
-        2px 4px 5px rgba(0, 0, 0, 0.6), 
-        4px 8px 10px rgba(255, 64, 110, 0.8);
-    background: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
-    padding: 10px 20px;
-    border-radius: 10px;
-    animation: fadeIn 2s ease-in-out;
-    margin-bottom: 20px;
-}
-
-.subtitle {
-    font-size: 1.5em;
-    margin-top: 10px;
-    color: #ffbfd2;
-    text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.5);
-    background: rgba(0, 0, 0, 0.3); /* Semi-transparent background */
-    padding: 5px 15px;
-    border-radius: 10px;
-}
+            font-size: 3.5em;
+            font-family: 'Sacramento', cursive;
+            font-weight: normal;
+            text-shadow: 2px 4px 5px rgba(0, 0, 0, 0.6), 4px 8px 10px rgba(255, 64, 110, 0.8);
+            color: #ffffff;
+            animation: fadeIn 2s ease-in-out;
+            margin-bottom: 20px;
+        }
 
         .subtitle {
             font-size: 1.5em;
@@ -162,19 +147,19 @@
 
     <script>
         // High-quality image download
-document.getElementById('download-btn').addEventListener('click', function () {
-    const container = document.getElementById('wish-container');
-    html2canvas(container, {
-        scale: 4, // High resolution
-        useCORS: true,
-        backgroundColor: '#ff7b7b', // Ensure background is not transparent
-    }).then(canvas => {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'valentines_day_wish.png';
-        link.click();
-    });
-});
+        document.getElementById('download-btn').addEventListener('click', function () {
+            const container = document.getElementById('wish-container');
+            html2canvas(container, {
+                scale: 4,
+                useCORS: true,
+                backgroundColor: '#ff7b7b',
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = 'valentines_day_wish.png';
+                link.click();
+            });
+        });
 
         // Share as image functionality
         document.getElementById('share-btn').addEventListener('click', function () {
