@@ -6,41 +6,49 @@
     <title>Valentine's Day Wishes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Sacramento&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --dark-bg: #1e1e1e;
-            --dark-card: #2a2a2a;
-            --dark-text: #fff;
-            --light-bg: #ff7b7b;
-            --light-card: rgba(255, 255, 255, 0.8);
-            --light-text: #000;
+            --bg-light: #ff7b7b;
+            --bg-dark: #1c1c1c;
+            --text-light: white;
+            --text-dark: #f0f0f0;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: var(--light-bg);
+            background: var(--bg-light);
+            color: var(--text-light);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: var(--light-text);
             overflow: hidden;
-            transition: background 0.3s ease, color 0.3s ease;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-dark);
         }
 
         .container {
             text-align: center;
             position: relative;
             padding: 60px 40px;
-            background: var(--light-card);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             width: 80%;
             max-width: 600px;
             backdrop-filter: blur(10px);
-            transition: background 0.3s ease;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+
+        body.dark-mode .container {
+            background: rgba(0, 0, 0, 0.5);
         }
 
         h1 {
@@ -54,18 +62,32 @@
 
         .heart {
             position: absolute;
-            font-size: 1.5em; /* Smaller heart size */
-            animation: heartAnimation 6s ease-in-out infinite;
-            color: rgba(255, 100, 140, 0.7);
-            pointer-events: none;
+            font-size: 0.6em;
+            animation: heartAnimation 4s linear infinite;
+            color: rgba(255, 100, 140, 0.8);
         }
 
-        /* Randomly scattered hearts */
-        .heart:nth-child(1) { top: 10%; left: 20%; animation-duration: 3s; }
-        .heart:nth-child(2) { top: 25%; left: 50%; animation-duration: 4s; }
-        .heart:nth-child(3) { top: 40%; left: 30%; animation-duration: 5s; }
-        .heart:nth-child(4) { top: 60%; left: 70%; animation-duration: 4.5s; }
-        .heart:nth-child(5) { top: 80%; left: 10%; animation-duration: 3.5s; }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes heartAnimation {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(calc(50vw - 50%), calc(100vh - 50%)) scale(0.1);
+                opacity: 0;
+            }
+        }
 
         .button {
             margin-top: 40px;
@@ -87,81 +109,52 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
 
-        .toggle-mode {
-            position: fixed;
+        .toggle-dark-mode {
+            position: absolute;
             top: 20px;
             right: 20px;
-            padding: 10px 20px;
-            background: #ffffff90;
-            border-radius: 20px;
+            font-size: 1.5em;
             cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: background 0.3s ease;
+            color: var(--text-light);
+            transition: color 0.3s;
         }
 
-        .toggle-mode:hover {
-            background: #ffffff;
-        }
-
-        .signature {
-            margin-top: 20px;
-            font-size: 1em;
-            opacity: 0.8;
-        }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(-30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes heartAnimation {
-            0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-20px) scale(1.2); }
-            100% { transform: translateY(0) scale(1); }
-        }
-
-        /* Dark mode styles */
-        body.dark-mode {
-            background: var(--dark-bg);
-            color: var(--dark-text);
-        }
-
-        .container.dark-mode {
-            background: var(--dark-card);
+        body.dark-mode .toggle-dark-mode {
+            color: var(--text-dark);
         }
     </style>
 </head>
 <body>
-    <div class="toggle-mode" id="toggle-mode">Switch to Dark Mode</div>
+    <i class="fas fa-moon toggle-dark-mode" id="toggle-dark-mode"></i>
 
     <div class="container" id="wish-container">
         <h1>Happy Valentine's Day!</h1>
-        <div class="heart">❤️</div>
-        <div class="heart">❤️</div>
-        <div class="heart">❤️</div>
-        <div class="heart">❤️</div>
-        <div class="heart">❤️</div>
+        <!-- Hearts scattered -->
+        <div class="heart" style="top: 10%; left: 20%; animation-duration: 4s;"></div>
+        <div class="heart" style="top: 30%; left: 50%; animation-duration: 5s;"></div>
+        <div class="heart" style="top: 50%; left: 80%; animation-duration: 6s;"></div>
+        <div class="heart" style="top: 70%; left: 10%; animation-duration: 4.5s;"></div>
+        <div class="heart" style="top: 90%; left: 60%; animation-duration: 6.5s;"></div>
+
         <button class="button" id="download-btn">Download Greeting</button>
-        <p class="signature">#Manuraj #EmmanuelKirui</p>
     </div>
 
     <script>
-        // Dark mode toggle
-        const toggleModeBtn = document.getElementById('toggle-mode');
-        toggleModeBtn.addEventListener('click', () => {
+        // Toggle dark mode
+        const toggleButton = document.getElementById('toggle-dark-mode');
+        toggleButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            toggleModeBtn.textContent = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+            toggleButton.classList.toggle('fa-sun');
+            toggleButton.classList.toggle('fa-moon');
         });
 
-        // Download button functionality
+        // Button to download the image
         document.getElementById('download-btn').addEventListener('click', function () {
             const container = document.getElementById('wish-container');
             html2canvas(container, {
-                scale: 4,  // High-quality resolution
+                scale: 4, // High-quality resolution
                 useCORS: true,
-                backgroundColor: document.body.classList.contains('dark-mode') ? '#1e1e1e' : '#ff7b7b',
+                backgroundColor: getComputedStyle(document.body).backgroundColor, // Adjust based on theme
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
