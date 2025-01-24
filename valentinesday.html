@@ -60,10 +60,18 @@
             margin-bottom: 20px;
         }
 
+        .signature {
+            font-size: 1.2em;
+            margin-top: 10px;
+            font-weight: bold;
+            font-family: 'Sacramento', cursive;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
         .heart {
             position: absolute;
             font-size: 0.6em;
-            animation: heartAnimation 4s linear infinite;
+            animation: heartAnimation 5s linear infinite;
             color: rgba(255, 100, 140, 0.8);
         }
 
@@ -84,7 +92,7 @@
                 opacity: 1;
             }
             100% {
-                transform: translate(calc(50vw - 50%), calc(100vh - 50%)) scale(0.1);
+                transform: translate(calc(-50vw + 100%), calc(-50vh + 100%)) scale(0.1);
                 opacity: 0;
             }
         }
@@ -111,9 +119,9 @@
 
         .toggle-dark-mode {
             position: absolute;
-            top: 20px;
+            top: 10px;
             right: 20px;
-            font-size: 1.5em;
+            font-size: 2em;
             cursor: pointer;
             color: var(--text-light);
             transition: color 0.3s;
@@ -129,13 +137,13 @@
 
     <div class="container" id="wish-container">
         <h1>Happy Valentine's Day!</h1>
+        <p class="signature">#manuraj #emmanuelkirui</p>
         <!-- Hearts scattered -->
         <div class="heart" style="top: 10%; left: 20%; animation-duration: 4s;"></div>
         <div class="heart" style="top: 30%; left: 50%; animation-duration: 5s;"></div>
         <div class="heart" style="top: 50%; left: 80%; animation-duration: 6s;"></div>
         <div class="heart" style="top: 70%; left: 10%; animation-duration: 4.5s;"></div>
         <div class="heart" style="top: 90%; left: 60%; animation-duration: 6.5s;"></div>
-
         <button class="button" id="download-btn">Download Greeting</button>
     </div>
 
