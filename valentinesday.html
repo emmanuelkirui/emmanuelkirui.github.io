@@ -137,7 +137,7 @@
             <button id="toggle-mode" title="Toggle Dark/Light Mode"><i>🌙</i></button>
         </div>
         <h1>Happy Valentine's Day!</h1>
-        <p class="subtitle">With Love from <b>#Manuraj</b> & <b>#EmmanuelKirui</b></p>
+        <p class="subtitle">With 💖 from <b>#Manuraj#EmmanuelKirui</b></p>
         <div class="heart" style="top: 20%; left: 10%; animation-duration: 4s;">❤️</div>
         <div class="heart" style="top: 50%; left: 30%; animation-duration: 5s;">❤️</div>
         <div class="heart" style="top: 70%; left: 70%; animation-duration: 6s;">❤️</div>
@@ -147,38 +147,37 @@
 
     <script>
         // High-quality image download
-        document.getElementById('download-btn').addEventListener('click', function () {
-            const container = document.getElementById('wish-container');
-            html2canvas(container, {
-                scale: 4,
-                useCORS: true,
-                backgroundColor: '#ff7b7b',
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL('image/png');
-                link.download = 'valentines_day_wish.png';
-                link.click();
-            });
-        });
+document.getElementById('download-btn').addEventListener('click', function () {
+    const container = document.getElementById('wish-container');
+    html2canvas(container, {
+        scale: 4,
+        useCORS: true,
+        backgroundColor: '#ff406e', // Solid background color for download
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'valentines_day_wish.png';
+        link.click();
+    });
+});
 
-        // Share as image functionality
-        document.getElementById('share-btn').addEventListener('click', function () {
-            const container = document.getElementById('wish-container');
-            html2canvas(container, {
-                scale: 4,
-                useCORS: true,
-                backgroundColor: '#ff7b7b',
-            }).then(canvas => {
-                canvas.toBlob(blob => {
-                    const filesArray = [new File([blob], "valentines_day_wish.png", { type: "image/png" })];
-                    const shareData = {
-                        files: filesArray,
-                    };
-                    navigator.share(shareData).catch(console.error);
-                });
-            });
+// Share as image functionality
+document.getElementById('share-btn').addEventListener('click', function () {
+    const container = document.getElementById('wish-container');
+    html2canvas(container, {
+        scale: 4,
+        useCORS: true,
+        backgroundColor: '#ff406e', // Solid background color for sharing
+    }).then(canvas => {
+        canvas.toBlob(blob => {
+            const filesArray = [new File([blob], "valentines_day_wish.png", { type: "image/png" })];
+            const shareData = {
+                files: filesArray,
+            };
+            navigator.share(shareData).catch(console.error);
         });
-
+    });
+});
         // Toggle between dark and light modes
         document.getElementById('toggle-mode').addEventListener('click', function () {
             const body = document.body;
