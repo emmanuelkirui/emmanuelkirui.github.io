@@ -25,7 +25,7 @@
             text-align: center;
             position: relative;
             padding: 60px 40px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.6); /* Adjusted opacity to make it less transparent */
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             width: 80%;
@@ -39,7 +39,7 @@
             font-family: 'Sacramento', cursive;
             font-weight: normal;
             color: #ffffff;
-            text-shadow: 1px 2px 5px rgba(255, 64, 110, 0.9);
+            text-shadow: 2px 3px 6px rgba(255, 64, 110, 0.9); /* Improved text clarity */
             animation: fadeIn 2s ease-in-out;
             margin-bottom: 20px;
         }
@@ -153,6 +153,8 @@
                 scale: 4,
                 useCORS: true,
                 backgroundColor: '#ff406e', // Solid background color for download
+                logging: true,
+                letterRendering: true, // Ensures better text rendering
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
@@ -168,6 +170,8 @@
                 scale: 4,
                 useCORS: true,
                 backgroundColor: '#ff406e',
+                logging: true,
+                letterRendering: true,
             }).then(canvas => {
                 canvas.toBlob(blob => {
                     const filesArray = [new File([blob], "valentines_day_wish.png", { type: "image/png" })];
