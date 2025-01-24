@@ -70,9 +70,10 @@
 
         .heart {
             position: absolute;
-            font-size: 0.6em;
-            animation: heartAnimation 5s linear infinite;
+            font-size: 20px;
             color: rgba(255, 100, 140, 0.8);
+            animation: scatter 5s infinite ease-in-out;
+            opacity: 0;
         }
 
         @keyframes fadeIn {
@@ -86,13 +87,16 @@
             }
         }
 
-        @keyframes heartAnimation {
+        @keyframes scatter {
             0% {
-                transform: translate(0, 0) scale(1);
+                transform: scale(0.5) translate(0, 0);
+                opacity: 0;
+            }
+            50% {
                 opacity: 1;
             }
             100% {
-                transform: translate(calc(-50vw + 100%), calc(-50vh + 100%)) scale(0.1);
+                transform: scale(1.2) translate(calc(100px - 50%), calc(-200px + 50%));
                 opacity: 0;
             }
         }
@@ -139,15 +143,31 @@
         <h1>Happy Valentine's Day!</h1>
         <p class="signature">#manuraj #emmanuelkirui</p>
         <!-- Hearts scattered -->
-        <div class="heart" style="top: 10%; left: 20%; animation-duration: 4s;"></div>
-        <div class="heart" style="top: 30%; left: 50%; animation-duration: 5s;"></div>
-        <div class="heart" style="top: 50%; left: 80%; animation-duration: 6s;"></div>
-        <div class="heart" style="top: 70%; left: 10%; animation-duration: 4.5s;"></div>
-        <div class="heart" style="top: 90%; left: 60%; animation-duration: 6.5s;"></div>
+        <div class="heart" style="top: 10%; left: 20%;"></div>
+        <div class="heart" style="top: 30%; left: 50%;"></div>
+        <div class="heart" style="top: 50%; left: 80%;"></div>
+        <div class="heart" style="top: 70%; left: 10%;"></div>
+        <div class="heart" style="top: 90%; left: 60%;"></div>
         <button class="button" id="download-btn">Download Greeting</button>
     </div>
 
     <script>
+        // Generate animated hearts dynamically
+        function createHearts() {
+            const container = document.querySelector('.container');
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.textContent = '❤️';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDuration = Math.random() * 2 + 3 + 's';
+                container.appendChild(heart);
+            }
+        }
+
+        createHearts();
+
         // Toggle dark mode
         const toggleButton = document.getElementById('toggle-dark-mode');
         toggleButton.addEventListener('click', () => {
