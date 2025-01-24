@@ -7,29 +7,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Sacramento&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --dark-bg: #1e1e1e;
+            --dark-card: #2a2a2a;
+            --dark-text: #fff;
+            --light-bg: #ff7b7b;
+            --light-card: rgba(255, 255, 255, 0.8);
+            --light-text: #000;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #ff7b7b, #ff406e); /* Smooth gradient background */
+            background: var(--light-bg);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            color: white;
+            color: var(--light-text);
             overflow: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
         }
+
         .container {
             text-align: center;
             position: relative;
             padding: 60px 40px;
-            background: rgba(0, 0, 0, 0.3);
+            background: var(--light-card);
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             width: 80%;
             max-width: 600px;
             backdrop-filter: blur(10px);
+            transition: background 0.3s ease;
         }
+
         h1 {
             font-size: 3.5em;
             font-family: 'Sacramento', cursive;
@@ -38,37 +51,22 @@
             animation: fadeIn 2s ease-in-out;
             margin-bottom: 20px;
         }
+
         .heart {
             position: absolute;
-            font-size: 6em;
-            animation: heartAnimation 4s ease-in-out infinite alternate;
+            font-size: 1.5em; /* Smaller heart size */
+            animation: heartAnimation 6s ease-in-out infinite;
             color: rgba(255, 100, 140, 0.7);
+            pointer-events: none;
         }
-        .heart:nth-child(1) {
-            top: 40px;
-            left: 50px;
-            animation-duration: 2.5s;
-        }
-        .heart:nth-child(2) {
-            top: 100px;
-            left: 200px;
-            animation-duration: 3s;
-        }
-        .heart:nth-child(3) {
-            top: 150px;
-            left: 350px;
-            animation-duration: 3.5s;
-        }
-        .heart:nth-child(4) {
-            top: 80px;
-            right: 70px;
-            animation-duration: 2.8s;
-        }
-        .heart:nth-child(5) {
-            top: 180px;
-            right: 120px;
-            animation-duration: 3s;
-        }
+
+        /* Randomly scattered hearts */
+        .heart:nth-child(1) { top: 10%; left: 20%; animation-duration: 3s; }
+        .heart:nth-child(2) { top: 25%; left: 50%; animation-duration: 4s; }
+        .heart:nth-child(3) { top: 40%; left: 30%; animation-duration: 5s; }
+        .heart:nth-child(4) { top: 60%; left: 70%; animation-duration: 4.5s; }
+        .heart:nth-child(5) { top: 80%; left: 10%; animation-duration: 3.5s; }
+
         .button {
             margin-top: 40px;
             padding: 15px 30px;
@@ -82,32 +80,60 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
+
         .button:hover {
             background-color: #ff2a4a;
             transform: translateY(-4px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+
+        .toggle-mode {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #ffffff90;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease;
         }
+
+        .toggle-mode:hover {
+            background: #ffffff;
+        }
+
+        .signature {
+            margin-top: 20px;
+            font-size: 1em;
+            opacity: 0.8;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         @keyframes heartAnimation {
-            0% {
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                transform: translateY(-50px) scale(1.2);
-            }
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.2); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        .container.dark-mode {
+            background: var(--dark-card);
         }
     </style>
 </head>
 <body>
+    <div class="toggle-mode" id="toggle-mode">Switch to Dark Mode</div>
 
     <div class="container" id="wish-container">
         <h1>Happy Valentine's Day!</h1>
@@ -117,16 +143,25 @@
         <div class="heart">❤️</div>
         <div class="heart">❤️</div>
         <button class="button" id="download-btn">Download Greeting</button>
+        <p class="signature">#Manuraj #EmmanuelKirui</p>
     </div>
 
     <script>
-        // Button to download the image
+        // Dark mode toggle
+        const toggleModeBtn = document.getElementById('toggle-mode');
+        toggleModeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            toggleModeBtn.textContent = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+        });
+
+        // Download button functionality
         document.getElementById('download-btn').addEventListener('click', function () {
             const container = document.getElementById('wish-container');
             html2canvas(container, {
-                scale: 4,  // High-quality resolution for crisp image
+                scale: 4,  // High-quality resolution
                 useCORS: true,
-                backgroundColor: '#ff7b7b',  // Valentine background color for proper capture
+                backgroundColor: document.body.classList.contains('dark-mode') ? '#1e1e1e' : '#ff7b7b',
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
@@ -135,6 +170,5 @@
             });
         });
     </script>
-
 </body>
 </html>
