@@ -83,20 +83,18 @@
         }
 
         h1 {
-            font-size: 3.5em;
+            font-size: 4em;
             font-family: 'Sacramento', cursive;
-            font-weight: normal;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
-            animation: fadeIn 2s ease-in-out;
+            font-weight: bold;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(255, 255, 255, 0.5);
             margin-bottom: 20px;
         }
 
         .signature {
-            font-size: 1.2em;
-            margin-top: 10px;
+            font-size: 1.5em;
             font-weight: bold;
             font-family: 'Sacramento', cursive;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
         }
 
         .heart {
@@ -105,17 +103,6 @@
             color: rgba(255, 100, 140, 0.8);
             animation: scatter 5s infinite ease-in-out;
             opacity: 0;
-        }
-
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
         }
 
         @keyframes scatter {
@@ -145,7 +132,7 @@
         </div>
         <h1>Happy Valentine's Day!</h1>
         <p class="signature">#manuraj #emmanuelkirui</p>
-        <!-- Hearts scattered -->
+        <!-- Animated hearts -->
         <div class="heart" style="top: 10%; left: 20%;"></div>
         <div class="heart" style="top: 30%; left: 50%;"></div>
         <div class="heart" style="top: 50%; left: 80%;"></div>
@@ -185,25 +172,28 @@
             });
         });
 
-        // Share button functionality
-        document.getElementById('share-btn').addEventListener('click', async function () {
-            const text = "Happy Valentine's Day! 💖 #manuraj #emmanuelkirui";
-            const url = location.href;
-
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: "Valentine's Day Wish",
-                        text: text,
-                        url: url,
-                    });
-                    alert("Wish shared successfully!");
-                } catch (err) {
-                    alert("Could not share the wish.");
-                }
-            } else {
-                alert("Sharing is not supported on this browser.");
-            }
+        // Share button functionality (share as image)
+        document.getElementById('share-btn').addEventListener('click', function () {
+            const container = document.getElementById('wish-container');
+            html2canvas(container, {
+                scale: 5, // High-quality resolution
+                useCORS: true,
+                backgroundColor: getComputedStyle(document.body).backgroundColor,
+            }).then(canvas => {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], "valentines_day_wish.png", { type: "image/png" });
+                    const filesArray = [file];
+                    if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+                        navigator.share({
+                            files: filesArray,
+                            title: "Valentine's Day Wish",
+                            text: "Happy Valentine's Day! 💖",
+                        });
+                    } else {
+                        alert("Sharing is not supported on this browser.");
+                    }
+                });
+            });
         });
     </script>
 </body>
