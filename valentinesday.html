@@ -6,164 +6,139 @@
     <title>Valentine's Day Wishes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Sacramento&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --bg-light: #ff7b7b;
-            --bg-dark: #1c1c1c;
-            --text-light: white;
-            --text-dark: #f0f0f0;
+            --primary-bg: linear-gradient(135deg, #ff7b7b, #ff406e);
+            --primary-color: white;
+            --button-bg: #ff406e;
+            --button-hover: #ff2a4a;
+        }
+
+        [data-theme="dark"] {
+            --primary-bg: linear-gradient(135deg, #222, #333);
+            --primary-color: #ddd;
+            --button-bg: #444;
+            --button-hover: #666;
         }
 
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background: var(--bg-light);
-            color: var(--text-light);
+            background: var(--primary-bg);
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            color: var(--primary-color);
             overflow: hidden;
             transition: background 0.3s, color 0.3s;
-        }
-
-        body.dark-mode {
-            background: var(--bg-dark);
-            color: var(--text-dark);
         }
 
         .container {
             text-align: center;
             position: relative;
-            padding: 40px 30px 60px;
-            background: rgba(255, 255, 255, 0.2);
+            padding: 60px 40px;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            width: 90%;
+            width: 80%;
             max-width: 600px;
             backdrop-filter: blur(10px);
-            transition: background 0.3s, box-shadow 0.3s;
         }
 
-        body.dark-mode .container {
-            background: rgba(0, 0, 0, 0.5);
+        h1 {
+            font-size: 3.5em;
+            font-family: 'Sacramento', cursive;
+            font-weight: normal;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+            margin-bottom: 20px;
         }
 
-        .top-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .heart {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
+            font-size: 6em;
+            animation: heartAnimation 4s ease-in-out infinite alternate;
+            color: rgba(255, 100, 140, 0.7);
         }
 
-        .top-buttons button {
-            background-color: #ff406e;
+        .button {
+            margin-top: 40px;
+            padding: 15px 30px;
+            background-color: var(--button-bg);
             color: white;
             border: none;
-            border-radius: 20px;
-            padding: 10px 15px;
-            font-size: 1em;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .top-buttons button:hover {
-            background-color: #ff2a4a;
-            transform: translateY(-2px);
+        .button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-4px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
 
-        h1 {
-            font-size: 4em;
-            font-family: 'Sacramento', cursive;
-            font-weight: bold;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7), -2px -2px 5px rgba(255, 255, 255, 0.5);
-            margin-bottom: 20px;
-        }
-
-        .signature {
-            font-size: 1.5em;
-            font-weight: bold;
-            font-family: 'Sacramento', cursive;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
-        }
-
-        .heart {
+        #toggle-theme {
             position: absolute;
-            font-size: 20px;
-            color: rgba(255, 100, 140, 0.8);
-            animation: scatter 5s infinite ease-in-out;
-            opacity: 0;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: var(--primary-color);
+            transition: color 0.3s;
         }
 
-        @keyframes scatter {
+        @keyframes heartAnimation {
             0% {
-                transform: scale(0.5) translate(0, 0);
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
+                transform: translateY(0) scale(1);
             }
             100% {
-                transform: scale(1.2) translate(calc(100px - 50%), calc(-200px + 50%));
-                opacity: 0;
+                transform: translateY(-50px) scale(1.2);
             }
         }
     </style>
 </head>
 <body>
+
+    <button id="toggle-theme" title="Toggle Dark/Light Mode">🌙</button>
+
     <div class="container" id="wish-container">
-        <div class="top-buttons">
-            <button id="download-btn">
-                <i class="fas fa-download"></i> Download
-            </button>
-            <button id="share-btn">
-                <i class="fas fa-share"></i> Share
-            </button>
-        </div>
         <h1>Happy Valentine's Day!</h1>
-        <p class="signature">#manuraj #emmanuelkirui</p>
-        <!-- Animated hearts -->
-        <div class="heart" style="top: 10%; left: 20%;"></div>
-        <div class="heart" style="top: 30%; left: 50%;"></div>
-        <div class="heart" style="top: 50%; left: 80%;"></div>
-        <div class="heart" style="top: 70%; left: 10%;"></div>
-        <div class="heart" style="top: 90%; left: 60%;"></div>
+        <div class="heart">❤️</div>
+        <div class="heart">❤️</div>
+        <div class="heart">❤️</div>
+        <div class="heart">❤️</div>
+        <div class="heart">❤️</div>
+        <button class="button" id="download-btn">Download Greeting</button>
     </div>
 
     <script>
-        // Generate animated hearts dynamically
-        function createHearts() {
-            const container = document.querySelector('.container');
-            for (let i = 0; i < 20; i++) {
-                const heart = document.createElement('div');
-                heart.classList.add('heart');
-                heart.textContent = '❤️';
-                heart.style.left = Math.random() * 100 + '%';
-                heart.style.top = Math.random() * 100 + '%';
-                heart.style.animationDuration = Math.random() * 2 + 3 + 's';
-                container.appendChild(heart);
+        // Toggle Dark/Light Mode
+        const toggleButton = document.getElementById('toggle-theme');
+        toggleButton.addEventListener('click', () => {
+            const currentTheme = document.body.dataset.theme;
+            if (currentTheme === 'dark') {
+                document.body.removeAttribute('data-theme');
+                toggleButton.textContent = '🌙'; // Dark mode icon
+            } else {
+                document.body.setAttribute('data-theme', 'dark');
+                toggleButton.textContent = '☀️'; // Light mode icon
             }
-        }
+        });
 
-        createHearts();
-
-        // Download button functionality
+        // Download as Image
         document.getElementById('download-btn').addEventListener('click', function () {
             const container = document.getElementById('wish-container');
             html2canvas(container, {
-                scale: 5, // High-quality resolution
+                scale: 4,  // High-quality resolution
                 useCORS: true,
-                backgroundColor: getComputedStyle(document.body).backgroundColor,
+                backgroundColor: document.body.dataset.theme === 'dark' ? '#222' : '#ff7b7b',
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
@@ -171,30 +146,7 @@
                 link.click();
             });
         });
-
-        // Share button functionality (share as image)
-        document.getElementById('share-btn').addEventListener('click', function () {
-            const container = document.getElementById('wish-container');
-            html2canvas(container, {
-                scale: 5, // High-quality resolution
-                useCORS: true,
-                backgroundColor: getComputedStyle(document.body).backgroundColor,
-            }).then(canvas => {
-                canvas.toBlob(blob => {
-                    const file = new File([blob], "valentines_day_wish.png", { type: "image/png" });
-                    const filesArray = [file];
-                    if (navigator.canShare && navigator.canShare({ files: filesArray })) {
-                        navigator.share({
-                            files: filesArray,
-                            title: "Valentine's Day Wish",
-                            text: "Happy Valentine's Day! 💖",
-                        });
-                    } else {
-                        alert("Sharing is not supported on this browser.");
-                    }
-                });
-            });
-        });
     </script>
+
 </body>
 </html>
