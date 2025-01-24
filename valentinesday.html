@@ -37,11 +37,11 @@
         .container {
             text-align: center;
             position: relative;
-            padding: 60px 40px;
+            padding: 40px 30px 60px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            width: 80%;
+            width: 90%;
             max-width: 600px;
             backdrop-filter: blur(10px);
             transition: background 0.3s, box-shadow 0.3s;
@@ -49,6 +49,37 @@
 
         body.dark-mode .container {
             background: rgba(0, 0, 0, 0.5);
+        }
+
+        .top-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+        }
+
+        .top-buttons button {
+            background-color: #ff406e;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .top-buttons button:hover {
+            background-color: #ff2a4a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
 
         h1 {
@@ -100,46 +131,18 @@
                 opacity: 0;
             }
         }
-
-        .button {
-            margin-top: 40px;
-            padding: 15px 30px;
-            background-color: #ff406e;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.2em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .button:hover {
-            background-color: #ff2a4a;
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-        }
-
-        .toggle-dark-mode {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 2em;
-            cursor: pointer;
-            color: var(--text-light);
-            transition: color 0.3s;
-        }
-
-        body.dark-mode .toggle-dark-mode {
-            color: var(--text-dark);
-        }
     </style>
 </head>
 <body>
-    <i class="fas fa-moon toggle-dark-mode" id="toggle-dark-mode"></i>
-
     <div class="container" id="wish-container">
+        <div class="top-buttons">
+            <button id="download-btn">
+                <i class="fas fa-download"></i> Download
+            </button>
+            <button id="share-btn">
+                <i class="fas fa-share"></i> Share
+            </button>
+        </div>
         <h1>Happy Valentine's Day!</h1>
         <p class="signature">#manuraj #emmanuelkirui</p>
         <!-- Hearts scattered -->
@@ -148,7 +151,6 @@
         <div class="heart" style="top: 50%; left: 80%;"></div>
         <div class="heart" style="top: 70%; left: 10%;"></div>
         <div class="heart" style="top: 90%; left: 60%;"></div>
-        <button class="button" id="download-btn">Download Greeting</button>
     </div>
 
     <script>
@@ -168,27 +170,40 @@
 
         createHearts();
 
-        // Toggle dark mode
-        const toggleButton = document.getElementById('toggle-dark-mode');
-        toggleButton.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            toggleButton.classList.toggle('fa-sun');
-            toggleButton.classList.toggle('fa-moon');
-        });
-
-        // Button to download the image
+        // Download button functionality
         document.getElementById('download-btn').addEventListener('click', function () {
             const container = document.getElementById('wish-container');
             html2canvas(container, {
-                scale: 4, // High-quality resolution
+                scale: 5, // High-quality resolution
                 useCORS: true,
-                backgroundColor: getComputedStyle(document.body).backgroundColor, // Adjust based on theme
+                backgroundColor: getComputedStyle(document.body).backgroundColor,
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.href = canvas.toDataURL('image/png');
                 link.download = 'valentines_day_wish.png';
                 link.click();
             });
+        });
+
+        // Share button functionality
+        document.getElementById('share-btn').addEventListener('click', async function () {
+            const text = "Happy Valentine's Day! 💖 #manuraj #emmanuelkirui";
+            const url = location.href;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: "Valentine's Day Wish",
+                        text: text,
+                        url: url,
+                    });
+                    alert("Wish shared successfully!");
+                } catch (err) {
+                    alert("Could not share the wish.");
+                }
+            } else {
+                alert("Sharing is not supported on this browser.");
+            }
         });
     </script>
 </body>
