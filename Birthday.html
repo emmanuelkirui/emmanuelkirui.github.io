@@ -3,130 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Wishes</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Great+Vibes&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Birthday Wishes Generator</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sacramento&display=swap');
-
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
             margin: 0;
-            text-align: center;
-            background: linear-gradient(135deg, #ffecd2, #fcb69f);
-            color: #4b2e83;
+            padding: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(12px);
-            border-radius: 15px;
-            padding: 30px;
             width: 90%;
-            max-width: 600px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 10px 0;
         }
 
-        .title {
-            font-family: 'Great Vibes', cursive;
-            font-size: 3.5em;
-            color: #e74c3c;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.4);
+        .input-container, .wishes-container {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
         }
 
         label {
-            font-weight: bold;
-            font-size: 1.2em;
             display: block;
-            margin-bottom: 8px;
-            text-align: left;
+            margin: 10px 0 5px;
+            font-weight: bold;
         }
 
-        input[type="text"],
-        input[type="date"],
-        input[type="file"] {
+        input, button {
             width: 100%;
             padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
         }
 
-        .button {
-            padding: 12px 25px;
-            background: #e74c3c;
+        button {
+            background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 25px;
-            font-size: 1.2em;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
         }
 
-        .button:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        button:hover {
+            background-color: #45a049;
         }
 
-        .output-container {
-            position: relative;
+        .uploaded-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .output {
-            margin-top: 20px;
-            font-family: 'Sacramento', cursive;
-            font-size: 2.5em;
-            color: #4b2e83;
-            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
-        }
-
-        .decorations {
-            margin-top: 20px;
-            font-size: 2em;
-            color: #e74c3c;
-        }
-
-        .decorations span {
-            margin: 0 10px;
-            animation: float 2s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .icon-bar {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-
-        .icon-bar button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #4b2e83;
-            font-size: 1.5em;
-            transition: transform 0.3s ease;
-            margin-left: 10px;
-        }
-
-        .icon-bar button:hover {
-            transform: scale(1.2);
+        #output {
+            text-align: center;
+            font-size: 18px;
+            padding: 20px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
 
         .hidden {
@@ -135,73 +86,90 @@
     </style>
 </head>
 <body>
-    <!-- Input Container -->
     <div class="container">
-        <div class="title">🎉 Create Birthday Wishes 🎉</div>
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" id="name" placeholder="Enter Name">
-        </div>
-        <div class="form-group">
-            <label for="date">Date of Birthday</label>
+        <h2>Birthday Wishes Generator</h2>
+        <div class="input-container">
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter the name">
+            
+            <label for="date">Date:</label>
             <input type="date" id="date">
+            
+            <label for="venue">Venue:</label>
+            <input type="text" id="venue" placeholder="Enter the venue">
+            
+            <label for="image">Upload an image:</label>
+            <input type="file" id="image" accept="image/*">
+            
+            <label for="wishes">Wishes from:</label>
+            <input type="text" id="wishes" value="#manuraj#emmanuelkirui" placeholder="Enter your wishes (default: #manuraj#emmanuelkirui)">
+            
+            <button onclick="generateWishes()">Generate Wishes</button>
         </div>
-        <div class="form-group">
-            <label for="venue">Venue</label>
-            <input type="text" id="venue" placeholder="Enter Venue">
-        </div>
-        <div class="form-group">
-            <label for="image">Upload Image</label>
-            <input type="file" id="image">
-        </div>
-        <button class="button" onclick="generateWishes()">Generate Wishes</button>
-    </div>
-
-    <!-- Wishes Display Container -->
-    <div class="container output-container hidden" id="wishes-container">
-        <div class="icon-bar">
-            <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
-        </div>
-        <div class="output" id="output"></div>
-        <div class="decorations">
-            <span>❤️</span>
-            <span>🌸</span>
-            <span>🎂</span>
-            <span>🎁</span>
-            <span>🌼</span>
+        
+        <div id="wishes-container" class="wishes-container hidden">
+            <div id="output"></div>
+            <button onclick="downloadAsImage()">Download as Image</button>
+            <button onclick="shareAsImage()">Share as Image</button>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         function generateWishes() {
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
             const venue = document.getElementById("venue").value;
+            const wishesFrom = document.getElementById("wishes").value;
+            const imageInput = document.getElementById("image");
+            const outputContainer = document.getElementById("wishes-container");
+            const output = document.getElementById("output");
 
             if (name && date && venue) {
-                const outputContainer = document.getElementById("wishes-container");
-                const output = document.getElementById("output");
+                let imageTag = "";
+                if (imageInput.files && imageInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        // Convert uploaded image to base64
+                        imageTag = `<img src="${e.target.result}" alt="Uploaded Image" class="uploaded-image" />`;
+                        renderOutput();
+                    };
+                    reader.readAsDataURL(imageInput.files[0]);
+                } else {
+                    renderOutput();
+                }
 
-                output.innerHTML = `
-                    🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!`;
-
-                outputContainer.classList.remove("hidden");
+                function renderOutput() {
+                    output.innerHTML = `
+                        ${imageTag}
+                        🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
+                        🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!<br>
+                        <br> <em>Wishes from: ${wishesFrom}</em>`;
+                    outputContainer.classList.remove("hidden");
+                }
             } else {
                 alert("Please fill out all fields before generating wishes.");
             }
         }
 
-        // Download wishes container as image
-        document.getElementById("download-btn").addEventListener("click", () => {
-            const wishesContainer = document.getElementById("wishes-container");
-            html2canvas(wishesContainer).then(canvas => {
+        function downloadAsImage() {
+            const wishesContainer = document.getElementById("output");
+            html2canvas(wishesContainer).then((canvas) => {
                 const link = document.createElement("a");
-                link.download = "birthday-wishes.png";
+                link.download = "birthday_wishes.png";
                 link.href = canvas.toDataURL("image/png");
                 link.click();
             });
-        });
+        }
+
+        function shareAsImage() {
+            const wishesContainer = document.getElementById("output");
+            html2canvas(wishesContainer).then((canvas) => {
+                const dataUrl = canvas.toDataURL("image/png");
+                const newWindow = window.open();
+                newWindow.document.write('<img src="' + dataUrl + '" alt="Birthday Wishes" />');
+            });
+        }
     </script>
 </body>
 </html>
