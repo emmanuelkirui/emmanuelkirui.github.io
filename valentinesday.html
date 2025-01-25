@@ -18,10 +18,6 @@
             --text-dark: #ecf0f1;
             --container-light: rgba(255, 255, 255, 0.3);
             --container-dark: rgba(44, 62, 80, 0.7);
-            --quote-light: #2c3e50; /* Quote color for light theme */
-            --quote-dark: #ecf0f1; /* Quote color for dark theme */
-            --signature-light: #34495e; /* Signature color for light theme */
-            --signature-dark: #bdc3c7; /* Signature color for dark theme */
         }
 
         body {
@@ -48,7 +44,7 @@
             width: 100%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
-            margin-top: 80px;
+            margin-top: 80px; /* To create space for the input and button */
         }
 
         .quote {
@@ -57,7 +53,7 @@
             margin: 20px;
             text-align: center;
             font-family: 'Georgia', serif;
-            color: var(--quote-light);
+            color: var(--text-dark);
             text-shadow: 2px 2px 0px var(--text-light), 4px 4px 5px rgba(0, 0, 0, 0.3),
                          6px 6px 10px rgba(0, 0, 0, 0.5), 10px 10px 20px rgba(0, 0, 0, 0.7);
             letter-spacing: 2px;
@@ -69,28 +65,11 @@
             margin-top: 10px;
             text-align: center;
             font-family: 'Courier New', Courier, monospace;
-            color: var(--signature-light);
+            color: var(--text-dark);
             text-shadow: 2px 2px 0px var(--text-light), 4px 4px 5px rgba(0, 0, 0, 0.3),
                          6px 6px 10px rgba(0, 0, 0, 0.5), 8px 8px 15px rgba(0, 0, 0, 0.7);
             letter-spacing: 2px;
             transition: text-shadow 0.3s ease, color 0.3s ease;
-        }
-
-        /* Dark Mode adjustments */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: var(--bg-dark);
-                color: var(--text-dark);
-            }
-            .container {
-                background: var(--container-dark);
-            }
-            .quote {
-                color: var(--quote-dark);
-            }
-            .signature {
-                color: var(--signature-dark);
-            }
         }
 
 
