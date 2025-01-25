@@ -127,7 +127,10 @@
                 transform: translate(-30px, -100px);
             }
         }
-
+        .dark-mode {
+            background: linear-gradient(135deg, #1e1e1e, #343434);
+            color: #ddd;
+        }
         .button {
             margin-top: 40px;
             padding: 15px 30px;
@@ -146,38 +149,45 @@
             background-color: #ff2a4a;
             transform: translateY(-4px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-        }
 
-        .dark-mode {
-            background: linear-gradient(135deg, #1e1e1e, #343434);
-            color: #ddd;
-        }
+    /* Input and button section */
+    .input-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 20px; /* space between input and container content */
+    }
 
-        /* Input and button section */
-        .input-section {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            margin-bottom: 20px;
-            position: absolute;
-            top: 20px; /* Align at the top of the container */
-            left: 50%;
-            transform: translateX(-50%);
-        }
+    /* Input field style */
+    #name-input {
+        padding: 8px 12px;
+        font-size: 1em;
+        margin-right: 10px;
+        border-radius: 5px;
+        width: 50%; /* reduced width for a more balanced look */
+        border: 2px solid #ddd;
+        transition: border-color 0.3s ease;
+    }
 
-        /* Input field style */
-        #name-input {
-            padding: 10px;
-            font-size: 1.2em;
-            margin-top: 0;
-            margin-right: 10px;
-            border-radius: 5px;
-            width: 60%;
-            border: 2px solid #ddd;
-            transition: border-color 0.3s ease;
-        }
+    /* Submit button style */
+    .button {
+        padding: 8px 20px;
+        font-size: 1em;
+        background-color: #ff406e;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .button:hover {
+        background-color: #ff2a4a;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
 
     </style>
 </head>
