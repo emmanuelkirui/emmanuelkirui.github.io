@@ -49,11 +49,28 @@
             font-weight: bold;
         }
 
-        .quote {
-            font-style: italic;
-            margin: 20px 0;
-            font-size: 1.5em;
-        }
+        
+.quote {
+  font-style: italic;
+  font-size: 2em;
+  margin: 20px;
+  color: #ffffff;
+  text-align: center;
+  padding: 20px 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+}
+
+.quote::before, 
+.quote::after {
+  content: '"';
+  color: #ff6b6b;
+  font-size: 1.5em;
+}
 
         .info {
             font-size: 1.2em;
