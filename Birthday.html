@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Wishes</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Sacramento&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            --bg-dark: linear-gradient(135deg, #2c3e50, #34495e);
+            --text-light: #333;
+            --text-dark: #ecf0f1;
+            --container-light: rgba(255, 255, 255, 0.7);
+            --container-dark: rgba(44, 62, 80, 0.7);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            background: var(--bg-light);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.5s, color 0.5s;
+        }
+
+        .container {
+            background: var(--container-light);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            margin-top: 80px;
+        }
+
+        .quote {
+            font-style: italic;
+            font-size: 2em;
+            margin: 20px;
+            color: var(--text-dark);
+        }
+
+        .info {
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: absolute;
+            top: 20px;
+            width: 100%;
+        }
+
+        .input-section input, .input-section button {
+            padding: 10px;
+            font-size: 1em;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .button {
+            background-color: #74b9ff;
+            color: white;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #0984e3;
+            transform: translateY(-3px);
+        }
+
+        .icon-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .icon-bar button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .icon-bar button:hover {
+            transform: scale(1.2);
+        }
+
+        .dark-mode {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="input-section">
+        <input type="text" id="name-input" placeholder="Enter Name">
+        <input type="date" id="date-input" placeholder="Enter Birthday Date">
+        <input type="text" id="venue-input" placeholder="Enter Venue">
+        <input type="file" id="image-input" accept="image/*">
+        <button onclick="updateGreeting()" class="button">Generate Birthday Wish</button>
+    </div>
+
+    <div class="container" id="wish-container">
+        <div class="icon-bar">
+            <button id="download-btn" title="Download">📥</button>
+            <button id="share-btn" title="Share">🔗</button>
+            <button id="toggle-mode" title="Toggle Dark/Light Mode">🌙</button>
+        </div>
+        <div class="quote" id="greeting-message">Happy Birthday!</div>
+        <div class="info" id="birthday-info"></div>
+        <div id="uploaded-image"></div>
+    </div>
+
+    <script>
+        function updateGreeting() {
+            const name = document.getElementById("name-input").value;
+            const date = document.getElementById("date-input").value;
+            const venue = document.getElementById("venue-input").value;
+            const imageInput = document.getElementById("image-input").files[0];
+            
+            const message = document.getElementById("greeting-message");
+            const info = document.getElementById("birthday-info");
+            const uploadedImage = document.getElementById("uploaded-image");
+
+            message.textContent = name ? `Happy Birthday, ${name}!` : "Happy Birthday!";
+            info.innerHTML = `
+                ${date ? `Date: ${new Date(date).toDateString()}<br>` : ""}
+                ${venue ? `Venue: ${venue}` : ""}
+            `;
+
+            if (imageInput) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImage.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image" style="max-width: 100%; border-radius: 10px; margin-top: 20px;">`;
+                };
+                reader.readAsDataURL(imageInput);
+            } else {
+                uploadedImage.innerHTML = "";
+            }
+        }
+
+        document.getElementById("toggle-mode").addEventListener("click", function () {
+            document.body.classList.toggle("dark-mode");
+            this.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+        });
+
+        document.getElementById("download-btn").addEventListener("click", () => {
+            const container = document.getElementById("wish-container");
+            html2canvas(container).then(canvas => {
+                const link = document.createElement("a");
+                link.download = "birthday-wish.png";
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        });
+
+        document.getElementById("share-btn").addEventListener("click", () => {
+            alert("Sharing is not fully implemented in this example.");
+        });
+    </script>
+</body>
+</html>
