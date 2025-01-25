@@ -79,8 +79,6 @@
 
         .output-container {
             position: relative;
-            text-align: center;
-            width: 100%;
         }
 
         .output {
@@ -89,8 +87,6 @@
             font-size: 2.5em;
             color: #4b2e83;
             text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
-            z-index: 2;
-            position: relative;
         }
 
         .decorations {
@@ -136,20 +132,6 @@
         .hidden {
             display: none;
         }
-
-        #uploaded-image {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            object-fit: cover;
-            filter: blur(8px);
-            z-index: 1;
-        }
     </style>
 </head>
 <body>
@@ -158,7 +140,7 @@
         <div class="title">🎉 Create Birthday Wishes 🎉</div>
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" id="name" value="#manuraj#" placeholder="Enter Name">
+            <input type="text" id="name" placeholder="Enter Name">
         </div>
         <div class="form-group">
             <label for="date">Date of Birthday</label>
@@ -170,11 +152,7 @@
         </div>
         <div class="form-group">
             <label for="image">Upload Image</label>
-            <input type="file" id="image" accept="image/*">
-        </div>
-        <div class="form-group">
-            <label for="wishes">Personalized Wishes (from #manuraj#emmanuelkirui)</label>
-            <input type="text" id="wishes" value="#emmanuelkirui" placeholder="Enter your personalized wishes">
+            <input type="file" id="image">
         </div>
         <button class="button" onclick="generateWishes()">Generate Wishes</button>
     </div>
@@ -182,11 +160,10 @@
     <!-- Wishes Display Container -->
     <div class="container output-container hidden" id="wishes-container">
         <div class="icon-bar">
-            <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
-            <button id="share-btn" title="Share"><i class="fa fa-share-alt"></i></button>
-        </div>
+    <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
+    <button id="share-btn" title="Share as Image"><i class="fa fa-share-alt"></i></button>
+</div>
         <div class="output" id="output"></div>
-        <div id="uploaded-image-container"></div>
         <div class="decorations">
             <span>❤️</span>
             <span>🌸</span>
@@ -201,31 +178,14 @@
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
             const venue = document.getElementById("venue").value;
-            const wishes = document.getElementById("wishes").value;
-            const image = document.getElementById("image").files[0];
-            const imageContainer = document.getElementById("uploaded-image-container");
 
-            if (name && date && venue && wishes) {
+            if (name && date && venue) {
                 const outputContainer = document.getElementById("wishes-container");
                 const output = document.getElementById("output");
 
-                // Set the wishes text
                 output.innerHTML = `
                     🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> 
-                    ${wishes} <br> Have a fantastic day!`;
-
-                // Display the uploaded image
-                if (image) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const img = document.createElement("img");
-                        img.src = e.target.result;
-                        img.id = "uploaded-image";
-                        imageContainer.appendChild(img);
-                    };
-                    reader.readAsDataURL(image);
-                }
+                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!`;
 
                 outputContainer.classList.remove("hidden");
             } else {
@@ -243,27 +203,30 @@
                 link.click();
             });
         });
+        // Share wishes container as an image
+document.getElementById("share-btn").addEventListener("click", () => {
+    const wishesContainer = document.getElementById("wishes-container");
 
-        // Share wishes container as image (or other share method)
-        document.getElementById("share-btn").addEventListener("click", () => {
-            const wishesContainer = document.getElementById("wishes-container");
-            html2canvas(wishesContainer).then(canvas => {
-                const imgData = canvas.toDataURL("image/png");
-                const shareData = {
-                    title: 'Happy Birthday Wishes',
-                    text: 'Check out these personalized birthday wishes!',
-                    url: imgData,
-                };
-
-                if (navigator.share) {
-                    navigator.share(shareData)
-                        .then(() => console.log('Sharing successful'))
-                        .catch((error) => console.log('Sharing failed', error));
-                } else {
-                    alert('Your browser does not support sharing.');
-                }
-            });
+    html2canvas(wishesContainer).then(canvas => {
+        canvas.toBlob(blob => {
+            const file = new File([blob], "birthday-wishes.png", { type: "image/png" });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    files: [file],
+                    title: "Birthday Wishes",
+                    text: "Check out these cool birthday wishes!",
+                }).then(() => {
+                    console.log("Shared successfully!");
+                }).catch(err => {
+                    console.error("Error sharing:", err);
+                    alert("Sharing failed. Please try again.");
+                });
+            } else {
+                alert("Sharing is not supported on this browser.");
+            }
         });
+    });
+});
     </script>
 </body>
 </html>
