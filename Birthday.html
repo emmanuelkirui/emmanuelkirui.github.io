@@ -21,6 +21,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            overflow: hidden;
         }
 
         .container {
@@ -109,6 +110,41 @@
             }
         }
 
+        .balloons {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+
+        .balloon {
+            position: absolute;
+            bottom: -100px;
+            width: 60px;
+            height: 90px;
+            background-color: #ff69b4;
+            border-radius: 50%;
+            animation: balloonFloat 6s ease-in-out infinite;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .balloon:nth-child(odd) {
+            background-color: #ff6347;
+        }
+
+        @keyframes balloonFloat {
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+            50% {
+                transform: translateX(15px) translateY(-80vh);
+            }
+            100% {
+                transform: translateX(0) translateY(0);
+            }
+        }
+
         .icon-bar {
             position: absolute;
             top: 10px;
@@ -134,31 +170,22 @@
         }
 
         .profile-pic {
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             margin-bottom: 20px;
             object-fit: cover;
-            border: 5px solid #e74c3c;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Add background effects */
-        .background-decorations {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('https://www.transparenttextures.com/patterns/asfalt.png');
-            opacity: 0.1;
-            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <!-- Background Decoration -->
-    <div class="background-decorations"></div>
+    <!-- Balloons Decoration -->
+    <div class="balloons">
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+        <div class="balloon"></div>
+    </div>
 
     <!-- Input Container -->
     <div class="container">
