@@ -79,14 +79,30 @@
 
         .output-container {
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .output {
+            position: relative;
             margin-top: 20px;
             font-family: 'Sacramento', cursive;
             font-size: 2.5em;
             color: #4b2e83;
             text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
+            z-index: 2; /* Ensures text appears above the image */
+        }
+
+        .output-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: blur(10px);
+            z-index: 1; /* Ensures image stays behind the text */
         }
 
         .decorations {
@@ -152,12 +168,7 @@
         </div>
         <div class="form-group">
             <label for="image">Upload Image</label>
-            <input type="file" id="image">
-        </div>
-        <!-- Added Personality Wishes Input -->
-        <div class="form-group">
-            <label for="personality">Personality Wishes</label>
-            <input type="text" id="personality" value="#manuraj#emmanuelkirui" placeholder="Enter Personality Wishes">
+            <input type="file" id="image" onchange="loadImage(event)">
         </div>
         <button class="button" onclick="generateWishes()">Generate Wishes</button>
     </div>
@@ -176,23 +187,31 @@
             <span>🎁</span>
             <span>🌼</span>
         </div>
+        <img id="uploaded-image" class="hidden" />
     </div>
 
     <script>
+        let uploadedImageUrl = '';
+
+        // Load the uploaded image
+        function loadImage(event) {
+            const image = document.getElementById('uploaded-image');
+            image.src = URL.createObjectURL(event.target.files[0]);
+            image.classList.remove('hidden'); // Make the image visible
+        }
+
         function generateWishes() {
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
             const venue = document.getElementById("venue").value;
-            const personality = document.getElementById("personality").value;  // New personality wish input
 
-            if (name && date && venue && personality) {  // Checking all fields, including personality
+            if (name && date && venue) {
                 const outputContainer = document.getElementById("wishes-container");
                 const output = document.getElementById("output");
 
                 output.innerHTML = `
                     🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br>
-                    🌟 Here's a special wish: <strong>${personality}</strong> <br> Have a fantastic day!`;
+                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!`;
 
                 outputContainer.classList.remove("hidden");
             } else {
