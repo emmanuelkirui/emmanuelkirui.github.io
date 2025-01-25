@@ -165,6 +165,10 @@
     </style>
 </head>
 <body>
+    <div> 
+    <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 1.2em; margin-top: 20px;">
+        <button onclick="updateGreeting()" class="button">Submit</button>
+    </div>
     <div class="container" id="wish-container">
         <div class="icon-bar">
             <button id="download-btn" title="Download"><i>📥</i></button>
@@ -172,8 +176,7 @@
             <button id="toggle-mode" title="Toggle Dark/Light Mode"><i>🌙</i></button>
         </div>
 
-        <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 1.2em; margin-top: 20px;">
-        <button onclick="updateGreeting()" class="button">Submit</button>
+        
 
         <div class="quote" id="greeting-message">Happy Valentine's Day!</div>
 
