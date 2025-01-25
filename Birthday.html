@@ -8,94 +8,147 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Great+Vibes&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Basic styles */
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sacramento&display=swap');
+
         body {
             font-family: 'Roboto', sans-serif;
-            background: #f8f8f8;
-            color: #333;
             margin: 0;
-            padding: 0;
+            text-align: center;
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            color: #4b2e83;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         .container {
-            width: 80%;
-            margin: 50px auto;
-            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .title {
-            font-size: 30px;
-            margin-bottom: 30px;
             font-family: 'Great Vibes', cursive;
+            font-size: 3.5em;
+            color: #e74c3c;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.4);
         }
 
-        .form-group {
-            margin-bottom: 15px;
+        label {
+            font-weight: bold;
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 8px;
+            text-align: left;
         }
 
-        .form-group input {
+        input[type="text"],
+        input[type="date"],
+        input[type="file"] {
+            width: 100%;
             padding: 10px;
-            font-size: 16px;
-            width: 80%;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .button {
-            padding: 15px 25px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .button:hover {
-            background-color: #2980b9;
-        }
-
-        .output-container {
-            margin-top: 50px;
-            display: none;
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .icon-bar {
-            text-align: right;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
             margin-bottom: 20px;
         }
 
-        .icon-bar button {
-            background-color: transparent;
+        .button {
+            padding: 12px 25px;
+            background: #e74c3c;
+            color: white;
             border: none;
-            font-size: 24px;
+            border-radius: 25px;
+            font-size: 1.2em;
             cursor: pointer;
-            margin-left: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .output-container {
+            position: relative;
+            text-align: center;
+            width: 100%;
         }
 
         .output {
-            font-size: 20px;
-            margin: 10px 0;
+            margin-top: 20px;
+            font-family: 'Sacramento', cursive;
+            font-size: 2.5em;
+            color: #4b2e83;
+            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            position: relative;
         }
 
-        .output img {
-            width: 100px;
-            margin-top: 15px;
+        .decorations {
+            margin-top: 20px;
+            font-size: 2em;
+            color: #e74c3c;
         }
 
         .decorations span {
-            font-size: 30px;
             margin: 0 10px;
-            color: #f39c12;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .icon-bar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .icon-bar button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #4b2e83;
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .icon-bar button:hover {
+            transform: scale(1.2);
         }
 
         .hidden {
             display: none;
+        }
+
+        #uploaded-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            object-fit: cover;
+            filter: blur(8px);
+            z-index: 1;
         }
     </style>
 </head>
@@ -120,7 +173,7 @@
             <input type="file" id="image" accept="image/*">
         </div>
         <div class="form-group">
-            <label for="wishes">Personalized Wishes</label>
+            <label for="wishes">Personalized Wishes (from #manuraj#emmanuelkirui)</label>
             <input type="text" id="wishes" value="#emmanuelkirui" placeholder="Enter your personalized wishes">
         </div>
         <button class="button" onclick="generateWishes()">Generate Wishes</button>
@@ -188,12 +241,10 @@
                 link.download = "birthday-wishes.png";
                 link.href = canvas.toDataURL("image/png");
                 link.click();
-            }).catch(err => {
-                alert('Error while downloading image: ' + err);
             });
         });
 
-        // Share wishes container as image (only for browsers that support sharing)
+        // Share wishes container as image (or other share method)
         document.getElementById("share-btn").addEventListener("click", () => {
             const wishesContainer = document.getElementById("wishes-container");
             html2canvas(wishesContainer).then(canvas => {
@@ -201,7 +252,7 @@
                 const shareData = {
                     title: 'Happy Birthday Wishes',
                     text: 'Check out these personalized birthday wishes!',
-                    url: imgData, // For image sharing
+                    url: imgData,
                 };
 
                 if (navigator.share) {
@@ -211,8 +262,6 @@
                 } else {
                     alert('Your browser does not support sharing.');
                 }
-            }).catch(err => {
-                alert('Error while sharing image: ' + err);
             });
         });
     </script>
