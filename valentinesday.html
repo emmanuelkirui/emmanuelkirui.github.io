@@ -64,13 +64,12 @@
   font-family: 'Georgia', serif; /* Elegant, professional font */
   color: var(--text-dark); /* Dark color for text */
   text-shadow: 
-    2px 2px 0px var(--text-light), /* Light shadow */
+    2px 2px 0px var(--text-light), /* Light shadow for a 3D glow */
     4px 4px 5px rgba(0, 0, 0, 0.3), /* Medium shadow for depth */
     6px 6px 15px rgba(0, 0, 0, 0.5), /* Strong shadow for depth */
-    10px 10px 20px rgba(0, 0, 0, 0.7); /* Very deep shadow for bold effect */
-  letter-spacing: 2px;
-  transform: perspective(800px) rotateX(15deg) rotateY(-10deg) translateZ(50px); /* Stronger 3D effect */
-  transition: transform 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
+    10px 10px 20px rgba(0, 0, 0, 0.7); /* Deep shadow for bold 3D effect */
+  letter-spacing: 2px; /* Optional: adds space between letters for better readability */
+  transition: text-shadow 0.3s ease, color 0.3s ease; /* Smooth transition for effects */
 }
 
 /* 3D effect and shadow applied to signature */
@@ -79,15 +78,14 @@
   margin-top: 10px;
   text-align: center;
   font-family: 'Courier New', Courier, monospace; /* Clean, professional font */
-  color: var(--text-dark); /* Adapt to light/dark themes */
+  color: var(--text-dark); /* Adapts to light/dark themes */
   text-shadow: 
     2px 2px 0px var(--text-light), /* Light shadow */
     4px 4px 5px rgba(0, 0, 0, 0.4), /* Medium shadow */
-    6px 6px 15px rgba(0, 0, 0, 0.6), /* Stronger shadow */
-    8px 8px 20px rgba(0, 0, 0, 0.8); /* Very deep shadow */
-  transform: perspective(600px) rotateX(20deg) rotateY(-15deg) translateZ(40px); /* Default 3D effect */
-  letter-spacing: 2px;
-  transition: all 0.3s ease; /* Smooth transition */
+    6px 6px 15px rgba(0, 0, 0, 0.6), /* Strong shadow */
+    8px 8px 20px rgba(0, 0, 0, 0.8); /* Very deep shadow for a bold 3D effect */
+  letter-spacing: 2px; /* Optional: adds space between letters for better readability */
+  transition: text-shadow 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
         .info {
             font-size: 1.2em;
