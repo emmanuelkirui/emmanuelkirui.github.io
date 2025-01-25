@@ -167,6 +167,10 @@
             <input type="text" id="venue" placeholder="Enter Venue">
         </div>
         <div class="form-group">
+            <label for="personality">Personality</label>
+            <input type="text" id="personality" placeholder="Enter Personality">
+        </div>
+        <div class="form-group">
             <label for="image">Upload Image</label>
             <input type="file" id="image" onchange="loadImage(event)">
         </div>
@@ -204,14 +208,16 @@
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
             const venue = document.getElementById("venue").value;
+            const personality = document.getElementById("personality").value;
 
-            if (name && date && venue) {
+            if (name && date && venue && personality) {
                 const outputContainer = document.getElementById("wishes-container");
                 const output = document.getElementById("output");
 
                 output.innerHTML = `
                     🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!`;
+                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!<br>
+                    Personality: <strong>${personality}</strong>`;
 
                 outputContainer.classList.remove("hidden");
             } else {
