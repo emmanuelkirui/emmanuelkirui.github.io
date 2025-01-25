@@ -42,6 +42,7 @@
             width: 100%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
+            margin-top: 80px; /* To create space for the input and button */
         }
 
         .quote {
@@ -152,17 +153,6 @@
             color: #ddd;
         }
 
-        @keyframes fadeIn {
-            0% {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
         /* Input and button section */
         .input-section {
             display: flex;
@@ -170,7 +160,11 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            margin-bottom: 20px; /* space between input and container content */
+            margin-bottom: 20px;
+            position: absolute;
+            top: 20px; /* Align at the top of the container */
+            left: 50%;
+            transform: translateX(-50%);
         }
 
         /* Input field style */
@@ -185,21 +179,20 @@
             transition: border-color 0.3s ease;
         }
 
-        
-
     </style>
 </head>
 <body>
+    
+    <div class="input-section"> 
+        <input type="text" id="name-input" placeholder="Enter your name">
+        <button onclick="updateGreeting()" class="button">Submit</button>
+    </div>
     
     <div class="container" id="wish-container">
         <div class="icon-bar">
             <button id="download-btn" title="Download"><i>📥</i></button>
             <button id="share-btn" title="Share as Image"><i>🔗</i></button>
             <button id="toggle-mode" title="Toggle Dark/Light Mode"><i>🌙</i></button>
-        </div>
-        <div class="input-section"> 
-        <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 1.2em; margin-top: 20px;">
-        <button onclick="updateGreeting()" class="button">Submit</button>
         </div>
     
         <div class="quote" id="greeting-message">Happy Valentine's Day!</div>
