@@ -33,26 +33,43 @@
             backdrop-filter: blur(10px);
             overflow: hidden;
         }
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: background 0.5s;
+        }
+
+        h1, .quote, .info, .signature, .footer {
+            color: inherit;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 4px 4px 8px rgba(0, 0, 0, 0.4);
+        }
 
         h1 {
-            font-size: 3.5em;
-            font-family: 'Sacramento', cursive;
-            font-weight: normal;
-            color: #ffffff;
-            text-shadow: 2px 3px 6px rgba(255, 64, 110, 0.9); /* Improved text clarity */
-            animation: fadeIn 2s ease-in-out;
-            margin-bottom: 20px;
+            font-size: 2.5em;
+            font-weight: bold;
         }
-        
-.text {
-  font-size: 3.5em;
-            font-family: 'Sacramento', cursive;
-            font-weight: normal;
-            color: #ffffff;
-            text-shadow: 2px 3px 6px rgba(255, 64, 110, 0.9); /* Improved text clarity */
-            animation: fadeIn 2s ease-in-out;
-            margin-bottom: 20px;
-}
+
+        .quote {
+            font-style: italic;
+            margin: 20px 0;
+            font-size: 1.5em;
+        }
+
+        .info {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .signature {
+            font-size: 1em;
+            margin-top: 10px;
+        }
+
+        .footer {
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
 
 
 
@@ -148,7 +165,7 @@
             <button id="share-btn" title="Share as Image"><i>🔗</i></button>
             <button id="toggle-mode" title="Toggle Dark/Light Mode"><i>🌙</i></button>
         </div>
-          <div class="text">Happy Valentine's Day!</div>
+          <div class="quote">Happy Valentine's Day!</div>
         <p class="subtitle">With 💖 from <b>#Manuraj#EmmanuelKirui</b></p>
         <div class="heart" style="top: 20%; left: 10%; animation-duration: 4s;">❤️</div>
         <div class="heart" style="top: 50%; left: 30%; animation-duration: 5s;">❤️</div>
