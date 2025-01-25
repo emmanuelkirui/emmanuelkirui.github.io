@@ -228,9 +228,12 @@
 document.getElementById("download-btn").addEventListener("click", () => {
     const container = document.getElementById("wish-container");
 
-    // Apply a solid light blue background to the canvas
+    // Get the background color of the container
+    const backgroundColor = window.getComputedStyle(container).backgroundColor;
+
+    // Apply the background color to the canvas
     html2canvas(container, {
-        backgroundColor: "#74b9ff" // Solid light blue background
+        backgroundColor: backgroundColor ? backgroundColor : "#74b9ff" // Fallback to light blue if no background color is found
     }).then(canvas => {
         const date = new Date();
         const formattedDate = date.toISOString().split('T')[0];
@@ -246,9 +249,11 @@ document.getElementById("download-btn").addEventListener("click", () => {
 document.getElementById("share-btn").addEventListener("click", () => {
     const container = document.getElementById("wish-container");
 
-    // Apply a solid light blue background to the canvas
+    // Get the background color of the container
+    const backgroundColor = window.getComputedStyle(container).backgroundColor;
+
     html2canvas(container, {
-        backgroundColor: "#74b9ff" // Solid light blue background
+        backgroundColor: backgroundColor ? backgroundColor : "#74b9ff" // Fallback to light blue if no background color is found
     }).then(canvas => {
         canvas.toBlob(blob => {
             const shareData = {
