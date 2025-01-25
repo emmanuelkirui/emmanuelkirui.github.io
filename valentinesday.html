@@ -55,24 +55,20 @@
         }
 
 
-        h1, .quote, .info, .signature, .footer {
-            color: inherit;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 4px 4px 8px rgba(0, 0, 0, 0.4);
-        }
 .quote {
   font-style: italic;
   font-size: 3em;
   margin: 20px;
   text-align: center;
-  font-family: 'Georgia', serif; /* Professional, elegant font */
-  color: var(--text-dark); /* Dynamic color for better visibility */
+  font-family: 'Georgia', serif; /* Elegant, professional font */
+  color: var(--text-dark); /* Dark color for text */
   text-shadow: 
-    2px 2px 0px var(--text-light), /* First layer for light 3D shadow */
-    4px 4px 0px #b0bec5, /* Second layer for medium shadow */
-    6px 6px 5px rgba(0, 0, 0, 0.3), /* Third layer for subtle depth */
-    8px 8px 10px rgba(0, 0, 0, 0.5); /* Final layer for a bold shadow effect */
+    2px 2px 0px var(--text-light), /* Light shadow */
+    4px 4px 5px rgba(0, 0, 0, 0.3), /* Medium shadow for depth */
+    6px 6px 15px rgba(0, 0, 0, 0.5), /* Strong shadow for depth */
+    10px 10px 20px rgba(0, 0, 0, 0.7); /* Very deep shadow for bold effect */
   letter-spacing: 2px;
-  transform: perspective(600px) rotateX(10deg) rotateY(-8deg) translateZ(20px); /* Stronger 3D perspective and depth */
+  transform: perspective(800px) rotateX(15deg) rotateY(-10deg) translateZ(40px); /* Strong 3D effect */
   transition: transform 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
 }
 
@@ -80,15 +76,16 @@
   font-size: 1em;
   margin-top: 10px;
   text-align: center;
-  font-family: 'Courier New', Courier, monospace; /* Clean and professional */
-  color: var(--text-dark); /* Adapts to light/dark themes */
+  font-family: 'Courier New', Courier, monospace; /* Clean, professional font */
+  color: var(--text-dark); /* Adapt to light/dark themes */
   text-shadow: 
-    2px 2px 0px var(--text-light), /* Light shadow for contrast */
-    4px 4px 10px rgba(0, 0, 0, 0.5), /* Soft outer shadow */
-    6px 6px 15px rgba(0, 0, 0, 0.7); /* Stronger depth shadow */
-  transform: perspective(500px) rotateX(5deg) rotateY(-5deg) translateZ(10px); /* Default 3D effect */
-  letter-spacing: 2px; /* Optional: adds space between letters for better readability */
-  transition: all 0.3s ease; /* Smooth transition for hover effect */
+    2px 2px 0px var(--text-light), /* Light shadow */
+    4px 4px 5px rgba(0, 0, 0, 0.4), /* Medium shadow */
+    6px 6px 15px rgba(0, 0, 0, 0.6), /* Stronger shadow */
+    8px 8px 20px rgba(0, 0, 0, 0.8); /* Very deep shadow */
+  transform: perspective(600px) rotateX(10deg) rotateY(-5deg) translateZ(20px); /* Default 3D effect */
+  letter-spacing: 2px;
+  transition: all 0.3s ease; /* Smooth transition */
 }
         .info {
             font-size: 1.2em;
