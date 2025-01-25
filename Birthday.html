@@ -154,16 +154,18 @@
             <label for="image">Upload Image</label>
             <input type="file" id="image">
         </div>
+        <div class="form-group">
+            <label for="wishes">Personalized Wishes (from #manuraj#emmanuelkirui)</label>
+            <input type="text" id="wishes" placeholder="Enter your personalized wishes">
+        </div>
         <button class="button" onclick="generateWishes()">Generate Wishes</button>
     </div>
 
     <!-- Wishes Display Container -->
     <div class="container output-container hidden" id="wishes-container">
         <div class="icon-bar">
-            <!-- Download Button -->
             <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
-            <!-- Share as Image Button -->
-            <button id="share-btn" title="Share as Image"><i class="fa fa-share-alt"></i></button>
+            <button id="share-btn" title="Share"><i class="fa fa-share-alt"></i></button>
         </div>
         <div class="output" id="output"></div>
         <div class="decorations">
@@ -180,14 +182,16 @@
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
             const venue = document.getElementById("venue").value;
+            const wishes = document.getElementById("wishes").value;
 
-            if (name && date && venue) {
+            if (name && date && venue && wishes) {
                 const outputContainer = document.getElementById("wishes-container");
                 const output = document.getElementById("output");
 
                 output.innerHTML = `
                     🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!`;
+                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> 
+                    ${wishes} <br> Have a fantastic day!`;
 
                 outputContainer.classList.remove("hidden");
             } else {
@@ -206,15 +210,24 @@
             });
         });
 
-        // Share wishes container as image
+        // Share wishes container as image (or other share method)
         document.getElementById("share-btn").addEventListener("click", () => {
             const wishesContainer = document.getElementById("wishes-container");
             html2canvas(wishesContainer).then(canvas => {
-                const dataUrl = canvas.toDataURL("image/png");
-                // Open in a new tab
-                const newTab = window.open();
-                newTab.document.write('<html><body><img src="' + dataUrl + '" alt="Wishes Image"/></body></html>');
-                newTab.document.close();
+                const imgData = canvas.toDataURL("image/png");
+                const shareData = {
+                    title: 'Happy Birthday Wishes',
+                    text: 'Check out these personalized birthday wishes!',
+                    url: imgData,
+                };
+
+                if (navigator.share) {
+                    navigator.share(shareData)
+                        .then(() => console.log('Sharing successful'))
+                        .catch((error) => console.log('Sharing failed', error));
+                } else {
+                    alert('Your browser does not support sharing.');
+                }
             });
         });
     </script>
