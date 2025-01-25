@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Birthday Wishes Generator</title>
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,16 +52,22 @@
             font-size: 16px;
         }
 
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        input[type="file"] {
+            width: auto;
         }
 
-        button:hover {
-            background-color: #45a049;
+        .icon-button {
+            background-color: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            margin: 0 5px;
+            transition: transform 0.2s ease;
+        }
+
+        .icon-button:hover {
+            transform: scale(1.1);
         }
 
         .uploaded-image {
@@ -79,10 +87,6 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
         }
-
-        .hidden {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -101,16 +105,20 @@
             <label for="image">Upload an image:</label>
             <input type="file" id="image" accept="image/*">
             
-            <label for="wishes">Wishes from:</label>
-            <input type="text" id="wishes" value="#manuraj#emmanuelkirui" placeholder="Enter your wishes (default: #manuraj#emmanuelkirui)">
-            
             <button onclick="generateWishes()">Generate Wishes</button>
         </div>
         
         <div id="wishes-container" class="wishes-container hidden">
             <div id="output"></div>
-            <button onclick="downloadAsImage()">Download as Image</button>
-            <button onclick="shareAsImage()">Share as Image</button>
+            <div>
+                <!-- Use Font Awesome icons for buttons -->
+                <button class="icon-button" onclick="downloadAsImage()">
+                    <i class="fas fa-download"></i> <!-- Download icon -->
+                </button>
+                <button class="icon-button" onclick="shareAsImage()">
+                    <i class="fas fa-share-alt"></i> <!-- Share icon -->
+                </button>
+            </div>
         </div>
     </div>
 
@@ -120,7 +128,6 @@
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
             const venue = document.getElementById("venue").value;
-            const wishesFrom = document.getElementById("wishes").value;
             const imageInput = document.getElementById("image");
             const outputContainer = document.getElementById("wishes-container");
             const output = document.getElementById("output");
@@ -143,8 +150,7 @@
                     output.innerHTML = `
                         ${imageTag}
                         🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                        🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!<br>
-                        <br> <em>Wishes from: ${wishesFrom}</em>`;
+                        🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!`;
                     outputContainer.classList.remove("hidden");
                 }
             } else {
@@ -165,9 +171,12 @@
         function shareAsImage() {
             const wishesContainer = document.getElementById("output");
             html2canvas(wishesContainer).then((canvas) => {
-                const dataUrl = canvas.toDataURL("image/png");
-                const newWindow = window.open();
-                newWindow.document.write('<img src="' + dataUrl + '" alt="Birthday Wishes" />');
+                const imageUrl = canvas.toDataURL("image/png");
+                const shareWindow = window.open("", "_blank");
+                shareWindow.document.write(`
+                    <h2>Share Your Birthday Wishes</h2>
+                    <img src="${imageUrl}" alt="Birthday Wishes" style="max-width: 100%; height: auto; border-radius: 10px;">
+                `);
             });
         }
     </script>
