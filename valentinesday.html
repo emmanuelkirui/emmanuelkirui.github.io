@@ -7,6 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Sacramento&display=swap" rel="stylesheet">
     <style>
+        
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -50,28 +52,30 @@
         }
 
         
+
 .quote {
   font-style: italic;
-  font-size: 2em;
+  font-size: 3em;
   margin: 20px;
-  color: #ffffff;
   text-align: center;
-  padding: 20px 40px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  max-width: 600px;
+  color: #fff;
+  text-shadow: 
+    1px 1px 2px rgba(0, 0, 0, 0.3), 
+    2px 2px 4px rgba(0, 0, 0, 0.2), 
+    3px 3px 6px rgba(0, 0, 0, 0.1);
+  letter-spacing: 2px;
+  transform: perspective(500px) rotateX(10deg);
+  animation: float 3s ease-in-out infinite;
 }
 
-.quote::before, 
-.quote::after {
-  content: '"';
-  color: #ff6b6b;
-  font-size: 1.5em;
+@keyframes float {
+  0%, 100% {
+    transform: perspective(500px) rotateX(10deg) translateY(0);
+  }
+  50% {
+    transform: perspective(500px) rotateX(10deg) translateY(-10px);
+  }
 }
-
         .info {
             font-size: 1.2em;
             margin: 10px 0;
