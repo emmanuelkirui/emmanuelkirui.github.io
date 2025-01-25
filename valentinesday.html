@@ -6,6 +6,7 @@
     <title>Valentine's Day Wishes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Sacramento&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
         
@@ -185,9 +186,11 @@
 <body>
     
     <div class="input-section"> 
-        <input type="text" id="name-input" placeholder="Enter your name">
-        <button onclick="updateGreeting()" class="button">Submit</button>
-    </div>
+    <input type="text" id="name-input" placeholder="Enter your name">
+    <button onclick="updateGreeting()" class="button">
+        <i class="fa fa-paper-plane"></i> <!-- Icon instead of text -->
+    </button>
+</div>
     
     <div class="container" id="wish-container">
         <div class="icon-bar">
