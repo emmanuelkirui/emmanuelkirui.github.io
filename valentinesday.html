@@ -7,17 +7,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Sacramento&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
         
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
-        E html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Quote</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
         :root {
             --bg-light: linear-gradient(135deg, #74b9ff, #a29bfe);
             --bg-dark: linear-gradient(135deg, #2c3e50, #34495e);
@@ -52,38 +43,32 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
         }
-/* 3D text effect for quote */
-.quote {
-  font-style: italic;
-  font-size: 3em;
-  margin: 20px;
-  text-align: center;
-  font-family: 'Georgia', serif; /* Elegant, professional font */
-  color: var(--text-dark); /* Dark color for the text */
-  text-shadow: 
-    2px 2px 0px var(--text-light), /* First layer for light shadow */
-    4px 4px 5px rgba(0, 0, 0, 0.3), /* Medium shadow for depth */
-    6px 6px 10px rgba(0, 0, 0, 0.5), /* Stronger shadow for more depth */
-    10px 10px 20px rgba(0, 0, 0, 0.7); /* Deep shadow for a bold 3D effect */
-  letter-spacing: 2px; /* Adds space between letters for a clearer 3D look */
-  transition: text-shadow 0.3s ease, color 0.3s ease; /* Smooth transition */
-}
 
-/* 3D text effect for signature */
-.signature {
-  font-size: 1em;
-  margin-top: 10px;
-  text-align: center;
-  font-family: 'Courier New', Courier, monospace; /* Clean, professional font */
-  color: var(--text-dark); /* Adapts to light/dark themes */
-  text-shadow: 
-    2px 2px 0px var(--text-light), /* Light shadow */
-    4px 4px 5px rgba(0, 0, 0, 0.3), /* Medium shadow */
-    6px 6px 10px rgba(0, 0, 0, 0.5), /* Strong shadow */
-    8px 8px 15px rgba(0, 0, 0, 0.7); /* Deeper shadow for more 3D effect */
-  letter-spacing: 2px; /* Adds space between letters for better readability */
-  transition: text-shadow 0.3s ease, color 0.3s ease; /* Smooth transition */
-}
+        .quote {
+            font-style: italic;
+            font-size: 3em;
+            margin: 20px;
+            text-align: center;
+            font-family: 'Georgia', serif;
+            color: var(--text-dark);
+            text-shadow: 2px 2px 0px var(--text-light), 4px 4px 5px rgba(0, 0, 0, 0.3),
+                         6px 6px 10px rgba(0, 0, 0, 0.5), 10px 10px 20px rgba(0, 0, 0, 0.7);
+            letter-spacing: 2px;
+            transition: text-shadow 0.3s ease, color 0.3s ease;
+        }
+
+        .signature {
+            font-size: 1em;
+            margin-top: 10px;
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--text-dark);
+            text-shadow: 2px 2px 0px var(--text-light), 4px 4px 5px rgba(0, 0, 0, 0.3),
+                         6px 6px 10px rgba(0, 0, 0, 0.5), 8px 8px 15px rgba(0, 0, 0, 0.7);
+            letter-spacing: 2px;
+            transition: text-shadow 0.3s ease, color 0.3s ease;
+        }
+
         .info {
             font-size: 1.2em;
             margin: 10px 0;
@@ -93,9 +78,6 @@
             font-size: 0.9em;
             margin-top: 10px;
         }
-
-
-
 
         .subtitle {
             font-size: 1.5em;
@@ -189,8 +171,14 @@
             <button id="share-btn" title="Share as Image"><i>🔗</i></button>
             <button id="toggle-mode" title="Toggle Dark/Light Mode"><i>🌙</i></button>
         </div>
-          <div class="quote">Happy Valentine's Day!</div>
+
+        <input type="text" id="name-input" placeholder="Enter your name" style="padding: 10px; font-size: 1.2em; margin-top: 20px;">
+        <button onclick="updateGreeting()" class="button">Submit</button>
+
+        <div class="quote" id="greeting-message">Happy Valentine's Day!</div>
+
         <p class="signature">With 💖 from <b>#Manuraj#EmmanuelKirui</b></p>
+
         <div class="heart" style="top: 20%; left: 10%; animation-duration: 4s;">❤️</div>
         <div class="heart" style="top: 50%; left: 30%; animation-duration: 5s;">❤️</div>
         <div class="heart" style="top: 70%; left: 70%; animation-duration: 6s;">❤️</div>
@@ -199,6 +187,18 @@
     </div>
 
     <script>
+        // Function to update the greeting with the name input
+        function updateGreeting() {
+            const name = document.getElementById("name-input").value;
+            const greetingMessage = document.getElementById("greeting-message");
+
+            if (name) {
+                greetingMessage.textContent = `Happy Valentine's Day, ${name}!`;
+            } else {
+                greetingMessage.textContent = "Happy Valentine's Day!";
+            }
+        }
+
         // Download Image
         document.getElementById("download-btn").addEventListener("click", () => {
             const container = document.getElementById("wish-container");
@@ -215,31 +215,31 @@
         });
 
         // Share Content as Image
-document.getElementById("share-btn").addEventListener("click", () => {
-    const container = document.getElementById("wish-container");
+        document.getElementById("share-btn").addEventListener("click", () => {
+            const container = document.getElementById("wish-container");
 
-    html2canvas(container).then(canvas => {
-        canvas.toBlob(blob => {
-            const shareData = {
-                title: 'Valentines wishes',
-                text: 'Check out this valentines wish!',
-                files: [
-                    new File([blob], 'valentines.png', { type: 'image/png' })
-                ],
-            };
+            html2canvas(container).then(canvas => {
+                canvas.toBlob(blob => {
+                    const shareData = {
+                        title: 'Valentines wishes',
+                        text: 'Check out this valentines wish!',
+                        files: [
+                            new File([blob], 'valentines.png', { type: 'image/png' })
+                        ],
+                    };
 
-            if (navigator.share) {
-                navigator.share(shareData).then(() => {
-                    console.log('Valentines image shared successfully!');
-                }).catch((error) => {
-                    console.log('Error sharing quote image:', error);
+                    if (navigator.share) {
+                        navigator.share(shareData).then(() => {
+                            console.log('Valentines image shared successfully!');
+                        }).catch((error) => {
+                            console.log('Error sharing quote image:', error);
+                        });
+                    } else {
+                        alert('Sharing not supported on this device/browser');
+                    }
                 });
-            } else {
-                alert('Sharing not supported on this device/browser');
-            }
+            });
         });
-    });
-});
 
         // Toggle between dark and light modes
         document.getElementById('toggle-mode').addEventListener('click', function () {
