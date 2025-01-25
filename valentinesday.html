@@ -43,6 +43,24 @@
             animation: fadeIn 2s ease-in-out;
             margin-bottom: 20px;
         }
+        
+.text {
+  font-size: 4rem;
+  color: #fff;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+  animation: glow 2s infinite alternate;
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px #ff6b6b, 0 0 20px #ff6b6b, 0 0 30px #ff6b6b;
+  }
+  to {
+    text-shadow: 0 0 20px #ff6b6b, 0 0 30px #ff6b6b, 0 0 40px #ff6b6b;
+  }
+}
 
         .subtitle {
             font-size: 1.5em;
@@ -136,7 +154,7 @@
             <button id="share-btn" title="Share as Image"><i>🔗</i></button>
             <button id="toggle-mode" title="Toggle Dark/Light Mode"><i>🌙</i></button>
         </div>
-        <h1>Happy Valentine's Day!</h1>
+          <div class="text">Happy Valentine's Day!</div>
         <p class="subtitle">With 💖 from <b>#Manuraj#EmmanuelKirui</b></p>
         <div class="heart" style="top: 20%; left: 10%; animation-duration: 4s;">❤️</div>
         <div class="heart" style="top: 50%; left: 30%; animation-duration: 5s;">❤️</div>
