@@ -154,15 +154,20 @@
             <label for="image">Upload Image</label>
             <input type="file" id="image">
         </div>
+        <!-- Added Personality Wishes Input -->
+        <div class="form-group">
+            <label for="personality">Personality Wishes</label>
+            <input type="text" id="personality" value="#manuraj#emmanuelkirui" placeholder="Enter Personality Wishes">
+        </div>
         <button class="button" onclick="generateWishes()">Generate Wishes</button>
     </div>
 
     <!-- Wishes Display Container -->
     <div class="container output-container hidden" id="wishes-container">
         <div class="icon-bar">
-    <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
-    <button id="share-btn" title="Share as Image"><i class="fa fa-share-alt"></i></button>
-</div>
+            <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
+            <button id="share-btn" title="Share as Image"><i class="fa fa-share-alt"></i></button>
+        </div>
         <div class="output" id="output"></div>
         <div class="decorations">
             <span>❤️</span>
@@ -178,14 +183,16 @@
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
             const venue = document.getElementById("venue").value;
+            const personality = document.getElementById("personality").value;  // New personality wish input
 
-            if (name && date && venue) {
+            if (name && date && venue && personality) {  // Checking all fields, including personality
                 const outputContainer = document.getElementById("wishes-container");
                 const output = document.getElementById("output");
 
                 output.innerHTML = `
                     🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> Have a fantastic day!`;
+                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br>
+                    🌟 Here's a special wish: <strong>${personality}</strong> <br> Have a fantastic day!`;
 
                 outputContainer.classList.remove("hidden");
             } else {
@@ -203,30 +210,31 @@
                 link.click();
             });
         });
-        // Share wishes container as an image
-document.getElementById("share-btn").addEventListener("click", () => {
-    const wishesContainer = document.getElementById("wishes-container");
 
-    html2canvas(wishesContainer).then(canvas => {
-        canvas.toBlob(blob => {
-            const file = new File([blob], "birthday-wishes.png", { type: "image/png" });
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: "Birthday Wishes",
-                    text: "Check out these cool birthday wishes!",
-                }).then(() => {
-                    console.log("Shared successfully!");
-                }).catch(err => {
-                    console.error("Error sharing:", err);
-                    alert("Sharing failed. Please try again.");
+        // Share wishes container as an image
+        document.getElementById("share-btn").addEventListener("click", () => {
+            const wishesContainer = document.getElementById("wishes-container");
+
+            html2canvas(wishesContainer).then(canvas => {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], "birthday-wishes.png", { type: "image/png" });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: "Birthday Wishes",
+                            text: "Check out these cool birthday wishes!",
+                        }).then(() => {
+                            console.log("Shared successfully!");
+                        }).catch(err => {
+                            console.error("Error sharing:", err);
+                            alert("Sharing failed. Please try again.");
+                        });
+                    } else {
+                        alert("Sharing is not supported on this browser.");
+                    }
                 });
-            } else {
-                alert("Sharing is not supported on this browser.");
-            }
+            });
         });
-    });
-});
     </script>
 </body>
 </html>
