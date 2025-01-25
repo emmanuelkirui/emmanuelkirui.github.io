@@ -224,46 +224,57 @@
         }
 
         // Download Image
-        document.getElementById("download-btn").addEventListener("click", () => {
-            const container = document.getElementById("wish-container");
+document.getElementById("download-btn").addEventListener("click", () => {
+    const container = document.getElementById("wish-container");
 
-            const date = new Date();
-            const formattedDate = date.toISOString().split('T')[0];
+    // Get the background color of the container
+    const backgroundColor = window.getComputedStyle(container).backgroundColor;
 
-            html2canvas(container).then(canvas => {
-                const link = document.createElement("a");
-                link.download = `valentine-wish-${formattedDate}.png`;
-                link.href = canvas.toDataURL("image/png", 1.0);
-                link.click();
-            });
-        });
+    // Apply the background color to the canvas
+    html2canvas(container, {
+        backgroundColor: backgroundColor // Ensures the background color matches
+    }).then(canvas => {
+        const date = new Date();
+        const formattedDate = date.toISOString().split('T')[0];
 
-        // Share Content as Image
-        document.getElementById("share-btn").addEventListener("click", () => {
-            const container = document.getElementById("wish-container");
+        const link = document.createElement("a");
+        link.download = `valentine-wish-${formattedDate}.png`;
+        link.href = canvas.toDataURL("image/png", 1.0);
+        link.click();
+    });
+});
 
-            html2canvas(container).then(canvas => {
-                canvas.toBlob(blob => {
-                    const shareData = {
-                        title: 'Valentines wishes',
-                        text: 'Check out this valentines wish!',
-                        files: [
-                            new File([blob], 'valentines.png', { type: 'image/png' })
-                        ],
-                    };
+// Share Content as Image
+document.getElementById("share-btn").addEventListener("click", () => {
+    const container = document.getElementById("wish-container");
 
-                    if (navigator.share) {
-                        navigator.share(shareData).then(() => {
-                            console.log('Valentines image shared successfully!');
-                        }).catch((error) => {
-                            console.log('Error sharing quote image:', error);
-                        });
-                    } else {
-                        alert('Sharing not supported on this device/browser');
-                    }
+    // Get the background color of the container
+    const backgroundColor = window.getComputedStyle(container).backgroundColor;
+
+    html2canvas(container, {
+        backgroundColor: backgroundColor // Ensures the background color matches
+    }).then(canvas => {
+        canvas.toBlob(blob => {
+            const shareData = {
+                title: 'Valentines wishes',
+                text: 'Check out this valentines wish!',
+                files: [
+                    new File([blob], 'valentines.png', { type: 'image/png' })
+                ],
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).then(() => {
+                    console.log('Valentines image shared successfully!');
+                }).catch((error) => {
+                    console.log('Error sharing quote image:', error);
                 });
-            });
+            } else {
+                alert('Sharing not supported on this device/browser');
+            }
         });
+    });
+});
 
         // Toggle between dark and light modes
         document.getElementById('toggle-mode').addEventListener('click', function () {
