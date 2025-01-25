@@ -9,37 +9,51 @@
     <style>
         
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+        E html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --bg-light: linear-gradient(135deg, #74b9ff, #a29bfe);
+            --bg-dark: linear-gradient(135deg, #2c3e50, #34495e);
+            --text-light: #333;
+            --text-dark: #ecf0f1;
+            --container-light: rgba(255, 255, 255, 0.3);
+            --container-dark: rgba(44, 62, 80, 0.7);
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: Arial, sans-serif;
+            text-align: center;
             margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #ff7b7b, #ff406e);
+            background: var(--bg-light);
+            color: var(--text-light);
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            color: white;
-            overflow: hidden;
-            transition: background 0.3s ease-in-out;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.5s, color 0.5s;
         }
 
         .container {
-            text-align: center;
-            position: relative;
-            padding: 60px 40px;
-            background: rgba(0, 0, 0, 0.6); /* Adjusted opacity to make it less transparent */
+            background: var(--container-light);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            width: 80%;
-            max-width: 600px;
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-        }
+            padding: 20px;
+            max-width: 500px;
             width: 100%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
             transition: background 0.5s;
         }
+
 
         h1, .quote, .info, .signature, .footer {
             color: inherit;
