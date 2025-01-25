@@ -139,10 +139,27 @@
             border-radius: 50%;
             margin-bottom: 20px;
             object-fit: cover;
+            border: 5px solid #e74c3c;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Add background effects */
+        .background-decorations {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/asfalt.png');
+            opacity: 0.1;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
+    <!-- Background Decoration -->
+    <div class="background-decorations"></div>
+
     <!-- Input Container -->
     <div class="container">
         <div class="title">🎉 Create Birthday Wishes 🎉</div>
