@@ -132,6 +132,13 @@
         .hidden {
             display: none;
         }
+
+        #uploaded-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -152,11 +159,11 @@
         </div>
         <div class="form-group">
             <label for="image">Upload Image</label>
-            <input type="file" id="image">
+            <input type="file" id="image" accept="image/*">
         </div>
         <div class="form-group">
             <label for="wishes">Personalized Wishes (from #manuraj#emmanuelkirui)</label>
-            <input type="text" id="wishes" value="#manuraj#emmanuelkirui" placeholder="Enter your personalized wishes">
+            <input type="text" id="wishes" placeholder="Enter your personalized wishes">
         </div>
         <button class="button" onclick="generateWishes()">Generate Wishes</button>
     </div>
@@ -168,6 +175,7 @@
             <button id="share-btn" title="Share"><i class="fa fa-share-alt"></i></button>
         </div>
         <div class="output" id="output"></div>
+        <div id="uploaded-image-container"></div>
         <div class="decorations">
             <span>❤️</span>
             <span>🌸</span>
@@ -183,15 +191,30 @@
             const date = document.getElementById("date").value;
             const venue = document.getElementById("venue").value;
             const wishes = document.getElementById("wishes").value;
+            const image = document.getElementById("image").files[0];
+            const imageContainer = document.getElementById("uploaded-image-container");
 
             if (name && date && venue && wishes) {
                 const outputContainer = document.getElementById("wishes-container");
                 const output = document.getElementById("output");
 
+                // Set the wishes text
                 output.innerHTML = `
                     🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
                     🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br> 
                     ${wishes} <br> Have a fantastic day!`;
+
+                // Display the uploaded image
+                if (image) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement("img");
+                        img.src = e.target.result;
+                        img.id = "uploaded-image";
+                        imageContainer.appendChild(img);
+                    };
+                    reader.readAsDataURL(image);
+                }
 
                 outputContainer.classList.remove("hidden");
             } else {
