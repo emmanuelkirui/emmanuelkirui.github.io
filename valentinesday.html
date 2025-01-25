@@ -51,28 +51,24 @@
             width: 100%;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
-            transition: background 0.5s;
-        }
-
-
-/* 3D effect and shadow applied to quote */
+/* 3D text effect for quote */
 .quote {
   font-style: italic;
   font-size: 3em;
   margin: 20px;
   text-align: center;
   font-family: 'Georgia', serif; /* Elegant, professional font */
-  color: var(--text-dark); /* Dark color for text */
+  color: var(--text-dark); /* Dark color for the text */
   text-shadow: 
-    2px 2px 0px var(--text-light), /* Light shadow for a 3D glow */
+    2px 2px 0px var(--text-light), /* Light shadow for the initial 3D glow */
     4px 4px 5px rgba(0, 0, 0, 0.3), /* Medium shadow for depth */
-    6px 6px 15px rgba(0, 0, 0, 0.5), /* Strong shadow for depth */
-    10px 10px 20px rgba(0, 0, 0, 0.7); /* Deep shadow for bold 3D effect */
-  letter-spacing: 2px; /* Optional: adds space between letters for better readability */
-  transition: text-shadow 0.3s ease, color 0.3s ease; /* Smooth transition for effects */
+    6px 6px 10px rgba(0, 0, 0, 0.5), /* Stronger shadow for more depth */
+    10px 10px 20px rgba(0, 0, 0, 0.7); /* Deep shadow for a bold 3D effect */
+  letter-spacing: 2px; /* Adds space between letters to enhance the 3D look */
+  transition: text-shadow 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
 
-/* 3D effect and shadow applied to signature */
+/* 3D text effect for signature */
 .signature {
   font-size: 1em;
   margin-top: 10px;
@@ -81,10 +77,10 @@
   color: var(--text-dark); /* Adapts to light/dark themes */
   text-shadow: 
     2px 2px 0px var(--text-light), /* Light shadow */
-    4px 4px 5px rgba(0, 0, 0, 0.4), /* Medium shadow */
-    6px 6px 15px rgba(0, 0, 0, 0.6), /* Strong shadow */
-    8px 8px 20px rgba(0, 0, 0, 0.8); /* Very deep shadow for a bold 3D effect */
-  letter-spacing: 2px; /* Optional: adds space between letters for better readability */
+    4px 4px 5px rgba(0, 0, 0, 0.3), /* Medium shadow */
+    6px 6px 10px rgba(0, 0, 0, 0.5), /* Strong shadow */
+    8px 8px 15px rgba(0, 0, 0, 0.7); /* Deeper shadow for more 3D effect */
+  letter-spacing: 2px; /* Adds space between letters to enhance the 3D look */
   transition: text-shadow 0.3s ease, color 0.3s ease; /* Smooth transition */
 }
         .info {
