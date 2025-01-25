@@ -68,6 +68,7 @@
         
 
 .quote {
+.quote {
   font-style: italic;
   font-size: 3em;
   margin: 20px;
@@ -75,20 +76,22 @@
   font-family: 'Georgia', serif; /* Professional, elegant font */
   color: var(--text-dark); /* Dynamic color for better visibility */
   text-shadow: 
-    2px 2px 0px var(--text-light), /* Light 3D shadow */
-    4px 4px 10px rgba(0, 0, 0, 0.3), /* Subtle outer shadow for depth */
-    6px 6px 15px rgba(0, 0, 0, 0.5); /* Stronger depth shadow */
+    2px 2px 0px var(--text-light), /* First layer for light 3D shadow */
+    4px 4px 0px #b0bec5, /* Second layer for medium shadow */
+    6px 6px 5px rgba(0, 0, 0, 0.3), /* Third layer for subtle depth */
+    8px 8px 10px rgba(0, 0, 0, 0.5); /* Final layer for a bold shadow effect */;
   letter-spacing: 2px;
-  transform: perspective(600px) rotateX(8deg) rotateY(-5deg); /* Enhanced 3D perspective */
+  transform: perspective(600px) rotateX(10deg) rotateY(-8deg) translateZ(20px); /* Stronger 3D perspective and depth */
   transition: transform 0.3s ease, text-shadow 0.3s ease, color 0.3s ease;
 }
 
 .quote:hover {
-  transform: perspective(600px) rotateX(0deg) rotateY(0deg) scale(1.1); /* Smooth hover interaction */
-  color: var(--text-light); /* Changes color on hover */
+  transform: perspective(600px) rotateX(0deg) rotateY(0deg) translateZ(25px) scale(1.1); /* Smooth hover animation */
+  color: var(--text-light); /* Changes color for contrast on hover */
   text-shadow: 
-    3px 3px 0px var(--text-dark), 
-    6px 6px 20px rgba(0, 0, 0, 0.7); /* Stronger hover shadow */
+    3px 3px 0px #b0bec5, 
+    5px 5px 15px rgba(0, 0, 0, 0.6), /* Enhanced shadow depth */
+    8px 8px 20px rgba(0, 0, 0, 0.8); /* Strong shadow focus on hover */;
 }
 
 
@@ -106,18 +109,17 @@
   text-shadow: 
     2px 2px 0px var(--text-light), /* Light shadow for contrast */
     4px 4px 10px rgba(0, 0, 0, 0.5); /* Soft outer shadow */
-  transform: perspective(500px) rotateX(5deg) rotateY(-5deg);
-  transition: all 0.3s ease;
+  transform: perspective(500px) rotateX(5deg) rotateY(-5deg); /* 3D effect */
+  transition: all 0.3s ease; /* Smooth transitions for hover */
 }
 
 .signature:hover {
-  transform: perspective(500px) rotateX(0deg) rotateY(0deg) scale(1.1);
+  transform: perspective(500px) rotateX(0deg) rotateY(0deg) scale(1.1); /* Smooth hover interaction */
   text-shadow: 
-    3px 3px 0px var(--text-light),
+    3px 3px 0px var(--text-light), 
     5px 5px 15px rgba(0, 0, 0, 0.7); /* Stronger shadow on hover */
-  color: var(--text-light); /* Slightly changes on hover for focus */
+  color: var(--text-light); /* Slightly changes color on hover for focus */
 }
-
         .footer {
             font-size: 0.9em;
             margin-top: 10px;
