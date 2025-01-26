@@ -83,14 +83,16 @@
         }
 
         .output {
-            margin-top: 20px;
-            font-family: 'Sacramento', cursive;
-            font-size: 2.5em;
-            color: #4b2e83;
-            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
-            transition: font-size 0.3s ease;
-        }
-
+    margin-top: 20px;
+    font-family: 'Sacramento', cursive;
+    font-size: 2.5em;
+    color: #4b2e83;
+    text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5),
+                 -1px -1px 3px rgba(255, 255, 255, 0.6),
+                 1px 1px 6px rgba(0, 0, 0, 0.5); /* Multiple shadows for depth */
+    transform: perspective(500px); /* Only applying 3D perspective */
+    transition: font-size 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
         .output.dynamic-font {
             font-size: 1.5em;
         }
@@ -123,32 +125,40 @@
         }
 
         .icon-bar button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #4b2e83;
-            font-size: 1.5em;
-            transition: transform 0.3s ease;
-            margin-left: 10px;
-        }
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4b2e83;
+    font-size: 1.5em;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
+    margin-left: 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Added shadow for depth */
+}
 
-        .icon-bar button:hover {
-            transform: scale(1.2);
-        }
+.icon-bar button:hover {
+    transform: scale(1.1); /* Scales the button up for a 3D hover effect */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Adds shadow to give a lifted effect */
+}
 
         .hidden {
             display: none;
         }
 
         .profile-pic {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-bottom: 20px;
-            object-fit: cover;
-            border: 3px solid #e74c3c;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    object-fit: cover;
+    border: 3px solid #e74c3c;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for scaling and shadow */
+}
+
+.profile-pic:hover {
+    transform: scale(1.1); /* Slightly scales up the profile picture for a 3D hover effect */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Increases shadow for a lifted effect */
+}
 
         .background-decorations {
             position: absolute;
@@ -344,18 +354,62 @@ if (eventType === 'Birthday') {
         output.classList.toggle('dynamic-font', fontSize === '1em');
     }
 
-    // Share the generated wishes as an image
-    document.getElementById('share-btn').addEventListener('click', function() {
-        const container = document.getElementById('wishes-container');
-        html2canvas(container).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = imgData;
-            link.download = 'event_wishes.png';
-            link.click();
-        });
-    });
+// Get references to the font controls and the container
+    const fontColorInput = document.getElementById('fontColor');
+    const fontSizeSelect = document.getElementById('fontSize');
+    const wishesContainer = document.getElementById('wishes-container');
+    const textElements = wishesContainer.querySelectorAll('.output, .decorations span'); // Target only text elements inside the container
 
+    // Function to update the font color and size
+    function updateFontStyles() {
+        const fontColor = fontColorInput.value; // Get the selected font color
+        const fontSize = fontSizeSelect.value;  // Get the selected font size
+
+        // Apply the font color and size to all text elements inside the container (excluding buttons)
+        textElements.forEach(element => {
+            element.style.color = fontColor;    // Set font color
+            element.style.fontSize = fontSize;  // Set font size
+        });
+    }
+
+    // Add event listeners to update styles when inputs change
+    fontColorInput.addEventListener('input', updateFontStyles);
+    fontSizeSelect.addEventListener('change', updateFontStyles);
+
+    // Call updateFontStyles initially to set the default styles
+    updateFontStyles();
+// Share the generated wishes as an image
+document.getElementById('share-btn').addEventListener('click', function() {
+    const container = document.getElementById('wishes-container');
+    
+    // Use html2canvas to capture the content of the container
+    html2canvas(container).then(canvas => {
+        const imgData = canvas.toDataURL('image/png'); // Convert canvas to image data
+
+        // Check if the Web Share API is supported
+        if (navigator.share) {
+            // Create a Blob from the image data
+            fetch(imgData)
+                .then(res => res.blob())
+                .then(blob => {
+                    const file = new File([blob], 'event_wishes.png', { type: 'image/png' });
+                    
+                    // Share the image via the Web Share API
+                    navigator.share({
+                        files: [file],
+                        title: 'Event Wishes',
+                        text: 'Check out these event wishes!'
+                    }).then(() => {
+                        console.log('Image shared successfully!');
+                    }).catch(err => {
+                        console.error('Error sharing the image:', err);
+                    });
+                });
+        } else {
+            alert('Web Share API is not supported on this device.');
+        }
+    });
+});
     // Download the profile picture and event wishes together
     document.getElementById('download-btn').addEventListener('click', function() {
         const container = document.getElementById('wishes-container');
