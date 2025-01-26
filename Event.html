@@ -343,6 +343,23 @@ if (eventType === 'Birthday') {
         // Adjust the font size for the message based on input
         output.classList.toggle('dynamic-font', fontSize === '1em');
     }
+        
+
+// Function to update font size and color dynamically
+function updateFontStyles() {
+    const fontColor = document.getElementById('fontColor').value;
+    const fontSize = document.getElementById('fontSize').value;
+    const container = document.getElementById('wishes-container');
+
+    container.style.color = fontColor;
+    container.style.fontSize = fontSize;
+}
+
+// Listen for font color changes
+document.getElementById('fontColor').addEventListener('input', updateFontStyles);
+
+// Listen for font size changes
+document.getElementById('fontSize').addEventListener('change', updateFontStyles);
 
     // Share the generated wishes as an image
     document.getElementById('share-btn').addEventListener('click', function() {
