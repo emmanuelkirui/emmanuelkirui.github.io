@@ -194,12 +194,20 @@
         <div class="form-group">
             <label for="event-select">Select Event</label>
             <select id="event-select">
-                <option value="Birthday">Birthday</option>
-                <option value="Valentine's Day">Valentine's Day</option>
-                <option value="Christmas">Christmas</option>
-                <option value="New Year">New Year</option>
-                <option value="Anniversary">Anniversary</option>
-            </select>
+    <option value="Birthday">Birthday</option>
+    <option value="Valentine's Day">Valentine's Day</option>
+    <option value="Christmas">Christmas</option>
+    <option value="New Year">New Year</option>
+    <option value="Anniversary">Anniversary</option>
+    <option value="Father's Day">Father's Day</option>
+    <option value="Mother's Day">Mother's Day</option>
+    <option value="Girlfriend's Day">Girlfriend's Day</option>
+    <option value="Boyfriend's Day">Boyfriend's Day</option>
+    <option value="Graduation Day">Graduation Day</option>
+    <option value="Teacher's Day">Teacher's Day</option>
+    <option value="Mashujaa Day">Mashujaa Day</option>
+    <option value="Jamhuri Day">Jamhuri Day</option>
+</select>
         </div>
         <div class="form-group">
             <label for="event-name">Event Name</label>
@@ -266,52 +274,107 @@
         reader.readAsDataURL(file);
     }
 
-    function generateWishes() {
-        const eventSelect = document.getElementById('event-select');
-        const eventName = document.getElementById('event-name').value;
-        const name = document.getElementById('name').value;
-        const date = document.getElementById('date').value;
-        const venue = document.getElementById('venue').value;
-        const profilePic = document.getElementById('profile-pic');
-        const personality = document.getElementById('personality').value;
-        const fontColor = document.getElementById('fontColor').value;
-        const fontSize = document.getElementById('fontSize').value;
+function generateWishes() {
+    const eventSelect = document.getElementById('event-select');
+    const name = document.getElementById('name').value;
+    const date = document.getElementById('date').value;
+    const venue = document.getElementById('venue').value;
+    const personality = document.getElementById('personality').value;
+    const fontColor = document.getElementById('fontColor').value;
+    const fontSize = document.getElementById('fontSize').value;
 
-        // Customize the wish message based on the selected event
-        let wishMessage = '';
-const eventType = eventSelect.value;
+    let wishMessage = '';
+    const eventType = eventSelect.value;
 
-if (eventType === 'Birthday') {
-    wishMessage = `🎂 Happy Birthday, ${name || 'Dear Friend'}! 🎉 May your day be filled with joy and love! 🎁
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === "Valentine's Day") {
-    wishMessage = `💖 Happy Valentine's Day, ${name || 'Dear'}! May your love bloom like a beautiful rose 🌹
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === 'Christmas') {
-    wishMessage = `🎄 Merry Christmas, ${name || 'Dear Friend'}! Wishing you peace, love, and happiness! 🎅🏼
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === 'New Year') {
-    wishMessage = `🎉 Happy New Year, ${name || 'Dear Friend'}! May this year bring you success and joy! 🎆
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === 'Anniversary') {
-    wishMessage = `💍 Happy Anniversary, ${name || 'Dear'}! Here's to another year of love and happiness 💕
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-}
-        // Set the output message with customization
-        const output = document.getElementById('output');
-        output.style.color = fontColor;
-        output.style.fontSize = fontSize;
-        output.textContent = wishMessage;
+    switch (eventType) {
+        case 'Birthday':
+            wishMessage = `🎂 Happy Birthday, ${name || 'Dear Friend'}! 🎉 May your day be filled with joy and love! 🎁
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            break;
+        case "Valentine's Day":
+            wishMessage = `💖 Happy Valentine's Day, ${name || 'Dear'}! May your love bloom like a beautiful rose 🌹
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            break;
+        case 'Christmas':
+            wishMessage = `🎄 Merry Christmas, ${name || 'Dear Friend'}! Wishing you peace, love, and happiness! 🎅🏼
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            break;
+        case 'New Year':
+            wishMessage = `🎉 Happy New Year, ${name || 'Dear Friend'}! May this year bring you success and joy! 🎆
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            break;
+        case 'Anniversary':
+            wishMessage = `💍 Happy Anniversary, ${name || 'Dear'}! Here's to another year of love and happiness 💕
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            break;
+        case "Father's Day":
+            wishMessage = `👨‍👧‍👦 Happy Father's Day, ${name || 'Dear Dad'}! Thank you for your love, guidance, and support.
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Loving Family'}`;
+            break;
+        case "Mother's Day":
+            wishMessage = `🌸 Happy Mother's Day, ${name || 'Dear Mom'}! You're the heart of the family and our greatest blessing.
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Loving Family'}`;
+            break;
+        case "Girlfriend's Day":
+            wishMessage = `💖 Happy Girlfriend's Day, ${name || 'My Love'}! Thank you for being the light of my life.
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Boyfriend'}`;
+            break;
+        case "Boyfriend's Day":
+            wishMessage = `💙 Happy Boyfriend's Day, ${name || 'My Love'}! You make my world brighter every day.
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Girlfriend'}`;
+            break;
+        case "Graduation Day":
+            wishMessage = `🎓 Congratulations on your Graduation, ${name || 'Dear Graduate'}! The future is yours to shape.
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            break;
+        case "Teacher's Day":
+            wishMessage = `📚 Happy Teacher's Day, ${name || 'Dear Teacher'}! Thank you for inspiring and guiding us every day.
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Students'}`;
+            break;
+        case "Mashujaa Day":
+            wishMessage = `🇰🇪 Happy Mashujaa Day! Let's honor the heroes who fought for our freedom and inspire future generations.
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Fellow Kenyans'}`;
+            break;
+        case "Jamhuri Day":
+            wishMessage = `🇰🇪 Happy Jamhuri Day! Let's celebrate our independence and strive for a better Kenya.
+            Date: ${date || 'N/A'}
+            Venue: ${venue || 'N/A'}
+            Wishes From: ${personality || 'Your Fellow Kenyans'}`;
+            break;
+        default:
+            wishMessage = 'Please select an event to generate wishes.';
+    }
+
+    // Set the output message with customization
+    const output = document.getElementById('output');
+    output.style.color = fontColor;
+    output.style.fontSize = fontSize;
+    output.textContent = wishMessage;
+
 
         // Show the wish container and profile pic
         document.getElementById('wishes-container').classList.remove('hidden');
