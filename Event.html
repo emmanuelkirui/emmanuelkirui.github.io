@@ -313,19 +313,20 @@ if (eventType === 'Birthday') {
 
     // Function to update the font color and size
     function updateFontStyles() {
-        const fontColor = fontColorInput.value;
-        const fontSize = fontSizeSelect.value;
+        const fontColor = fontColorInput.value; // Get the selected font color
+        const fontSize = fontSizeSelect.value;  // Get the selected font size
 
         // Apply the font color and size to the container
-        wishesContainer.style.color = fontColor;
-        wishesContainer.style.fontSize = fontSize;
+        wishesContainer.style.color = fontColor;    // Set font color
+        wishesContainer.style.fontSize = fontSize;  // Set font size
     }
 
     // Add event listeners to update styles when inputs change
     fontColorInput.addEventListener('input', updateFontStyles);
     fontSizeSelect.addEventListener('change', updateFontStyles);
 
-        
+    // Call updateFontStyles initially to set the default styles
+    updateFontStyles();
         // Add event decoration animations based on selected event
         const decorations = document.querySelectorAll('.decorations span');
         if (eventType === 'Birthday') {
