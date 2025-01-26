@@ -21,6 +21,12 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background-color: #121212;
+            color: #ffffff;
         }
 
         .container {
@@ -32,6 +38,10 @@
             max-width: 600px;
             margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .container.dark-mode {
+            background: rgba(50, 50, 50, 0.8);
         }
 
         .title {
@@ -175,11 +185,29 @@
             border: 2px solid #ddd;
             border-radius: 8px;
         }
+
+        /* Dark mode toggle icon */
+        .mode-toggle {
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #4b2e83;
+        }
+
+        body.dark-mode .mode-toggle {
+            color: #ffffff;
+        }
     </style>
 </head>
 <body>
     <!-- Background Decoration -->
     <div class="background-decorations"></div>
+
+    <!-- Dark Mode Toggle Button -->
+    <div class="icon-bar">
+        <button id="mode-toggle" class="mode-toggle" title="Toggle Dark/Light Mode">
+            <i class="fas fa-sun"></i>
+        </button>
+    </div>
 
     <!-- Input Container -->
     <div class="container">
@@ -236,6 +264,19 @@
     </div>
 
     <script>
+        // Toggle dark mode
+        document.getElementById("mode-toggle").addEventListener("click", function() {
+            document.body.classList.toggle("dark-mode");
+            const icon = document.querySelector("#mode-toggle i");
+            if (document.body.classList.contains("dark-mode")) {
+                icon.classList.remove("fa-sun");
+                icon.classList.add("fa-moon");
+            } else {
+                icon.classList.remove("fa-moon");
+                icon.classList.add("fa-sun");
+            }
+        });
+
         // Load profile picture
         function loadProfilePic(event) {
             const output = document.getElementById('profile-pic');
@@ -310,6 +351,25 @@
                     navigator.share(shareData).catch((error) => console.log('Error sharing:', error));
                 }
             });
+        });
+
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const lightModeToggle = document.getElementById('light-mode-toggle');
+
+        // Check and apply mode from localStorage
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        darkModeToggle.addEventListener('click', function() {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('theme', 'dark');
+        });
+
+        lightModeToggle.addEventListener('click', function() {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('theme', 'light');
         });
     </script>
 </body>
