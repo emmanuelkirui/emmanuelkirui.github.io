@@ -286,6 +286,31 @@
         fontSizeInput.addEventListener("change", () => {
             output.style.fontSize = fontSizeInput.value;
         });
+
+        // Download the wishes as image
+        document.getElementById("download-btn").addEventListener("click", function() {
+            html2canvas(document.getElementById("wishes-container")).then(function(canvas) {
+                const link = document.createElement("a");
+                link.download = "birthday_wishes.png";
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            });
+        });
+
+        // Share as image
+        document.getElementById("share-btn").addEventListener("click", function() {
+            html2canvas(document.getElementById("wishes-container")).then(function(canvas) {
+                const dataUrl = canvas.toDataURL("image/png");
+                const shareData = {
+                    title: 'Happy Birthday Wishes',
+                    text: 'Check out this cool birthday wish!',
+                    url: dataUrl
+                };
+                if (navigator.share) {
+                    navigator.share(shareData).catch((error) => console.log('Error sharing:', error));
+                }
+            });
+        });
     </script>
 </body>
 </html>
