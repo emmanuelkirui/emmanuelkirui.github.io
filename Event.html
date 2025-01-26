@@ -227,12 +227,12 @@
             <option value="3em">Extra Large</option>
         </select>
     </div>
-<div class="icon-bar">
+
+    <div class="container output-container hidden" id="wishes-container">
+        <div class="icon-bar">
             <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
             <button id="share-btn" title="Share as Image"><i class="fa fa-share-alt"></i></button>
-</div>
-    <div class="container output-container hidden" id="wishes-container">
-        
+        </div>
         <img id="profile-pic" class="profile-pic" style="display:none;">
         <div class="output" id="output"></div>
         <div class="decorations">
@@ -305,19 +305,18 @@ if (eventType === 'Birthday') {
 
         // Show the wish container and profile pic
         document.getElementById('wishes-container').classList.remove('hidden');
-
-           // Get references to the font controls and the container
+ // Get references to the font controls and the container
     const fontColorInput = document.getElementById('fontColor');
     const fontSizeSelect = document.getElementById('fontSize');
     const wishesContainer = document.getElementById('wishes-container');
-    const textElements = wishesContainer.querySelectorAll('*'); // All elements inside the container
+    const textElements = wishesContainer.querySelectorAll('.output, .decorations span'); // Target only text elements inside the container
 
     // Function to update the font color and size
     function updateFontStyles() {
         const fontColor = fontColorInput.value; // Get the selected font color
         const fontSize = fontSizeSelect.value;  // Get the selected font size
 
-        // Apply the font color and size to all text elements inside the container
+        // Apply the font color and size to all text elements inside the container (excluding buttons)
         textElements.forEach(element => {
             element.style.color = fontColor;    // Set font color
             element.style.fontSize = fontSize;  // Set font size
@@ -330,6 +329,7 @@ if (eventType === 'Birthday') {
 
     // Call updateFontStyles initially to set the default styles
     updateFontStyles();
+
 
         // Add event decoration animations based on selected event
         const decorations = document.querySelectorAll('.decorations span');
