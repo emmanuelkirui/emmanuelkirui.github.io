@@ -274,85 +274,52 @@
         reader.readAsDataURL(file);
     }
 
-    function generateWishes() {
-        const eventSelect = document.getElementById('event-select');
-        const eventName = document.getElementById('event-name').value;
-        const name = document.getElementById('name').value;
-        const date = document.getElementById('date').value;
-        const venue = document.getElementById('venue').value;
-        const profilePic = document.getElementById('profile-pic');
-        const personality = document.getElementById('personality').value;
-        const fontColor = document.getElementById('fontColor').value;
-        const fontSize = document.getElementById('fontSize').value;
-        const fontType = document.getElementById('fontType').value; // Initialize the font type
-// Customize the wish message based on the selected event
-let wishMessage = '';
-const eventType = eventSelect.value;
+function generateWishes() {
+    const eventSelect = document.getElementById('event-select');
+    const eventName = document.getElementById('event-name').value;
+    const name = document.getElementById('name').value;
+    const date = document.getElementById('date').value;
+    const venue = document.getElementById('venue').value;
+    const profilePic = document.getElementById('profile-pic');
+    const personality = document.getElementById('personality').value;
+    const fontColor = document.getElementById('fontColor').value;
+    const fontSize = document.getElementById('fontSize').value;
+    const fontType = document.getElementById('fontType').value; // Initialize the font type
 
-if (eventType === 'Birthday') {
-    wishMessage = `🎂 Happy Birthday, ${name || 'Dear Friend'}! 🎉 May your day be filled with joy and love! 🎁
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === "Valentine's Day") {
-    wishMessage = `💖 Happy Valentine's Day, ${name || 'Dear'}! May your love bloom like a beautiful rose 🌹
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === 'Christmas') {
-    wishMessage = `🎄 Merry Christmas, ${name || 'Dear Friend'}! Wishing you peace, love, and happiness! 🎅🏼
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === 'New Year') {
-    wishMessage = `🎉 Happy New Year, ${name || 'Dear Friend'}! May this year bring you success and joy! 🎆
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === 'Anniversary') {
-    wishMessage = `💍 Happy Anniversary, ${name || 'Dear'}! Here's to another year of love and happiness 💕
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === 'Graduation Day') {
-    wishMessage = `🎓 Happy Graduation Day, ${name || 'Graduate'}! 🎉 Wishing you success in all your future endeavors 🎓
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
-} else if (eventType === 'Teacher\'s Day') {
-    wishMessage = `🍎 Happy Teacher's Day, ${name || 'Teacher'}! 📚 Thank you for all your hard work and dedication 🍎
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Students'}`;
-} else if (eventType === 'Girlfriend\'s Day') {
-    wishMessage = `💖 Happy Girlfriend's Day, ${name || 'Sweetheart'}! 💐 You mean the world to me 💖
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Loving Partner'}`;
-} else if (eventType === 'Boyfriend\'s Day') {
-    wishMessage = `💙 Happy Boyfriend's Day, ${name || 'Honey'}! 💎 Thank you for being amazing 💙
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Loving Partner'}`;
-} else if (eventType === 'Father\'s Day') {
-    wishMessage = `👨‍👧‍👦 Happy Father's Day, ${name || 'Dad'}! 🎉 Thank you for being the pillar of strength and love 👨‍👧‍👦
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Children'}`;
-} else if (eventType === 'Mother\'s Day') {
-    wishMessage = `👩‍👧‍👦 Happy Mother's Day, ${name || 'Mom'}! 💐 Thank you for your endless love and support 👩‍👧‍👦
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Children'}`;
-}
-// Set the output message with customization
-const output = document.getElementById('output');
-output.style.color = fontColor;          // Apply the font color
-output.style.fontSize = fontSize;        // Apply the font size
-output.style.fontFamily = fontType;      // Apply the font type
-output.textContent = wishMessage;        // Set the wish message text
-// Show the wish container and profile pic
-document.getElementById('wishes-container').classList.remove('hidden');
+    // Customize the wish message based on the selected event
+    let wishMessage = '';
+    const eventType = eventSelect.value;
+
+    if (eventType === 'Birthday') {
+        wishMessage = `🎂 Happy Birthday, ${name || 'Dear Friend'}! 🎉 May your day be filled with joy and love! 🎁
+        Date: ${date || 'Not provided'} 
+        Venue: ${venue || 'Not provided'}`;
+    } else if (eventType === 'Valentine\'s Day') {
+        wishMessage = `💖 Happy Valentine's Day, ${name || 'My Love'}! 💐 Wishing you all the love and happiness today and always!
+        Date: ${date || 'Not provided'} 
+        Venue: ${venue || 'Not provided'}`;
+    } else if (eventType === 'Christmas') {
+        wishMessage = `🎄 Merry Christmas, ${name || 'My Dear'}! 🎁 May your holiday season be filled with peace, joy, and love!
+        Date: ${date || 'Not provided'} 
+        Venue: ${venue || 'Not provided'}`;
+    } // Continue for other events...
+
+    // Set the generated message in the output container
+    const outputContainer = document.getElementById('wishes-container');
+    const output = document.getElementById('output');
+    output.innerHTML = wishMessage;
+
+    // Display the generated message
+    outputContainer.style.display = 'block';
+    
+    // Set styles for the output
+    output.style.color = fontColor;
+    output.style.fontSize = fontSize;
+    output.style.fontFamily = fontType;
+    // Show the wish container and profile pic;
+document.getElementById('wishes-container').classList.remove('hidden')
+
+
 
 // Get references to the font controls and the container
 const fontColorInput = document.getElementById('fontColor');
