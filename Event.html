@@ -351,8 +351,9 @@ function updateFontStyles() {
     const fontSize = document.getElementById('fontSize').value;
     const container = document.getElementById('wishes-container');
 
+    // Apply the font color and size changes
     container.style.color = fontColor;
-    container.style.fontSize = fontSize;
+    container.style.fontSize = fontSize + 'px'; // Ensure that the font size is appended with 'px'
 }
 
 // Listen for font color changes
