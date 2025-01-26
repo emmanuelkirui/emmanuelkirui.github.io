@@ -235,99 +235,106 @@
     </div>
 
     <script>
-        function loadProfilePic(event) {
-            const output = document.getElementById('profile-pic');
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    output.src = e.target.result;
-                    output.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        function generateWishes() {
-            const eventName = document.getElementById("event-name").value;
-            const name = document.getElementById("name").value;
-            const date = document.getElementById("date").value;
-            const venue = document.getElementById("venue").value;
-            const personality = document.getElementById("personality").value;
-
-            if (eventName && name && date && venue && personality) {
-                const outputContainer = document.getElementById("wishes-container");
-                const output = document.getElementById("output");
-
-                const textContent = `
-                    🎉 Happy ${eventName}, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
-                    🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
-                `;
-
-                output.innerHTML = textContent;
-                outputContainer.classList.remove("hidden");
-
-                setDecorations(eventName);
-            } else {
-                alert("Please fill out all fields before generating wishes.");
-            }
-        }
-
-        function setDecorations(eventName) {
-            const decorations = {
-                "Birthday": ["❤️", "🎂", "🎉", "🎁", "🌼"],
-                "Valentine's Day": ["❤️", "🌹", "💌", "🍫", "💖"],
-                "Christmas": ["🎄", "🎅", "🎁", "✨", "❄️"],
-                "New Year": ["🎉", "🎆", "🍾", "🥂", "🎇"],
-                "Anniversary": ["💍", "💐", "❤️", "🎉", "🌹"]
+    function loadProfilePic(event) {
+        const output = document.getElementById('profile-pic');
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                output.src = e.target.result;
+                output.style.display = 'block';
             };
-
-            const outputDecorations = document.querySelector('.decorations');
-            outputDecorations.innerHTML = '';  // Clear previous decorations
-
-            const selectedDecorations = decorations[eventName] || [];
-
-            selectedDecorations.forEach((decoration) => {
-                const span = document.createElement('span');
-                span.textContent = decoration;
-                outputDecorations.appendChild(span);
-            });
+            reader.readAsDataURL(file);
         }
+    }
 
-        // Handle event selection and update decorations
-        document.getElementById('event-select').addEventListener('change', (event) => {
-            const eventName = event.target.value;
+    function generateWishes() {
+        const eventName = document.getElementById("event-name").value;
+        const name = document.getElementById("name").value;
+        const date = document.getElementById("date").value;
+        const venue = document.getElementById("venue").value;
+        const personality = document.getElementById("personality").value;
+
+        if (eventName && name && date && venue && personality) {
+            const outputContainer = document.getElementById("wishes-container");
+            const output = document.getElementById("output");
+
+            const textContent = `
+                🎉 Happy ${eventName}, <strong>${name}</strong>! 🎂<br>
+                🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
+                🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
+            `;
+
+            output.innerHTML = textContent;
+            outputContainer.classList.remove("hidden");
+
             setDecorations(eventName);
-        });
-
-        // Generate wishes with event-specific decorations
-        function generateWishes() {
-            const name = document.getElementById("name").value;
-            const date = document.getElementById("date").value;
-            const venue = document.getElementById("venue").value;
-            const personality = document.getElementById("personality").value;
-            const eventName = document.getElementById('event-select').value;
-
-            if (name && date && venue && personality && eventName) {
-                const outputContainer = document.getElementById("wishes-container");
-                const output = document.getElementById("output");
-
-                const textContent = `
-                    🎉 Happy ${eventName}, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
-                    🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
-                `;
-
-                output.innerHTML = textContent;
-                outputContainer.classList.remove("hidden");
-
-                // Set event-specific decorations
-                setDecorations(eventName);
-            } else {
-                alert("Please fill out all fields before generating wishes.");
-            }
+        } else {
+            alert("Please fill out all fields before generating wishes.");
         }
-    </script>
+    }
+
+    function setDecorations(eventName) {
+        const decorations = {
+            "Birthday": ["❤️", "🎂", "🎉", "🎁", "🌼"],
+            "Valentine's Day": ["❤️", "🌹", "💌", "🍫", "💖"],
+            "Christmas": ["🎄", "🎅", "🎁", "✨", "❄️"],
+            "New Year": ["🎉", "🎆", "🍾", "🥂", "🎇"],
+            "Anniversary": ["💍", "💐", "❤️", "🎉", "🌹"]
+        };
+
+        const outputDecorations = document.querySelector('.decorations');
+        outputDecorations.innerHTML = '';  // Clear previous decorations
+
+        const selectedDecorations = decorations[eventName] || [];
+
+        selectedDecorations.forEach((decoration) => {
+            const span = document.createElement('span');
+            span.textContent = decoration;
+            outputDecorations.appendChild(span);
+        });
+    }
+
+    // Handle event selection and update decorations
+    document.getElementById('event-select').addEventListener('change', (event) => {
+        const eventName = event.target.value;
+        setDecorations(eventName);
+    });
+
+    // Download as image
+    document.getElementById('download-btn').addEventListener('click', () => {
+        const container = document.getElementById('wishes-container');
+        html2canvas(container).then((canvas) => {
+            const link = document.createElement('a');
+            link.download = 'event-wishes.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    });
+
+    // Share as image
+    document.getElementById('share-btn').addEventListener('click', () => {
+        const container = document.getElementById('wishes-container');
+        html2canvas(container).then((canvas) => {
+            const dataUrl = canvas.toDataURL();
+            const shareData = {
+                title: 'Event Wishes',
+                text: 'Check out these event wishes!',
+                url: dataUrl
+            };
+            navigator.share(shareData).catch(console.error);
+        });
+    });
+
+    // Font controls
+    document.getElementById('fontColor').addEventListener('input', (event) => {
+        document.getElementById('output').style.color = event.target.value;
+    });
+
+    document.getElementById('fontSize').addEventListener('change', (event) => {
+        document.getElementById('output').style.fontSize = event.target.value;
+    });
+
+</script>
 </body>
 </html>
