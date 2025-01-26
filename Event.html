@@ -371,16 +371,37 @@ if (eventType === 'Birthday') {
 
 
     // Share the generated wishes as an image
-    document.getElementById('share-btn').addEventListener('click', function() {
-        const container = document.getElementById('wishes-container');
-        html2canvas(container).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = imgData;
-            link.download = 'event_wishes.png';
-            link.click();
-        });
+document.getElementById('share-btn').addEventListener('click', function() {
+    const container = document.getElementById('wishes-container');
+    
+    // Use html2canvas to capture the content of the container
+    html2canvas(container).then(canvas => {
+        const imgData = canvas.toDataURL('image/png'); // Convert canvas to image data
+
+        // Check if the Web Share API is supported
+        if (navigator.share) {
+            // Create a Blob from the image data
+            fetch(imgData)
+                .then(res => res.blob())
+                .then(blob => {
+                    const file = new File([blob], 'event_wishes.png', { type: 'image/png' });
+                    
+                    // Share the image via the Web Share API
+                    navigator.share({
+                        files: [file],
+                        title: 'Event Wishes',
+                        text: 'Check out these event wishes!'
+                    }).then(() => {
+                        console.log('Image shared successfully!');
+                    }).catch(err => {
+                        console.error('Error sharing the image:', err);
+                    });
+                });
+        } else {
+            alert('Web Share API is not supported on this device.');
+        }
     });
+});
 
     // Download the profile picture and event wishes together
     document.getElementById('download-btn').addEventListener('click', function() {
