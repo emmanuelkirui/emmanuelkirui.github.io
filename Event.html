@@ -285,10 +285,8 @@
         const fontColor = document.getElementById('fontColor').value;
         const fontSize = document.getElementById('fontSize').value;
         const fontType = document.getElementById('fontType').value; // Initialize the font type
-
-
-        // Customize the wish message based on the selected event
-        let wishMessage = '';
+// Customize the wish message based on the selected event
+let wishMessage = '';
 const eventType = eventSelect.value;
 
 if (eventType === 'Birthday') {
@@ -316,8 +314,7 @@ if (eventType === 'Birthday') {
     Date: ${date || 'N/A'}
     Venue: ${venue || 'N/A'}
     Wishes From: ${personality || 'Your Well-Wishers'}`;
-}
-else if (eventType === 'Graduation Day') {
+} else if (eventType === 'Graduation Day') {
     wishMessage = `🎓 Happy Graduation Day, ${name || 'Graduate'}! 🎉 Wishing you success in all your future endeavors 🎓
     Date: ${date || 'N/A'}
     Venue: ${venue || 'N/A'}
@@ -347,13 +344,7 @@ else if (eventType === 'Graduation Day') {
     Date: ${date || 'N/A'}
     Venue: ${venue || 'N/A'}
     Wishes From: ${personality || 'Your Children'}`;
-} else if (eventType === 'Anniversary') {
-    wishMessage = `💍 Happy Anniversary, ${name || 'Dear'}! Here's to another year of love and happiness 💕
-    Date: ${date || 'N/A'}
-    Venue: ${venue || 'N/A'}
-    Wishes From: ${personality || 'Your Well-Wishers'}`;
 }
-
 // Set the output message with customization
 const output = document.getElementById('output');
 output.style.color = fontColor;          // Apply the font color
