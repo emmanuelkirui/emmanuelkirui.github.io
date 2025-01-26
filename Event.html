@@ -347,20 +347,20 @@ if (eventType === 'Birthday') {
 
 // Function to update font size and color dynamically
 function updateFontStyles() {
-    const fontColor = document.getElementById('fontColor').value;
-    const fontSize = document.getElementById('fontSize').value;
+    const fontColor = document.getElementById('fontColor').value;  // Get font color
+    const fontSize = document.getElementById('fontSize').value;    // Get font size
     const container = document.getElementById('wishes-container');
 
     // Apply the font color and size changes
-    container.style.color = fontColor;
-    container.style.fontSize = fontSize + 'px'; // Ensure that the font size is appended with 'px'
+    container.style.color = fontColor;    // Update font color
+    container.style.fontSize = fontSize + 'px'; // Ensure font size is applied in px
 }
 
 // Listen for font color changes
 document.getElementById('fontColor').addEventListener('input', updateFontStyles);
 
 // Listen for font size changes
-document.getElementById('fontSize').addEventListener('change', updateFontStyles);
+document.getElementById('fontSize').addEventListener('input', updateFontStyles);
 
     // Share the generated wishes as an image
     document.getElementById('share-btn').addEventListener('click', function() {
