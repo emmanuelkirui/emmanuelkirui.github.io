@@ -85,28 +85,20 @@
             margin-top: 20px;
             font-family: 'Sacramento', cursive;
             font-size: 2.5em;
-            background: linear-gradient(45deg, #ffdf00, #ff9900);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: glitter 1.5s infinite;
+            color: #4b2e83;
+            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
+            transition: font-size 0.3s ease;
         }
 
-        @keyframes glitter {
-            0% {
-                text-shadow: 0 0 5px #ff9900, 0 0 10px #ffcc00, 0 0 20px #ffee00;
-            }
-            50% {
-                text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffee00, 0 0 30px #ffdf00;
-            }
-            100% {
-                text-shadow: 0 0 5px #ffee00, 0 0 15px #ffcc00, 0 0 25px #ff9900;
-            }
+        .output.dynamic-font {
+            font-size: 1.5em; /* Adjusts dynamically */
         }
 
         .decorations {
             margin-top: 20px;
             font-size: 2em;
             color: #e74c3c;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         }
 
         .decorations span {
@@ -148,8 +140,8 @@
         }
 
         .profile-pic {
-            width: 30px;
-            height: 30px;
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             margin-bottom: 20px;
             object-fit: cover;
@@ -157,6 +149,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
+        /* Add background effects */
         .background-decorations {
             position: absolute;
             top: 0;
@@ -170,8 +163,10 @@
     </style>
 </head>
 <body>
+    <!-- Background Decoration -->
     <div class="background-decorations"></div>
 
+    <!-- Input Container -->
     <div class="container">
         <div class="title">🎉 Create Birthday Wishes 🎉</div>
         <div class="form-group">
@@ -192,11 +187,12 @@
         </div>
         <div class="form-group">
             <label for="personality">Personality Wishes</label>
-            <input type="text" id="personality" value="#manuraj#emmanuelkirui" placeholder="Enter Personality Wishes">
+            <input type="text" id="personality" placeholder="Enter Personality Wishes">
         </div>
         <button class="button" onclick="generateWishes()">Generate Wishes</button>
     </div>
 
+    <!-- Wishes Display Container -->
     <div class="container output-container hidden" id="wishes-container">
         <div class="icon-bar">
             <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
@@ -214,12 +210,13 @@
     </div>
 
     <script>
+        // Load profile picture
         function loadProfilePic(event) {
             const output = document.getElementById('profile-pic');
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     output.src = e.target.result;
                     output.style.display = 'block';
                 };
@@ -227,6 +224,7 @@
             }
         }
 
+        // Generate wishes
         function generateWishes() {
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
@@ -237,17 +235,27 @@
                 const outputContainer = document.getElementById("wishes-container");
                 const output = document.getElementById("output");
 
-                output.innerHTML = `
+                const textContent = `
                     🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>. <br>
-                    🌟 Here's a special wish: <strong>${personality}</strong> <br> Have a fantastic day!`;
+                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
+                    🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
+                `;
 
+                // Adjust font size dynamically for long text
+                if (textContent.length > 200) {
+                    output.classList.add("dynamic-font");
+                } else {
+                    output.classList.remove("dynamic-font");
+                }
+
+                output.innerHTML = textContent;
                 outputContainer.classList.remove("hidden");
             } else {
                 alert("Please fill out all fields before generating wishes.");
             }
         }
 
+        // Download wishes as an image
         document.getElementById("download-btn").addEventListener("click", () => {
             const wishesContainer = document.getElementById("wishes-container");
             html2canvas(wishesContainer).then(canvas => {
@@ -258,9 +266,9 @@
             });
         });
 
+        // Share wishes as an image
         document.getElementById("share-btn").addEventListener("click", () => {
             const wishesContainer = document.getElementById("wishes-container");
-
             html2canvas(wishesContainer).then(canvas => {
                 canvas.toBlob(blob => {
                     const file = new File([blob], "birthday-wishes.png", { type: "image/png" });
@@ -269,12 +277,8 @@
                             files: [file],
                             title: "Birthday Wishes",
                             text: "Check out these cool birthday wishes!",
-                        }).then(() => {
-                            console.log("Shared successfully!");
-                        }).catch(err => {
-                            console.error("Error sharing:", err);
-                            alert("Sharing failed. Please try again.");
-                        });
+                        }).then(() => console.log("Shared successfully!"))
+                          .catch(err => alert("Sharing failed: " + err.message));
                     } else {
                         alert("Sharing is not supported on this browser.");
                     }
