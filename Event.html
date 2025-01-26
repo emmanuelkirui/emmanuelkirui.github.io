@@ -269,19 +269,39 @@
 
         // Customize the wish message based on the selected event
         let wishMessage = '';
-        const eventType = eventSelect.value;
+const eventType = eventSelect.value;
 
-        if (eventType === 'Birthday') {
-            wishMessage = `🎂 Happy Birthday, ${name}! 🎉 May your day be filled with joy and love! 🎁`;
-        } else if (eventType === "Valentine's Day") {
-            wishMessage = `💖 Happy Valentine's Day, ${name}! May your love bloom like a beautiful rose 🌹`;
-        } else if (eventType === 'Christmas') {
-            wishMessage = `🎄 Merry Christmas, ${name}! Wishing you peace, love, and happiness! 🎅🏼`;
-        } else if (eventType === 'New Year') {
-            wishMessage = `🎉 Happy New Year, ${name}! May this year bring you success and joy! 🎆`;
-        } else if (eventType === 'Anniversary') {
-            wishMessage = `💍 Happy Anniversary, ${name}! Here's to another year of love and happiness 💕`;
-        }
+if (eventType === 'Birthday') {
+    wishMessage = `🎂 Happy Birthday, ${name}! 🎉 May your day be filled with joy and love! 🎁
+    Event: ${eventName}
+    Date: ${date}
+    Venue: ${venue}
+    Personality Type: ${personality}`;
+} else if (eventType === "Valentine's Day") {
+    wishMessage = `💖 Happy Valentine's Day, ${name}! May your love bloom like a beautiful rose 🌹
+    Event: ${eventName}
+    Date: ${date}
+    Venue: ${venue}
+    Personality Type: ${personality}`;
+} else if (eventType === 'Christmas') {
+    wishMessage = `🎄 Merry Christmas, ${name}! Wishing you peace, love, and happiness! 🎅🏼
+    Event: ${eventName}
+    Date: ${date}
+    Venue: ${venue}
+    Personality Type: ${personality}`;
+} else if (eventType === 'New Year') {
+    wishMessage = `🎉 Happy New Year, ${name}! May this year bring you success and joy! 🎆
+    Event: ${eventName}
+    Date: ${date}
+    Venue: ${venue}
+    Personality Type: ${personality}`;
+} else if (eventType === 'Anniversary') {
+    wishMessage = `💍 Happy Anniversary, ${name}! Here's to another year of love and happiness 💕
+    Event: ${eventName}
+    Date: ${date}
+    Venue: ${venue}
+    Personality Type: ${personality}`;
+}
 
         // Set the output message with customization
         const output = document.getElementById('output');
