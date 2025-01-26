@@ -213,6 +213,7 @@
     <option value="Mashujaa Day">Mashujaa Day</option>
     <option value="Jamhuri Day">Jamhuri Day</option>
     <option value="Wedding">Wedding</option>
+    <option value="Greetings Day">Greetings Day</option>
 </select>
         </div>
         <div class="form-group">
@@ -379,6 +380,12 @@ function generateWishes() {
     Venue: ${venue}
     Best Wishes From: ${personality}`;
     break;
+      case "Greetings Day":
+    wishMessage = `🌟 Hello, ${name}! Wishing you a wonderful day filled with joy, positivity, and good vibes. Keep shining!
+    Date: ${date}
+    Venue: ${venue}
+    Wishes From: ${personality}`;
+    break;
         default:
             wishMessage = 'Please select an event to generate wishes.';
     }
@@ -479,6 +486,12 @@ if (eventType === 'Birthday') {
     decorations[2].textContent = '💕';
     decorations[3].textContent = '🌸';
     decorations[4].textContent = '❤️';
+} else if (eventType === "Greetings Day") {
+    decorations[0].textContent = '🌟';
+    decorations[1].textContent = '🌞';
+    decorations[2].textContent = '💫';
+    decorations[3].textContent = '✨';
+    decorations[4].textContent = '🌈';
 }
 
         // Adjust the font size for the message based on input
