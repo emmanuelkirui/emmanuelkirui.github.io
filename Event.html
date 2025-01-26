@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Wishes Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Sacramento&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            text-align: center;
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            color: #4b2e83;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .title {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5em;
+            color: #e74c3c;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 1.2em;
+            display: block;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="file"],
+        input[type="text"].event-name {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+
+        .button {
+            padding: 12px 25px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .output-container {
+            position: relative;
+        }
+
+        .output {
+            margin-top: 20px;
+            font-family: 'Sacramento', cursive;
+            font-size: 2.5em;
+            color: #4b2e83;
+            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
+            transition: font-size 0.3s ease;
+        }
+
+        .output.dynamic-font {
+            font-size: 1.5em;
+        }
+
+        .decorations {
+            margin-top: 20px;
+            font-size: 2em;
+            color: #e74c3c;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .decorations span {
+            margin: 0 10px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .icon-bar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .icon-bar button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #4b2e83;
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .icon-bar button:hover {
+            transform: scale(1.2);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 3px solid #e74c3c;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .background-decorations {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://www.transparenttextures.com/patterns/asfalt.png');
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .font-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .font-controls select,
+        .font-controls input {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-decorations"></div>
+
+    <div class="container">
+        <div class="title">🎉 Event Wishes Generator 🎉</div>
+        <div class="form-group">
+            <label for="event-name">Event Name</label>
+            <input type="text" id="event-name" class="event-name" placeholder="Enter Event (e.g., Birthday, Valentine's Day)">
+        </div>
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Enter Name">
+        </div>
+        <div class="form-group">
+            <label for="date">Date of Event</label>
+            <input type="date" id="date">
+        </div>
+        <div class="form-group">
+            <label for="venue">Venue</label>
+            <input type="text" id="venue" placeholder="Enter Venue">
+        </div>
+        <div class="form-group">
+            <label for="image">Upload Image</label>
+            <input type="file" id="image" onchange="loadProfilePic(event)">
+        </div>
+        <div class="form-group">
+            <label for="personality">Personalized Message</label>
+            <input type="text" id="personality" value="#emmanuelkirui#manuraj" placeholder="Enter Message">
+        </div>
+        <button class="button" onclick="generateWishes()">Generate Wishes</button>
+    </div>
+
+    <div class="font-controls">
+        <input type="color" id="fontColor" title="Choose font color">
+        <select id="fontSize" title="Choose font size">
+            <option value="1em">Small</option>
+            <option value="1.5em" selected>Medium</option>
+            <option value="2em">Large</option>
+            <option value="3em">Extra Large</option>
+        </select>
+    </div>
+
+    <div class="container output-container hidden" id="wishes-container">
+        <div class="icon-bar">
+            <button id="download-btn" title="Download"><i class="fa fa-download"></i></button>
+            <button id="share-btn" title="Share as Image"><i class="fa fa-share-alt"></i></button>
+        </div>
+        <img id="profile-pic" class="profile-pic" style="display:none;">
+        <div class="output" id="output"></div>
+        <div class="decorations">
+            <span id="decoration1">❤️</span>
+            <span id="decoration2">🌸</span>
+            <span id="decoration3">🎂</span>
+            <span id="decoration4">🎁</span>
+            <span id="decoration5">🌼</span>
+        </div>
+    </div>
+
+    <script>
+        function loadProfilePic(event) {
+            const output = document.getElementById('profile-pic');
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    output.src = e.target.result;
+                    output.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function generateWishes() {
+            const eventName = document.getElementById("event-name").value;
+            const name = document.getElementById("name").value;
+            const date = document.getElementById("date").value;
+            const venue = document.getElementById("venue").value;
+            const personality = document.getElementById("personality").value;
+
+            if (eventName && name && date && venue && personality) {
+                const outputContainer = document.getElementById("wishes-container");
+                const output = document.getElementById("output");
+
+                const textContent = `
+                    🎉 Happy ${eventName}, <strong>${name}</strong>! 🎂<br>
+                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
+                    🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
+                `;
+
+                output.innerHTML = textContent;
+                outputContainer.classList.remove("hidden");
+
+                setDecorations(eventName);
+            } else {
+                alert("Please fill out all fields before generating wishes.");
+            }
+        }
+
+        function setDecorations(eventName) {
+            const decorations = {
+                "Birthday": ["❤️", "🎂", "🎉", "🎁", "🌼"],
+                "Valentine's Day": ["❤️", "🌹", "💌", "🍫", "💖"],
+                "Christmas": ["🎄", "🎅", "🎁", "✨", "❄️"],
+                "New Year": ["🎉", "🎆", "🍾", "🥂", "🎇"],
+                "Anniversary": ["💍", "💐", "❤️", "🎉", "🌹"]
+            };
+
+            const outputDecorations = document.querySelector('.decorations');
+            outputDecorations.innerHTML = '';  // Clear previous decorations
+
+            const selectedDecorations = decorations[eventName] || [];
+
+            selectedDecorations.forEach((decoration) => {
+                const span = document.createElement('span');
+                span.textContent = decoration;
+                outputDecorations.appendChild(span);
+            });
+        }
+
+        // Handle event selection and update decorations
+        document.getElementById('event-select').addEventListener('change', (event) => {
+            const eventName = event.target.value;
+            setDecorations(eventName);
+        });
+
+        // Generate wishes with event-specific decorations
+        function generateWishes() {
+            const name = document.getElementById("name").value;
+            const date = document.getElementById("date").value;
+            const venue = document.getElementById("venue").value;
+            const personality = document.getElementById("personality").value;
+            const eventName = document.getElementById('event-select').value;
+
+            if (name && date && venue && personality && eventName) {
+                const outputContainer = document.getElementById("wishes-container");
+                const output = document.getElementById("output");
+
+                const textContent = `
+                    🎉 Happy ${eventName}, <strong>${name}</strong>! 🎂<br>
+                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
+                    🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
+                `;
+
+                output.innerHTML = textContent;
+                outputContainer.classList.remove("hidden");
+
+                // Set event-specific decorations
+                setDecorations(eventName);
+            } else {
+                alert("Please fill out all fields before generating wishes.");
+            }
+        }
+    </script>
+</body>
+</html>
