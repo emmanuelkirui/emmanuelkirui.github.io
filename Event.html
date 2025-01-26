@@ -305,6 +305,26 @@ if (eventType === 'Birthday') {
 
         // Show the wish container and profile pic
         document.getElementById('wishes-container').classList.remove('hidden');
+
+         // Get references to the font controls and the container
+    const fontColorInput = document.getElementById('fontColor');
+    const fontSizeSelect = document.getElementById('fontSize');
+    const wishesContainer = document.getElementById('wishes-container');
+
+    // Function to update the font color and size
+    function updateFontStyles() {
+        const fontColor = fontColorInput.value;
+        const fontSize = fontSizeSelect.value;
+
+        // Apply the font color and size to the container
+        wishesContainer.style.color = fontColor;
+        wishesContainer.style.fontSize = fontSize;
+    }
+
+    // Add event listeners to update styles when inputs change
+    fontColorInput.addEventListener('input', updateFontStyles);
+    fontSizeSelect.addEventListener('change', updateFontStyles);
+
         
         // Add event decoration animations based on selected event
         const decorations = document.querySelectorAll('.decorations span');
@@ -345,22 +365,6 @@ if (eventType === 'Birthday') {
     }
         
 
-// Function to update font size and color dynamically
-function updateFontStyles() {
-    const fontColor = document.getElementById('fontColor').value;  // Get font color
-    const fontSize = document.getElementById('fontSize').value;    // Get font size
-    const container = document.getElementById('wishes-container');
-
-    // Apply the font color and size changes
-    container.style.color = fontColor;    // Update font color
-    container.style.fontSize = fontSize + 'px'; // Ensure font size is applied in px
-}
-
-// Listen for font color changes
-document.getElementById('fontColor').addEventListener('input', updateFontStyles);
-
-// Listen for font size changes
-document.getElementById('fontSize').addEventListener('input', updateFontStyles);
 
     // Share the generated wishes as an image
     document.getElementById('share-btn').addEventListener('click', function() {
