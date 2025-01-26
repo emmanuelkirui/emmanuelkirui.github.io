@@ -114,32 +114,40 @@
         }
 
         .icon-bar button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #4b2e83;
-            font-size: 1.5em;
-            transition: transform 0.3s ease;
-            margin-left: 10px;
-        }
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4b2e83;
+    font-size: 1.5em;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
+    margin-left: 10px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Added shadow for depth */
+}
 
-        .icon-bar button:hover {
-            transform: scale(1.2);
-        }
+.icon-bar button:hover {
+    transform: scale(1.1); /* Scales the button up for a 3D hover effect */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Adds shadow to give a lifted effect */
+}
 
         .hidden {
             display: none;
         }
 
         .profile-pic {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-bottom: 20px;
-            object-fit: cover;
-            border: 3px solid #e74c3c;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    object-fit: cover;
+    border: 3px solid #e74c3c;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for scaling and shadow */
+}
+
+.profile-pic:hover {
+    transform: scale(1.1); /* Slightly scales up the profile picture for a 3D hover effect */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Increases shadow for a lifted effect */
+}
 
         .background-decorations {
             position: absolute;
