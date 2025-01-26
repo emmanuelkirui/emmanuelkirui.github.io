@@ -211,6 +211,7 @@
     <option value="Teacher's Day">Teacher's Day</option>
     <option value="Mashujaa Day">Mashujaa Day</option>
     <option value="Jamhuri Day">Jamhuri Day</option>
+    <option value="Wedding">Wedding</option>
 </select>
         </div>
         <div class="form-group">
@@ -371,6 +372,12 @@ function generateWishes() {
             Venue: ${venue}
             Wishes From: ${personality}`;
             break;
+      case "Wedding":
+    wishMessage = `💍 Congratulations on your wedding, ${name}! Wishing you a lifetime of love and happiness together.
+    Date: ${date}
+    Venue: ${venue}
+    Best Wishes From: ${personality}`;
+    break;
         default:
             wishMessage = 'Please select an event to generate wishes.';
     }
@@ -384,39 +391,94 @@ output.textContent = wishMessage; // Set the text content
         // Show the wish container and profile pic
         document.getElementById('wishes-container').classList.remove('hidden');
         
+        
         // Add event decoration animations based on selected event
-        const decorations = document.querySelectorAll('.decorations span');
-        if (eventType === 'Birthday') {
-            decorations[0].textContent = '🎂';
-            decorations[1].textContent = '🎁';
-            decorations[2].textContent = '🎉';
-            decorations[3].textContent = '🎈';
-            decorations[4].textContent = '🎉';
-        } else if (eventType === "Valentine's Day") {
-            decorations[0].textContent = '❤️';
-            decorations[1].textContent = '🌹';
-            decorations[2].textContent = '💖';
-            decorations[3].textContent = '💌';
-            decorations[4].textContent = '🌸';
-        } else if (eventType === 'Christmas') {
-            decorations[0].textContent = '🎄';
-            decorations[1].textContent = '🎅🏼';
-            decorations[2].textContent = '🎁';
-            decorations[3].textContent = '⭐';
-            decorations[4].textContent = '❄️';
-        } else if (eventType === 'New Year') {
-            decorations[0].textContent = '🎆';
-            decorations[1].textContent = '🎉';
-            decorations[2].textContent = '✨';
-            decorations[3].textContent = '🥂';
-            decorations[4].textContent = '🌟';
-        } else if (eventType === 'Anniversary') {
-            decorations[0].textContent = '💍';
-            decorations[1].textContent = '❤️';
-            decorations[2].textContent = '🌹';
-            decorations[3].textContent = '💕';
-            decorations[4].textContent = '💖';
-        }
+const decorations = document.querySelectorAll('.decorations span');
+if (eventType === 'Birthday') {
+    decorations[0].textContent = '🎂';
+    decorations[1].textContent = '🎁';
+    decorations[2].textContent = '🎉';
+    decorations[3].textContent = '🎈';
+    decorations[4].textContent = '🎉';
+} else if (eventType === "Valentine's Day") {
+    decorations[0].textContent = '❤️';
+    decorations[1].textContent = '🌹';
+    decorations[2].textContent = '💖';
+    decorations[3].textContent = '💌';
+    decorations[4].textContent = '🌸';
+} else if (eventType === 'Christmas') {
+    decorations[0].textContent = '🎄';
+    decorations[1].textContent = '🎅🏼';
+    decorations[2].textContent = '🎁';
+    decorations[3].textContent = '⭐';
+    decorations[4].textContent = '❄️';
+} else if (eventType === 'New Year') {
+    decorations[0].textContent = '🎆';
+    decorations[1].textContent = '🎉';
+    decorations[2].textContent = '✨';
+    decorations[3].textContent = '🥂';
+    decorations[4].textContent = '🌟';
+} else if (eventType === 'Anniversary') {
+    decorations[0].textContent = '💍';
+    decorations[1].textContent = '❤️';
+    decorations[2].textContent = '🌹';
+    decorations[3].textContent = '💕';
+    decorations[4].textContent = '💖';
+} else if (eventType === 'Wedding') {
+    decorations[0].textContent = '💍';
+    decorations[1].textContent = '💒';
+    decorations[2].textContent = '🎉';
+    decorations[3].textContent = '🌹';
+    decorations[4].textContent = '✨';
+} else if (eventType === "Girlfriend's Day") {
+    decorations[0].textContent = '💖';
+    decorations[1].textContent = '🌸';
+    decorations[2].textContent = '💕';
+    decorations[3].textContent = '💌';
+    decorations[4].textContent = '🌹';
+} else if (eventType === "Boyfriend's Day") {
+    decorations[0].textContent = '💘';
+    decorations[1].textContent = '✨';
+    decorations[2].textContent = '🌹';
+    decorations[3].textContent = '💌';
+    decorations[4].textContent = '❤️';
+} else if (eventType === 'Graduation Day') {
+    decorations[0].textContent = '🎓';
+    decorations[1].textContent = '📜';
+    decorations[2].textContent = '✨';
+    decorations[3].textContent = '🎉';
+    decorations[4].textContent = '🎆';
+} else if (eventType === "Teacher's Day") {
+    decorations[0].textContent = '📚';
+    decorations[1].textContent = '📖';
+    decorations[2].textContent = '🍎';
+    decorations[3].textContent = '🎓';
+    decorations[4].textContent = '✨';
+} else if (eventType === 'Mashujaa Day') {
+    decorations[0].textContent = '🇰🇪';
+    decorations[1].textContent = '🎖️';
+    decorations[2].textContent = '🌟';
+    decorations[3].textContent = '🎉';
+    decorations[4].textContent = '🇰🇪';
+} else if (eventType === 'Jamhuri Day') {
+    decorations[0].textContent = '🇰🇪';
+    decorations[1].textContent = '🎉';
+    decorations[2].textContent = '✨';
+    decorations[3].textContent = '🎆';
+    decorations[4].textContent = '🌟';
+} else if (eventType === "Father's Day") {
+    decorations[0].textContent = '👔';
+    decorations[1].textContent = '🎉';
+    decorations[2].textContent = '✨';
+    decorations[3].textContent = '🎁';
+    decorations[4].textContent = '❤️';
+} else if (eventType === "Mother's Day") {
+    decorations[0].textContent = '💐';
+    decorations[1].textContent = '🌹';
+    decorations[2].textContent = '💕';
+    decorations[3].textContent = '🌸';
+    decorations[4].textContent = '❤️';
+}
 
         // Adjust the font size for the message based on input
         output.classList.toggle('dynamic-font', fontSize === '1em');
