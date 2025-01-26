@@ -88,14 +88,14 @@
 .output {
     margin-top: 20px;
     font-family: 'Sacramento', cursive;
-    font-size: 2.5em;
-    color: #4b2e83;
+    font-size: 3em; /* Increased font size for better readability */
+    color: #4b2e83; /* Retained the original color */
     font-weight: bold; /* Bold text */
-    text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5),
-                 -1px -1px 3px rgba(255, 255, 255, 0.6),
-                 1px 1px 6px rgba(0, 0, 0, 0.5),
-                 0 0 15px rgba(255, 255, 255, 0.3); /* Added glow for more 3D effect */
-    transform: perspective(500px) rotateX(5deg) rotateY(5deg); /* Applying rotation for 3D effect */
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6),
+                 0px 0px 8px rgba(255, 255, 255, 0.6), 
+                 1px 1px 12px rgba(0, 0, 0, 0.3), 
+                 0 0 18px rgba(255, 255, 255, 0.3); /* Adjusted shadows for better clarity */
+    transform: perspective(500px) rotateX(3deg) rotateY(3deg); /* Adjusted the rotation for a more subtle 3D effect */
     transition: font-size 0.3s ease, transform 0.3s ease; /* Smooth transition */
 }
 .output.dynamic-font {
@@ -214,6 +214,8 @@
     <option value="Jamhuri Day">Jamhuri Day</option>
     <option value="Wedding">Wedding</option>
     <option value="Greetings Day">Greetings Day</option>
+    <option value="Goodnight">Goodnight</option>
+    <option value="Good Morning">Good Morning</option>
 </select>
         </div>
         <div class="form-group">
@@ -383,7 +385,14 @@ function generateWishes() {
       case "Greetings Day":
     wishMessage = `🌟 Hello, ${name}! Wishing you a wonderful day filled with joy, positivity, and good vibes. Keep shining!
     Date: ${date}
-    Venue: ${venue}
+    Wishes From: ${personality}`;
+    break;
+      case "Goodnight":
+    wishMessage = `🌙 Goodnight, ${name}! Wishing you a peaceful sleep and sweet dreams. Rest well and wake up refreshed.
+    Wishes From: ${personality}`;
+    break;
+      case "Good Morning":
+    wishMessage = `🌅 Good Morning, ${name}! May your day be filled with new opportunities, smiles, and positive energy. Have an amazing day ahead!
     Wishes From: ${personality}`;
     break;
         default:
@@ -492,7 +501,19 @@ if (eventType === 'Birthday') {
     decorations[2].textContent = '💫';
     decorations[3].textContent = '✨';
     decorations[4].textContent = '🌈';
-}
+} else if (eventType === "Goodnight") {
+    decorations[0].textContent = '🌙';
+    decorations[1].textContent = '🌜';
+    decorations[2].textContent = '💫';
+    decorations[3].textContent = '⭐';
+    decorations[4].textContent = '🛏️';
+     } else if (eventType === "Good Morning") {
+    decorations[0].textContent = '🌅';
+    decorations[1].textContent = '☀️';
+    decorations[2].textContent = '🌻';
+    decorations[3].textContent = '💐';
+    decorations[4].textContent = '✨';
+     }
 
         // Adjust the font size for the message based on input
         output.classList.toggle('dynamic-font', fontSize === '1em');
