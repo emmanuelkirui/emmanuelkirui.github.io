@@ -273,103 +273,103 @@
         }
         reader.readAsDataURL(file);
     }
-
 function generateWishes() {
     const eventSelect = document.getElementById('event-select');
-    const name = document.getElementById('name').value;
-    const date = document.getElementById('date').value;
-    const venue = document.getElementById('venue').value;
-    const personality = document.getElementById('personality').value;
-    const fontColor = document.getElementById('fontColor').value;
-    const fontSize = document.getElementById('fontSize').value;
+    const name = document.getElementById('name').value || 'Dear Friend'; // Default to 'Dear Friend' if name is not provided
+    const date = document.getElementById('date').value || 'N/A'; // Default to 'N/A' if not provided
+    const venue = document.getElementById('venue').value || 'N/A'; // Default to 'N/A' if not provided
+    const personality = document.getElementById('personality').value || 'Your Well-Wishers'; // Default to 'Your Well-Wishers' if not provided
+    const fontColor = document.getElementById('fontColor').value || '#000'; // Default to black
+    const fontSize = document.getElementById('fontSize').value || '16px'; // Default font size
 
-    let wishMessage = '';
-    const eventType = eventSelect.value;
+    let wishMessage = ''; // Initialize the message
+    const eventType = eventSelect.value; // Get the selected event
 
+    // Generate custom messages based on the event
     switch (eventType) {
         case 'Birthday':
-            wishMessage = `🎂 Happy Birthday, ${name || 'Dear Friend'}! 🎉 May your day be filled with joy and love! 🎁
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            wishMessage = `🎂 Happy Birthday, ${name}! 🎉 Wishing you a day filled with love, laughter, and happiness. 🎁
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Valentine's Day":
-            wishMessage = `💖 Happy Valentine's Day, ${name || 'Dear'}! May your love bloom like a beautiful rose 🌹
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            wishMessage = `💖 Happy Valentine's Day, ${name}! 🌹 May your day be as sweet as your love.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case 'Christmas':
-            wishMessage = `🎄 Merry Christmas, ${name || 'Dear Friend'}! Wishing you peace, love, and happiness! 🎅🏼
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            wishMessage = `🎄 Merry Christmas, ${name}! 🎅🏼 Wishing you peace, joy, and all the best this holiday season.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case 'New Year':
-            wishMessage = `🎉 Happy New Year, ${name || 'Dear Friend'}! May this year bring you success and joy! 🎆
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            wishMessage = `🎉 Happy New Year, ${name}! 🎆 May this year bring you endless success and happiness.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case 'Anniversary':
-            wishMessage = `💍 Happy Anniversary, ${name || 'Dear'}! Here's to another year of love and happiness 💕
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            wishMessage = `💍 Happy Anniversary, ${name}! 💕 Here's to many more years of love and joy.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Father's Day":
-            wishMessage = `👨‍👧‍👦 Happy Father's Day, ${name || 'Dear Dad'}! Thank you for your love, guidance, and support.
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Loving Family'}`;
+            wishMessage = `👨‍👧‍👦 Happy Father's Day, ${name}! Thank you for being a guiding light and a source of strength.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Mother's Day":
-            wishMessage = `🌸 Happy Mother's Day, ${name || 'Dear Mom'}! You're the heart of the family and our greatest blessing.
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Loving Family'}`;
+            wishMessage = `🌸 Happy Mother's Day, ${name}! Thank you for your endless love and care.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Girlfriend's Day":
-            wishMessage = `💖 Happy Girlfriend's Day, ${name || 'My Love'}! Thank you for being the light of my life.
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Boyfriend'}`;
+            wishMessage = `💖 Happy Girlfriend's Day, ${name}! You light up my world every single day.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Boyfriend's Day":
-            wishMessage = `💙 Happy Boyfriend's Day, ${name || 'My Love'}! You make my world brighter every day.
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Girlfriend'}`;
+            wishMessage = `💙 Happy Boyfriend's Day, ${name}! Thank you for being my rock and my happiness.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Graduation Day":
-            wishMessage = `🎓 Congratulations on your Graduation, ${name || 'Dear Graduate'}! The future is yours to shape.
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Well-Wishers'}`;
+            wishMessage = `🎓 Congratulations on your Graduation, ${name}! Your hard work has paid off, and the future is bright.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Teacher's Day":
-            wishMessage = `📚 Happy Teacher's Day, ${name || 'Dear Teacher'}! Thank you for inspiring and guiding us every day.
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Students'}`;
+            wishMessage = `📚 Happy Teacher's Day, ${name}! Your guidance inspires greatness in everyone.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Mashujaa Day":
-            wishMessage = `🇰🇪 Happy Mashujaa Day! Let's honor the heroes who fought for our freedom and inspire future generations.
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Fellow Kenyans'}`;
+            wishMessage = `🇰🇪 Happy Mashujaa Day, ${name}! Let's honor our heroes who shaped our nation.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         case "Jamhuri Day":
-            wishMessage = `🇰🇪 Happy Jamhuri Day! Let's celebrate our independence and strive for a better Kenya.
-            Date: ${date || 'N/A'}
-            Venue: ${venue || 'N/A'}
-            Wishes From: ${personality || 'Your Fellow Kenyans'}`;
+            wishMessage = `🇰🇪 Happy Jamhuri Day, ${name}! Let's celebrate our independence and unity as a nation.
+            Date: ${date}
+            Venue: ${venue}
+            Wishes From: ${personality}`;
             break;
         default:
             wishMessage = 'Please select an event to generate wishes.';
     }
 
-    // Set the output message with customization
+    // Set the output message with styling
     const output = document.getElementById('output');
     output.style.color = fontColor;
     output.style.fontSize = fontSize;
