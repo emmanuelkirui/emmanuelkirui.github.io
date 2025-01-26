@@ -244,13 +244,7 @@
             <option value="2em">Large</option>
             <option value="3em">Extra Large</option>
         </select>
-<select id="fontFamily" title="Choose font type">
-    <option value="Arial, sans-serif">Arial</option>
-    <option value="'Times New Roman', serif">Times New Roman</option>
-    <option value="'Courier New', monospace">Courier New</option>
-    <option value="'Sacramento', cursive" selected>Sacramento</option> <!-- Default -->
-    <option value="'Roboto', sans-serif">Roboto</option>
-</select>
+
     </div>
 
     <div class="container output-container hidden" id="wishes-container">
@@ -288,7 +282,7 @@ function generateWishes() {
     const personality = document.getElementById('personality').value || 'Your Well-Wishers'; // Default to 'Your Well-Wishers' if not provided
     const fontColor = document.getElementById('fontColor').value || '#000'; // Default to black
     const fontSize = document.getElementById('fontSize').value || '16px'; // Default font size
-    const fontFamilySelect = document.getElementById('fontFamily'); // New font-family control
+    
 
     let wishMessage = ''; // Initialize the message
     const eventType = eventSelect.value; // Get the selected event
@@ -381,7 +375,6 @@ function generateWishes() {
 const output = document.getElementById('output');
 output.style.color = fontColor; // Set the font color
 output.style.fontSize = fontSize; // Set the font size
-output.style.fontFamily = fontFamily; // Set the font type
 output.textContent = wishMessage; // Set the text content
 
         // Show the wish container and profile pic
@@ -435,19 +428,16 @@ output.textContent = wishMessage; // Set the text content
     function updateFontStyles() {
         const fontColor = fontColorInput.value; // Get the selected font color
         const fontSize = fontSizeSelect.value;  // Get the selected font size
-        const fontFamily = fontFamilySelect.value; // Get the selected font-family
          // Apply the font color and size to all text elements inside the container (excluding buttons)
         textElements.forEach(element => {
             element.style.color = fontColor;    // Set font color
             element.style.fontSize = fontSize;  // Set font size
-            element.style.fontFamily = fontFamily; // Set font-family
         });
     }
 
     // Add event listeners to update styles when inputs change
     fontColorInput.addEventListener('input', updateFontStyles);
     fontSizeSelect.addEventListener('change', updateFontStyles);
-    fontFamilySelect.addEventListener('change', updateFontStyles);
 
     // Call updateFontStyles initially to set the default styles
     updateFontStyles();
