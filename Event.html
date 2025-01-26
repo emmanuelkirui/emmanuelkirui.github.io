@@ -83,13 +83,16 @@
         }
 
         .output {
-            margin-top: 20px;
-            font-family: 'Sacramento', cursive;
-            font-size: 2.5em;
-            color: #4b2e83;
-            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
-            transition: font-size 0.3s ease;
-        }
+    margin-top: 20px;
+    font-family: 'Sacramento', cursive;
+    font-size: 2.5em;
+    color: #4b2e83;
+    text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5),
+                 -1px -1px 3px rgba(255, 255, 255, 0.6),
+                 1px 1px 6px rgba(0, 0, 0, 0.5); /* Multiple shadows for depth */
+    transform: perspective(500px) rotateX(10deg) rotateY(5deg); /* 3D perspective */
+    transition: font-size 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
 
         .output.dynamic-font {
             font-size: 1.5em;
