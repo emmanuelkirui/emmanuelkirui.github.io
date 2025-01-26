@@ -373,13 +373,17 @@ function generateWishes() {
     }
 
     // Set the output message with styling
-  output.textContent = wishMessage;
-    output.style.color = fontColor;
-    output.style.fontSize = fontSize;
+          output.textContent = wishMessage;
+        output.style.color = fontColor;
+        output.style.fontSize = fontSize;
 
-    // Apply the selected background color
-    wishesContainer.style.backgroundColor = bgColor;
+        // Apply the selected background color
+        wishesContainer.style.backgroundColor = bgColor;
 
+        // Debug: Log the selected background color
+        console.log("Selected Background Color: ", bgColor);
+
+       
 
         // Show the wish container and profile pic
         document.getElementById('wishes-container').classList.remove('hidden');
