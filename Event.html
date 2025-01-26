@@ -183,12 +183,18 @@
         <div class="form-group">
             <label for="event-select">Select Event</label>
             <select id="event-select">
-                <option value="Birthday">Birthday</option>
-                <option value="Valentine's Day">Valentine's Day</option>
-                <option value="Christmas">Christmas</option>
-                <option value="New Year">New Year</option>
-                <option value="Anniversary">Anniversary</option>
-            </select>
+    <option value="Birthday">Birthday</option>
+    <option value="Valentine's Day">Valentine's Day</option>
+    <option value="Christmas">Christmas</option>
+    <option value="New Year">New Year</option>
+    <option value="Anniversary">Anniversary</option>
+    <option value="Graduation Day">Graduation Day</option>
+    <option value="Teacher's Day">Teacher's Day</option>
+    <option value="Girlfriend's Day">Girlfriend's Day</option>
+    <option value="Boyfriend's Day">Boyfriend's Day</option>
+    <option value="Father's Day">Father's Day</option>
+    <option value="Mother's Day">Mother's Day</option>
+</select>
         </div>
         <div class="form-group">
             <label for="event-name">Event Name</label>
@@ -296,78 +302,143 @@ if (eventType === 'Birthday') {
     Venue: ${venue || 'N/A'}
     Wishes From: ${personality || 'Your Well-Wishers'}`;
 }
-        // Set the output message with customization
-        const output = document.getElementById('output');
-        output.style.color = fontColor;
-        output.style.fontSize = fontSize;
-        output.textContent = wishMessage;
+else if (eventType === 'Graduation Day') {
+    wishMessage = `🎓 Happy Graduation Day, ${name || 'Graduate'}! 🎉 Wishing you success in all your future endeavors 🎓
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Well-Wishers'}`;
+} else if (eventType === 'Teacher\'s Day') {
+    wishMessage = `🍎 Happy Teacher's Day, ${name || 'Teacher'}! 📚 Thank you for all your hard work and dedication 🍎
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Students'}`;
+} else if (eventType === 'Girlfriend\'s Day') {
+    wishMessage = `💖 Happy Girlfriend's Day, ${name || 'Sweetheart'}! 💐 You mean the world to me 💖
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Loving Partner'}`;
+} else if (eventType === 'Boyfriend\'s Day') {
+    wishMessage = `💙 Happy Boyfriend's Day, ${name || 'Honey'}! 💎 Thank you for being amazing 💙
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Loving Partner'}`;
+} else if (eventType === 'Father\'s Day') {
+    wishMessage = `👨‍👧‍👦 Happy Father's Day, ${name || 'Dad'}! 🎉 Thank you for being the pillar of strength and love 👨‍👧‍👦
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Children'}`;
+} else if (eventType === 'Mother\'s Day') {
+    wishMessage = `👩‍👧‍👦 Happy Mother's Day, ${name || 'Mom'}! 💐 Thank you for your endless love and support 👩‍👧‍👦
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Children'}`;
+} else if (eventType === 'Anniversary') {
+    wishMessage = `💍 Happy Anniversary, ${name || 'Dear'}! Here's to another year of love and happiness 💕
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Well-Wishers'}`;
+}
 
-        // Show the wish container and profile pic
-        document.getElementById('wishes-container').classList.remove('hidden');
- // Get references to the font controls and the container
-    const fontColorInput = document.getElementById('fontColor');
-    const fontSizeSelect = document.getElementById('fontSize');
-    const wishesContainer = document.getElementById('wishes-container');
-    const textElements = wishesContainer.querySelectorAll('.output, .decorations span'); // Target only text elements inside the container
+// Set the output message with customization
+const output = document.getElementById('output');
+output.style.color = fontColor;
+output.style.fontSize = fontSize;
+output.textContent = wishMessage;
 
-    // Function to update the font color and size
-    function updateFontStyles() {
-        const fontColor = fontColorInput.value; // Get the selected font color
-        const fontSize = fontSizeSelect.value;  // Get the selected font size
+// Show the wish container and profile pic
+document.getElementById('wishes-container').classList.remove('hidden');
 
-        // Apply the font color and size to all text elements inside the container (excluding buttons)
-        textElements.forEach(element => {
-            element.style.color = fontColor;    // Set font color
-            element.style.fontSize = fontSize;  // Set font size
-        });
-    }
+// Get references to the font controls and the container
+const fontColorInput = document.getElementById('fontColor');
+const fontSizeSelect = document.getElementById('fontSize');
+const wishesContainer = document.getElementById('wishes-container');
+const textElements = wishesContainer.querySelectorAll('.output, .decorations span'); // Target only text elements inside the container
 
-    // Add event listeners to update styles when inputs change
-    fontColorInput.addEventListener('input', updateFontStyles);
-    fontSizeSelect.addEventListener('change', updateFontStyles);
+// Function to update the font color and size
+function updateFontStyles() {
+    const fontColor = fontColorInput.value; // Get the selected font color
+    const fontSize = fontSizeSelect.value;  // Get the selected font size
 
-    // Call updateFontStyles initially to set the default styles
-    updateFontStyles();
+    // Apply the font color and size to all text elements inside the container (excluding buttons)
+    textElements.forEach(element => {
+        element.style.color = fontColor;    // Set font color
+        element.style.fontSize = fontSize;  // Set font size
+    });
+}
 
+// Add event listeners to update styles when inputs change
+fontColorInput.addEventListener('input', updateFontStyles);
+fontSizeSelect.addEventListener('change', updateFontStyles);
 
-        // Add event decoration animations based on selected event
-        const decorations = document.querySelectorAll('.decorations span');
-        if (eventType === 'Birthday') {
-            decorations[0].textContent = '🎂';
-            decorations[1].textContent = '🎁';
-            decorations[2].textContent = '🎉';
-            decorations[3].textContent = '🎈';
-            decorations[4].textContent = '🎉';
-        } else if (eventType === "Valentine's Day") {
-            decorations[0].textContent = '❤️';
-            decorations[1].textContent = '🌹';
-            decorations[2].textContent = '💖';
-            decorations[3].textContent = '💌';
-            decorations[4].textContent = '🌸';
-        } else if (eventType === 'Christmas') {
-            decorations[0].textContent = '🎄';
-            decorations[1].textContent = '🎅🏼';
-            decorations[2].textContent = '🎁';
-            decorations[3].textContent = '⭐';
-            decorations[4].textContent = '❄️';
-        } else if (eventType === 'New Year') {
-            decorations[0].textContent = '🎆';
-            decorations[1].textContent = '🎉';
-            decorations[2].textContent = '✨';
-            decorations[3].textContent = '🥂';
-            decorations[4].textContent = '🌟';
-        } else if (eventType === 'Anniversary') {
-            decorations[0].textContent = '💍';
-            decorations[1].textContent = '❤️';
-            decorations[2].textContent = '🌹';
-            decorations[3].textContent = '💕';
-            decorations[4].textContent = '💖';
-        }
+// Call updateFontStyles initially to set the default styles
+updateFontStyles();
 
-        // Adjust the font size for the message based on input
-        output.classList.toggle('dynamic-font', fontSize === '1em');
-    }
-        
+// Add event decoration animations based on selected event
+const decorations = document.querySelectorAll('.decorations span');
+if (eventType === 'Birthday') {
+    decorations[0].textContent = '🎂';
+    decorations[1].textContent = '🎁';
+    decorations[2].textContent = '🎉';
+    decorations[3].textContent = '🎈';
+    decorations[4].textContent = '🎉';
+} else if (eventType === "Valentine's Day") {
+    decorations[0].textContent = '❤️';
+    decorations[1].textContent = '🌹';
+    decorations[2].textContent = '💖';
+    decorations[3].textContent = '💌';
+    decorations[4].textContent = '🌸';
+} else if (eventType === 'Christmas') {
+    decorations[0].textContent = '🎄';
+    decorations[1].textContent = '🎅🏼';
+    decorations[2].textContent = '🎁';
+    decorations[3].textContent = '⭐';
+    decorations[4].textContent = '❄️';
+} else if (eventType === 'New Year') {
+    decorations[0].textContent = '🎆';
+    decorations[1].textContent = '🎉';
+    decorations[2].textContent = '✨';
+    decorations[3].textContent = '🥂';
+    decorations[4].textContent = '🌟';
+} else if (eventType === 'Anniversary') {
+    decorations[0].textContent = '💍';
+    decorations[1].textContent = '❤️';
+    decorations[2].textContent = '🌹';
+    decorations[3].textContent = '💕';
+    decorations[4].textContent = '💖';
+} else if (eventType === 'Graduation Day') {
+    decorations[0].textContent = '🎓';
+    decorations[1].textContent = '🎉';
+    decorations[2].textContent = '🌟';
+    decorations[3].textContent = '📚';
+    decorations[4].textContent = '🎓';
+} else if (eventType === 'Teacher\'s Day') {
+    decorations[0].textContent = '🍎';
+    decorations[1].textContent = '📚';
+    decorations[2].textContent = '🎓';
+    decorations[3].textContent = '🌟';
+    decorations[4].textContent = '🍎';
+} else if (eventType === 'Girlfriend\'s Day' || eventType === 'Boyfriend\'s Day') {
+    decorations[0].textContent = '💖';
+    decorations[1].textContent = '💍';
+    decorations[2].textContent = '🌹';
+    decorations[3].textContent = '💕';
+    decorations[4].textContent = '💑';
+} else if (eventType === 'Father\'s Day') {
+    decorations[0].textContent = '👨‍👧‍👦';
+    decorations[1].textContent = '🎉';
+    decorations[2].textContent = '💪';
+    decorations[3].textContent = '⭐';
+    decorations[4].textContent = '🎁';
+} else if (eventType === 'Mother\'s Day') {
+    decorations[0].textContent = '👩‍👧‍👦';
+    decorations[1].textContent = '💐';
+    decorations[2].textContent = '💖';
+    decorations[3].textContent = '🎉';
+    decorations[4].textContent = '🌸';
+}
+
+// Adjust the font size for the message based on input
+output.classList.toggle('dynamic-font', fontSize === '1em');
 
 
     // Share the generated wishes as an image
