@@ -81,17 +81,16 @@
         .output-container {
             position: relative;
         }
-.output {
-    margin-top: 20px;
-    font-family: 'Sacramento', cursive;
-    font-size: 2.5em;
-    color: #4b2e83;
-    text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5),
-                 -1px -1px 3px rgba(255, 255, 255, 0.6),
-                 1px 1px 6px rgba(0, 0, 0, 0.5); /* Multiple shadows for depth */
-    transform: perspective(500px); /* Only applying 3D perspective */
-    transition: font-size 0.3s ease, transform 0.3s ease; /* Smooth transition */
-}
+
+        .output {
+            margin-top: 20px;
+            font-family: 'Sacramento', cursive;
+            font-size: 2.5em;
+            color: #4b2e83;
+            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.5);
+            transition: font-size 0.3s ease;
+        }
+
         .output.dynamic-font {
             font-size: 1.5em;
         }
@@ -107,6 +106,16 @@
             margin: 0 10px;
             animation: float 2s ease-in-out infinite;
         }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
         .icon-bar {
             position: absolute;
             top: 10px;
@@ -114,40 +123,32 @@
         }
 
         .icon-bar button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #4b2e83;
-    font-size: 1.5em;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
-    margin-left: 10px;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Added shadow for depth */
-}
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #4b2e83;
+            font-size: 1.5em;
+            transition: transform 0.3s ease;
+            margin-left: 10px;
+        }
 
-.icon-bar button:hover {
-    transform: scale(1.1); /* Scales the button up for a 3D hover effect */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Adds shadow to give a lifted effect */
-}
+        .icon-bar button:hover {
+            transform: scale(1.2);
+        }
 
         .hidden {
             display: none;
         }
 
         .profile-pic {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-bottom: 20px;
-    object-fit: cover;
-    border: 3px solid #e74c3c;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for scaling and shadow */
-}
-
-.profile-pic:hover {
-    transform: scale(1.1); /* Slightly scales up the profile picture for a 3D hover effect */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Increases shadow for a lifted effect */
-}
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            border: 3px solid #e74c3c;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
 
         .background-decorations {
             position: absolute;
@@ -183,18 +184,12 @@
         <div class="form-group">
             <label for="event-select">Select Event</label>
             <select id="event-select">
-    <option value="Birthday">Birthday</option>
-    <option value="Valentine's Day">Valentine's Day</option>
-    <option value="Christmas">Christmas</option>
-    <option value="New Year">New Year</option>
-    <option value="Anniversary">Anniversary</option>
-    <option value="Graduation Day">Graduation Day</option>
-    <option value="Teacher's Day">Teacher's Day</option>
-    <option value="Girlfriend's Day">Girlfriend's Day</option>
-    <option value="Boyfriend's Day">Boyfriend's Day</option>
-    <option value="Father's Day">Father's Day</option>
-    <option value="Mother's Day">Mother's Day</option>
-</select>
+                <option value="Birthday">Birthday</option>
+                <option value="Valentine's Day">Valentine's Day</option>
+                <option value="Christmas">Christmas</option>
+                <option value="New Year">New Year</option>
+                <option value="Anniversary">Anniversary</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="event-name">Event Name</label>
@@ -224,27 +219,14 @@
     </div>
 
     <div class="font-controls">
-    <input type="color" id="fontColor" title="Choose font color">
-    <select id="fontSize" title="Choose font size">
-        <option value="1em">Small</option>
-        <option value="1.5em" selected>Medium</option>
-        <option value="2em">Large</option>
-        <option value="3em">Extra Large</option>
-    </select>
-    <select id="fontType" title="Choose font type">
-        <option value="Arial" selected>Arial</option>
-        <option value="Verdana">Verdana</option>
-        <option value="Georgia">Georgia</option>
-        <option value="Times New Roman">Times New Roman</option>
-        <option value="Courier New">Courier New</option>
-        <option value="Comic Sans MS">Comic Sans MS</option>
-        <option value="Sacramento">Sacramento</option>
-        <option value="Roboto">Roboto</option>
-        <option value="Lobster">Lobster</option>
-        <option value="Pacifico">Pacifico</option>
-        <option value="Open Sans">Open Sans</option>
-    </select>
-</div>
+        <input type="color" id="fontColor" title="Choose font color">
+        <select id="fontSize" title="Choose font size">
+            <option value="1em">Small</option>
+            <option value="1.5em" selected>Medium</option>
+            <option value="2em">Large</option>
+            <option value="3em">Extra Large</option>
+        </select>
+    </div>
 
     <div class="container output-container hidden" id="wishes-container">
         <div class="icon-bar">
@@ -274,182 +256,105 @@
         reader.readAsDataURL(file);
     }
 
-function generateWishes() {
-    const eventSelect = document.getElementById('event-select');
-    const eventName = document.getElementById('event-name').value;
-    const name = document.getElementById('name').value;
-    const date = document.getElementById('date').value;
-    const venue = document.getElementById('venue').value;
-    const profilePic = document.getElementById('profile-pic');
-    const personality = document.getElementById('personality').value;
-    const fontColor = document.getElementById('fontColor').value;
-    const fontSize = document.getElementById('fontSize').value;
-    const fontType = document.getElementById('fontType').value; // Initialize the font type
+    function generateWishes() {
+        const eventSelect = document.getElementById('event-select');
+        const eventName = document.getElementById('event-name').value;
+        const name = document.getElementById('name').value;
+        const date = document.getElementById('date').value;
+        const venue = document.getElementById('venue').value;
+        const profilePic = document.getElementById('profile-pic');
+        const personality = document.getElementById('personality').value;
+        const fontColor = document.getElementById('fontColor').value;
+        const fontSize = document.getElementById('fontSize').value;
 
-    // Customize the wish message based on the selected event
-    let wishMessage = '';
-    const eventType = eventSelect.value;
+        // Customize the wish message based on the selected event
+        let wishMessage = '';
+const eventType = eventSelect.value;
 
-    if (eventType === 'Birthday') {
-        wishMessage = `🎂 Happy Birthday, ${name || 'Dear Friend'}! 🎉 May your day be filled with joy and love! 🎁
-        Date: ${date || 'Not provided'} 
-        Venue: ${venue || 'Not provided'}`;
-    } else if (eventType === 'Valentine\'s Day') {
-        wishMessage = `💖 Happy Valentine's Day, ${name || 'My Love'}! 💐 Wishing you all the love and happiness today and always!
-        Date: ${date || 'Not provided'} 
-        Venue: ${venue || 'Not provided'}`;
-    } else if (eventType === 'Christmas') {
-        wishMessage = `🎄 Merry Christmas, ${name || 'My Dear'}! 🎁 May your holiday season be filled with peace, joy, and love!
-        Date: ${date || 'Not provided'} 
-        Venue: ${venue || 'Not provided'}`;
-    } // Continue for other events...
-
-    // Set the generated message in the output container
-    const outputContainer = document.getElementById('wishes-container');
-    const output = document.getElementById('output');
-    output.innerHTML = wishMessage;
-
-    // Display the generated message
-    outputContainer.style.display = 'block';
-    
-    // Set styles for the output
-    output.style.color = fontColor;
-    output.style.fontSize = fontSize;
-    output.style.fontFamily = fontType;
-    // Show the wish container and profile pic;
-document.getElementById('wishes-container').classList.remove('hidden')
-
-
-
-// Get references to the font controls and the container
-const fontColorInput = document.getElementById('fontColor');
-const fontSizeSelect = document.getElementById('fontSize');
-const fontTypeSelect = document.getElementById('fontType'); // Get the font type input
-const wishesContainer = document.getElementById('wishes-container');
-const textElements = wishesContainer.querySelectorAll('.output, .decorations span'); // Target only text elements inside the container
-
-// Function to update the font color, size, and type
-function updateFontStyles() {
-    const fontColor = fontColorInput.value; // Get the selected font color
-    const fontSize = fontSizeSelect.value;  // Get the selected font size
-    const fontType = fontTypeSelect.value;  // Get the selected font type
-
-    // Apply the font color, size, and type to all text elements inside the container (excluding buttons)
-    textElements.forEach(element => {
-        element.style.color = fontColor;        // Set font color
-        element.style.fontSize = fontSize;      // Set font size
-        element.style.fontFamily = fontType;    // Set font type
-    });
-}
-
-// Add event listeners to update styles when inputs change
-fontColorInput.addEventListener('input', updateFontStyles);
-fontSizeSelect.addEventListener('change', updateFontStyles);
-fontTypeSelect.addEventListener('change', updateFontStyles);  // Add listener for font type change
-
-// Call updateFontStyles initially to set the default styles
-updateFontStyles();
-
-// Add event decoration animations based on selected event
-const decorations = document.querySelectorAll('.decorations span');
 if (eventType === 'Birthday') {
-    decorations[0].textContent = '🎂';
-    decorations[1].textContent = '🎁';
-    decorations[2].textContent = '🎉';
-    decorations[3].textContent = '🎈';
-    decorations[4].textContent = '🎉';
+    wishMessage = `🎂 Happy Birthday, ${name || 'Dear Friend'}! 🎉 May your day be filled with joy and love! 🎁
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Well-Wishers'}`;
 } else if (eventType === "Valentine's Day") {
-    decorations[0].textContent = '❤️';
-    decorations[1].textContent = '🌹';
-    decorations[2].textContent = '💖';
-    decorations[3].textContent = '💌';
-    decorations[4].textContent = '🌸';
+    wishMessage = `💖 Happy Valentine's Day, ${name || 'Dear'}! May your love bloom like a beautiful rose 🌹
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Well-Wishers'}`;
 } else if (eventType === 'Christmas') {
-    decorations[0].textContent = '🎄';
-    decorations[1].textContent = '🎅🏼';
-    decorations[2].textContent = '🎁';
-    decorations[3].textContent = '⭐';
-    decorations[4].textContent = '❄️';
+    wishMessage = `🎄 Merry Christmas, ${name || 'Dear Friend'}! Wishing you peace, love, and happiness! 🎅🏼
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Well-Wishers'}`;
 } else if (eventType === 'New Year') {
-    decorations[0].textContent = '🎆';
-    decorations[1].textContent = '🎉';
-    decorations[2].textContent = '✨';
-    decorations[3].textContent = '🥂';
-    decorations[4].textContent = '🌟';
+    wishMessage = `🎉 Happy New Year, ${name || 'Dear Friend'}! May this year bring you success and joy! 🎆
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Well-Wishers'}`;
 } else if (eventType === 'Anniversary') {
-    decorations[0].textContent = '💍';
-    decorations[1].textContent = '❤️';
-    decorations[2].textContent = '🌹';
-    decorations[3].textContent = '💕';
-    decorations[4].textContent = '💖';
-} else if (eventType === 'Graduation Day') {
-    decorations[0].textContent = '🎓';
-    decorations[1].textContent = '🎉';
-    decorations[2].textContent = '🌟';
-    decorations[3].textContent = '📚';
-    decorations[4].textContent = '🎓';
-} else if (eventType === 'Teacher\'s Day') {
-    decorations[0].textContent = '🍎';
-    decorations[1].textContent = '📚';
-    decorations[2].textContent = '🎓';
-    decorations[3].textContent = '🌟';
-    decorations[4].textContent = '🍎';
-} else if (eventType === 'Girlfriend\'s Day' || eventType === 'Boyfriend\'s Day') {
-    decorations[0].textContent = '💖';
-    decorations[1].textContent = '💍';
-    decorations[2].textContent = '🌹';
-    decorations[3].textContent = '💕';
-    decorations[4].textContent = '💑';
-} else if (eventType === 'Father\'s Day') {
-    decorations[0].textContent = '👨‍👧‍👦';
-    decorations[1].textContent = '🎉';
-    decorations[2].textContent = '💪';
-    decorations[3].textContent = '⭐';
-    decorations[4].textContent = '🎁';
-} else if (eventType === 'Mother\'s Day') {
-    decorations[0].textContent = '👩‍👧‍👦';
-    decorations[1].textContent = '💐';
-    decorations[2].textContent = '💖';
-    decorations[3].textContent = '🎉';
-    decorations[4].textContent = '🌸';
+    wishMessage = `💍 Happy Anniversary, ${name || 'Dear'}! Here's to another year of love and happiness 💕
+    Date: ${date || 'N/A'}
+    Venue: ${venue || 'N/A'}
+    Wishes From: ${personality || 'Your Well-Wishers'}`;
 }
+        // Set the output message with customization
+        const output = document.getElementById('output');
+        output.style.color = fontColor;
+        output.style.fontSize = fontSize;
+        output.textContent = wishMessage;
 
-// Adjust the font size for the message based on input
-output.classList.toggle('dynamic-font', fontSize === '1em');
+        // Show the wish container and profile pic
+        document.getElementById('wishes-container').classList.remove('hidden');
+        
+        // Add event decoration animations based on selected event
+        const decorations = document.querySelectorAll('.decorations span');
+        if (eventType === 'Birthday') {
+            decorations[0].textContent = '🎂';
+            decorations[1].textContent = '🎁';
+            decorations[2].textContent = '🎉';
+            decorations[3].textContent = '🎈';
+            decorations[4].textContent = '🎉';
+        } else if (eventType === "Valentine's Day") {
+            decorations[0].textContent = '❤️';
+            decorations[1].textContent = '🌹';
+            decorations[2].textContent = '💖';
+            decorations[3].textContent = '💌';
+            decorations[4].textContent = '🌸';
+        } else if (eventType === 'Christmas') {
+            decorations[0].textContent = '🎄';
+            decorations[1].textContent = '🎅🏼';
+            decorations[2].textContent = '🎁';
+            decorations[3].textContent = '⭐';
+            decorations[4].textContent = '❄️';
+        } else if (eventType === 'New Year') {
+            decorations[0].textContent = '🎆';
+            decorations[1].textContent = '🎉';
+            decorations[2].textContent = '✨';
+            decorations[3].textContent = '🥂';
+            decorations[4].textContent = '🌟';
+        } else if (eventType === 'Anniversary') {
+            decorations[0].textContent = '💍';
+            decorations[1].textContent = '❤️';
+            decorations[2].textContent = '🌹';
+            decorations[3].textContent = '💕';
+            decorations[4].textContent = '💖';
+        }
 
+        // Adjust the font size for the message based on input
+        output.classList.toggle('dynamic-font', fontSize === '1em');
+    }
 
     // Share the generated wishes as an image
-document.getElementById('share-btn').addEventListener('click', function() {
-    const container = document.getElementById('wishes-container');
-    
-    // Use html2canvas to capture the content of the container
-    html2canvas(container).then(canvas => {
-        const imgData = canvas.toDataURL('image/png'); // Convert canvas to image data
-
-        // Check if the Web Share API is supported
-        if (navigator.share) {
-            // Create a Blob from the image data
-            fetch(imgData)
-                .then(res => res.blob())
-                .then(blob => {
-                    const file = new File([blob], 'event_wishes.png', { type: 'image/png' });
-                    
-                    // Share the image via the Web Share API
-                    navigator.share({
-                        files: [file],
-                        title: 'Event Wishes',
-                        text: 'Check out these event wishes!'
-                    }).then(() => {
-                        console.log('Image shared successfully!');
-                    }).catch(err => {
-                        console.error('Error sharing the image:', err);
-                    });
-                });
-        } else {
-            alert('Web Share API is not supported on this device.');
-        }
+    document.getElementById('share-btn').addEventListener('click', function() {
+        const container = document.getElementById('wishes-container');
+        html2canvas(container).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = 'event_wishes.png';
+            link.click();
+        });
     });
-});
 
     // Download the profile picture and event wishes together
     document.getElementById('download-btn').addEventListener('click', function() {
