@@ -298,19 +298,25 @@
         });
 
         // Share as image
-        document.getElementById("share-btn").addEventListener("click", function() {
-            html2canvas(document.getElementById("wishes-container")).then(function(canvas) {
-                const dataUrl = canvas.toDataURL("image/png");
-                const shareData = {
-                    title: 'Happy Birthday Wishes',
-                    text: 'Check out this cool birthday wish!',
-                    url: dataUrl
-                };
-                if (navigator.share) {
-                    navigator.share(shareData).catch((error) => console.log('Error sharing:', error));
-                }
-            });
+document.getElementById("share-btn").addEventListener("click", function() {
+    html2canvas(document.getElementById("wishes-container")).then(function(canvas) {
+        canvas.toBlob(function(blob) {
+            const shareData = {
+                title: 'Happy Birthday Wishes',
+                text: 'Check out this cool birthday wish!',
+                files: [
+                    new File([blob], "birthday_wishes.png", { type: "image/png" })
+                ]
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch((error) => console.log('Error sharing:', error));
+            } else {
+                alert('Share functionality is not supported on your browser.');
+            }
         });
+    });
+});
     </script>
 </body>
 </html>
