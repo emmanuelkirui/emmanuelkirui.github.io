@@ -182,6 +182,16 @@
     <div class="container">
         <div class="title">🎉 Event Wishes Generator 🎉</div>
         <div class="form-group">
+            <label for="event-select">Select Event</label>
+            <select id="event-select">
+                <option value="Birthday">Birthday</option>
+                <option value="Valentine's Day">Valentine's Day</option>
+                <option value="Christmas">Christmas</option>
+                <option value="New Year">New Year</option>
+                <option value="Anniversary">Anniversary</option>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="event-name">Event Name</label>
             <input type="text" id="event-name" class="event-name" placeholder="Enter Event (e.g., Birthday, Valentine's Day)">
         </div>
@@ -238,103 +248,111 @@
     function loadProfilePic(event) {
         const output = document.getElementById('profile-pic');
         const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                output.src = e.target.result;
-                output.style.display = 'block';
-            };
-            reader.readAsDataURL(file);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            output.src = e.target.result;
+            output.style.display = 'block';
         }
+        reader.readAsDataURL(file);
     }
 
     function generateWishes() {
-        const eventName = document.getElementById("event-name").value;
-        const name = document.getElementById("name").value;
-        const date = document.getElementById("date").value;
-        const venue = document.getElementById("venue").value;
-        const personality = document.getElementById("personality").value;
+        const eventSelect = document.getElementById('event-select');
+        const eventName = document.getElementById('event-name').value;
+        const name = document.getElementById('name').value;
+        const date = document.getElementById('date').value;
+        const venue = document.getElementById('venue').value;
+        const profilePic = document.getElementById('profile-pic');
+        const personality = document.getElementById('personality').value;
+        const fontColor = document.getElementById('fontColor').value;
+        const fontSize = document.getElementById('fontSize').value;
 
-        if (eventName && name && date && venue && personality) {
-            const outputContainer = document.getElementById("wishes-container");
-            const output = document.getElementById("output");
+        // Customize the wish message based on the selected event
+        let wishMessage = '';
+        const eventType = eventSelect.value;
 
-            const textContent = `
-                🎉 Happy ${eventName}, <strong>${name}</strong>! 🎂<br>
-                🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
-                🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
-            `;
-
-            output.innerHTML = textContent;
-            outputContainer.classList.remove("hidden");
-
-            setDecorations(eventName);
-        } else {
-            alert("Please fill out all fields before generating wishes.");
+        if (eventType === 'Birthday') {
+            wishMessage = `🎂 Happy Birthday, ${name}! 🎉 May your day be filled with joy and love! 🎁`;
+        } else if (eventType === "Valentine's Day") {
+            wishMessage = `💖 Happy Valentine's Day, ${name}! May your love bloom like a beautiful rose 🌹`;
+        } else if (eventType === 'Christmas') {
+            wishMessage = `🎄 Merry Christmas, ${name}! Wishing you peace, love, and happiness! 🎅🏼`;
+        } else if (eventType === 'New Year') {
+            wishMessage = `🎉 Happy New Year, ${name}! May this year bring you success and joy! 🎆`;
+        } else if (eventType === 'Anniversary') {
+            wishMessage = `💍 Happy Anniversary, ${name}! Here's to another year of love and happiness 💕`;
         }
+
+        // Set the output message with customization
+        const output = document.getElementById('output');
+        output.style.color = fontColor;
+        output.style.fontSize = fontSize;
+        output.textContent = wishMessage;
+
+        // Show the wish container and profile pic
+        document.getElementById('wishes-container').classList.remove('hidden');
+        
+        // Add event decoration animations based on selected event
+        const decorations = document.querySelectorAll('.decorations span');
+        if (eventType === 'Birthday') {
+            decorations[0].textContent = '🎂';
+            decorations[1].textContent = '🎁';
+            decorations[2].textContent = '🎉';
+            decorations[3].textContent = '🎈';
+            decorations[4].textContent = '🎉';
+        } else if (eventType === "Valentine's Day") {
+            decorations[0].textContent = '❤️';
+            decorations[1].textContent = '🌹';
+            decorations[2].textContent = '💖';
+            decorations[3].textContent = '💌';
+            decorations[4].textContent = '🌸';
+        } else if (eventType === 'Christmas') {
+            decorations[0].textContent = '🎄';
+            decorations[1].textContent = '🎅🏼';
+            decorations[2].textContent = '🎁';
+            decorations[3].textContent = '⭐';
+            decorations[4].textContent = '❄️';
+        } else if (eventType === 'New Year') {
+            decorations[0].textContent = '🎆';
+            decorations[1].textContent = '🎉';
+            decorations[2].textContent = '✨';
+            decorations[3].textContent = '🥂';
+            decorations[4].textContent = '🌟';
+        } else if (eventType === 'Anniversary') {
+            decorations[0].textContent = '💍';
+            decorations[1].textContent = '❤️';
+            decorations[2].textContent = '🌹';
+            decorations[3].textContent = '💕';
+            decorations[4].textContent = '💖';
+        }
+
+        // Adjust the font size for the message based on input
+        output.classList.toggle('dynamic-font', fontSize === '1em');
     }
 
-    function setDecorations(eventName) {
-        const decorations = {
-            "Birthday": ["❤️", "🎂", "🎉", "🎁", "🌼"],
-            "Valentine's Day": ["❤️", "🌹", "💌", "🍫", "💖"],
-            "Christmas": ["🎄", "🎅", "🎁", "✨", "❄️"],
-            "New Year": ["🎉", "🎆", "🍾", "🥂", "🎇"],
-            "Anniversary": ["💍", "💐", "❤️", "🎉", "🌹"]
-        };
-
-        const outputDecorations = document.querySelector('.decorations');
-        outputDecorations.innerHTML = '';  // Clear previous decorations
-
-        const selectedDecorations = decorations[eventName] || [];
-
-        selectedDecorations.forEach((decoration) => {
-            const span = document.createElement('span');
-            span.textContent = decoration;
-            outputDecorations.appendChild(span);
-        });
-    }
-
-    // Handle event selection and update decorations
-    document.getElementById('event-select').addEventListener('change', (event) => {
-        const eventName = event.target.value;
-        setDecorations(eventName);
-    });
-
-    // Download as image
-    document.getElementById('download-btn').addEventListener('click', () => {
+    // Share the generated wishes as an image
+    document.getElementById('share-btn').addEventListener('click', function() {
         const container = document.getElementById('wishes-container');
-        html2canvas(container).then((canvas) => {
+        html2canvas(container).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
             const link = document.createElement('a');
-            link.download = 'event-wishes.png';
-            link.href = canvas.toDataURL();
+            link.href = imgData;
+            link.download = 'event_wishes.png';
             link.click();
         });
     });
 
-    // Share as image
-    document.getElementById('share-btn').addEventListener('click', () => {
+    // Download the profile picture and event wishes together
+    document.getElementById('download-btn').addEventListener('click', function() {
         const container = document.getElementById('wishes-container');
-        html2canvas(container).then((canvas) => {
-            const dataUrl = canvas.toDataURL();
-            const shareData = {
-                title: 'Event Wishes',
-                text: 'Check out these event wishes!',
-                url: dataUrl
-            };
-            navigator.share(shareData).catch(console.error);
+        html2canvas(container).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = imgData;
+            link.download = 'event_wishes.png';
+            link.click();
         });
     });
-
-    // Font controls
-    document.getElementById('fontColor').addEventListener('input', (event) => {
-        document.getElementById('output').style.color = event.target.value;
-    });
-
-    document.getElementById('fontSize').addEventListener('change', (event) => {
-        document.getElementById('output').style.fontSize = event.target.value;
-    });
-
-</script>
+    </script>
 </body>
 </html>
