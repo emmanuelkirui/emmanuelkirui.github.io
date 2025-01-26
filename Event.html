@@ -78,11 +78,18 @@
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
         }
 
+    
         .output-container {
-            position: relative;
-        }
+    position: relative;
+    background-color: #add8e6; /* Light blue background color */
+    border: 1px solid #ccc; /* Optional border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Spacing inside the container */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    margin-top: 20px; /* Space above the container */
+}
 
-        .output {
+.output {
     margin-top: 20px;
     font-family: 'Sacramento', cursive;
     font-size: 2.5em;
@@ -93,9 +100,10 @@
     transform: perspective(500px); /* Only applying 3D perspective */
     transition: font-size 0.3s ease, transform 0.3s ease; /* Smooth transition */
 }
-        .output.dynamic-font {
-            font-size: 1.5em;
-        }
+
+.output.dynamic-font {
+    font-size: 1.5em;
+}
 
         .decorations {
             margin-top: 20px;
