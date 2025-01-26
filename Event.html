@@ -284,6 +284,8 @@
         const personality = document.getElementById('personality').value;
         const fontColor = document.getElementById('fontColor').value;
         const fontSize = document.getElementById('fontSize').value;
+        const fontType = document.getElementById('fontType').value; // Initialize the font type
+
 
         // Customize the wish message based on the selected event
         let wishMessage = '';
@@ -354,10 +356,10 @@ else if (eventType === 'Graduation Day') {
 
 // Set the output message with customization
 const output = document.getElementById('output');
-output.style.color = fontColor;
-output.style.fontSize = fontSize;
-output.textContent = wishMessage;
-
+output.style.color = fontColor;          // Apply the font color
+output.style.fontSize = fontSize;        // Apply the font size
+output.style.fontFamily = fontType;      // Apply the font type
+output.textContent = wishMessage;        // Set the wish message text
 // Show the wish container and profile pic
 document.getElementById('wishes-container').classList.remove('hidden');
 
