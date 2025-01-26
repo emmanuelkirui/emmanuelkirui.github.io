@@ -91,7 +91,7 @@
         }
 
         .output.dynamic-font {
-            font-size: 1.5em; /* Adjusts dynamically */
+            font-size: 1.5em;
         }
 
         .decorations {
@@ -160,6 +160,21 @@
             opacity: 0.1;
             pointer-events: none;
         }
+
+        /* Font customization controls */
+        .font-controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .font-controls select,
+        .font-controls input {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -190,6 +205,17 @@
             <input type="text" id="personality" value="#emmanuelkirui#manuraj" placeholder="Enter Personality Wishes">
         </div>
         <button class="button" onclick="generateWishes()">Generate Wishes</button>
+    </div>
+
+    <!-- Font Customization -->
+    <div class="font-controls">
+        <input type="color" id="fontColor" title="Choose font color">
+        <select id="fontSize" title="Choose font size">
+            <option value="1em">Small</option>
+            <option value="1.5em" selected>Medium</option>
+            <option value="2em">Large</option>
+            <option value="3em">Extra Large</option>
+        </select>
     </div>
 
     <!-- Wishes Display Container -->
@@ -241,13 +267,6 @@
                     🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
                 `;
 
-                // Adjust font size dynamically for long text
-                if (textContent.length > 200) {
-                    output.classList.add("dynamic-font");
-                } else {
-                    output.classList.remove("dynamic-font");
-                }
-
                 output.innerHTML = textContent;
                 outputContainer.classList.remove("hidden");
             } else {
@@ -255,35 +274,17 @@
             }
         }
 
-        // Download wishes as an image
-        document.getElementById("download-btn").addEventListener("click", () => {
-            const wishesContainer = document.getElementById("wishes-container");
-            html2canvas(wishesContainer).then(canvas => {
-                const link = document.createElement("a");
-                link.download = "birthday-wishes.png";
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-            });
+        // Font customization
+        const fontColorInput = document.getElementById("fontColor");
+        const fontSizeInput = document.getElementById("fontSize");
+        const output = document.getElementById("output");
+
+        fontColorInput.addEventListener("input", () => {
+            output.style.color = fontColorInput.value;
         });
 
-        // Share wishes as an image
-        document.getElementById("share-btn").addEventListener("click", () => {
-            const wishesContainer = document.getElementById("wishes-container");
-            html2canvas(wishesContainer).then(canvas => {
-                canvas.toBlob(blob => {
-                    const file = new File([blob], "birthday-wishes.png", { type: "image/png" });
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            files: [file],
-                            title: "Birthday Wishes",
-                            text: "Check out these cool birthday wishes!",
-                        }).then(() => console.log("Shared successfully!"))
-                          .catch(err => alert("Sharing failed: " + err.message));
-                    } else {
-                        alert("Sharing is not supported on this browser.");
-                    }
-                });
-            });
+        fontSizeInput.addEventListener("change", () => {
+            output.style.fontSize = fontSizeInput.value;
         });
     </script>
 </body>
