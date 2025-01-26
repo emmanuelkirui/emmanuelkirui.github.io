@@ -378,11 +378,11 @@ function generateWishes() {
     }
 
     // Set the output message with styling
-    const output = document.getElementById('output');
-    output.style.color = fontColor;
-    output.style.fontSize = fontSize;
-    output.textContent = wishMessage;
-
+const output = document.getElementById('output');
+output.style.color = fontColor; // Set the font color
+output.style.fontSize = fontSize; // Set the font size
+output.style.fontFamily = fontFamily; // Set the font type
+output.textContent = wishMessage; // Set the text content
 
         // Show the wish container and profile pic
         document.getElementById('wishes-container').classList.remove('hidden');
