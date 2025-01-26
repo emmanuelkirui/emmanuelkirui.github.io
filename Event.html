@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -244,7 +244,6 @@
             <option value="2em">Large</option>
             <option value="3em">Extra Large</option>
         </select>
-        <input type="color" id="bgColor" title="Choose background color">
 
     </div>
 
@@ -282,8 +281,8 @@ function generateWishes() {
     const venue = document.getElementById('venue').value || 'N/A'; // Default to 'N/A' if not provided
     const personality = document.getElementById('personality').value || 'Your Well-Wishers'; // Default to 'Your Well-Wishers' if not provided
     const fontColor = document.getElementById('fontColor').value || '#000'; // Default to black
-    const fontSize = document.getElementById('fontSize').value || '16px'; // Default font size  
-    const bgColor = document.getElementById('bgColor').value || '#ffffff'; // Get selected background color
+    const fontSize = document.getElementById('fontSize').value || '16px'; // Default font size
+    
 
     let wishMessage = ''; // Initialize the message
     const eventType = eventSelect.value; // Get the selected event
@@ -373,17 +372,10 @@ function generateWishes() {
     }
 
     // Set the output message with styling
-          output.textContent = wishMessage;
-        output.style.color = fontColor;
-        output.style.fontSize = fontSize;
-
-        // Apply the selected background color
-        wishesContainer.style.backgroundColor = bgColor;
-
-        // Debug: Log the selected background color
-        console.log("Selected Background Color: ", bgColor);
-
-       
+const output = document.getElementById('output');
+output.style.color = fontColor; // Set the font color
+output.style.fontSize = fontSize; // Set the font size
+output.textContent = wishMessage; // Set the text content
 
         // Show the wish container and profile pic
         document.getElementById('wishes-container').classList.remove('hidden');
