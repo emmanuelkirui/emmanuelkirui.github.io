@@ -21,7 +21,8 @@
         }
 
         .container {
-            width: 80%;
+            width: 90%;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 40px 0;
             background-color: #fff;
@@ -47,9 +48,8 @@
             color: #fff;
             text-align: center;
             padding: 10px 0;
-            position: fixed;
+            position: relative;
             width: 100%;
-            bottom: 0;
         }
 
         /* Header */
@@ -65,6 +65,7 @@
             left: 0;
             right: 0;
             z-index: 1000;
+            width: 100%;
         }
 
         header h1 {
@@ -73,7 +74,7 @@
         }
 
         .hamburger {
-            display: none;
+            display: flex;
             flex-direction: column;
             justify-content: space-between;
             width: 30px;
@@ -104,19 +105,19 @@
         /* Navigation Styles */
         nav {
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             align-items: center;
-            background-color: #333;
             position: absolute;
             top: 60px; /* Adjust according to header height */
             width: 100%;
             height: 0;
             overflow: hidden;
             transition: all 0.3s ease;
+            background-color: #333;
         }
 
         nav.open {
-            height: 300px; /* You can adjust this as needed */
+            height: auto;
         }
 
         nav a {
@@ -136,22 +137,57 @@
             flex-direction: column;
         }
 
-        /* Media Queries */
+        /* Main content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .policy-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Media Queries for larger screens */
         @media (min-width: 768px) {
+            body {
+                padding-top: 80px; /* Increase padding for larger screens */
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            /* Align the nav horizontally */
             nav {
-                display: flex;
-                justify-content: flex-end;
-                align-items: center;
                 position: static;
                 height: auto;
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+
+            nav a {
+                padding: 10px 15px;
             }
 
             .hamburger {
                 display: none;
             }
+        }
 
-            nav a {
-                padding: 10px 15px;
+        @media (min-width: 1024px) {
+            header h1 {
+                font-size: 2.5rem;
+            }
+
+            .container {
+                width: 80%;
+            }
+
+            .policy-section ul {
+                margin-left: 20px;
             }
         }
     </style>
@@ -181,60 +217,62 @@
     <!-- Privacy Policy Content -->
     <div class="container">
         <h1>Privacy Policy</h1>
-        <p>Welcome to our Privacy Policy page! We are committed to protecting your privacy and ensuring a safe online experience. Below is an overview of how we collect, use, and protect your information when you use our online solutions services.</p>
+        <div class="main-content">
+            <p>Welcome to our Privacy Policy page! We are committed to protecting your privacy and ensuring a safe online experience. Below is an overview of how we collect, use, and protect your information when you use our online solutions services.</p>
 
-        <div class="policy-section">
-            <h2>1. Information We Collect</h2>
-            <p>We collect information when you use our services, such as:</p>
-            <ul>
-                <li>Your name, email address, and other contact information</li>
-                <li>Information you provide when requesting our services (e.g., logo design, web design, music production, etc.)</li>
-                <li>Payment information for services rendered</li>
-                <li>Data related to your interactions with our website, including IP address and cookies</li>
-            </ul>
-        </div>
+            <div class="policy-section">
+                <h2>1. Information We Collect</h2>
+                <p>We collect information when you use our services, such as:</p>
+                <ul>
+                    <li>Your name, email address, and other contact information</li>
+                    <li>Information you provide when requesting our services (e.g., logo design, web design, music production, etc.)</li>
+                    <li>Payment information for services rendered</li>
+                    <li>Data related to your interactions with our website, including IP address and cookies</li>
+                </ul>
+            </div>
 
-        <div class="policy-section">
-            <h2>2. How We Use Your Information</h2>
-            <p>We use the information we collect to:</p>
-            <ul>
-                <li>Provide you with the online solutions you request, including logo design, web design, music production, content writing, lyrics making, video animation, and other services.</li>
-                <li>Process payments for services rendered</li>
-                <li>Communicate with you about your projects, orders, and inquiries</li>
-                <li>Improve the functionality and content of our website and services</li>
-                <li>Send promotional material related to our services, if you have opted in</li>
-            </ul>
-        </div>
+            <div class="policy-section">
+                <h2>2. How We Use Your Information</h2>
+                <p>We use the information we collect to:</p>
+                <ul>
+                    <li>Provide you with the online solutions you request, including logo design, web design, music production, content writing, lyrics making, video animation, and other services.</li>
+                    <li>Process payments for services rendered</li>
+                    <li>Communicate with you about your projects, orders, and inquiries</li>
+                    <li>Improve the functionality and content of our website and services</li>
+                    <li>Send promotional material related to our services, if you have opted in</li>
+                </ul>
+            </div>
 
-        <div class="policy-section">
-            <h2>3. Third-Party Services</h2>
-            <p>We may use third-party services (e.g., payment processors, email marketing tools) to provide our services. These third parties may collect and process your data according to their own privacy policies. We are not responsible for the actions or policies of these third parties, and we encourage you to read their privacy policies to understand how your data is handled.</p>
-        </div>
+            <div class="policy-section">
+                <h2>3. Third-Party Services</h2>
+                <p>We may use third-party services (e.g., payment processors, email marketing tools) to provide our services. These third parties may collect and process your data according to their own privacy policies. We are not responsible for the actions or policies of these third parties, and we encourage you to read their privacy policies to understand how your data is handled.</p>
+            </div>
 
-        <div class="policy-section">
-            <h2>4. Data Security</h2>
-            <p>We take reasonable steps to protect your personal information. However, please be aware that no method of transmission over the internet is 100% secure, and we cannot guarantee the absolute security of your data.</p>
-        </div>
+            <div class="policy-section">
+                <h2>4. Data Security</h2>
+                <p>We take reasonable steps to protect your personal information. However, please be aware that no method of transmission over the internet is 100% secure, and we cannot guarantee the absolute security of your data.</p>
+            </div>
 
-        <div class="policy-section">
-            <h2>5. Your Rights</h2>
-            <p>You have the right to:</p>
-            <ul>
-                <li>Access the personal data we have collected about you</li>
-                <li>Request corrections or updates to your personal information</li>
-                <li>Request the deletion of your personal data, where applicable</li>
-            </ul>
-            <p>If you have any concerns or requests regarding your personal data, please contact us via our contact page.</p>
-        </div>
+            <div class="policy-section">
+                <h2>5. Your Rights</h2>
+                <p>You have the right to:</p>
+                <ul>
+                    <li>Access the personal data we have collected about you</li>
+                    <li>Request corrections or updates to your personal information</li>
+                    <li>Request the deletion of your personal data, where applicable</li>
+                </ul>
+                <p>If you have any concerns or requests regarding your personal data, please contact us via our contact page.</p>
+            </div>
 
-        <div class="policy-section">
-            <h2>6. Changes to This Privacy Policy</h2>
-            <p>We reserve the right to update or modify this privacy policy at any time. Any changes will be posted on this page, and we encourage you to review it periodically for updates.</p>
-        </div>
+            <div class="policy-section">
+                <h2>6. Changes to This Privacy Policy</h2>
+                <p>We reserve the right to update or modify this privacy policy at any time. Any changes will be posted on this page, and we encourage you to review it periodically for updates.</p>
+            </div>
 
-        <div class="policy-section">
-            <h2>7. Contact Us</h2>
-            <p>If you have any questions or concerns regarding this privacy policy or the use of your personal data, please don't hesitate to reach out to us.</p>
+            <div class="policy-section">
+                <h2>7. Contact Us</h2>
+                <p>If you have any questions or concerns regarding this privacy policy or the use of your personal data, please don't hesitate to reach out to us.</p>
+            </div>
         </div>
     </div>
 
