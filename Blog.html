@@ -333,55 +333,61 @@ body:not(.dark-mode) .whats-new h2 {
         padding: 8px 15px;
     }
     
-    /* Footer Links */
+/* Footer Links */
 .footer-links {
     list-style: none;
     padding: 0;
     margin: 0;
     display: flex;
-    justify-content: center; /* Centers the links horizontally */
-    flex-wrap: wrap; /* Ensures links wrap on smaller screens */
+    justify-content: center; /* Centers links horizontally */
+    flex-wrap: wrap; /* Allows links to wrap on smaller screens */
     gap: 20px; /* Adds spacing between links */
+    background-color: #333; /* Dark background for better contrast */
+    padding: 15px 10px; /* Adds padding for a neat layout */
+    border-top: 2px solid #f39c12; /* Accent border for a professional look */
 }
 
 .footer-links li {
-    margin: 0; /* Removes unnecessary right margin */
+    margin: 0; /* Removes unnecessary margin */
 }
 
 .footer-links a {
-    color: #fff;
+    color: #f39c12; /* High-contrast color for light mode */
     text-decoration: none;
-    font-size: 16px; /* Slightly larger font for better readability */
-    transition: color 0.3s ease, text-decoration 0.3s ease; /* Smooth transition */
+    font-size: 16px; /* Slightly larger font for readability */
+    font-weight: 600; /* Makes links bolder for emphasis */
+    transition: color 0.3s ease, text-decoration 0.3s ease; /* Smooth hover effect */
 }
 
 .footer-links a:hover {
-    color: #f39c12; /* Changes color on hover for a professional effect */
+    color: #e67e22; /* Darker accent color on hover */
     text-decoration: underline;
 }
 
 /* Footer Disclaimer */
 .disclaimer {
     font-size: 14px;
-    color: #aaa; /* Softer color for subtlety */
-    margin-top: 15px; /* Adds more spacing above */
-    text-align: center; /* Centers the disclaimer text */
+    color: #ddd; /* Light text for better visibility */
+    margin-top: 15px; /* Adds spacing above */
+    text-align: center; /* Centers the disclaimer */
     line-height: 1.6; /* Improves readability */
+    background-color: #333; /* Matches footer background */
+    padding: 10px; /* Adds padding for a cleaner look */
 }
 
 /* Responsive Design for Footer */
 @media (max-width: 600px) {
     .footer-links {
-        flex-direction: column; /* Stacks links vertically on small screens */
+        flex-direction: column; /* Stacks links vertically */
         align-items: center; /* Centers links vertically */
     }
 
     .footer-links a {
-        font-size: 14px; /* Slightly smaller font for smaller screens */
+        font-size: 14px; /* Adjusts font size for small screens */
     }
 
     .disclaimer {
-        font-size: 12px; /* Adjusts text size for mobile */
+        font-size: 12px; /* Smaller font size for small screens */
         line-height: 1.4;
     }
 }
