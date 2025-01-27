@@ -441,18 +441,6 @@ body:not(.dark-mode) .whats-new h2 {
 
      posts:', error));
 
-            // Fetch and load "What's New" section dynamically
-            const whatsNewList = document.getElementById('whats-new-list');
-            fetch('announcements.json')
-                .then(response => response.json())
-                .then(announcements => {
-                    announcements.forEach(item => {
-                        const listItem = document.createElement('li');
-                        listItem.textContent = item;
-                        whatsNewList.appendChild(listItem);
-                    });
-                })
-                .catch(error => console.error('Error fetching announcements:', error));
 
 
         
