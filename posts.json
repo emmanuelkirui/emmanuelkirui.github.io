@@ -10,5 +10,25 @@
     {
         "title": "Latest News Title 3",
         "content": "Quisque ut nisi. Praesent egestas tristique nibh. Nunc egestas, augue eu tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non est at libero vulputate cursus. Integer ac neque. Vivamus eget nibh. Etiam cursus leo vel metus."
+    },
+    {
+        "title": "Lyrics Making",
+        "content": "Creating lyrics is an art form that requires creativity, rhythm, and a deep understanding of language. This process often involves crafting meaningful verses, hooks, and choruses that resonate with the audience."
+    },
+    {
+        "title": "Video Editing",
+        "content": "Video editing involves manipulating and arranging video footage to create a final product. Editors use various tools and techniques to enhance the visual appeal, coherence, and storytelling of the video."
+    },
+    {
+        "title": "Content Writing",
+        "content": "Content writing is the practice of creating written material for various platforms, with the goal of informing, entertaining, or persuading the audience. It includes blog posts, articles, and social media content."
+    },
+    {
+        "title": "Web Design",
+        "content": "Web design is the process of planning and creating websites. This involves the layout, color scheme, fonts, navigation, and overall aesthetics of the site to provide a user-friendly experience."
+    },
+    {
+        "title": "Graphics and Motion Design",
+        "content": "Graphics and motion design combines visual art and animation to communicate messages through moving images. This field is commonly used in advertisements, movies, video games, and social media."
     }
 ]
