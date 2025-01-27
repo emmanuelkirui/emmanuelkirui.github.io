@@ -235,6 +235,69 @@ body:not(.dark-mode) .whats-new h2 {
     flex-wrap: wrap;
 }
 
+/* Modal Styles */
+.cookie-consent-modal {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.cookie-consent-modal.show {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Close Button */
+.cookie-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    color: white;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Content */
+.cookie-consent-content {
+    max-width: 90%; /* Adjust for small screens */
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.cookie-consent-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.cookie-consent-content p {
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* Buttons */
+.cookie-actions {
+    display: flex;
+    flex-wrap: wrap; /* Ensure buttons wrap on small screens */
+    justify-content: center;
+    gap: 10px; /* Add space between buttons */
+}
+
 .cookie-actions .btn {
     background-color: #f39c12;
     color: white;
@@ -242,38 +305,32 @@ body:not(.dark-mode) .whats-new h2 {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    flex: 1; /* Buttons take equal width */
+    max-width: 150px; /* Limit button width */
 }
 
 .cookie-actions .btn:hover {
     background-color: #e67e22;
 }
 
-/* Close Button */
-.cookie-close-btn {
-    background: transparent;
-    color: white;
-    font-size: 1.2rem;
-    border: none;
-    cursor: pointer;
-    align-self: flex-start;
-    margin-left: auto;
-    margin-right: 10px;
-    padding: 5px;
-    transition: color 0.3s ease;
-}
-
-.cookie-close-btn:hover {
-    color: #e74c3c;
-}
-
 /* Responsive Design */
 @media (max-width: 600px) {
     .cookie-consent-modal {
-        flex-direction: column;
+        padding: 15px;
     }
-    .cookie-consent-content {
-        text-align: center;
+
+    .cookie-consent-content h2 {
+        font-size: 1.2rem;
+    }
+
+    .cookie-consent-content p {
+        font-size: 0.9rem;
+    }
+
+    .cookie-actions .btn {
+        font-size: 0.9rem;
+        padding: 8px 15px;
     }
 }
         !-- Footer CSS Styling -->
