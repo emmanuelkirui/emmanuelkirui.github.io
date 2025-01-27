@@ -11,9 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* General Styles */
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f4f4f4;
+            color: #333;
             margin: 0;
             padding: 0;
             transition: background-color 0.3s, color 0.3s;
@@ -36,58 +38,37 @@
             margin: 0;
         }
 
-        /* Professional Dark Mode Toggle */
-        .theme-toggle {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.3s ease;
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
         }
 
-        .theme-toggle i {
-            font-size: 24px;
-            margin: 0 10px;
-            transition: transform 0.3s ease-in-out;
+        header.dark-mode {
+            background-color: #222;
         }
 
-        .theme-toggle i.active {
-            transform: scale(1.2);
-            color: #FFD700;
+        nav.dark-mode {
+            background-color: #222;
         }
 
-        /* Hamburger Menu */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 25px;
-            width: 30px;
-            cursor: pointer;
-            position: relative;
-            z-index: 10;
+        .post.dark-mode {
+            background-color: #444;
         }
 
-        .hamburger div {
-            height: 4px;
-            background-color: white;
+        .post {
+            background-color: #fff;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
-            transition: all 0.3s ease-in-out;
+            transition: background-color 0.3s ease-in-out;
         }
 
-        .hamburger.open div:nth-child(1) {
-            transform: rotate(45deg);
-            position: absolute;
-            top: 0;
-        }
-
-        .hamburger.open div:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger.open div:nth-child(3) {
-            transform: rotate(-45deg);
-            position: absolute;
-            top: 0;
+        /* Theme Toggle */
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 1.2rem;
         }
 
         /* Navigation */
@@ -96,7 +77,6 @@
             justify-content: center;
             background-color: #333;
             width: 100%;
-            transition: transform 0.3s ease-in-out;
         }
 
         nav a {
@@ -105,67 +85,42 @@
             padding: 15px 20px;
             display: block;
             transition: background-color 0.3s ease;
-            font-size: 1.1rem;
         }
 
         nav a:hover {
             background-color: #575757;
         }
 
-        .nav-links {
-            display: flex;
-            flex-direction: row;
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                display: none;
+            }
+
+            nav.open {
+                display: flex;
+            }
+
+            .hamburger {
+                display: block;
+                cursor: pointer;
+            }
         }
 
-        .nav-links.open {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background-color: #333;
+        .hamburger {
+            display: none;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 5px;
         }
 
         .container {
             padding: 20px;
-        }
-
-        .post {
-            background-color: white;
-            margin-bottom: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-
-        .post h2 {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.8rem;
-            color: #333;
-        }
-
-        .post p {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: #555;
-        }
-
-        /* Image Gallery Section */
-        .image-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .image-gallery img {
-            width: 100%;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .image-gallery img:hover {
-            transform: scale(1.05);
         }
 
         /* What's New Section */
@@ -176,63 +131,16 @@
             border-radius: 10px;
         }
 
-        .whats-new h3 {
-            margin-bottom: 10px;
-        }
-
-        /* Dark Mode */
-        body.dark-mode {
-            background-color: #333;
-            color: white;
-        }
-
-        header.dark-mode {
-            background-color: #222;
-        }
-
-        .post.dark-mode {
+        .whats-new.dark-mode {
             background-color: #444;
-            color: white;
         }
-
-        nav.dark-mode {
-            background-color: #222;
-        }
-
-        /* Smooth transition for mode change */
-        body, header, nav, .post {
-            transition: all 0.3s ease-in-out;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            nav {
-                display: none;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            nav.open {
-                display: block;
-                width: 100%;
-            }
-
-            .post {
-                margin: 10px;
-                padding: 15px;
-            }
-        }
-
     </style>
 </head>
 <body>
     <header>
         <h1>Latest News Blog</h1>
-        <div class="theme-toggle">
-            <i id="dark-mode-icon" class="fa fa-moon active">🌙</i>
-            <i id="light-mode-icon" class="fa fa-sun">☀️</i>
+        <div class="theme-toggle" id="theme-toggle">
+            <i class="fa fa-moon"></i> Toggle Theme
         </div>
         <div class="hamburger" id="hamburger">
             <div></div>
@@ -242,30 +150,43 @@
     </header>
 
     <nav id="nav">
-        <div class="nav-links">
-            <a href="poster.html">Poster Generator</a>
-            <a href="birthday.html">Birthday</a>
-            <a href="valentine'sday.html">Valentine's Day</a>
-        </div>
+        <a href="poster.html">Poster Generator</a>
+        <a href="birthday.html">Birthday</a>
+        <a href="valentine'sday.html">Valentine's Day</a>
     </nav>
 
     <div class="container" id="blog-posts-container">
         <!-- Posts will be dynamically loaded here -->
     </div>
 
-    <!-- Image Gallery Section -->
-    <div class="image-gallery" id="image-gallery">
-        <!-- Images will be dynamically loaded here -->
-    </div>
-
     <!-- What's New Section -->
-    <div class="whats-new">
+    <div class="whats-new" id="whats-new">
         <h3>What's New</h3>
         <p>Stay tuned for the latest blog updates! New features are coming soon.</p>
     </div>
 
     <script>
-        // Fetch posts from the JSON file and display them
+        // Dark and Light Mode Toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const header = document.querySelector('header');
+        const nav = document.getElementById('nav');
+        const whatsNew = document.getElementById('whats-new');
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            header.classList.toggle('dark-mode');
+            nav.classList.toggle('dark-mode');
+            whatsNew.classList.toggle('dark-mode');
+        });
+
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
+        });
+
+        // Fetch and Display Blog Posts
         fetch('posts.json')
             .then(response => response.json())
             .then(posts => {
@@ -281,65 +202,6 @@
                 });
             })
             .catch(error => console.error('Error loading posts:', error));
-
-        // Load images dynamically into the gallery section
-        window.onload = function() {
-            const imageGallery = document.getElementById('image-gallery');
-            const images = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
-
-            images.forEach(image => {
-                const imgElement = document.createElement('img');
-                imgElement.src = 'images/' + image;
-                imgElement.alt = 'Gallery Image';
-                imageGallery.appendChild(imgElement);
-            });
-        }
-
-        // Dark and Light Mode Toggle
-        document.addEventListener('DOMContentLoaded', function() {
-    const darkModeIcon = document.getElementById('dark-mode-icon');
-    const lightModeIcon = document.getElementById('light-mode-icon');
-
-    // Function to toggle icons
-    function toggleIcons(mode) {
-        if (mode === 'dark') {
-            darkModeIcon.classList.add('active');
-            lightModeIcon.classList.remove('active');
-        } else {
-            lightModeIcon.classList.add('active');
-            darkModeIcon.classList.remove('active');
-        }
-    }
-
-    darkModeIcon.addEventListener('click', () => {
-        document.body.classList.add('dark-mode');
-        localStorage.setItem('theme', 'dark');
-        toggleIcons('dark');
-    });
-
-    lightModeIcon.addEventListener('click', () => {
-        document.body.classList.remove('dark-mode');
-        localStorage.setItem('theme', 'light');
-        toggleIcons('light');
-    });
-
-    // Load the theme from localStorage on page load
-    if(localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-        toggleIcons('dark');
-    } else {
-        toggleIcons('light');
-    }
-});
-
-        // Hamburger Menu Toggle
-        const hamburger = document.getElementById('hamburger');
-        const nav = document.getElementById('nav');
-
-        hamburger.addEventListener('click', () => {
-            nav.classList.toggle('open');
-            hamburger.classList.toggle('open');
-        });
     </script>
 </body>
 </html>
