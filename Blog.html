@@ -258,6 +258,45 @@ body:not(.dark-mode) .whats-new h2 {
 .cookie-actions .btn:hover {
     background-color: #e67e22;
 }
+<!-- Footer CSS Styling -->
+    footer {
+        background-color: #333;
+        color: #fff;
+        padding: 20px 0;
+        text-align: center;
+    }
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .footer-content p {
+        margin: 0;
+    }
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+    }
+    .footer-links li {
+        margin-right: 15px;
+    }
+    .footer-links a {
+        color: #fff;
+        text-decoration: none;
+    }
+    .footer-links a:hover {
+        text-decoration: underline;
+    }
+    .disclaimer {
+        font-size: 14px;
+        color: #bbb;
+        margin-top: 10px;
+    }
     </style>
 </head>
 <body>
@@ -312,6 +351,22 @@ body:not(.dark-mode) .whats-new h2 {
         </div>
     </div>
 </div>
+        <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <p>&copy; 2025 Emmanuel Kirui. All rights reserved.</p>
+            <ul class="footer-links">
+                <li><a href="terms-conditions.html">Terms and Conditions</a></li>
+                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                <li><a href="#">Third-Party Services</a></li>
+            </ul>
+            <p class="disclaimer">
+                This site uses third-party services, cookies, and advertisements. We are not responsible for any issues caused by them. Please read the terms and conditions of third-party services from their respective links.
+            </p>
+        </div>
+    </div>
+</footer>
     <script>
         const body = document.body;
         const header = document.querySelector('header');
