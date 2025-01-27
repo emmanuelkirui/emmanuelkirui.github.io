@@ -6,6 +6,7 @@
     <title>Blog - Latest News</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -32,6 +33,11 @@
 
         header i {
             font-size: 20px;
+            display: none;
+        }
+
+        header .theme-toggle i.active {
+            display: inline-block;
         }
 
         nav {
@@ -49,6 +55,29 @@
 
         nav a:hover {
             background-color: #575757;
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .hamburger div {
+            width: 30px;
+            height: 3px;
+            background-color: white;
+            margin: 5px 0;
+        }
+
+        .nav-links {
+            display: flex;
+        }
+
+        .nav-links.open {
+            display: block;
+            width: 100%;
+            text-align: center;
         }
 
         .container {
@@ -75,6 +104,18 @@
             color: #555;
         }
 
+        /* What's New Section */
+        .whats-new {
+            margin-top: 20px;
+            background-color: #e0e0e0;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .whats-new h3 {
+            margin-bottom: 10px;
+        }
+
         /* Dark Mode */
         body.dark-mode {
             background-color: #333;
@@ -97,7 +138,16 @@
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             nav {
-                flex-direction: column;
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            nav.open {
+                display: block;
+                width: 100%;
             }
 
             .post {
@@ -111,20 +161,32 @@
 <body>
     <header>
         <div class="theme-toggle">
-            <i id="dark-mode-icon" class="fa fa-moon">🌙</i>
+            <i id="dark-mode-icon" class="fa fa-moon active">🌙</i>
             <i id="light-mode-icon" class="fa fa-sun">☀️</i>
         </div>
         <h1>Latest News Blog</h1>
     </header>
 
-    <nav>
+    <nav id="nav">
         <a href="poster.html">Poster Generator</a>
         <a href="birthday.html">Birthday</a>
         <a href="valentine'sday.html">Valentine's Day</a>
     </nav>
 
+    <div class="hamburger" id="hamburger">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
     <div class="container" id="blog-posts-container">
         <!-- Posts will be dynamically loaded here -->
+    </div>
+
+    <!-- What's New Section -->
+    <div class="whats-new">
+        <h3>What's New</h3>
+        <p>Stay tuned for the latest blog updates! New features are coming soon.</p>
     </div>
 
     <script>
@@ -152,18 +214,35 @@
 
             darkModeIcon.addEventListener('click', () => {
                 document.body.classList.add('dark-mode');
+                darkModeIcon.classList.add('active');
+                lightModeIcon.classList.remove('active');
                 localStorage.setItem('theme', 'dark');
             });
 
             lightModeIcon.addEventListener('click', () => {
                 document.body.classList.remove('dark-mode');
+                lightModeIcon.classList.add('active');
+                darkModeIcon.classList.remove('active');
                 localStorage.setItem('theme', 'light');
             });
 
             // Load the theme from localStorage on page load
             if(localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
+                darkModeIcon.classList.add('active');
+                lightModeIcon.classList.remove('active');
+            } else {
+                lightModeIcon.classList.add('active');
+                darkModeIcon.classList.remove('active');
             }
+        });
+
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const nav = document.getElementById('nav');
+
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
         });
     </script>
 </body>
