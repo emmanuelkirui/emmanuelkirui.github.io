@@ -246,7 +246,7 @@
 </head>
 <body>
  <header>
-        <h1>Latest News Blog</h1>
+        <h1>Events Wishes</h1>
         <div class="theme-toggle">
             <i class="fas fa-moon"></i>
         </div>
@@ -346,6 +346,12 @@
     </div>
 
     <script>
+     const hamburger = document.getElementById('hamburger');
+        // Hamburger menu toggle
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
+            hamburger.classList.toggle('open');
+        });
     function loadProfilePic(event) {
         const output = document.getElementById('profile-pic');
         const file = event.target.files[0];
