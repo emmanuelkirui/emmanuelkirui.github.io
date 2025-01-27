@@ -104,6 +104,26 @@
             color: #555;
         }
 
+        /* Image Gallery Section */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .image-gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .image-gallery img:hover {
+            transform: scale(1.05);
+        }
+
         /* What's New Section */
         .whats-new {
             margin-top: 20px;
@@ -183,6 +203,11 @@
         <!-- Posts will be dynamically loaded here -->
     </div>
 
+    <!-- Image Gallery Section -->
+    <div class="image-gallery" id="image-gallery">
+        <!-- Images will be dynamically loaded here -->
+    </div>
+
     <!-- What's New Section -->
     <div class="whats-new">
         <h3>What's New</h3>
@@ -206,6 +231,19 @@
                 });
             })
             .catch(error => console.error('Error loading posts:', error));
+
+        // Load images dynamically into the gallery section
+        window.onload = function() {
+            const imageGallery = document.getElementById('image-gallery');
+            const images = ['image1.jpg', 'image2.jpg', 'image3.jpg']; // Add your image file names here
+
+            images.forEach(image => {
+                const imgElement = document.createElement('img');
+                imgElement.src = 'images/' + image; // Adjust the path to where your images are stored
+                imgElement.alt = 'Gallery Image';
+                imageGallery.appendChild(imgElement);
+            });
+        }
 
         // Dark and Light Mode Toggle
         document.addEventListener('DOMContentLoaded', function() {
