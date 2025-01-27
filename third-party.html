@@ -165,11 +165,13 @@
     </footer>
 <script>
     const hamburger = document.getElementById('hamburger');
-        // Hamburger menu toggle
-        hamburger.addEventListener('click', () => {
-            nav.classList.toggle('open');
-            hamburger.classList.toggle('open');
-        });
+    const nav = document.getElementById('nav');
+
+    // Hamburger menu toggle
+    hamburger.addEventListener('click', () => {
+        nav.classList.toggle('open');
+        hamburger.classList.toggle('open');
+    });
 </script>
 </body>
 
