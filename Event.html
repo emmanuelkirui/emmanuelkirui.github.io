@@ -585,6 +585,16 @@ document.getElementById('share-btn').addEventListener('click', function() {
             link.click();
         });
     });
+     const container = document.querySelector('.container');
+
+// Temporarily remove rounded corners
+container.style.borderRadius = '0';
+
+html2canvas(container).then((canvas) => {
+    document.body.appendChild(canvas); // Add canvas to the page or process it
+    // Restore the original border radius
+    container.style.borderRadius = '15px';
+});
     </script>
 </body>
 </html>
