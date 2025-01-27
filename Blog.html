@@ -134,17 +134,38 @@
         }
 
         /* New Section */
-        .whats-new {
-            background-color: #fff;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
+.whats-new {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, color 0.3s;
+}
 
-        .whats-new h2 {
-            margin-bottom: 10px;
-        }
+.whats-new h2 {
+    margin-bottom: 10px;
+}
+
+/* Dark Mode Styles */
+body.dark-mode .whats-new {
+    background-color: #333;  /* Dark background */
+    color: #fff;             /* Light text */
+}
+
+body.dark-mode .whats-new h2 {
+    color: #fff;             /* Light text color for heading */
+}
+
+/* Light Mode Styles (default) */
+body:not(.dark-mode) .whats-new {
+    background-color: #fff;  /* Light background */
+    color: #333;             /* Dark text */
+}
+
+body:not(.dark-mode) .whats-new h2 {
+    color: #333;             /* Dark text color for heading */
+}
 
         /* Image Slideshow */
         .image-slideshow {
