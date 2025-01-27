@@ -115,34 +115,36 @@
             }
         }
 
-        /* Hamburger Menu */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 20px;
-            width: 25px;
-            cursor: pointer;
-        }
+        /* Hamburger menu styles */
+.hamburger-menu {
+    position: fixed; /* Makes the menu fixed to the screen */
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Optional: semi-transparent background */
+    width: 250px; /* Adjust the width of the menu */
+    height: 100%; /* Full screen height */
+    display: none; /* Initially hidden */
+    z-index: 9999; /* Ensure it's above other content */
+    transition: transform 0.3s ease-in-out; /* Smooth slide-in transition */
+    transform: translateX(100%); /* Initially off-screen */
+}
 
-        .hamburger div {
-            background-color: white;
-            height: 3px;
-            border-radius: 2px;
-            transition: all 0.3s;
-        }
+/* When the menu is active */
+.hamburger-menu.open {
+    display: block;
+    transform: translateX(0); /* Slide in the menu */
+}
 
-        .hamburger.open div:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
+/* Hamburger button styles */
+.hamburger-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10000; /* Ensures the button is above the menu */
+    cursor: pointer;
+}
 
-        .hamburger.open div:nth-child(2) {
-            opacity: 0;
-        }
 
-        .hamburger.open div:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
-        }
 
         /* Navigation */
         nav {
