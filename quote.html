@@ -194,6 +194,26 @@
     </style>
 </head>
 <body>
+    <header>
+        <h1>Quotes/h1>
+        <button class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+        <div class="hamburger" id="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </header>
+
+    <nav id="nav">
+        <a href="index.html">Home</a>
+        <a href="Poster.html">Poster Generator</a>
+        <a href="Birthday.html">Birthday</a>
+        <a href="Event.html">Event</a>
+        <a href="quote.html">Quotes</a>
+        <a href="valentinesday.html">Valentine's</a>
+    </nav>
     <button class="theme-toggle" id="theme-toggle">
         <i class="fas fa-moon"></i>
     </button>
@@ -240,6 +260,12 @@
     </div>
 
     <script>
+        const hamburger = document.getElementById('hamburger');
+        // Hamburger menu toggle
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
+            hamburger.classList.toggle('open');
+        });
         // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
         const body = document.body;
