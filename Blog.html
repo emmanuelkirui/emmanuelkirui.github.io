@@ -32,7 +32,7 @@
             margin: 0;
         }
 
-        /* Professional Dark Mode Toggle */
+        /* Dark Mode Toggle */
         .theme-toggle {
             display: flex;
             align-items: center;
@@ -53,7 +53,7 @@
 
         /* Hamburger Menu */
         .hamburger {
-            display: none;
+            display: flex;
             flex-direction: column;
             justify-content: space-between;
             height: 25px;
@@ -85,12 +85,17 @@
             top: 0;
         }
 
-        /* Navigation */
+        /* Navbar */
         nav {
             display: flex;
             justify-content: center;
             background-color: #333;
             width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: -1;
         }
 
         nav a {
@@ -117,7 +122,7 @@
             background-color: #333;
         }
 
-        /* Styling for Navbar Items */
+        /* Navbar Styling for Professional Look */
         nav a {
             font-size: 1.1rem;
             padding: 10px 15px;
@@ -332,6 +337,14 @@
         hamburger.addEventListener('click', () => {
             nav.classList.toggle('open');
             hamburger.classList.toggle('open');
+        });
+
+        // Close hamburger menu when clicking outside
+        window.addEventListener('click', (event) => {
+            if (!hamburger.contains(event.target) && !nav.contains(event.target)) {
+                nav.classList.remove('open');
+                hamburger.classList.remove('open');
+            }
         });
     </script>
 </body>
