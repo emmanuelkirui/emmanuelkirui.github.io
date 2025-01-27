@@ -171,22 +171,44 @@
         const themeToggle = document.querySelector('.theme-toggle');
         const hamburger = document.getElementById('hamburger');
 
+        // Load theme preference from localStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            enableDarkMode();
+        }
+
         // Toggle theme
         themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            header.classList.toggle('dark-mode');
-            nav.classList.toggle('dark-mode');
-            document.querySelectorAll('.post').forEach(post => {
-                post.classList.toggle('dark-mode');
-            });
-
-            const icon = themeToggle.querySelector('i');
             if (body.classList.contains('dark-mode')) {
-                icon.classList.replace('fa-moon', 'fa-sun');
+                disableDarkMode();
             } else {
-                icon.classList.replace('fa-sun', 'fa-moon');
+                enableDarkMode();
             }
         });
+
+        // Enable dark mode
+        function enableDarkMode() {
+            body.classList.add('dark-mode');
+            header.classList.add('dark-mode');
+            nav.classList.add('dark-mode');
+            document.querySelectorAll('.post').forEach(post => {
+                post.classList.add('dark-mode');
+            });
+            localStorage.setItem('theme', 'dark');
+            themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+        }
+
+        // Disable dark mode
+        function disableDarkMode() {
+            body.classList.remove('dark-mode');
+            header.classList.remove('dark-mode');
+            nav.classList.remove('dark-mode');
+            document.querySelectorAll('.post').forEach(post => {
+                post.classList.remove('dark-mode');
+            });
+            localStorage.setItem('theme', 'light');
+            themeToggle.querySelector('i').classList.replace('fa-sun', 'fa-moon');
+        }
 
         // Hamburger menu toggle
         hamburger.addEventListener('click', () => {
