@@ -297,33 +297,40 @@
 
         // Dark and Light Mode Toggle
         document.addEventListener('DOMContentLoaded', function() {
-            const darkModeIcon = document.getElementById('dark-mode-icon');
-            const lightModeIcon = document.getElementById('light-mode-icon');
+    const darkModeIcon = document.getElementById('dark-mode-icon');
+    const lightModeIcon = document.getElementById('light-mode-icon');
 
-            darkModeIcon.addEventListener('click', () => {
-                document.body.classList.add('dark-mode');
-                darkModeIcon.classList.add('active');
-                lightModeIcon.classList.remove('active');
-                localStorage.setItem('theme', 'dark');
-            });
+    // Function to toggle icons
+    function toggleIcons(mode) {
+        if (mode === 'dark') {
+            darkModeIcon.classList.add('active');
+            lightModeIcon.classList.remove('active');
+        } else {
+            lightModeIcon.classList.add('active');
+            darkModeIcon.classList.remove('active');
+        }
+    }
 
-            lightModeIcon.addEventListener('click', () => {
-                document.body.classList.remove('dark-mode');
-                lightModeIcon.classList.add('active');
-                darkModeIcon.classList.remove('active');
-                localStorage.setItem('theme', 'light');
-            });
+    darkModeIcon.addEventListener('click', () => {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+        toggleIcons('dark');
+    });
 
-            // Load the theme from localStorage on page load
-            if(localStorage.getItem('theme') === 'dark') {
-                document.body.classList.add('dark-mode');
-                darkModeIcon.classList.add('active');
-                lightModeIcon.classList.remove('active');
-            } else {
-                lightModeIcon.classList.add('active');
-                darkModeIcon.classList.remove('active');
-            }
-        });
+    lightModeIcon.addEventListener('click', () => {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light');
+        toggleIcons('light');
+    });
+
+    // Load the theme from localStorage on page load
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        toggleIcons('dark');
+    } else {
+        toggleIcons('light');
+    }
+});
 
         // Hamburger Menu Toggle
         const hamburger = document.getElementById('hamburger');
