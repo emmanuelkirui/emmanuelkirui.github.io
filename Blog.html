@@ -216,31 +216,47 @@ body:not(.dark-mode) .whats-new h2 {
 }
 
 .cookie-consent-content h2 {
-    margin-bottom: 15px;
+/* Cookie Consent Modal */
+.cookie-consent-modal {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    transition: all 0.3s ease;
 }
 
-.cookie-consent-content p {
-    font-size: 14px;
-    margin-bottom: 20px;
+.cookie-consent-modal.show {
+    display: block;
+}
+
+.cookie-consent-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.cookie-actions {
+    margin-top: 10px;
 }
 
 .cookie-actions .btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin: 5px;
-    cursor: pointer;
-    border: none;
-    background-color: #333;
+    background-color: #f39c12;
     color: white;
+    padding: 10px 20px;
+    border: none;
     border-radius: 5px;
+    cursor: pointer;
+    margin: 5px;
 }
 
 .cookie-actions .btn:hover {
-    background-color: #444;
-}
-
-.cookie-actions .btn:focus {
-    outline: none;
+    background-color: #e67e22;
 }
     </style>
 </head>
@@ -402,31 +418,33 @@ body:not(.dark-mode) .whats-new h2 {
             images[currentIndex].classList.add('active');
         }, 3000);
 
-        document.addEventListener("DOMContentLoaded", function () {
-    const cookieConsentModal = document.getElementById('cookie-consent-modal');
-    const acceptCookiesButton = document.getElementById('accept-cookies');
-    const rejectCookiesButton = document.getElementById('reject-cookies');
+        // Get the cookie consent modal and buttons
+const cookieModal = document.getElementById('cookie-consent-modal');
+const acceptBtn = document.getElementById('accept-cookies');
+const rejectBtn = document.getElementById('reject-cookies');
 
-    // Check if user has already accepted/rejected cookies
-    if (!localStorage.getItem('cookiesAccepted')) {
-        console.log("Displaying modal...");
-        cookieConsentModal.style.display = 'flex';
-    }
+// Check if the user has already accepted or rejected cookies
+if (!localStorage.getItem('cookieConsent')) {
+    // Show the modal if the user has not made a choice yet
+    cookieModal.classList.add('show');
+}
 
-    // Accept cookies
-    acceptCookiesButton.addEventListener('click', function () {
-        console.log("Cookies accepted");
-        localStorage.setItem('cookiesAccepted', 'true');
-        cookieConsentModal.style.display = 'none';
-    });
-
-    // Reject cookies
-    rejectCookiesButton.addEventListener('click', function () {
-        console.log("Cookies rejected");
-        localStorage.setItem('cookiesAccepted', 'false');
-        cookieConsentModal.style.display = 'none';
-    });
+// Handle accepting cookies
+acceptBtn.addEventListener('click', () => {
+    localStorage.setItem('cookieConsent', 'accepted'); // Save the acceptance to localStorage
+    cookieModal.classList.remove('show'); // Hide the modal
 });
+
+// Handle rejecting cookies
+rejectBtn.addEventListener('click', () => {
+    localStorage.setItem('cookieConsent', 'rejected'); // Save the rejection to localStorage
+    cookieModal.classList.remove('show'); // Hide the modal
+});
+
+// If cookies are already accepted or rejected, don't show the modal again
+if (localStorage.getItem('cookieConsent') === 'accepted' || localStorage.getItem('cookieConsent') === 'rejected') {
+    cookieModal.classList.remove('show');
+}
     </script>
 </body>
 </html>
