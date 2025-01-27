@@ -103,7 +103,7 @@
 <body>
     
 <header>
-        <h1>Latest News Blog</h1>
+        <h1>Terms & Conditions</h1>
         <div class="theme-toggle">
             <i class="fas fa-moon"></i>
         </div>
@@ -199,7 +199,14 @@
     <footer>
         <p>&copy; 2025 Emmanuel Kirui. All rights reserved.</p>
     </footer>
-
+<script>
+    const hamburger = document.getElementById('hamburger');
+        // Hamburger menu toggle
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
+            hamburger.classList.toggle('open');
+        });
+</script>
 </body>
 
 </html>
