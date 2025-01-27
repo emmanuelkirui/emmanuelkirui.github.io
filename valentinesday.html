@@ -181,7 +181,59 @@
         border: 2px solid #ddd;
         transition: border-color 0.3s ease;
     }
+/* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 20px;
+            width: 25px;
+            cursor: pointer;
+        }
 
+        .hamburger div {
+            background-color: white;
+            height: 3px;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .hamburger.open div:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.open div:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.open div:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Navigation */
+        nav {
+            display: none;
+            background-color: #333;
+        }
+
+        nav.open {
+            display: block;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+        }
+
+        nav a:hover {
+            background-color: #444;
+        }
 
     </style>
 </head>
