@@ -36,10 +36,12 @@
             margin: 0;
         }
 
+        /* Professional Dark Mode Toggle */
         .theme-toggle {
             display: flex;
             align-items: center;
             cursor: pointer;
+            transition: transform 0.3s ease;
         }
 
         .theme-toggle i {
@@ -53,6 +55,7 @@
             color: #FFD700;
         }
 
+        /* Hamburger Menu */
         .hamburger {
             display: none;
             flex-direction: column;
@@ -87,6 +90,7 @@
             top: 0;
         }
 
+        /* Navigation */
         nav {
             display: flex;
             justify-content: center;
@@ -144,6 +148,7 @@
             color: #555;
         }
 
+        /* Image Gallery Section */
         .image-gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -163,6 +168,7 @@
             transform: scale(1.05);
         }
 
+        /* What's New Section */
         .whats-new {
             margin-top: 20px;
             background-color: #e0e0e0;
@@ -174,7 +180,7 @@
             margin-bottom: 10px;
         }
 
-        /* Dark Mode Styles */
+        /* Dark Mode */
         body.dark-mode {
             background-color: #333;
             color: white;
@@ -193,10 +199,12 @@
             background-color: #222;
         }
 
+        /* Smooth transition for mode change */
         body, header, nav, .post {
             transition: all 0.3s ease-in-out;
         }
 
+        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             nav {
                 display: none;
@@ -216,6 +224,7 @@
                 padding: 15px;
             }
         }
+
     </style>
 </head>
 <body>
@@ -240,70 +249,97 @@
         </div>
     </nav>
 
-    <div class="container" id="blog-posts-container"></div>
+    <div class="container" id="blog-posts-container">
+        <!-- Posts will be dynamically loaded here -->
+    </div>
 
-    <div class="image-gallery" id="image-gallery"></div>
+    <!-- Image Gallery Section -->
+    <div class="image-gallery" id="image-gallery">
+        <!-- Images will be dynamically loaded here -->
+    </div>
 
+    <!-- What's New Section -->
     <div class="whats-new">
         <h3>What's New</h3>
         <p>Stay tuned for the latest blog updates! New features are coming soon.</p>
     </div>
 
     <script>
-        // Fetch posts and images
+        // Fetch posts from the JSON file and display them
+        fetch('posts.json')
+            .then(response => response.json())
+            .then(posts => {
+                const postsContainer = document.getElementById('blog-posts-container');
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('post');
+                    postElement.innerHTML = `
+                        <h2>${post.title}</h2>
+                        <p>${post.content}</p>
+                    `;
+                    postsContainer.appendChild(postElement);
+                });
+            })
+            .catch(error => console.error('Error loading posts:', error));
+
+        // Load images dynamically into the gallery section
         window.onload = function() {
             const imageGallery = document.getElementById('image-gallery');
             const images = ['image1.jpg', 'image2.jpg', 'image3.jpg'];
+
             images.forEach(image => {
                 const imgElement = document.createElement('img');
                 imgElement.src = 'images/' + image;
                 imgElement.alt = 'Gallery Image';
                 imageGallery.appendChild(imgElement);
             });
-
-            // Dark/Light Mode Toggle
-            const darkModeIcon = document.getElementById('dark-mode-icon');
-            const lightModeIcon = document.getElementById('light-mode-icon');
-            const body = document.body;
-
-            function toggleIcons(mode) {
-                if (mode === 'dark') {
-                    darkModeIcon.classList.add('active');
-                    lightModeIcon.classList.remove('active');
-                } else {
-                    lightModeIcon.classList.add('active');
-                    darkModeIcon.classList.remove('active');
-                }
-            }
-
-            darkModeIcon.addEventListener('click', () => {
-                body.classList.add('dark-mode');
-                localStorage.setItem('theme', 'dark');
-                toggleIcons('dark');
-            });
-
-            lightModeIcon.addEventListener('click', () => {
-                body.classList.remove('dark-mode');
-                localStorage.setItem('theme', 'light');
-                toggleIcons('light');
-            });
-
-            if (localStorage.getItem('theme') === 'dark') {
-                body.classList.add('dark-mode');
-                toggleIcons('dark');
-            } else {
-                toggleIcons('light');
-            }
-
-            // Hamburger Menu Toggle
-            const hamburger = document.getElementById('hamburger');
-            const nav = document.getElementById('nav');
-
-            hamburger.addEventListener('click', () => {
-                nav.classList.toggle('open');
-                hamburger.classList.toggle('open');
-            });
         }
+
+        // Dark and Light Mode Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+    const darkModeIcon = document.getElementById('dark-mode-icon');
+    const lightModeIcon = document.getElementById('light-mode-icon');
+
+    // Function to toggle icons
+    function toggleIcons(mode) {
+        if (mode === 'dark') {
+            darkModeIcon.classList.add('active');
+            lightModeIcon.classList.remove('active');
+        } else {
+            lightModeIcon.classList.add('active');
+            darkModeIcon.classList.remove('active');
+        }
+    }
+
+    darkModeIcon.addEventListener('click', () => {
+        document.body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+        toggleIcons('dark');
+    });
+
+    lightModeIcon.addEventListener('click', () => {
+        document.body.classList.remove('dark-mode');
+        localStorage.setItem('theme', 'light');
+        toggleIcons('light');
+    });
+
+    // Load the theme from localStorage on page load
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        toggleIcons('dark');
+    } else {
+        toggleIcons('light');
+    }
+});
+
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const nav = document.getElementById('nav');
+
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
+            hamburger.classList.toggle('open');
+        });
     </script>
 </body>
 </html>
