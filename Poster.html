@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Poster Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        header .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        header i {
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-section, .poster-section {
+            width: 45%;
+            margin: 10px;
+        }
+
+        .input-section h2, .poster-section h2 {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .input-section input, .input-section textarea, .input-section button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .input-section input[type="file"] {
+            padding: 0;
+            font-size: 1rem;
+        }
+
+        .poster-section {
+            text-align: center;
+        }
+
+        .poster-container {
+            width: 100%;
+            height: 450px;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .poster-header {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+
+        .poster-date, .poster-details {
+            font-size: 1.2rem;
+            color: #34495e;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .poster-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .poster-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .poster-actions button {
+            padding: 12px 20px;
+            font-size: 1rem;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #333;
+            color: white;
+        }
+
+        header.dark-mode {
+            background-color: #222;
+        }
+
+        .poster-container.dark-mode {
+            background-color: #444;
+        }
+
+        .poster-header.dark-mode,
+        .poster-details.dark-mode {
+            color: white;
+        }
+
+        .poster-actions button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+        }
+
+        .poster-actions button:hover {
+            background-color: #27ae60;
+        }
+
+        /* Light mode icon visibility */
+        #light-mode-icon {
+            display: none;
+        }
+
+        body.dark-mode #light-mode-icon {
+            display: block;
+        }
+
+        body.dark-mode #dark-mode-icon {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="theme-toggle">
+            <i id="dark-mode-icon" class="fa fa-moon">🌙</i>
+            <i id="light-mode-icon" class="fa fa-sun">☀️</i>
+        </div>
+        <h1>Professional Poster Generator</h1>
+    </header>
+
+    <div class="container">
+        <div class="input-section">
+            <h2>Enter Event Details</h2>
+            <form id="event-form">
+                <label for="event-title">Event Title:</label>
+                <input type="text" id="event-title" name="event-title" placeholder="e.g. Birthday Party" required><br>
+                
+                <label for="event-date">Date:</label>
+                <input type="date" id="event-date" name="event-date" required><br>
+
+                <label for="event-details">Details:</label>
+                <textarea id="event-details" name="event-details" placeholder="Event Description" required></textarea><br>
+
+                <label for="event-image">Upload Image (Optional):</label>
+                <input type="file" id="event-image" name="event-image" accept="image/*"><br>
+
+                <button type="submit">Generate Poster</button>
+            </form>
+        </div>
+
+        <div class="poster-section" id="poster-container" style="display: none;">
+            <div class="poster-container" id="poster">
+                <img id="poster-image" src="" alt="Event Image" class="poster-image" style="display: none;">
+                <h2 id="poster-title" class="poster-header">Event Title</h2>
+                <p id="poster-date" class="poster-date">Event Date</p>
+                <p id="poster-details" class="poster-details">Event Details</p>
+            </div>
+
+            <div class="poster-actions">
+                <button id="download-btn" title="Download">Download Poster</button>
+                <button id="share-btn" title="Share as Image">Share Poster</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dark and Light Mode Toggle
+            const darkModeIcon = document.getElementById('dark-mode-icon');
+            const lightModeIcon = document.getElementById('light-mode-icon');
+
+            darkModeIcon.addEventListener('click', () => {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            });
+
+            lightModeIcon.addEventListener('click', () => {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            });
+
+            // Load the theme from localStorage on page load
+            if(localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+
+            // Handle the form submission to generate the poster
+            const form = document.getElementById('event-form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const title = document.getElementById('event-title').value;
+                const date = document.getElementById('event-date').value;
+                const details = document.getElementById('event-details').value;
+                const image = document.getElementById('event-image').files[0];
+
+                document.getElementById('poster-title').textContent = title;
+                document.getElementById('poster-date').textContent = date;
+                document.getElementById('poster-details').textContent = details;
+
+                // Display the uploaded image if available
+                const posterImage = document.getElementById('poster-image');
+                if (image) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        posterImage.src = e.target.result;
+                        posterImage.style.display = 'block';
+                    };
+                    reader.readAsDataURL(image);
+                } else {
+                    posterImage.style.display = 'none';
+                }
+
+                document.getElementById('poster-container').style.display = 'block';
+            });
+
+            // Function to download the generated poster
+            document.getElementById('download-btn').addEventListener('click', function() {
+                const poster = document.getElementById('poster-container');
+                html2canvas(poster).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = 'generated_poster.png';
+                    link.click();
+                });
+            });
+
+            // Function to share the generated poster
+            document.getElementById('share-btn').addEventListener('click', function() {
+                const poster = document.getElementById('poster-container');
+                html2canvas(poster).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    if (navigator.share) {
+                        fetch(imgData)
+                            .then(res => res.blob())
+                            .then(blob => {
+                                const file = new File([blob], 'generated_poster.png', { type: 'image/png' });
+                                navigator.share({
+                                    files: [file],
+                                    title: 'Generated Poster',
+                                    text: 'Check out this event poster!'
+                                }).then(() => {
+                                    console.log('Poster shared successfully!');
+                                }).catch(err => {
+                                    console.error('Error sharing the poster:', err);
+                                });
+                            });
+                    } else {
+                        alert('Web Share API is not supported on this device.');
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
