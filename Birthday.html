@@ -117,95 +117,100 @@
             }
         }
 
-        /* Hamburger menu styles */
-        .hamburger-menu {
-            position: fixed;
-            top: 0;
-            right: 0;
-            background-color: rgba(0, 0, 0, 0.7); /* Optional: semi-transparent background */
-            width: 250px;
-            height: 100%;
-            visibility: hidden; /* Hidden by default */
-            opacity: 0; /* Hidden by default */
-            z-index: 9999; /* Ensure it's above other content */
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-        }
+/* Hamburger menu styles */
+.hamburger-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Optional: semi-transparent background */
+    width: 250px;
+    height: 100%;
+    visibility: hidden; /* Hidden by default */
+    opacity: 0; /* Hidden by default */
+    z-index: 99999; /* Ensure it's above everything else */
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
 
-        /* When the menu is active */
-        .hamburger-menu.open {
-            visibility: visible;
-            opacity: 1;
-        }
+/* When the menu is active */
+.hamburger-menu.open {
+    visibility: visible;
+    opacity: 1;
+}
 
-        /* Hamburger button styles */
-        .hamburger-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 10000; /* Ensures the button is above the menu */
-            cursor: pointer;
-        }
+/* Hamburger button styles */
+.hamburger-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100000; /* Ensures the button is above everything, including the menu */
+    cursor: pointer;
+}
 
-        .hamburger-btn div {
-            background-color: white;
-            height: 4px;
-            width: 30px;
-            margin: 5px;
-            border-radius: 3px;
-            transition: transform 0.3s ease-in-out;
-        }
+/* Hamburger bars */
+.hamburger-btn div {
+    background-color: white;
+    height: 4px;
+    width: 30px;
+    margin: 5px;
+    border-radius: 3px;
+    transition: transform 0.3s ease-in-out;
+}
 
-        .hamburger-btn.open div:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
+/* Hamburger button animation when active */
+.hamburger-btn.open div:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
 
-        .hamburger-btn.open div:nth-child(2) {
-            opacity: 0;
-        }
+.hamburger-btn.open div:nth-child(2) {
+    opacity: 0;
+}
 
-        .hamburger-btn.open div:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
-        }
+.hamburger-btn.open div:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
 
-        /* Navigation */
-        nav {
-            display: none;
-            background-color: #333;
-        }
+/* Navigation */
+nav {
+    display: none;
+    background-color: #333;
+}
 
-        nav.open {
-            display: block;
-            position: absolute;
-            top: 60px;
-            left: 0;
-            width: 100%;
-        }
+/* Navigation display when open */
+nav.open {
+    display: block;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+}
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-            display: block;
-        }
+/* Navigation link styles */
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+}
 
-        nav a:hover {
-            background-color: #444;
-        }
+/* Navigation link hover effect */
+nav a:hover {
+    background-color: #444;
+}
 
-        /* Media Queries for Hamburger */
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
+/* Media Queries for Hamburger */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
 
-            nav {
-                display: none;
-            }
+    nav {
+        display: none;
+    }
 
-            nav.open {
-                display: block;
-            }
-        }
+    nav.open {
+        display: block;
+    }
+}
 
     </style>
 </head>
