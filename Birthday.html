@@ -115,66 +115,6 @@
             }
         }
 
-        .icon-bar {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
-
-        .icon-bar button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #4b2e83;
-            font-size: 1.5em;
-            transition: transform 0.3s ease;
-            margin-left: 10px;
-        }
-
-        .icon-bar button:hover {
-            transform: scale(1.2);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .profile-pic {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-bottom: 20px;
-            object-fit: cover;
-            border: 3px solid #e74c3c;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Add background effects */
-        .background-decorations {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('https://www.transparenttextures.com/patterns/asfalt.png');
-            opacity: 0.1;
-            pointer-events: none;
-        }
-
-        /* Font customization controls */
-        .font-controls {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .font-controls select,
-        .font-controls input {
-            padding: 8px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-        }
         /* Hamburger Menu */
         .hamburger {
             display: none;
@@ -227,6 +167,21 @@
 
         nav a:hover {
             background-color: #444;
+        }
+
+        /* Media Queries for Hamburger */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            nav {
+                display: none;
+            }
+
+            nav.open {
+                display: block;
+            }
         }
     </style>
 </head>
@@ -309,93 +264,90 @@
     </div>
 
     <script>
-        const hamburger = document.getElementById('hamburger');
-        // Hamburger menu toggle
-        hamburger.addEventListener('click', () => {
-            nav.classList.toggle('open');
-            hamburger.classList.toggle('open');
-        });
-        // Load profile picture
-        function loadProfilePic(event) {
-            const output = document.getElementById('profile-pic');
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    output.src = e.target.result;
-                    output.style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+    const hamburger = document.getElementById('hamburger');
+    const nav = document.getElementById('nav');
 
-        // Generate wishes
-        function generateWishes() {
-            const name = document.getElementById("name").value;
-            const date = document.getElementById("date").value;
-            const venue = document.getElementById("venue").value;
-            const personality = document.getElementById("personality").value;
+    // Hamburger menu toggle
+    hamburger.addEventListener('click', () => {
+        nav.classList.toggle('open');
+        hamburger.classList.toggle('open');
+    });
 
-            if (name && date && venue && personality) {
-                const outputContainer = document.getElementById("wishes-container");
-                const output = document.getElementById("output");
-
-                const textContent = `
-                    🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
-                    🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
-                    🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
-                `;
-
-                output.innerHTML = textContent;
-                outputContainer.classList.remove("hidden");
-            } else {
-                alert("Please fill out all fields before generating wishes.");
-            }
-        }
-
-        // Font customization
-        const fontColorInput = document.getElementById("fontColor");
-        const fontSizeInput = document.getElementById("fontSize");
-        const output = document.getElementById("output");
-
-        fontColorInput.addEventListener("input", () => {
-            output.style.color = fontColorInput.value;
-        });
-
-        fontSizeInput.addEventListener("change", () => {
-            output.style.fontSize = fontSizeInput.value;
-        });
-
-        // Download the wishes as image
-        document.getElementById("download-btn").addEventListener("click", function() {
-            html2canvas(document.getElementById("wishes-container")).then(function(canvas) {
-                const link = document.createElement("a");
-                link.download = "birthday_wishes.png";
-                link.href = canvas.toDataURL("image/png");
-                link.click();
-            });
-        });
-
-        // Share as image
-document.getElementById("share-btn").addEventListener("click", function() {
-    html2canvas(document.getElementById("wishes-container")).then(function(canvas) {
-        canvas.toBlob(function(blob) {
-            const shareData = {
-                title: 'Happy Birthday Wishes',
-                text: 'Check out this cool birthday wish!',
-                files: [
-                    new File([blob], "birthday_wishes.png", { type: "image/png" })
-                ]
+    // Load profile picture
+    function loadProfilePic(event) {
+        const output = document.getElementById('profile-pic');
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                output.src = e.target.result;
+                output.style.display = 'block';
             };
+            reader.readAsDataURL(file);
+        }
+    }
 
+    // Generate wishes
+    function generateWishes() {
+        const name = document.getElementById("name").value;
+        const date = document.getElementById("date").value;
+        const venue = document.getElementById("venue").value;
+        const personality = document.getElementById("personality").value;
+
+        if (name && date && venue && personality) {
+            const outputContainer = document.getElementById("wishes-container");
+            const output = document.getElementById("output");
+
+            const textContent = `
+                🎉 Happy Birthday, <strong>${name}</strong>! 🎂<br>
+                🎈 Your celebration is on <strong>${new Date(date).toDateString()}</strong> at <strong>${venue}</strong>.<br>
+                🌟 Here's a special wish: <strong>${personality}</strong>.<br> Have a fantastic day!
+            `;
+
+            output.innerHTML = textContent;
+            outputContainer.classList.remove("hidden");
+        } else {
+            alert("Please fill out all fields before generating wishes.");
+        }
+    }
+
+    // Font customization
+    const fontColorInput = document.getElementById("fontColor");
+    const fontSizeInput = document.getElementById("fontSize");
+    const output = document.getElementById("output");
+
+    fontColorInput.addEventListener("input", () => {
+        output.style.color = fontColorInput.value;
+    });
+
+    fontSizeInput.addEventListener("change", () => {
+        output.style.fontSize = fontSizeInput.value;
+    });
+
+    // Download the wishes as image
+    document.getElementById("download-btn").addEventListener("click", function() {
+        html2canvas(document.getElementById("wishes-container")).then(function(canvas) {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL();
+            link.download = 'birthday-wishes.png';
+            link.click();
+        });
+    });
+
+    // Share as image
+    document.getElementById("share-btn").addEventListener("click", function() {
+        html2canvas(document.getElementById("wishes-container")).then(function(canvas) {
+            const dataUrl = canvas.toDataURL();
+            const shareData = {
+                title: "Birthday Wishes",
+                text: "Here's a special birthday wish!",
+                url: dataUrl
+            };
             if (navigator.share) {
-                navigator.share(shareData).catch((error) => console.log('Error sharing:', error));
+                navigator.share(shareData).catch(err => console.log("Sharing failed", err));
             } else {
-                alert('Share functionality is not supported on your browser.');
+                alert("Sharing is not supported on this browser.");
             }
         });
     });
-});
-    </script>
-</body>
-</html>
+</script>
