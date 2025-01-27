@@ -133,6 +133,38 @@
             background-color: #1e1e1e;
         }
 
+        /* New Section */
+        .whats-new {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .whats-new h2 {
+            margin-bottom: 10px;
+        }
+
+        /* Image Slideshow */
+        .image-slideshow {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .slideshow-images img {
+            width: 100%;
+            display: none;
+        }
+
+        .slideshow-images img.active {
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hamburger {
@@ -162,6 +194,25 @@
 
     <div class="container" id="blog-posts-container">
         <!-- Posts will be dynamically loaded here -->
+    </div>
+
+    <!-- What's New Section -->
+    <div class="container">
+        <div class="whats-new">
+            <h2>What's New</h2>
+            <ul id="whats-new-list">
+                <!-- News items will be dynamically loaded here -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Image Slideshow Section -->
+    <div class="container">
+        <div class="image-slideshow" id="slideshow">
+            <div class="slideshow-images" id="slideshow-images">
+                <!-- Images will be loaded here -->
+            </div>
+        </div>
     </div>
 
     <script>
@@ -235,6 +286,40 @@
                 });
             })
             .catch(error => console.error('Error loading posts:', error));
+
+        // Add "What's New" items
+        const whatsNewList = document.getElementById('whats-new-list');
+        const newsItems = [
+            'New Feature: Dark Mode for Better Reading',
+            'Fresh Blog Post: How to Implement API Security',
+            'Latest Update: New Cybersecurity Guidelines'
+        ];
+        newsItems.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            whatsNewList.appendChild(li);
+        });
+
+        // Load images into the slideshow
+        const slideshowImagesContainer = document.getElementById('slideshow-images');
+        const imageFolder = 'https://raw.githubusercontent.com/emmanuelkirui/images/'; // GitHub raw URL to images folder
+        const imageFiles = ['image1.jpg', 'image2.jpg', 'image3.jpg']; // Adjust filenames as needed
+
+        imageFiles.forEach((imageFile, index) => {
+            const img = document.createElement('img');
+            img.src = `${imageFolder}${imageFile}`;
+            img.classList.add(index === 0 ? 'active' : '');
+            slideshowImagesContainer.appendChild(img);
+        });
+
+        // Slideshow functionality
+        let currentIndex = 0;
+        setInterval(() => {
+            const images = document.querySelectorAll('#slideshow-images img');
+            images[currentIndex].classList.remove('active');
+            currentIndex = (currentIndex + 1) % images.length;
+            images[currentIndex].classList.add('active');
+        }, 3000);
     </script>
 </body>
 </html>
