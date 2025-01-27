@@ -332,46 +332,59 @@ body:not(.dark-mode) .whats-new h2 {
         font-size: 0.9rem;
         padding: 8px 15px;
     }
+    
+    /* Footer Links */
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Centers the links horizontally */
+    flex-wrap: wrap; /* Ensures links wrap on smaller screens */
+    gap: 20px; /* Adds spacing between links */
 }
-        !-- Footer CSS Styling -->
-    footer {
-        background-color: #333;
-        color: #fff;
-        padding: 20px 0;
-        text-align: center;
-    }
-    .footer-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    .footer-content p {
-        margin: 0;
-    }
+
+.footer-links li {
+    margin: 0; /* Removes unnecessary right margin */
+}
+
+.footer-links a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px; /* Slightly larger font for better readability */
+    transition: color 0.3s ease, text-decoration 0.3s ease; /* Smooth transition */
+}
+
+.footer-links a:hover {
+    color: #f39c12; /* Changes color on hover for a professional effect */
+    text-decoration: underline;
+}
+
+/* Footer Disclaimer */
+.disclaimer {
+    font-size: 14px;
+    color: #aaa; /* Softer color for subtlety */
+    margin-top: 15px; /* Adds more spacing above */
+    text-align: center; /* Centers the disclaimer text */
+    line-height: 1.6; /* Improves readability */
+}
+
+/* Responsive Design for Footer */
+@media (max-width: 600px) {
     .footer-links {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
+        flex-direction: column; /* Stacks links vertically on small screens */
+        align-items: center; /* Centers links vertically */
     }
-    .footer-links li {
-        margin-right: 15px;
-    }
+
     .footer-links a {
-        color: #fff;
-        text-decoration: none;
+        font-size: 14px; /* Slightly smaller font for smaller screens */
     }
-    .footer-links a:hover {
-        text-decoration: underline;
-    }
+
     .disclaimer {
-        font-size: 14px;
-        color: #bbb;
-        margin-top: 10px;
+        font-size: 12px; /* Adjusts text size for mobile */
+        line-height: 1.4;
     }
+}
     </style>
 </head>
 <body>
