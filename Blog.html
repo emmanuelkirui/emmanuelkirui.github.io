@@ -43,9 +43,11 @@
             font-size: 24px;
             margin: 0 10px;
             transition: transform 0.3s ease-in-out;
+            display: none;
         }
 
         .theme-toggle i.active {
+            display: inline-block;
             transform: scale(1.2);
         }
 
@@ -115,6 +117,18 @@
             background-color: #333;
         }
 
+        /* Styling for Navbar Items */
+        nav a {
+            font-size: 1.1rem;
+            padding: 10px 15px;
+        }
+
+        nav a:hover {
+            background-color: #444;
+            border-radius: 5px;
+        }
+
+        /* Container */
         .container {
             padding: 20px;
         }
@@ -217,7 +231,7 @@
     <header>
         <h1>Latest News Blog</h1>
         <div class="theme-toggle">
-            <i id="dark-mode-icon" class="fa fa-moon active">🌙</i>
+            <i id="dark-mode-icon" class="fa fa-moon">🌙</i>
             <i id="light-mode-icon" class="fa fa-sun">☀️</i>
         </div>
         <div class="hamburger" id="hamburger">
