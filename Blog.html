@@ -192,30 +192,6 @@ body:not(.dark-mode) .whats-new h2 {
                 display: flex;
             }
         }
-        /* Cookie Consent Modal */
-.cookie-consent-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: none; /* Hidden by default */
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.cookie-consent-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    max-width: 400px;
-    width: 90%;
-}
-
-.cookie-consent-content h2 {
 /* Cookie Consent Modal */
 .cookie-consent-modal {
     display: none;
@@ -241,8 +217,13 @@ body:not(.dark-mode) .whats-new h2 {
     margin: 0 auto;
 }
 
+.cookie-consent-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
 .cookie-actions {
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 .cookie-actions .btn {
@@ -253,12 +234,13 @@ body:not(.dark-mode) .whats-new h2 {
     border-radius: 5px;
     cursor: pointer;
     margin: 5px;
+    transition: background-color 0.3s ease;
 }
 
 .cookie-actions .btn:hover {
     background-color: #e67e22;
 }
-<!-- Footer CSS Styling -->
+        !-- Footer CSS Styling -->
     footer {
         background-color: #333;
         color: #fff;
