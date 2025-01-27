@@ -1,27 +1,7 @@
 [
     {
-        "title": "Latest News Title 1",
-        "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio, vitae scelerisque enim ligula venenatis dolor. Maecenas nisl est, ultrices nec congue eget, auctor vitae massa."
-    },
-    {
-        "title": "Latest News Title 2",
-        "content": "Nullam ac urna eu felis dapibus condimentum sit amet a augue. Sed non neque elit. Sed ut imperdiet nisi. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla."
-    },
-    {
-        "title": "Latest News Title 3",
-        "content": "Quisque ut nisi. Praesent egestas tristique nibh. Nunc egestas, augue eu tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non est at libero vulputate cursus. Integer ac neque. Vivamus eget nibh. Etiam cursus leo vel metus."
-    },
-    {
         "title": "Lyrics Making",
         "content": "Creating lyrics is an art form that requires creativity, rhythm, and a deep understanding of language. This process often involves crafting meaningful verses, hooks, and choruses that resonate with the audience."
-    },
-    {
-        "title": "Video Editing",
-        "content": "Video editing involves manipulating and arranging video footage to create a final product. Editors use various tools and techniques to enhance the visual appeal, coherence, and storytelling of the video."
-    },
-    {
-        "title": "Content Writing",
-        "content": "Content writing is the practice of creating written material for various platforms, with the goal of informing, entertaining, or persuading the audience. It includes blog posts, articles, and social media content."
     },
     {
         "title": "Web Design",
@@ -30,5 +10,33 @@
     {
         "title": "Graphics and Motion Design",
         "content": "Graphics and motion design combines visual art and animation to communicate messages through moving images. This field is commonly used in advertisements, movies, video games, and social media."
+    },
+    {
+        "title": "Football Predictions",
+        "content": "Football predictions involve analyzing teams, players, and past performances to forecast match outcomes. This service can help fans and bettors make informed decisions."
+    },
+    {
+        "title": "Video Editing",
+        "content": "Video editing involves manipulating and arranging video footage to create a final product. Editors use various tools and techniques to enhance the visual appeal, coherence, and storytelling of the video."
+    },
+    {
+        "title": "Animation",
+        "content": "Animation is the art of creating moving images using various techniques like 2D, 3D, and stop-motion. It's commonly used in films, games, and educational content."
+    },
+    {
+        "title": "Posters & Flyers",
+        "content": "Designing posters and flyers involves creating visual content to promote events, businesses, or products. This includes careful use of colors, typography, and imagery to capture attention."
+    },
+    {
+        "title": "Birthday & Wedding Cards",
+        "content": "Personalized birthday and wedding cards add a special touch to celebrations. These cards are designed with care to reflect the unique style and wishes of the sender."
+    },
+    {
+        "title": "Web Customization",
+        "content": "Web customization involves tailoring the look and functionality of a website to meet specific needs. This could include adding custom features, optimizing user experience, and integrating third-party tools."
+    },
+    {
+        "title": "Other Online Solutions",
+        "content": "Other online solutions include a wide range of services such as digital marketing, SEO optimization, e-commerce setup, and custom software solutions to enhance online presence and business operations."
     }
 ]
