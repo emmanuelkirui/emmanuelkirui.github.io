@@ -1,3 +1,5 @@
+
+        
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,34 +118,54 @@
         }
 
         /* Hamburger menu styles */
-.hamburger-menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.7); /* Optional: semi-transparent background */
-    width: 250px;
-    height: 100%;
-    visibility: hidden; /* Hidden by default */
-    opacity: 0; /* Hidden by default */
-    z-index: 9999; /* Ensure it's above other content */
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-}
+        .hamburger-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7); /* Optional: semi-transparent background */
+            width: 250px;
+            height: 100%;
+            visibility: hidden; /* Hidden by default */
+            opacity: 0; /* Hidden by default */
+            z-index: 9999; /* Ensure it's above other content */
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
 
-/* When the menu is active */
-.hamburger-menu.open {
-    visibility: visible;
-    opacity: 1;
-}
+        /* When the menu is active */
+        .hamburger-menu.open {
+            visibility: visible;
+            opacity: 1;
+        }
 
-/* Hamburger button styles */
-.hamburger-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 10000; /* Ensures the button is above the menu */
-    cursor: pointer;
-}
+        /* Hamburger button styles */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10000; /* Ensures the button is above the menu */
+            cursor: pointer;
+        }
 
+        .hamburger-btn div {
+            background-color: white;
+            height: 4px;
+            width: 30px;
+            margin: 5px;
+            border-radius: 3px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .hamburger-btn.open div:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-btn.open div:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.open div:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
 
         /* Navigation */
         nav {
@@ -185,45 +207,12 @@
             }
         }
 
-        /* Responsive Flexbox layout */
-        @media (max-width: 768px) {
-            .container {
-                width: 90%;
-                margin: 20px;
-                padding: 20px;
-            }
-
-            .font-controls {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin-top: 20px;
-            }
-
-            .font-controls input,
-            .font-controls select {
-                width: 100%;
-                margin-bottom: 10px;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .font-controls {
-                display: flex;
-                justify-content: center;
-                gap: 20px;
-                margin-top: 20px;
-            }
-        }
     </style>
 </head>
 <body>
     <header>
         <h1>Birthday</h1>
-        <div class="theme-toggle">
-            <i class="fas fa-moon"></i>
-        </div>
-        <div class="hamburger" id="hamburger">
+        <div class="hamburger-btn" id="hamburger">
             <div></div>
             <div></div>
             <div></div>
@@ -295,7 +284,7 @@
         </div>
     </div>
     <script>
-        // Hamburger Menu Toggle
+              // Hamburger Menu Toggle
         document.getElementById('hamburger').addEventListener('click', function() {
             this.classList.toggle('open');
             document.getElementById('nav').classList.toggle('open');
