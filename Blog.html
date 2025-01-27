@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Latest News</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        header .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        header i {
+            font-size: 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+        }
+
+        nav a:hover {
+            background-color: #575757;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .post {
+            background-color: white;
+            margin-bottom: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .post h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+        .post p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #333;
+            color: white;
+        }
+
+        header.dark-mode {
+            background-color: #222;
+        }
+
+        .post.dark-mode {
+            background-color: #444;
+            color: white;
+        }
+
+        nav.dark-mode {
+            background-color: #222;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+            }
+
+            .post {
+                margin: 10px;
+                padding: 15px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="theme-toggle">
+            <i id="dark-mode-icon" class="fa fa-moon">🌙</i>
+            <i id="light-mode-icon" class="fa fa-sun">☀️</i>
+        </div>
+        <h1>Latest News Blog</h1>
+    </header>
+
+    <nav>
+        <a href="poster.html">Poster Generator</a>
+        <a href="birthday.html">Birthday</a>
+        <a href="valentine'sday.html">Valentine's Day</a>
+    </nav>
+
+    <div class="container" id="blog-posts-container">
+        <!-- Posts will be dynamically loaded here -->
+    </div>
+
+    <script>
+        // Fetch posts from the JSON file and display them
+        fetch('posts.json')
+            .then(response => response.json())
+            .then(posts => {
+                const postsContainer = document.getElementById('blog-posts-container');
+                posts.forEach(post => {
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('post');
+                    postElement.innerHTML = `
+                        <h2>${post.title}</h2>
+                        <p>${post.content}</p>
+                    `;
+                    postsContainer.appendChild(postElement);
+                });
+            })
+            .catch(error => console.error('Error loading posts:', error));
+
+        // Dark and Light Mode Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkModeIcon = document.getElementById('dark-mode-icon');
+            const lightModeIcon = document.getElementById('light-mode-icon');
+
+            darkModeIcon.addEventListener('click', () => {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', 'dark');
+            });
+
+            lightModeIcon.addEventListener('click', () => {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('theme', 'light');
+            });
+
+            // Load the theme from localStorage on page load
+            if(localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+        });
+    </script>
+</body>
+</html>
