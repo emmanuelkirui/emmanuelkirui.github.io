@@ -398,15 +398,16 @@ body:not(.dark-mode) .whats-new h2 {
         });
 
         // Function to load images dynamically into the slideshow
+function// Function to load images dynamically into the slideshow
 function loadSlideshowImages() {
     const slideshowImagesContainer = document.getElementById('slideshow-images');
-    const imageFolder = 'https://raw.githubusercontent.com/emmanuelkirui/Daily-quotes/images/'; // GitHub raw URL to images folder
-    const imageFiles = ['1724263549180.jpg', 'FB_IMG_1718473413829.jpg', '1724263531314.jpg']; // Manually specify filenames
+    const imageFolder = 'images/'; // Local folder to the images
+    const imageFiles = ['1724263549180.jpg', 'FB_IMG_1718473413829.jpg', '1724263531314.jpg']; // List of image filenames
 
     imageFiles.forEach((imageFile, index) => {
         const img = document.createElement('img');
         img.src = `${imageFolder}${imageFile}`;
-        img.classList.add(index === 0 ? 'active' : '');
+        img.classList.add(index === 0 ? 'active' : ''); // Add 'active' class to the first image
         slideshowImagesContainer.appendChild(img);
     });
 }
@@ -417,10 +418,10 @@ function startSlideshow() {
 
     setInterval(() => {
         const images = document.querySelectorAll('#slideshow-images img');
-        images[currentIndex].classList.remove('active');
-        currentIndex = (currentIndex + 1) % images.length;
-        images[currentIndex].classList.add('active');
-    }, 3000);
+        images[currentIndex].classList.remove('active'); // Remove active class from the current image
+        currentIndex = (currentIndex + 1) % images.length; // Move to the next image
+        images[currentIndex].classList.add('active'); // Add active class to the next image
+    }, 3000); // Change image every 3 seconds
 }
 
 // Initialize the slideshow
