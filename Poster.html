@@ -348,6 +348,12 @@
     </div>
 
     <script>
+        const hamburger = document.getElementById('hamburger');
+        // Hamburger menu toggle
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
+            hamburger.classList.toggle('open');
+        });
         document.addEventListener('DOMContentLoaded', function() {
             // Dark and Light Mode Toggle
             const darkModeIcon = document.getElementById('dark-mode-icon');
