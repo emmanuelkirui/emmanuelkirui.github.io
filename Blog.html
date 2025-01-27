@@ -25,7 +25,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         header h1 {
@@ -38,18 +37,18 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.3s ease;
         }
 
         .theme-toggle i {
             font-size: 24px;
             margin: 0 10px;
             transition: transform 0.3s ease-in-out;
+            display: none; /* Initially hide both icons */
         }
 
         .theme-toggle i.active {
+            display: inline-block; /* Show only active icon */
             transform: scale(1.2);
-            color: #FFD700; /* Highlight active icon */
         }
 
         /* Hamburger Menu */
@@ -61,7 +60,6 @@
             width: 30px;
             cursor: pointer;
             position: relative;
-            z-index: 10;
         }
 
         .hamburger div {
@@ -93,7 +91,6 @@
             justify-content: center;
             background-color: #333;
             width: 100%;
-            transition: transform 0.3s ease-in-out;
         }
 
         nav a {
@@ -102,7 +99,6 @@
             padding: 15px 20px;
             display: block;
             transition: background-color 0.3s ease;
-            font-size: 1.1rem;
         }
 
         nav a:hover {
@@ -216,7 +212,6 @@
                 padding: 15px;
             }
         }
-
     </style>
 </head>
 <body>
@@ -292,30 +287,31 @@
             const darkModeIcon = document.getElementById('dark-mode-icon');
             const lightModeIcon = document.getElementById('light-mode-icon');
 
-            darkModeIcon.addEventListener('click', () => {
-                document.body.classList.add('dark-mode');
-                darkModeIcon.classList.add('active');
-                lightModeIcon.classList.remove('active');
-                localStorage.setItem('theme', 'dark');
-            });
-
-            lightModeIcon.addEventListener('click', () => {
-                document.body.classList.remove('dark-mode');
-                lightModeIcon.classList.add('active');
-                darkModeIcon.classList.remove('active');
-                localStorage.setItem('theme', 'light');
-            });
-
-            // Load the theme from localStorage on page load
-            if(localStorage.getItem('theme') === 'dark') {
-                document.body.classList.add('dark-mode');
-                darkModeIcon.classList.add('active');
-                lightModeIcon.classList.remove('active');
-            } else {
-                lightModeIcon.classList.add('active');
-                darkModeIcon.classList.remove('active');
+            // Function to toggle between dark and light mode
+            function toggleTheme(mode) {
+                if (mode === 'dark') {
+                    document.body.classList.add('dark-mode');
+                    darkModeIcon.classList.add('active');
+                    lightModeIcon.classList.remove('active');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    lightModeIcon.classList.add('active');
+                    darkModeIcon.classList.remove('active');
+                    localStorage.setItem('theme', 'light');
+                }
             }
-        });
+
+            // Initialize the theme based on localStorage
+        if(localStorage.getItem('theme') === 'dark') {
+            toggleTheme('dark');
+        } else {
+            toggleTheme('light');
+        }
+
+        // Event listeners for toggling the theme
+        darkModeIcon.addEventListener('click', () => toggleTheme('dark'));
+        lightModeIcon.addEventListener('click', () => toggleTheme('light'));
 
         // Hamburger Menu Toggle
         const hamburger = document.getElementById('hamburger');
