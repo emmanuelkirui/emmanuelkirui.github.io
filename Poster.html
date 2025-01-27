@@ -7,11 +7,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        /* Global Styles */
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         header {
@@ -35,13 +37,15 @@
 
         .container {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             padding: 20px;
             flex-wrap: wrap;
+            gap: 20px;
         }
 
         .input-section, .poster-section {
-            width: 45%;
+            width: 100%;
+            max-width: 600px;
             margin: 15px 0;
         }
 
@@ -50,6 +54,7 @@
             font-size: 1.5rem;
             margin-bottom: 15px;
             color: #333;
+            text-align: center;
         }
 
         .input-section input, .input-section textarea, .input-section button {
@@ -178,6 +183,55 @@
 
         body.dark-mode #dark-mode-icon {
             display: none;
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .input-section, .poster-section {
+                width: 90%;
+                max-width: 100%;
+            }
+
+            .poster-container {
+                height: auto;
+                max-width: 100%;
+            }
+
+            .poster-header {
+                font-size: 2rem;
+            }
+
+            .poster-date, .poster-details {
+                font-size: 1rem;
+            }
+
+            .poster-image {
+                height: 250px;
+            }
+
+            .poster-actions button {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            .poster-header {
+                font-size: 1.8rem;
+            }
+
+            .poster-actions button {
+                padding: 10px 12px;
+                font-size: 0.8rem;
+            }
+
+            .input-section input, .input-section textarea, .input-section button {
+                font-size: 0.9rem;
+            }
         }
 
     </style>
