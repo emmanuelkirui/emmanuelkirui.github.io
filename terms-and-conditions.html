@@ -13,6 +13,7 @@
             padding: 0;
         }
 
+        /* Container for content */
         .container {
             width: 80%;
             margin: 0 auto;
@@ -44,9 +45,29 @@
             width: 100%;
             bottom: 0;
         }
-        /* Hamburger Menu */
+
+        /* Flexbox Layout for Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+        }
+
         .hamburger {
-            display: none;
+            display: flex;
             flex-direction: column;
             justify-content: space-between;
             height: 20px;
@@ -73,18 +94,19 @@
             transform: rotate(-45deg) translate(5px, -5px);
         }
 
-        /* Navigation */
+        /* Flexbox Navigation */
         nav {
             display: none;
             background-color: #333;
-        }
-
-        nav.open {
-            display: block;
             position: absolute;
             top: 60px;
             left: 0;
             width: 100%;
+            z-index: 999;
+        }
+
+        nav.open {
+            display: block;
         }
 
         nav a {
@@ -97,12 +119,20 @@
         nav a:hover {
             background-color: #444;
         }
+
+        /* For smaller screens */
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 
 <body>
-    
-<header>
+
+    <header>
         <h1>Terms & Conditions</h1>
         <div class="theme-toggle">
             <i class="fas fa-moon"></i>
@@ -122,6 +152,7 @@
         <a href="quote.html">Quotes</a>
         <a href="valentinesday.html">Valentine's</a>
     </nav>
+
     <div class="container">
         <h1>Terms and Conditions</h1>
         <p>Welcome to our Terms and Conditions page. By accessing or using our services, you agree to comply with and be bound by the following terms and conditions. Please read them carefully.</p>
@@ -199,14 +230,17 @@
     <footer>
         <p>&copy; 2025 Emmanuel Kirui. All rights reserved.</p>
     </footer>
-<script>
-    const hamburger = document.getElementById('hamburger');
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const nav = document.getElementById('nav');
+
         // Hamburger menu toggle
         hamburger.addEventListener('click', () => {
             nav.classList.toggle('open');
             hamburger.classList.toggle('open');
         });
-</script>
+    </script>
 </body>
 
 </html>
