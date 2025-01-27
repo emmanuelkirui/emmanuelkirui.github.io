@@ -32,7 +32,7 @@
             margin: 0;
         }
 
-        /* Dark Mode Toggle */
+        /* Professional Dark Mode Toggle */
         .theme-toggle {
             display: flex;
             align-items: center;
@@ -43,17 +43,15 @@
             font-size: 24px;
             margin: 0 10px;
             transition: transform 0.3s ease-in-out;
-            display: none;
         }
 
         .theme-toggle i.active {
-            display: inline-block;
             transform: scale(1.2);
         }
 
         /* Hamburger Menu */
         .hamburger {
-            display: flex;
+            display: none;
             flex-direction: column;
             justify-content: space-between;
             height: 25px;
@@ -85,90 +83,38 @@
             top: 0;
         }
 
-        /* Navbar */
+        /* Navigation */
         nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #333;
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 10; /* Increased z-index for better visibility */
-    padding: 10px 20px;
-}
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+            width: 100%;
+        }
 
-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 20px;
-    display: block;
-    transition: background-color 0.3s ease, border-radius 0.3s ease;
-    font-size: 1rem;
-}
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
 
-nav a:hover {
-    background-color: #575757;
-    border-radius: 5px;
-}
+        nav a:hover {
+            background-color: #575757;
+        }
 
-.nav-links {
-    display: flex;
-    flex-direction: row;
-    gap: 20px; /* Added gap for better spacing */
-}
+        .nav-links {
+            display: flex;
+            flex-direction: row;
+        }
 
-.nav-links.open {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #333;
-    width: 100%;
-    padding: 20px 0;
-    position: absolute;
-    top: 60px; /* Adjusted to not overlap with the header */
-    left: 0;
-    right: 0;
-}
+        .nav-links.open {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background-color: #333;
+        }
 
-.nav-links a {
-    padding: 15px 20px;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease;
-}
-
-.nav-links a:hover {
-    background-color: #444;
-}
-
-@media (max-width: 768px) {
-    nav {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .nav-links {
-        display: none;
-        width: 100%;
-    }
-
-    .nav-links.open {
-        display: flex;
-    }
-
-    .hamburger {
-        display: flex;
-    }
-
-    nav a {
-        padding: 10px 20px;
-        font-size: 1.2rem;
-    }
-}
-
-        /* Container */
         .container {
             padding: 20px;
         }
@@ -271,7 +217,7 @@ nav a:hover {
     <header>
         <h1>Latest News Blog</h1>
         <div class="theme-toggle">
-            <i id="dark-mode-icon" class="fa fa-moon">🌙</i>
+            <i id="dark-mode-icon" class="fa fa-moon active">🌙</i>
             <i id="light-mode-icon" class="fa fa-sun">☀️</i>
         </div>
         <div class="hamburger" id="hamburger">
@@ -337,50 +283,42 @@ nav a:hover {
 
         // Dark and Light Mode Toggle
         document.addEventListener('DOMContentLoaded', function() {
-    const darkModeIcon = document.getElementById('dark-mode-icon');
-    const lightModeIcon = document.getElementById('light-mode-icon');
+            const darkModeIcon = document.getElementById('dark-mode-icon');
+            const lightModeIcon = document.getElementById('light-mode-icon');
 
-    darkModeIcon.addEventListener('click', () => {
-        document.body.classList.add('dark-mode');
-        darkModeIcon.classList.add('active');
-        lightModeIcon.classList.remove('active');
-        localStorage.setItem('theme', 'dark');
-    });
+            darkModeIcon.addEventListener('click', () => {
+                document.body.classList.add('dark-mode');
+                darkModeIcon.classList.add('active');
+                lightModeIcon.classList.remove('active');
+                localStorage.setItem('theme', 'dark');
+            });
 
-    lightModeIcon.addEventListener('click', () => {
-        document.body.classList.remove('dark-mode');
-        lightModeIcon.classList.add('active');
-        darkModeIcon.classList.remove('active');
-        localStorage.setItem('theme', 'light');
-    });
+            lightModeIcon.addEventListener('click', () => {
+                document.body.classList.remove('dark-mode');
+                lightModeIcon.classList.add('active');
+                darkModeIcon.classList.remove('active');
+                localStorage.setItem('theme', 'light');
+            });
 
-    // Load the theme from localStorage on page load
-    if(localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-mode');
-        darkModeIcon.classList.add('active');
-        lightModeIcon.classList.remove('active');
-    } else {
-        lightModeIcon.classList.add('active');
-        darkModeIcon.classList.remove('active');
-    }
+            // Load the theme from localStorage on page load
+            if(localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+                darkModeIcon.classList.add('active');
+                lightModeIcon.classList.remove('active');
+            } else {
+                lightModeIcon.classList.add('active');
+                darkModeIcon.classList.remove('active');
+            }
+        });
 
-    // Hamburger Menu Toggle
-    const hamburger = document.getElementById('hamburger');
-    const nav = document.getElementById('nav');
+        // Hamburger Menu Toggle
+        const hamburger = document.getElementById('hamburger');
+        const nav = document.getElementById('nav');
 
-    hamburger.addEventListener('click', () => {
-        nav.classList.toggle('open');
-        hamburger.classList.toggle('open');
-    });
-
-    // Close hamburger menu when clicking outside
-    window.addEventListener('click', (event) => {
-        if (!hamburger.contains(event.target) && !nav.contains(event.target)) {
-            nav.classList.remove('open');
-            hamburger.classList.remove('open');
-        }
-    });
-});
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
+            hamburger.classList.toggle('open');
+        });
     </script>
 </body>
 </html>
