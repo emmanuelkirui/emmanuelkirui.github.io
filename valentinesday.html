@@ -284,6 +284,13 @@
     </div>
 
     <script>
+        const hamburger = document.getElementById('hamburger');
+        // Hamburger menu toggle
+        hamburger.addEventListener('click', () => {
+            nav.classList.toggle('open');
+            hamburger.classList.toggle('open');
+        });
+
         // Function to update the greeting with the name input
         function updateGreeting() {
             const name = document.getElementById("name-input").value;
