@@ -418,33 +418,8 @@ body:not(.dark-mode) .whats-new h2 {
             images[currentIndex].classList.add('active');
         }, 3000);
 
-        // Get the cookie consent modal and buttons
-const cookieModal = document.getElementById('cookie-consent-modal');
-const acceptBtn = document.getElementById('accept-cookies');
-const rejectBtn = document.getElementById('reject-cookies');
-
-// Check if the user has already accepted or rejected cookies
-if (!localStorage.getItem('cookieConsent')) {
-    // Show the modal if the user has not made a choice yet
-    cookieModal.classList.add('show');
-}
-
-// Handle accepting cookies
-acceptBtn.addEventListener('click', () => {
-    localStorage.setItem('cookieConsent', 'accepted'); // Save the acceptance to localStorage
-    cookieModal.classList.remove('show'); // Hide the modal
-});
-
-// Handle rejecting cookies
-rejectBtn.addEventListener('click', () => {
-    localStorage.setItem('cookieConsent', 'rejected'); // Save the rejection to localStorage
-    cookieModal.classList.remove('show'); // Hide the modal
-});
-
-// If cookies are already accepted or rejected, don't show the modal again
-if (localStorage.getItem('cookieConsent') === 'accepted' || localStorage.getItem('cookieConsent') === 'rejected') {
-    cookieModal.classList.remove('show');
-}
+        
     </script>
+        <script src="cookies.js"></script> <!-- Link to the separate cookies.js file -->
 </body>
 </html>
