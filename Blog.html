@@ -397,27 +397,35 @@ body:not(.dark-mode) .whats-new h2 {
             whatsNewList.appendChild(li);
         });
 
-        // Load images into the slideshow
-        const slideshowImagesContainer = document.getElementById('slideshow-images');
-        const imageFolder = 'https://raw.githubusercontent.com/emmanuelkirui/images/'; // GitHub raw URL to images folder
-        const imageFiles = ['image1.jpg', 'image2.jpg', 'image3.jpg']; // Adjust filenames as needed
+        // Function to load images dynamically into the slideshow
+function loadSlideshowImages() {
+    const slideshowImagesContainer = document.getElementById('slideshow-images');
+    const imageFolder = 'https://raw.githubusercontent.com/emmanuelkirui/Daily-quotes/images/'; // GitHub raw URL to images folder
+    const imageFiles = ['1724263549180.jpg', 'FB_IMG_1718473413829.jpg', '1724263531314.jpg']; // Manually specify filenames
 
-        imageFiles.forEach((imageFile, index) => {
-            const img = document.createElement('img');
-            img.src = `${imageFolder}${imageFile}`;
-            img.classList.add(index === 0 ? 'active' : '');
-            slideshowImagesContainer.appendChild(img);
-        });
+    imageFiles.forEach((imageFile, index) => {
+        const img = document.createElement('img');
+        img.src = `${imageFolder}${imageFile}`;
+        img.classList.add(index === 0 ? 'active' : '');
+        slideshowImagesContainer.appendChild(img);
+    });
+}
 
-        // Slideshow functionality
-        let currentIndex = 0;
-        setInterval(() => {
-            const images = document.querySelectorAll('#slideshow-images img');
-            images[currentIndex].classList.remove('active');
-            currentIndex = (currentIndex + 1) % images.length;
-            images[currentIndex].classList.add('active');
-        }, 3000);
+// Slideshow functionality (automatic image switch every 3 seconds)
+function startSlideshow() {
+    let currentIndex = 0;
 
+    setInterval(() => {
+        const images = document.querySelectorAll('#slideshow-images img');
+        images[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % images.length;
+        images[currentIndex].classList.add('active');
+    }, 3000);
+}
+
+// Initialize the slideshow
+loadSlideshowImages();
+startSlideshow();
         
     </script>
         <script src="cookies.js"></script> <!-- Link to the separate cookies.js file -->
