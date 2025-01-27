@@ -439,8 +439,18 @@ body:not(.dark-mode) .whats-new h2 {
             })
             .catch(error => console.error('Error loading posts:', error));
 
-     posts:', error));
-
+        // Add "What's New" items
+        const whatsNewList = document.getElementById('whats-new-list');
+        const newsItems = [
+            'New Feature: Dark Mode for Better Reading',
+            'Fresh Blog Post: How to Implement API Security',
+            'Latest Update: New Cybersecurity Guidelines'
+        ];
+        newsItems.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item;
+            whatsNewList.appendChild(li);
+        });
 
 
         
