@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stay updated with the latest news, trends, and articles in various niches.">
+    <meta name="keywords" content="Blog, News, Updates, Articles, Tech, Lifestyle">
+    <meta name="author" content="Emmanuel Kirui">
     <title>Latest News Blog</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* General Styles */
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f9f9f9;
+            background-color: #f4f4f4;
             color: #333;
             margin: 0;
             padding: 0;
@@ -18,84 +21,45 @@
         }
 
         header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             background-color: #333;
             color: white;
             padding: 15px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
         }
 
         header h1 {
+            font-size: 1.8rem;
             margin: 0;
-            font-size: 1.5rem;
         }
 
-        /* Dark Mode */
-        body.dark-mode {
-            background-color: #121212;
-            color: #f9f9f9;
-        }
-
-        header.dark-mode {
-            background-color: #1e1e1e;
-        }
-
-        nav.dark-mode a {
-            color: #f9f9f9;
-        }
-
-        /* Theme Toggle Button */
+        /* Theme Toggle */
         .theme-toggle {
             cursor: pointer;
-            font-size: 1rem;
+        }
+
+        .theme-toggle i {
+            font-size: 24px;
             color: white;
-        }
-
-        /* Navigation Styles */
-        nav {
-            background-color: #333;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-
-        nav.open {
-            display: flex;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: white;
-            padding: 10px 15px;
-            width: 100%;
-            text-align: center;
-            transition: background-color 0.3s;
-        }
-
-        nav a:hover {
-            background-color: #575757;
         }
 
         /* Hamburger Menu */
         .hamburger {
-            cursor: pointer;
-            display: flex;
+            display: none;
             flex-direction: column;
-            justify-content: space-around;
-            width: 25px;
+            justify-content: space-between;
             height: 20px;
+            width: 25px;
+            cursor: pointer;
         }
 
         .hamburger div {
-            width: 25px;
-            height: 3px;
             background-color: white;
-            transition: transform 0.3s ease, opacity 0.3s ease;
+            height: 3px;
+            border-radius: 2px;
+            transition: all 0.3s;
         }
 
         .hamburger.open div:nth-child(1) {
@@ -110,6 +74,31 @@
             transform: rotate(-45deg) translate(5px, -5px);
         }
 
+        /* Navigation */
+        nav {
+            display: none;
+            background-color: #333;
+        }
+
+        nav.open {
+            display: block;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+        }
+
+        nav a:hover {
+            background-color: #444;
+        }
+
         /* Blog Posts */
         .container {
             padding: 20px;
@@ -118,53 +107,45 @@
         .post {
             background-color: white;
             margin-bottom: 20px;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .post.dark-mode {
             background-color: #1e1e1e;
+            color: #f9f9f9;
         }
 
-        /* What's New Section */
-        .whats-new {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f4f4f4;
-            border-radius: 8px;
-            transition: background-color 0.3s;
+        /* Dark Mode */
+        body.dark-mode {
+            background-color: #121212;
+            color: white;
         }
 
-        .whats-new.dark-mode {
-            background-color: #242424;
+        header.dark-mode {
+            background-color: #1e1e1e;
         }
 
-        /* Responsive Design */
-        @media (min-width: 768px) {
-            nav {
-                display: flex;
-                flex-direction: row;
-                justify-content: center;
-                background-color: #333;
-            }
+        nav.dark-mode {
+            background-color: #1e1e1e;
+        }
 
-            nav a {
-                display: inline-block;
-            }
-
+        /* Responsive */
+        @media (max-width: 768px) {
             .hamburger {
-                display: none;
+                display: flex;
             }
         }
     </style>
 </head>
 <body>
-    <header id="header">
+    <header>
         <h1>Latest News Blog</h1>
-        <div class="theme-toggle" id="theme-toggle">
-            <i class="fa fa-moon"></i>
+        <div class="theme-toggle">
+            <i class="fas fa-moon"></i>
         </div>
         <div class="hamburger" id="hamburger">
             <div></div>
@@ -176,33 +157,28 @@
     <nav id="nav">
         <a href="poster.html">Poster Generator</a>
         <a href="birthday.html">Birthday</a>
-        <a href="valentinesday.html">Valentine's Day</a>
+        <a href="valentine'sday.html">Valentine's Day</a>
     </nav>
 
     <div class="container" id="blog-posts-container">
-        <!-- Blog posts will be dynamically loaded here -->
-    </div>
-
-    <div class="whats-new" id="whats-new">
-        <h3>What's New</h3>
-        <p>Stay tuned for the latest updates and features!</p>
+        <!-- Posts will be dynamically loaded here -->
     </div>
 
     <script>
-        // DOM Elements
         const body = document.body;
-        const header = document.getElementById('header');
+        const header = document.querySelector('header');
         const nav = document.getElementById('nav');
-        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggle = document.querySelector('.theme-toggle');
         const hamburger = document.getElementById('hamburger');
-        const whatsNew = document.getElementById('whats-new');
 
-        // Theme Toggle Functionality
+        // Toggle theme
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('dark-mode');
             header.classList.toggle('dark-mode');
             nav.classList.toggle('dark-mode');
-            whatsNew.classList.toggle('dark-mode');
+            document.querySelectorAll('.post').forEach(post => {
+                post.classList.toggle('dark-mode');
+            });
 
             const icon = themeToggle.querySelector('i');
             if (body.classList.contains('dark-mode')) {
@@ -212,13 +188,13 @@
             }
         });
 
-        // Hamburger Menu Functionality
+        // Hamburger menu toggle
         hamburger.addEventListener('click', () => {
             nav.classList.toggle('open');
             hamburger.classList.toggle('open');
         });
 
-        // Fetch and Display Blog Posts
+        // Fetch posts dynamically
         fetch('posts.json')
             .then(response => response.json())
             .then(posts => {
