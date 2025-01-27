@@ -22,28 +22,73 @@
             padding: 20px;
             text-align: center;
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        header .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+        header h1 {
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        /* Professional Dark Mode Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
             cursor: pointer;
         }
 
-        header i {
-            font-size: 20px;
+        .theme-toggle i {
+            font-size: 24px;
+            margin: 0 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .theme-toggle i.active {
+            transform: scale(1.2);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
             display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 25px;
+            width: 30px;
+            cursor: pointer;
+            position: relative;
         }
 
-        header .theme-toggle i.active {
-            display: inline-block;
+        .hamburger div {
+            height: 4px;
+            background-color: white;
+            border-radius: 10px;
+            transition: all 0.3s ease-in-out;
         }
 
+        .hamburger.open div:nth-child(1) {
+            transform: rotate(45deg);
+            position: absolute;
+            top: 0;
+        }
+
+        .hamburger.open div:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.open div:nth-child(3) {
+            transform: rotate(-45deg);
+            position: absolute;
+            top: 0;
+        }
+
+        /* Navigation */
         nav {
             display: flex;
             justify-content: center;
             background-color: #333;
+            width: 100%;
         }
 
         nav a {
@@ -51,33 +96,23 @@
             text-decoration: none;
             padding: 15px 20px;
             display: block;
+            transition: background-color 0.3s ease;
         }
 
         nav a:hover {
             background-color: #575757;
         }
 
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            cursor: pointer;
-        }
-
-        .hamburger div {
-            width: 30px;
-            height: 3px;
-            background-color: white;
-            margin: 5px 0;
-        }
-
         .nav-links {
             display: flex;
+            flex-direction: row;
         }
 
         .nav-links.open {
             display: block;
             width: 100%;
             text-align: center;
+            background-color: #333;
         }
 
         .container {
@@ -180,24 +215,25 @@
 </head>
 <body>
     <header>
+        <h1>Latest News Blog</h1>
         <div class="theme-toggle">
             <i id="dark-mode-icon" class="fa fa-moon active">🌙</i>
             <i id="light-mode-icon" class="fa fa-sun">☀️</i>
         </div>
-        <h1>Latest News Blog</h1>
+        <div class="hamburger" id="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
     </header>
 
     <nav id="nav">
-        <a href="poster.html">Poster Generator</a>
-        <a href="birthday.html">Birthday</a>
-        <a href="valentine'sday.html">Valentine's Day</a>
+        <div class="nav-links">
+            <a href="poster.html">Poster Generator</a>
+            <a href="birthday.html">Birthday</a>
+            <a href="valentine'sday.html">Valentine's Day</a>
+        </div>
     </nav>
-
-    <div class="hamburger" id="hamburger">
-        <div></div>
-        <div></div>
-        <div></div>
-    </div>
 
     <div class="container" id="blog-posts-container">
         <!-- Posts will be dynamically loaded here -->
@@ -281,6 +317,7 @@
 
         hamburger.addEventListener('click', () => {
             nav.classList.toggle('open');
+            hamburger.classList.toggle('open');
         });
     </script>
 </body>
