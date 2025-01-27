@@ -388,17 +388,20 @@
 
     // Check if user has already accepted/rejected cookies
     if (!localStorage.getItem('cookiesAccepted')) {
+        console.log("Displaying modal...");
         cookieConsentModal.style.display = 'flex';
     }
 
     // Accept cookies
     acceptCookiesButton.addEventListener('click', function () {
+        console.log("Cookies accepted");
         localStorage.setItem('cookiesAccepted', 'true');
         cookieConsentModal.style.display = 'none';
     });
 
     // Reject cookies
     rejectCookiesButton.addEventListener('click', function () {
+        console.log("Cookies rejected");
         localStorage.setItem('cookiesAccepted', 'false');
         cookieConsentModal.style.display = 'none';
     });
