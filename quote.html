@@ -139,7 +139,7 @@
     -moz-image-rendering: -moz-crisp-edges; /* For Firefox to improve sharpness */
 }
         .hamburger {
-    position: absolute;
+    position: fixed; /* Keeps the menu in place even when scrolling */
     top: 10px; /* Distance from the top */
     right: 10px; /* Distance from the right */
     display: flex;
@@ -148,7 +148,8 @@
     width: 30px;
     height: 25px;
     cursor: pointer;
-    z-index: 100; /* Ensures it appears above other elements */
+    z-index: 9999; /* High value to ensure it's above all other elements */
+    background-color: transparent; /* Avoid background conflicts */
 }
 
 .hamburger div {
