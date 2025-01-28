@@ -37,14 +37,16 @@
         }
 
         footer {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+    /* Remove fixed positioning */
+    position: static;
+    /* Optionally add margin-top if you need spacing above the footer */
+    margin-top: 20px; 
+}
 
         /* Flexbox Layout for Header */
         header {
