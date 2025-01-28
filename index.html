@@ -13,6 +13,25 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271"
      crossorigin="anonymous"></script>
     <style>
+        
+/* Root variables for color themes */
+:root {
+    --bg-color: #f8f9fa; /* Light background */
+    --text-color: #333; /* Dark text */
+    --border-color: #e9ecef;
+    --link-bg-color: #fff;
+    --link-text-color: #333;
+    --link-hover-shadow: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212; /* Dark background */
+    --text-color: #f8f9fa; /* Light text */
+    --border-color: #333;
+    --link-bg-color: #333;
+    --link-text-color: #fff;
+    --link-hover-shadow: rgba(255, 255, 255, 0.15);
+}
         /* General Styles */
         body {
             font-family: 'Roboto', sans-serif;
@@ -396,7 +415,7 @@ body:not(.dark-mode) .whats-new h2 {
 }
 
 /* General Section Styling */
-#social-links {
+#social-links {.
     background-color: var(--bg-color);
     padding: 40px 0;
     text-align: center;
@@ -488,6 +507,9 @@ body:not(.dark-mode) .whats-new h2 {
     outline: 2px dashed var(--link-text-color);
     outline-offset: 4px;
 }
+     </style>
+</head>
+<body>
     <header>
         <h1>Latest News Blog</h1>
         <div class="theme-toggle">
