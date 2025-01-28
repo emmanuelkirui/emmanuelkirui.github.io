@@ -184,72 +184,103 @@
         transition: border-color 0.3s ease;
     }
 /* Hamburger Menu */
-        
-        .hamburger {
-    position: fixed; /* Ensures it stays in the same spot even when scrolling */
-    top: 10px; /* Adjust distance from the top */
-    right: 10px; /* Adjust distance from the right */
-    z-index: 9999; /* Very high value to ensure it is above all elements */
+.hamburger {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     width: 30px;
     height: 25px;
     cursor: pointer;
-    background-color: transparent; /* Transparent background */
+    position: fixed; /* Keep the hamburger button fixed at the top */
+    top: 20px; /* Adjust based on your header */
+    left: 20px; /* Adjust based on your design */
+    z-index: 9999; /* Ensure it stays above other content */
 }
 
+/* Hamburger bars */
 .hamburger div {
-    background-color: #000; /* Color of the hamburger lines */
+    background-color: white;
     height: 3px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+/* When hamburger is open */
+.hamburger.open div:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.open div:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.open div:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+/* Navigation Styles */
+nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: absolute;
+    top: 60px; /* Adjust according to header height */
     width: 100%;
-    border-radius: 2px;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background-color: #333;
+    flex-direction: column;
+    z-index: 1000; /* Ensure it's above content */
 }
 
-body {
-    margin: 0; /* Ensure no unwanted margin pushes elements */
-    padding: 0;
+/* When the menu is open, adjust the height to show the items */
+nav.open {
+    height: auto;
 }
 
-        .hamburger.open div:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
+/* Navigation link styles */
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 15px 20px;
+    display: block;
+    text-align: center;
+}
 
-        .hamburger.open div:nth-child(2) {
-            opacity: 0;
-        }
+/* Navigation link hover effect */
+nav a:hover {
+    background-color: #444;
+}
 
-        .hamburger.open div:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
-        }
+/* Flexbox for navigation links */
+nav {
+    flex-direction: column;
+}
 
-        nav {
-            display: none;
-            flex-direction: column;
-            position: absolute;
-            top: 50px;
-            right: 20px;
-            background-color: #444;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+/* Media Queries for Hamburger (Responsive) */
+@media (max-width: 768px) {
+    /* Show the hamburger menu on small screens */
+    .hamburger {
+        display: flex;
+    }
 
-        nav.open {
-            display: flex;
-        }
+    /* Hide navigation menu initially */
+    nav {
+        display: flex;
+    }
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            display: block;
-            text-align: center;
-            transition: background-color 0.3s ease;
-        }
+    /* When the nav is open, it will display properly */
+    nav.open {
+        height: auto;
+    }
 
-        nav a:hover {
-            background-color: #555;
-        }
+    /* Adjust navigation for mobile */
+    nav a {
+        padding: 15px;
+        text-align: center;
+    }
+}
 
     </style>
 </head>
