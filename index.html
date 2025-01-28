@@ -556,11 +556,31 @@ body:not(.dark-mode) .whats-new h2 {
   color: var(--card-text-color);
 }
 
-.author {
-    font-style: italic;
-    color: #555;
-    margin-top: 10px;
-    }
+/* Back to Top Button Styles */
+#backToTop {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  display: none; /* Initially hidden */
+  font-size: 20px;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+  display: flex;
+}
+
+#backToTop:hover {
+  background-color: #0056b3;
+}
         
 
      </style>
@@ -674,6 +694,12 @@ body:not(.dark-mode) .whats-new h2 {
     <h2>Connect With Me</h2>
     <ul id="social-accounts"></ul>
 </section>
+    
+<!-- Back to Top Button -->
+<button id="backToTop" title="Go to top">
+  <i class="fa fa-arrow-up"></i>
+</button>
+
         <!-- Footer -->
 <footer>
     <div class="container">
@@ -764,6 +790,22 @@ body:not(.dark-mode) .whats-new h2 {
                 });
             })
             .catch(error => console.error('Error loading posts:', error));
+        // Back to Top Script
+const backToTopButton = document.getElementById("backToTop");
+
+// Show or hide the button based on scroll position
+window.onscroll = function () {
+  if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+    backToTopButton.style.display = "flex";
+  } else {
+    backToTopButton.style.display = "none";
+  }
+};
+
+// Scroll back to the top when the button is clicked
+backToTopButton.onclick = function () {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
 
         // Add "What's New" items dynamically from the JSON file
 fetch('whatsnew.json')
