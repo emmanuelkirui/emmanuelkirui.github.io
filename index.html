@@ -68,84 +68,58 @@
         }
 
 /* Hamburger Menu */
-.hamburger {
-    display: none; /* Hidden on large screens */
-    flex-direction: column;
-    justify-content: space-between;
-    height: 20px;
-    width: 25px;
-    cursor: pointer;
-}
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 20px;
+            width: 25px;
+            cursor: pointer;
+        }
 
-.hamburger div {
-    background-color: white;
-    height: 3px;
-    border-radius: 2px;
-    transition: all 0.3s;
-}
+        .hamburger div {
+            background-color: white;
+            height: 3px;
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
 
-.hamburger.open div:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
+        .hamburger.open div:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
 
-.hamburger.open div:nth-child(2) {
-    opacity: 0;
-}
+        .hamburger.open div:nth-child(2) {
+            opacity: 0;
+        }
 
-.hamburger.open div:nth-child(3) {
-    transform: rotate(-45deg) translate(5px, -5px);
-}
+        .hamburger.open div:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
 
-/* Navigation */
-nav {
-    display: flex; /* Flexbox for large screens */
-    background-color: #333;
-    justify-content: center; /* Center the nav items */
-    align-items: center;
-    gap: 20px; /* Space between links */
-    padding: 10px 0;
-}
+        /* Navigation */
+        nav {
+            display: none;
+            background-color: #333;
+        }
 
-nav a {
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    font-size: 16px;
-    font-family: Arial, sans-serif;
-    border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
+        nav.open {
+            display: block;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+        }
 
-nav a:hover {
-    background-color: #ff0000; /* Red background on hover */
-}
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            display: block;
+        }
 
-/* Responsive behavior: for smaller screens */
-@media screen and (max-width: 768px) {
-    nav {
-        display: none; /* Hidden on small screens */
-        flex-direction: column; /* Stack links vertically */
-        background-color: #333;
-        position: absolute;
-        top: 60px;
-        left: 0;
-        width: 100%;
-    }
-
-    nav.open {
-        display: block; /* Show when hamburger is clicked */
-    }
-
-    nav a {
-        text-align: center;
-        padding: 15px;
-    }
-
-    /* Hamburger menu displayed on small screens */
-    .hamburger {
-        display: flex; /* Show hamburger on small screens */
-    }
-}
+        nav a:hover {
+            background-color: #444;
+        }
 
         /* Blog Posts */
         .container {
