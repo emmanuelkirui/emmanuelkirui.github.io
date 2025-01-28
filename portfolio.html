@@ -6,22 +6,26 @@
   <title>Professional Portfolio</title>
   <style>
     /* Global Styles */
+    :root {
+      --bg-color: #f4f4f9;
+      --text-color: #333;
+      --secondary-color: #007BFF;
+      --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #1e1e2f;
+      --text-color: #fff;
+      --secondary-color: #66d9ef;
+      --box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+    }
+
     body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 0;
-      color: #333;
-      background-color: #f4f4f9;
-      line-height: 1.6;
-    }
-
-    a {
-      text-decoration: none;
-      color: #007BFF;
-    }
-
-    a:hover {
-      text-decoration: underline;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .container {
@@ -30,195 +34,210 @@
       padding: 20px;
     }
 
-    .header {
+    header {
       text-align: center;
       margin-bottom: 40px;
     }
 
-    .header h1 {
+    header h1 {
       font-size: 2.5rem;
-      color: #333;
     }
 
-    .header p {
-      font-size: 1.1rem;
-      color: #555;
+    header p {
+      font-size: 1.2rem;
+      color: var(--text-color);
     }
 
-    /* Section Styles */
     .section {
-      margin-bottom: 60px;
+      margin-bottom: 40px;
     }
 
     .section h2 {
       font-size: 1.8rem;
-      color: #444;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #007BFF;
+      margin-bottom: 15px;
+      border-bottom: 2px solid var(--secondary-color);
       display: inline-block;
       padding-bottom: 5px;
     }
 
-    .slideshow {
+    /* Badge Section */
+    .badge-container {
       display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      gap: 15px;
-      padding: 10px 0;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
     }
 
-    .slideshow img {
-      scroll-snap-align: center;
-      max-width: 100%;
-      height: auto;
+    .badge {
+      width: 150px;
+      height: 270px;
+      box-shadow: var(--box-shadow);
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
     }
 
-    .flex-container {
+    /* Education Section */
+    .education {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
     }
 
-    .flex-item {
-      flex: 1 1 calc(50% - 20px);
-      background-color: #fff;
-      padding: 20px;
+    .education-card {
+      flex: 1 1 calc(33.333% - 20px);
+      padding: 15px;
+      box-shadow: var(--box-shadow);
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border: 1px solid #ddd;
+      background-color: var(--bg-color);
     }
 
-    .badge-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-
-    .badge-container img {
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    iframe {
+    /* Slideshow Section */
+    .slideshow-container {
+      position: relative;
       width: 100%;
-      height: 500px;
-      border: 1px solid #ddd;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .slideshow img {
+      width: 100%;
+      height: auto;
       border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    .slideshow img.active {
+      display: block;
+    }
+
+    .slideshow-controls {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .slideshow-controls button {
+      background-color: var(--secondary-color);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .slideshow-controls button:hover {
+      background-color: darkblue;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header class="header">
+    <!-- Dark/Light Mode Toggle -->
+    <button id="themeToggle" class="toggle-theme" style="position: fixed; top: 20px; right: 20px;">🌙</button>
+
+    <!-- Header -->
+    <header>
       <h1>Emmanuel Kiprotich Kirui</h1>
       <p>Aspiring Cloud Cybersecurity Expert | Diploma in IT | Passionate about Innovation</p>
     </header>
 
-    <!-- Achievements Section -->
+    <!-- Earned Badges Section -->
     <section class="section">
-      <h2>Latest Achievements</h2>
-      <div class="slideshow" id="achievementsSlideshow"></div>
+      <h2>Earned Badges</h2>
+      <div class="badge-container">
+        <div class="badge">
+          <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="c45a92ac-2f59-4316-814b-90195f482734" data-share-badge-host="https://www.credly.com"></div>
+          <script async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+        </div>
+        <div class="badge">
+          <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="8239f143-b9f4-49a9-a0ff-ef498a9948b2" data-share-badge-host="https://www.credly.com"></div>
+          <script async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+        </div>
+      </div>
     </section>
 
     <!-- Education Section -->
     <section class="section">
       <h2>Education</h2>
-      <div class="flex-container" id="educationSection"></div>
+      <div class="education">
+        <div class="education-card">
+          <h3>Diploma in Information Technology</h3>
+          <p>Kisii University, 2023</p>
+        </div>
+        <div class="education-card">
+          <h3>High School</h3>
+          <p>Kabungut Boys High School, KCSE (2018-2021)</p>
+        </div>
+      </div>
     </section>
 
-    <!-- Certifications Section -->
+    <!-- Attachment Section -->
     <section class="section">
-      <h2>Certifications</h2>
-      <div class="flex-container" id="certificationsSection"></div>
+      <h2>Attachment Experience</h2>
+      <div>
+        <p><strong>NHIF IT Role (Kericho, Kenya)</strong></p>
+        <p>Duration: August 2023 - November 2023</p>
+        <p>Gained experience in managing IT systems, troubleshooting, and database management.</p>
+      </div>
     </section>
 
-    <!-- Badges Section -->
+    <!-- Slideshow Section -->
     <section class="section">
-      <h2>Earned Badges</h2>
-      <div class="badge-container" id="badgesSection"></div>
-    </section>
-
-    <!-- CV & Resume -->
-    <section class="section">
-      <h2>CV & Resume</h2>
-      <iframe src="cv_and_resume.pdf" title="CV and Resume"></iframe>
+      <h2>Achievements & Screenshots</h2>
+      <div class="slideshow-container">
+        <div class="slideshow">
+          <img src="screenshot1.jpg" alt="Achievement 1" class="active">
+          <img src="screenshot2.jpg" alt="Achievement 2">
+          <img src="screenshot3.jpg" alt="Achievement 3">
+        </div>
+        <div class="slideshow-controls">
+          <button id="prevSlide">Previous</button>
+          <button id="nextSlide">Next</button>
+        </div>
+      </div>
     </section>
   </div>
 
+  <!-- Footer -->
+  <footer>
+    <p>Designed by Emmanuel Kiprotich Kirui</p>
+  </footer>
+
   <script>
-    const portfolioData = {
-      achievements: [
-        "achievement1.jpg",
-        "achievement2.jpg",
-        "achievement3.jpg"
-      ],
-      education: [
-        {
-          level: "Diploma in Information Technology",
-          institution: "Kisii University",
-          year: "2023"
-        },
-        {
-          level: "KCSE",
-          institution: "Kabungut Boys High School",
-          year: "2021"
-        }
-      ],
-      certifications: [
-        {
-          name: "Cloud Cybersecurity Certificate",
-          issuer: "Google",
-          link: "https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url"
-        }
-      ],
-      badges: [
-        "badge1.png",
-        "badge2.png",
-        "badge3.png"
-      ]
-    };
+    // Dark/Light Mode Toggle
+    const themeToggle = document.getElementById("themeToggle");
+    const currentTheme = localStorage.getItem("theme") || "light";
+    document.body.setAttribute("data-theme", currentTheme);
+    themeToggle.textContent = currentTheme === "dark" ? "☀️" : "🌙";
 
-    // Populate achievements slideshow
-    const achievementsSlideshow = document.getElementById("achievementsSlideshow");
-    portfolioData.achievements.forEach(image => {
-      const img = document.createElement("img");
-      img.src = image;
-      img.alt = "Achievement";
-      achievementsSlideshow.appendChild(img);
+    themeToggle.addEventListener("click", () => {
+      const newTheme = currentTheme === "dark" ? "light" : "dark";
+      document.body.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      themeToggle.textContent = newTheme === "dark" ? "☀️" : "🌙";
     });
 
-    // Populate education section
-    const educationSection = document.getElementById("educationSection");
-    portfolioData.education.forEach(edu => {
-      const div = document.createElement("div");
-      div.className = "flex-item";
-      div.innerHTML = `<strong>${edu.level}</strong><br>${edu.institution}<br>${edu.year}`;
-      educationSection.appendChild(div);
+    // Slideshow
+    const slides = document.querySelectorAll(".slideshow img");
+    let currentSlide = 0;
+
+    document.getElementById("prevSlide").addEventListener("click", () => {
+      slides[currentSlide].classList.remove("active");
+      currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+      slides[currentSlide].classList.add("active");
     });
 
-    // Populate certifications section
-    const certificationsSection = document.getElementById("certificationsSection");
-    portfolioData.certifications.forEach(cert => {
-      const div = document.createElement("div");
-      div.className = "flex-item";
-      div.innerHTML = `<strong>${cert.name}</strong><br>Issued by: ${cert.issuer}<br><a href="${cert.link}" target="_blank">View Certificate</a>`;
-      certificationsSection.appendChild(div);
-    });
-
-    // Populate badges section
-    const badgesSection = document.getElementById("badgesSection");
-    portfolioData.badges.forEach(badge => {
-      const img = document.createElement("img");
-      img.src = badge;
-      img.alt = "Badge";
-      badgesSection.appendChild(img);
+    document.getElementById("nextSlide").addEventListener("click", () => {
+      slides[currentSlide].classList.remove("active");
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add("active");
     });
   </script>
 </body>
