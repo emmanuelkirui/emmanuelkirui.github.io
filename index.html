@@ -394,6 +394,97 @@ body:not(.dark-mode) .whats-new h2 {
         line-height: 1.4;
     }
 }
+
+    /* General Section Styling */
+#social-links {
+    background-color: #f8f9fa; /* Light background */
+    padding: 20px 0;
+    text-align: center;
+    border-top: 2px solid #e9ecef;
+}
+
+#social-links h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333; /* Darker text for better contrast */
+}
+
+/* List Styling */
+#social-accounts {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px; /* Space between items */
+}
+
+#social-accounts li {
+    display: inline-block;
+}
+
+/* Link Styling */
+#social-accounts a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Icon Styling */
+#social-accounts i {
+    font-size: 20px;
+}
+
+/* Background Colors for Each Platform */
+#social-accounts a[href*="facebook"] {
+    background-color: #3b5998; /* Facebook Blue */
+}
+
+#social-accounts a[href*="twitter"] {
+    background-color: #1da1f2; /* Twitter Blue */
+}
+
+#social-accounts a[href*="instagram"] {
+    background: linear-gradient(45deg, #fd1d1d, #fcb045); /* Instagram Gradient */
+}
+
+#social-accounts a[href*="linkedin"] {
+    background-color: #0077b5; /* LinkedIn Blue */
+}
+
+#social-accounts a[href*="youtube"] {
+    background-color: #ff0000; /* YouTube Red */
+}
+
+#social-accounts a[href*="github"] {
+    background-color: #333; /* GitHub Black */
+}
+
+#social-accounts a[href*="tiktok"] {
+    background: linear-gradient(45deg, #25f4ee, #fe2c55); /* TikTok Gradient */
+}
+
+/* Hover Effect */
+#social-accounts a:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle hover shadow */
+    opacity: 0.9;
+}
+
+/* Accessibility: Add a focus effect for better navigation */
+#social-accounts a:focus {
+    outline: 2px dashed #0077b5; /* Dashed outline for focus */
+    outline-offset: 4px;
+}
     </style>
 </head>
 <body>
@@ -473,6 +564,10 @@ body:not(.dark-mode) .whats-new h2 {
         </div>
     </div>
 </div>
+    <section id="social-links">
+    <h2>Connect With Me</h2>
+    <ul id="social-accounts"></ul>
+</section>
         <!-- Footer -->
 <footer>
     <div class="container">
@@ -604,36 +699,30 @@ document.addEventListener('DOMContentLoaded', () => {
         
     </script>
         <script src="cookies.js"></script> <!-- Link to the separate cookies.js file -->
-    
+
 <script>
-    // Social Media JSON Integration
-    const socialAccountsFile = 'socialaccount.json'; // Path to the JSON file
+    // Fetch social links from socialaccount.json
+    fetch('socialaccount.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const socialLinksContainer = document.getElementById('social-accounts');
 
-    // Fetch and load social media links
-    async function loadSocialMediaLinks() {
-        try {
-            const response = await fetch(socialAccountsFile);
-            if (!response.ok) throw new Error('Failed to load social accounts file');
-            
-            const socialAccounts = await response.json();
-            const socialMediaLinksContainer = document.getElementById('social-media-links');
-
-            socialAccounts.forEach(account => {
+            data.socialAccounts.forEach(account => {
                 const listItem = document.createElement('li');
-                const link = document.createElement('a');
-                link.href = account.url;
-                link.target = '_blank';
-                link.innerHTML = `<i class="${account.icon}"></i> ${account.name}`;
-                listItem.appendChild(link);
-                socialMediaLinksContainer.appendChild(listItem);
+                listItem.innerHTML = `
+                    <a href="${account.profileLink}" target="_blank" title="${account.description}">
+                        <i class="${account.icon}"></i> ${account.platform}
+                    </a>
+                `;
+                socialLinksContainer.appendChild(listItem);
             });
-        } catch (error) {
-            console.error('Error loading social media links:', error);
-        }
-    }
-
-    // Call the function to load social media links
-    loadSocialMediaLinks();
+        })
+        .catch(error => console.error('Error fetching socialaccount.json:', error));
 </script>
 
 </body>
