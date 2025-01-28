@@ -1,42 +1,52 @@
 [
     {
         "title": "Lyrics Making",
-        "content": "Creating lyrics is an art form that requires creativity, rhythm, and a deep understanding of language. This process often involves crafting meaningful verses, hooks, and choruses that resonate with the audience."
+        "content": "Creating lyrics is an art form that requires creativity, rhythm, and a deep understanding of language. This process often involves crafting meaningful verses, hooks, and choruses that resonate with the audience.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Web Design",
-        "content": "Web design is the process of planning and creating websites. This involves the layout, color scheme, fonts, navigation, and overall aesthetics of the site to provide a user-friendly experience."
+        "content": "Web design is the process of planning and creating websites. This involves the layout, color scheme, fonts, navigation, and overall aesthetics of the site to provide a user-friendly experience.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Graphics and Motion Design",
-        "content": "Graphics and motion design combines visual art and animation to communicate messages through moving images. This field is commonly used in advertisements, movies, video games, and social media."
+        "content": "Graphics and motion design combines visual art and animation to communicate messages through moving images. This field is commonly used in advertisements, movies, video games, and social media.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Football Predictions",
-        "content": "Football predictions involve analyzing teams, players, and past performances to forecast match outcomes. This service can help fans and bettors make informed decisions."
+        "content": "Football predictions involve analyzing teams, players, and past performances to forecast match outcomes. This service can help fans and bettors make informed decisions.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Video Editing",
-        "content": "Video editing involves manipulating and arranging video footage to create a final product. Editors use various tools and techniques to enhance the visual appeal, coherence, and storytelling of the video."
+        "content": "Video editing involves manipulating and arranging video footage to create a final product. Editors use various tools and techniques to enhance the visual appeal, coherence, and storytelling of the video.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Animation",
-        "content": "Animation is the art of creating moving images using various techniques like 2D, 3D, and stop-motion. It's commonly used in films, games, and educational content."
+        "content": "Animation is the art of creating moving images using various techniques like 2D, 3D, and stop-motion. It's commonly used in films, games, and educational content.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Posters & Flyers",
-        "content": "Designing posters and flyers involves creating visual content to promote events, businesses, or products. This includes careful use of colors, typography, and imagery to capture attention."
+        "content": "Designing posters and flyers involves creating visual content to promote events, businesses, or products. This includes careful use of colors, typography, and imagery to capture attention.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Birthday & Wedding Cards",
-        "content": "Personalized birthday and wedding cards add a special touch to celebrations. These cards are designed with care to reflect the unique style and wishes of the sender."
+        "content": "Personalized birthday and wedding cards add a special touch to celebrations. These cards are designed with care to reflect the unique style and wishes of the sender.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Web Customization",
-        "content": "Web customization involves tailoring the look and functionality of a website to meet specific needs. This could include adding custom features, optimizing user experience, and integrating third-party tools."
+        "content": "Web customization involves tailoring the look and functionality of a website to meet specific needs. This could include adding custom features, optimizing user experience, and integrating third-party tools.",
+        "author": "Emmanuel Kirui"
     },
     {
         "title": "Other Online Solutions",
-        "content": "Other online solutions include a wide range of services such as digital marketing, SEO optimization, e-commerce setup, and custom software solutions to enhance online presence and business operations."
+        "content": "Other online solutions include a wide range of services such as digital marketing, SEO optimization, e-commerce setup, and custom software solutions to enhance online presence and business operations.",
+        "author": "Emmanuel Kirui"
     }
 ]
