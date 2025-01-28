@@ -45,6 +45,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             position: relative;
             margin-top: 80px; /* To create space for the input and button */
+            z-index: 1;
         }
 
         .quote {
@@ -143,6 +144,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1;
         }
 
         .button:hover {
@@ -184,24 +186,24 @@
 /* Hamburger Menu */
         
         .hamburger {
-    position: fixed; /* Keeps it floating at the top even when scrolling */
-    top: 10px; /* Distance from the top */
-    right: 10px; /* Distance from the right */
+    position: fixed; /* Ensures it stays in the same spot even when scrolling */
+    top: 10px; /* Adjust distance from the top */
+    right: 10px; /* Adjust distance from the right */
+    z-index: 9999; /* Very high value to ensure it is above all elements */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     width: 30px;
     height: 25px;
     cursor: pointer;
-    z-index: 9999; /* Keeps it above all elements */
-    background-color: transparent; /* No background blocking */
+    background-color: transparent; /* Transparent background */
 }
 
 .hamburger div {
-    background-color: #fff; /* Color of the hamburger lines */
+    background-color: #000; /* Color of the hamburger lines */
     height: 3px;
-    border-radius: 3px;
-    transition: all 0.3s ease;
+    width: 100%;
+    border-radius: 2px;
 }
 
 body {
