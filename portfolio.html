@@ -11,6 +11,8 @@
       --text-color: #333;
       --secondary-color: #007BFF;
       --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --hover-color: rgba(0, 123, 255, 0.2); /* Professional hover effect */
+      --button-hover-color: rgba(255, 255, 255, 0.3);
     }
 
     [data-theme="dark"] {
@@ -18,6 +20,8 @@
       --text-color: #fff;
       --secondary-color: #66d9ef;
       --box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+      --hover-color: rgba(102, 217, 239, 0.2);
+      --button-hover-color: rgba(255, 255, 255, 0.5);
     }
 
     body {
@@ -43,11 +47,21 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      transition: background-color 0.3s ease;
+    }
+
+    header:hover {
+      background-color: var(--secondary-color); /* Smooth background change on hover */
     }
 
     header .logo {
       font-size: 1.5rem;
       font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    header .logo:hover {
+      color: var(--secondary-color); /* Highlight logo on hover */
     }
 
     nav {
@@ -61,11 +75,12 @@
       font-size: 1rem;
       padding: 5px 10px;
       border-radius: 4px;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
     nav a:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: var(--hover-color);
+      transform: scale(1.05); /* Add a slight zoom effect */
     }
 
     /* Light/Dark Mode Toggle Button */
@@ -76,11 +91,12 @@
       border: none;
       background: none;
       color: #fff;
-      transition: color 0.3s ease;
+      transition: color 0.3s ease, transform 0.2s ease;
     }
 
     .theme-toggle:hover {
       color: #ffd700;
+      transform: scale(1.1); /* Slight zoom effect for the toggle */
     }
 
     /* Responsive Navigation */
@@ -130,6 +146,11 @@
       border-bottom: 2px solid var(--secondary-color);
       display: inline-block;
       padding-bottom: 5px;
+      transition: color 0.3s ease;
+    }
+
+    .section h2:hover {
+      color: var(--secondary-color); /* Highlight section titles on hover */
     }
 
     /* Internship Section */
@@ -145,6 +166,12 @@
       box-shadow: var(--box-shadow);
       border-radius: 8px;
       background-color: var(--bg-color);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .internship-card:hover {
+      transform: translateY(-5px); /* Slight lift effect on hover */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
     }
 
     .internship-card h3 {
