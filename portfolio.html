@@ -217,6 +217,131 @@
 .badge iframe:hover {
   transform: scale(1.1);
 }
+    /* Container for the achievements section */
+#achievements {
+    background-color: #f8f9fa;
+    padding: 30px 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Title Styling */
+#achievements h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Achievement Frames (Flexbox for better alignment) */
+.achievement-frame {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.achievement-frame:hover {
+    transform: scale(1.05);
+}
+
+.achievement-frame h4 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Style for the badges */
+.achievement-frame div {
+    margin: 20px 0;
+}
+
+/* Button styling for viewing certificates and projects */
+.achievement-frame .btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.achievement-frame .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Flexbox for carousel inner items */
+.carousel-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+/* Styling for embedded PDF viewer */
+#certificate-viewer embed {
+    width: 100%;
+    height: 500px;
+}
+
+/* Counter styling */
+#achievementCounter {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Carousel Controls (Prev and Next) */
+.carousel-control-prev-icon, .carousel-control-next-icon {
+    background-color: #007bff;
+    border-radius: 50%;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    filter: none;
+}
+
+/* Responsive Design for mobile view */
+@media (max-width: 768px) {
+    #achievements h2 {
+        font-size: 2rem;
+    }
+
+    .achievement-frame {
+        padding: 15px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .carousel-item {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .achievement-frame h4 {
+        font-size: 1.25rem;
+    }
+
+    #certificate-viewer embed {
+        height: 300px;
+    }
+}
   </style>
 </head>
 <body>
@@ -269,6 +394,108 @@
     </div>
   </div>
 </section>
+    <section id="achievements" class="my-5">
+    <div class="container">
+        <h2 class="text-center">Latest Achievements</h2>
+        <div id="achievementCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <!-- Google Cloud Cybersecurity Badge -->
+                <div class="carousel-item active">
+                    <div class="achievement-frame">
+                        <h4>Achieved a Google Cloud Cybersecurity Certificate!</h4>
+                        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="c45a92ac-2f59-4316-814b-90195f482734" data-share-badge-host="https://www.credly.com"></div>
+                        <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+                        <a href="https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url" target="_blank" class="btn btn-link">View Certificate</a>
+                    </div>
+                </div>
+                <!-- Diploma in Information Technology -->
+                <div class="carousel-item">
+                    <div class="achievement-frame">
+                        <h4>Completed a Diploma in Information Technology at Kisii University!</h4>
+                        <div id="certificate-viewer" style="margin-top: 10px;">
+                            <embed src="certificates/MANURAJ KSU.pdf" class="responsive-pdf" type="application/pdf">
+                        </div>
+                    </div>
+                </div>
+                <!-- NHIF IT Work -->
+                <div class="carousel-item">
+                    <div class="achievement-frame">
+                        <h4>Worked in IT at NHIF, Kericho!</h4>
+                        <p>Gained hands-on experience in managing IT systems and support.</p>
+                        <div id="certificate-viewer" style="margin-top: 10px;">
+                            <embed src="certificates/Recomentation NHIF.pdf" class="responsive-pdf" type="application/pdf">
+                        </div>
+                    </div>
+                </div>
+                <!-- Car Rental Project -->
+                <div class="carousel-item">
+                    <div class="achievement-frame">
+                        <h4>Created a Car Rental System as a campus project!</h4>
+                        <a href="https://emmanuelkirui.42web.io/carrental" target="_blank" class="btn btn-link">View Project</a>
+                    </div>
+                </div>
+                <!-- Python & Cybersecurity Skills -->
+                <div class="carousel-item">
+                    <div class="achievement-frame">
+                        <h4>Developed skills in Python programming and cybersecurity!</h4>
+                        <p>Focused on ethical hacking and cloud security practices.</p>
+                    </div>
+                </div>
+                <!-- Cybersecurity Labs -->
+                <div class="carousel-item">
+                    <div class="achievement-frame">
+                        <h4>Participated in various cybersecurity labs!</h4>
+                        <p>Hands-on experience with cloud cybersecurity tools and techniques.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Counter Display -->
+            <div id="achievementCounter" class="text-center my-3">
+                <span id="currentAchievement"></span> / <span id="totalAchievements"></span>
+            </div>
+
+            <!-- Carousel Controls -->
+            <a class="carousel-control-prev" href="#achievementCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#achievementCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      var totalItems = document.querySelectorAll('#achievementCarousel .carousel-item').length;
+      var currentAchievement = document.getElementById('currentAchievement');
+      var totalAchievements = document.getElementById('totalAchievements');
+
+      // Set the total achievements count on page load
+      totalAchievements.textContent = totalItems;
+
+      // Function to update the counter
+      var updateCounter = function () {
+          // Find the active item
+          var activeItems = document.querySelectorAll('#achievementCarousel .carousel-item');
+          var currentIndex = Array.from(activeItems).findIndex(item => item.classList.contains('active'));
+
+          // Update the current achievement display
+          currentAchievement.textContent = currentIndex + 1; // +1 to make it 1-based index
+      };
+
+      // Listen for carousel slide events
+      $('#achievementCarousel').on('slid.bs.carousel', function () {
+          updateCounter();
+      });
+
+      // Initial counter update
+      updateCounter();
+  });
+</script>
     <!-- Internship Section -->
     <section class="section" id="internship">
       <h2>Attachment/Internship</h2>
