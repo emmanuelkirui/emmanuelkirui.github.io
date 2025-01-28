@@ -115,81 +115,103 @@
                 transform: translateY(-10px);
             }
         }
-/* Hamburger menu styles */
-.hamburger-menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.7); /* Optional: semi-transparent background */
-    width: 250px;
-    height: 100%;
-    visibility: hidden; /* Hidden by default */
-    opacity: 0; /* Hidden by default */
-    z-index: 99999; /* Ensure it's above everything else */
-    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-}
-
-/* When the menu is active */
-.hamburger-menu.open {
-    visibility: visible;
-    opacity: 1;
-}
-
-/* Hamburger button styles */
-.hamburger-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 100000; /* Ensures the button is above everything, including the menu */
+/* Hamburger Menu */
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 25px;
     cursor: pointer;
+    position: fixed; /* Keep the hamburger button fixed at the top */
+    top: 20px; /* Adjust based on your header */
+    right: 20px; /* Position it at the right corner */
+    z-index: 9999; /* Ensure it stays above other content */
 }
 
 /* Hamburger bars */
-.hamburger-btn div {
+.hamburger div {
     background-color: white;
-    height: 4px;
-    width: 30px;
-    margin: 5px;
+    height: 3px;
     border-radius: 3px;
-    transition: transform 0.3s ease-in-out;
+    transition: all 0.3s ease;
 }
 
-/* Hamburger button animation when active */
-.hamburger-btn.open div:nth-child(1) {
+/* When hamburger is open */
+.hamburger.open div:nth-child(1) {
     transform: rotate(45deg) translate(5px, 5px);
 }
 
-.hamburger-btn.open div:nth-child(2) {
+.hamburger.open div:nth-child(2) {
     opacity: 0;
 }
 
-.hamburger-btn.open div:nth-child(3) {
+.hamburger.open div:nth-child(3) {
     transform: rotate(-45deg) translate(5px, -5px);
 }
 
-/* Navigation */
+/* Navigation Styles */
 nav {
-    display: none;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: absolute;
+    top: 60px; /* Adjust according to header height */
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
     background-color: #333;
+    flex-direction: column;
+    z-index: 1000; /* Ensure it's above content */
 }
 
-/* Navigation display when open */
+/* When the menu is open, adjust the height to show the items */
 nav.open {
-    display: block;
-    position: absolute;
-    top: 0; /* Adjusted to show from top */
-    left: 0;
-    width: 100%;
-    height: 100vh; /* Ensure it takes up full height */
-    transition: top 0.3s ease-in-out;
+    height: auto;
 }
 
 /* Navigation link styles */
 nav a {
     color: white;
     text-decoration: none;
-    padding: 10px 15px;
+    padding: 15px 20px;
     display: block;
+    text-align: center;
+}
+
+/* Navigation link hover effect */
+nav a:hover {
+    background-color: #444;
+}
+
+/* Flexbox for navigation links */
+nav {
+    flex-direction: column;
+}
+
+/* Media Queries for Hamburger (Responsive) */
+@media (max-width: 768px) {
+    /* Show the hamburger menu on small screens */
+    .hamburger {
+        display: flex;
+    }
+
+    /* Hide navigation menu initially */
+    nav {
+        display: flex;
+    }
+
+    /* When the nav is open, it will display properly */
+    nav.open {
+        height: auto;
+    }
+
+    /* Adjust navigation for mobile */
+    nav a {
+        padding: 15px;
+        text-align: center;
+    }
 }
 
 /* Navigation link hover effect */
