@@ -604,5 +604,37 @@ document.addEventListener('DOMContentLoaded', () => {
         
     </script>
         <script src="cookies.js"></script> <!-- Link to the separate cookies.js file -->
+    
+<script>
+    // Social Media JSON Integration
+    const socialAccountsFile = 'socialaccount.json'; // Path to the JSON file
+
+    // Fetch and load social media links
+    async function loadSocialMediaLinks() {
+        try {
+            const response = await fetch(socialAccountsFile);
+            if (!response.ok) throw new Error('Failed to load social accounts file');
+            
+            const socialAccounts = await response.json();
+            const socialMediaLinksContainer = document.getElementById('social-media-links');
+
+            socialAccounts.forEach(account => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = account.url;
+                link.target = '_blank';
+                link.innerHTML = `<i class="${account.icon}"></i> ${account.name}`;
+                listItem.appendChild(link);
+                socialMediaLinksContainer.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error('Error loading social media links:', error);
+        }
+    }
+
+    // Call the function to load social media links
+    loadSocialMediaLinks();
+</script>
+
 </body>
 </html>
