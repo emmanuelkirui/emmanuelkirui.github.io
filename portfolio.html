@@ -190,6 +190,21 @@
       margin-top: 40px;
       font-size: 0.9rem;
     }
+    .badges {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.badge img {
+  max-width: 100px;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.badge img:hover {
+  transform: scale(1.1);
+      }
   </style>
 </head>
 <body>
@@ -217,7 +232,31 @@
       <h2>Welcome</h2>
       <p>Welcome to my professional portfolio, where you can explore my achievements, certifications, and skills!</p>
     </section>
-
+<section class="section" id="achievements">
+  <h2>Achievements</h2>
+  <div class="badges">
+    <div class="badge">
+      <!-- Google Cloud Cybersecurity Badge -->
+      <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="c45a92ac-2f59-4316-814b-90195f482734" data-share-badge-host="https://www.credly.com"></div>
+      <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+      <p>Cloud Cybersecurity Certificate</p>
+    </div>
+    
+    <div class="badge">
+      <!-- Prompt Design in Vertex AI Badge -->
+      <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="8239f143-b9f4-49a9-a0ff-ef498a9948b2" data-share-badge-host="https://www.credly.com"></div>
+      <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+      <p>Prompt Design in Vertex AI</p>
+    </div>
+    
+    <div class="badge">
+      <!-- OPSWAT ICIP Badge -->
+      <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="de1bd1df-41ed-43ab-aeb7-ceda541b4657" data-share-badge-host="https://www.credly.com"></div>
+      <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
+      <p>OPSWAT ICIP Badge</p>
+    </div>
+  </div>
+</section>
     <!-- Internship Section -->
     <section class="section" id="internship">
       <h2>Attachment/Internship</h2>
