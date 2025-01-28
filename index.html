@@ -507,6 +507,56 @@ body:not(.dark-mode) .whats-new h2 {
     outline: 2px dashed var(--link-text-color);
     outline-offset: 4px;
 }
+    /* Container for videos */
+#videos {
+  padding: 20px;
+  background-color: var(--background-color); /* Adapt to light/dark mode */
+  color: var(--text-color); /* Adapt to light/dark mode */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#videos h2 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.video-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.video-card {
+  width: 200px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.video-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.video-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.video-card p {
+  padding: 10px;
+  font-size: 14px;
+  text-align: center;
+  background-color: var(--card-background-color);
+  color: var(--card-text-color);
+}
+
+
      </style>
 </head>
 <body>
@@ -557,7 +607,10 @@ body:not(.dark-mode) .whats-new h2 {
             </ul>
         </div>
     </div>
-
+    <section id="videos">
+  <h2>My YouTube Channel</h2>
+  <div id="video-list" class="video-container"></div>
+    </section>
     <!-- Image Slideshow Section -->
     <div class="container">
         <div class="image-slideshow" id="slideshow">
@@ -718,6 +771,66 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.classList.add('show'); // Ensure the modal is visible
 });
 
+        // Configuration
+const apiKey = 'AIzaSyB8Z2g9N8VrPycbFVj4utcig69gkPT5ZJw'; // Replace with your YouTube Data API key
+const channelId = 'UCowmIx_sYZ6qi8PtaAtCGUg'; // Replace with your YouTube channel ID
+const maxResults = 4; // Maximum number of videos to show
+const slideInterval = 120000; // Interval for slideshow in milliseconds (2 minutes)
+
+let videoCache = []; // Cache for storing videos
+let currentIndex = 0; // Index for the current set of videos
+
+// Fetch videos sorted by view count
+async function fetchVideos() {
+  const url = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet&type=video&order=viewCount&maxResults=50`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    videoCache = data.items; // Store videos in the cache
+    displayVideos(); // Display the first set of videos
+  } catch (error) {
+    console.error('Error fetching videos:', error);
+    const errorMessage = document.createElement('p');
+    errorMessage.textContent = 'Failed to load videos. Please try again later.';
+    document.getElementById('video-list').appendChild(errorMessage);
+  }
+}
+
+// Display a set of videos based on the current index
+function displayVideos() {
+  const videoList = document.getElementById('video-list'); // Target container for videos
+  videoList.innerHTML = ''; // Clear previous content
+  const videosToShow = videoCache.slice(currentIndex, currentIndex + maxResults);
+
+  videosToShow.forEach((video) => {
+    const videoId = video.id.videoId;
+    const thumbnail = video.snippet.thumbnails.medium.url;
+    const title = video.snippet.title;
+    const videoLink = `https://www.youtube.com/watch?v=${videoId}`;
+
+    const videoCard = document.createElement('div');
+    videoCard.classList.add('video-card'); // CSS class for styling
+    videoCard.innerHTML = `
+      <a href="${videoLink}" target="_blank">
+        <img src="${thumbnail}" alt="${title}">
+        <p>${title}</p>
+      </a>
+    `;
+    videoList.appendChild(videoCard);
+  });
+
+  // Update the current index for the next set
+  currentIndex = (currentIndex + maxResults) % videoCache.length;
+}
+
+// Automatically rotate videos every 2 minutes
+function startSlideshow() {
+  setInterval(displayVideos, slideInterval);
+}
+
+// Initial setup
+fetchVideos(); // Fetch videos from YouTube
+startSlideshow(); // Start the slideshow
         
     </script>
         <script src="cookies.js"></script> <!-- Link to the separate cookies.js file -->
