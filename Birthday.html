@@ -115,7 +115,6 @@
                 transform: translateY(-10px);
             }
         }
-
 /* Hamburger menu styles */
 .hamburger-menu {
     position: fixed;
@@ -178,9 +177,11 @@ nav {
 nav.open {
     display: block;
     position: absolute;
-    top: 60px;
+    top: 0; /* Adjusted to show from top */
     left: 0;
     width: 100%;
+    height: 100vh; /* Ensure it takes up full height */
+    transition: top 0.3s ease-in-out;
 }
 
 /* Navigation link styles */
@@ -198,14 +199,17 @@ nav a:hover {
 
 /* Media Queries for Hamburger */
 @media (max-width: 768px) {
-    .hamburger {
-        display: flex;
+    /* Ensure the hamburger button is visible on small screens */
+    .hamburger-btn {
+        display: block;
     }
 
+    /* Hide the nav by default on small screens */
     nav {
         display: none;
     }
 
+    /* Show nav when it is open */
     nav.open {
         display: block;
     }
