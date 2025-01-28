@@ -540,7 +540,7 @@ body:not(.dark-mode) .whats-new h2 {
 .video-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-}
+} 
 
 .video-card img {
   width: 100%;
@@ -556,6 +556,12 @@ body:not(.dark-mode) .whats-new h2 {
   color: var(--card-text-color);
 }
 
+.author {
+    font-style: italic;
+    color: #555;
+    margin-top: 10px;
+    }
+        
 
      </style>
 </head>
@@ -583,6 +589,7 @@ body:not(.dark-mode) .whats-new h2 {
     
     <div class="container" id="blog-posts-container">
         <!-- Posts will be dynamically loaded here -->
+        
     </div>
     <div class="container">
 <!-- AdSense Display Ad -->
@@ -740,6 +747,8 @@ body:not(.dark-mode) .whats-new h2 {
                     postElement.innerHTML = `
                         <h2>${post.title}</h2>
                         <p>${post.content}</p>
+                        <p class="author">Author: ${post.author}</p>
+            `;
                     `;
                     postsContainer.appendChild(postElement);
                 });
