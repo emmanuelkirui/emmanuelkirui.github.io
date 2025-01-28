@@ -3,103 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portfolio</title>
+  <title>Professional Portfolio</title>
   <style>
+    /* Global Styles */
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      color: #333;
+      background-color: #f4f4f9;
+      line-height: 1.6;
     }
+
+    a {
+      text-decoration: none;
+      color: #007BFF;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
+
     .header {
       text-align: center;
-      margin-bottom: 20px;
-    }
-    .header h1 {
-      margin: 0;
-      font-size: 2em;
-      color: #333;
-    }
-    .section {
       margin-bottom: 40px;
     }
-    .section h2 {
-      font-size: 1.5em;
-      color: #555;
-      margin-bottom: 10px;
+
+    .header h1 {
+      font-size: 2.5rem;
+      color: #333;
     }
+
+    .header p {
+      font-size: 1.1rem;
+      color: #555;
+    }
+
+    /* Section Styles */
+    .section {
+      margin-bottom: 60px;
+    }
+
+    .section h2 {
+      font-size: 1.8rem;
+      color: #444;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #007BFF;
+      display: inline-block;
+      padding-bottom: 5px;
+    }
+
     .slideshow {
       display: flex;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      gap: 10px;
+      gap: 15px;
+      padding: 10px 0;
     }
+
     .slideshow img {
       scroll-snap-align: center;
       max-width: 100%;
       height: auto;
       border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+
     .flex-container {
       display: flex;
       flex-wrap: wrap;
       gap: 20px;
     }
-    .flex-container > div {
+
+    .flex-item {
       flex: 1 1 calc(50% - 20px);
-      background-color: #f9f9f9;
-      padding: 15px;
-      border: 1px solid #ddd;
+      background-color: #fff;
+      padding: 20px;
       border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ddd;
     }
-    iframe {
-      width: 100%;
-      height: 500px;
-      border: none;
-    }
+
     .badge-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 15px;
     }
+
     .badge-container img {
-      width: 80px;
-      height: 80px;
+      width: 100px;
+      height: 100px;
       object-fit: contain;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header class="header">
-      <h1>My Portfolio</h1>
+      <h1>Emmanuel Kiprotich Kirui</h1>
+      <p>Aspiring Cloud Cybersecurity Expert | Diploma in IT | Passionate about Innovation</p>
     </header>
 
+    <!-- Achievements Section -->
     <section class="section">
       <h2>Latest Achievements</h2>
       <div class="slideshow" id="achievementsSlideshow"></div>
     </section>
 
+    <!-- Education Section -->
     <section class="section">
       <h2>Education</h2>
       <div class="flex-container" id="educationSection"></div>
     </section>
 
+    <!-- Certifications Section -->
     <section class="section">
       <h2>Certifications</h2>
       <div class="flex-container" id="certificationsSection"></div>
     </section>
 
+    <!-- Badges Section -->
     <section class="section">
-      <h2>Badges</h2>
+      <h2>Earned Badges</h2>
       <div class="badge-container" id="badgesSection"></div>
     </section>
 
+    <!-- CV & Resume -->
     <section class="section">
       <h2>CV & Resume</h2>
       <iframe src="cv_and_resume.pdf" title="CV and Resume"></iframe>
@@ -107,7 +153,6 @@
   </div>
 
   <script>
-    // Example JSON content
     const portfolioData = {
       achievements: [
         "achievement1.jpg",
@@ -116,7 +161,7 @@
       ],
       education: [
         {
-          level: "Diploma in IT",
+          level: "Diploma in Information Technology",
           institution: "Kisii University",
           year: "2023"
         },
@@ -145,6 +190,7 @@
     portfolioData.achievements.forEach(image => {
       const img = document.createElement("img");
       img.src = image;
+      img.alt = "Achievement";
       achievementsSlideshow.appendChild(img);
     });
 
@@ -152,6 +198,7 @@
     const educationSection = document.getElementById("educationSection");
     portfolioData.education.forEach(edu => {
       const div = document.createElement("div");
+      div.className = "flex-item";
       div.innerHTML = `<strong>${edu.level}</strong><br>${edu.institution}<br>${edu.year}`;
       educationSection.appendChild(div);
     });
@@ -160,6 +207,7 @@
     const certificationsSection = document.getElementById("certificationsSection");
     portfolioData.certifications.forEach(cert => {
       const div = document.createElement("div");
+      div.className = "flex-item";
       div.innerHTML = `<strong>${cert.name}</strong><br>Issued by: ${cert.issuer}<br><a href="${cert.link}" target="_blank">View Certificate</a>`;
       certificationsSection.appendChild(div);
     });
@@ -169,6 +217,7 @@
     portfolioData.badges.forEach(badge => {
       const img = document.createElement("img");
       img.src = badge;
+      img.alt = "Badge";
       badgesSection.appendChild(img);
     });
   </script>
