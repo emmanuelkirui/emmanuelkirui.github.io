@@ -237,94 +237,104 @@
 
            /* Hamburger Icon Styling */
     
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            width: 30px;
-            height: 25px;
-            cursor: pointer;
-        }
+/* Hamburger Menu */
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 25px;
+    cursor: pointer;
+    position: fixed; /* Keep the hamburger button fixed at the top */
+    top: 20px; /* Adjust based on your header */
+    left: 20px; /* Adjust based on your design */
+    z-index: 9999; /* Ensure it stays above other content */
+}
 
-        .hamburger div {
-            background-color: white;
-            height: 3px;
-            border-radius: 3px;
-            transition: all 0.3s ease;
-        }
+/* Hamburger bars */
+.hamburger div {
+    background-color: white;
+    height: 3px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
 
-        /* When hamburger is open */
-        .hamburger.open div:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
+/* When hamburger is open */
+.hamburger.open div:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
 
-        .hamburger.open div:nth-child(2) {
-            opacity: 0;
-        }
+.hamburger.open div:nth-child(2) {
+    opacity: 0;
+}
 
-        .hamburger.open div:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
-        }
+.hamburger.open div:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
 
-        /* Navigation Styles */
-        nav {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            position: absolute;
-            top: 60px; /* Adjust according to header height */
-            width: 100%;
-            height: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            background-color: #333;
-        }
+/* Navigation Styles */
+nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: absolute;
+    top: 60px; /* Adjust according to header height */
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background-color: #333;
+    flex-direction: column;
+    z-index: 1000; /* Ensure it's above content */
+}
 
-        nav.open {
-            height: auto;
-        }
+/* When the menu is open, adjust the height to show the items */
+nav.open {
+    height: auto;
+}
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 15px 20px;
-            display: block;
-            text-align: center;
-        }
+/* Navigation link styles */
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 15px 20px;
+    display: block;
+    text-align: center;
+}
 
-        nav a:hover {
-            background-color: #444;
-        }
+/* Navigation link hover effect */
+nav a:hover {
+    background-color: #444;
+}
 
-        /* Flexbox for navigation links */
-        nav {
-            flex-direction: column;
-        }
-        @media (min-width: 768px) {
-            body {
-                padding-top: 80px; /* Increase padding for larger screens */
-            }
+/* Flexbox for navigation links */
+nav {
+    flex-direction: column;
+}
 
-            header h1 {
-                font-size: 2rem;
-            }
+/* Media Queries for Hamburger (Responsive) */
+@media (max-width: 768px) {
+    /* Show the hamburger menu on small screens */
+    .hamburger {
+        display: flex;
+    }
 
-            /* Align the nav horizontally */
-            nav {
-                position: static;
-                height: auto;
-                flex-direction: row;
-                justify-content: flex-end;
-            }
+    /* Hide navigation menu initially */
+    nav {
+        display: flex;
+    }
 
-            nav a {
-                padding: 10px 15px;
-            }
+    /* When the nav is open, it will display properly */
+    nav.open {
+        height: auto;
+    }
 
-            .hamburger {
-                display: none;
-            }
-        }
+    /* Adjust navigation for mobile */
+    nav a {
+        padding: 15px;
+        text-align: center;
+    }
+}
 
         
             
