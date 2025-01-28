@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Professional Portfolio</title>
+  <!-- Bootstrap JS (Optional, for carousel functionality) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     /* Global Styles */
     :root {
@@ -217,100 +219,85 @@
 .badge iframe:hover {
   transform: scale(1.1);
 }
-/* Container for the carousel */
-.carousel-container {
-    width: 100%;  /* Make the carousel container take up full width */
-    max-width: 1200px; /* Optional: limits max width for better alignment */
-    margin: 0 auto; /* Centering the container */
-    position: relative; /* Required for absolute positioning of controls */
-    overflow: hidden; /* Hide content that overflows, creating the slideshow effect */
-    border-radius: 10px; /* Optional: to give rounded corners */
-}
 
-/* Carousel Inner (Slides) */
+/* General styling for the carousel */
 .carousel-inner {
-    display: flex;  /* Use flexbox to align slides horizontally */
-    transition: transform 0.5s ease-in-out; /* Smooth transition between slides */
-    width: 100%;
-}
-
-/* Individual slide styling */
-.carousel-item {
-    width: 100%;  /* Make each slide take up full width of container */
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column; /* Align elements inside each slide */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Carousel items and their content styling */
+.carousel-item {
     padding: 20px;
-    box-sizing: border-box; /* Ensure padding doesn't affect the width */
-}
-
-/* Styling for achievement frame */
-.achievement-frame {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
+    background: #fff;
+    border-radius: 10px;
 }
 
-/* Style for the previous and next carousel controls */
-.carousel-control-prev,
-.carousel-control-next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;  /* Ensure the buttons are on top */
-    background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background */
-    padding: 10px;
-    border-radius: 50%;
+.achievement-frame {
+    max-width: 600px; /* Ensure content doesn't stretch too wide */
+    margin: 0 auto;
 }
 
-/* Adjust positioning of previous and next buttons */
-.carousel-control-prev {
-    left: 10px;
+h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
 }
 
-.carousel-control-next {
-    right: 10px;
+p {
+    font-size: 1rem;
+    color: #555;
 }
 
-/* Styling for carousel control icons */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-}
-
-/* Hover effect for carousel control icons */
-.carousel-control-prev-icon:hover,
-.carousel-control-next-icon:hover {
-    background-color: #FF6347;
-}
-
-/* Responsive design for smaller screens */
-@media (max-width: 768px) {
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        width: 25px;
-        height: 25px;
-    }
-
-    .achievement-frame {
-        padding: 10px;
-    }
-}
-
-/* Styling for the PDF viewer */
 .responsive-pdf {
     width: 100%;
     height: 400px;
     border: none;
 }
 
-/* Styling for counter display */
-#achievementCounter {
-    font-size: 18px;
-    font-weight: bold;
+/* Styling for the buttons */
+.btn-link {
+    text-decoration: none;
+    color: #007bff;
+    font-weight: 600;
 }
+
+/* Make sure the carousel controls are well positioned */
+.carousel-control-prev-icon, .carousel-control-next-icon {
+    background-color: #007bff;
+    border-radius: 50%;
+}
+
+.carousel-control-prev, .carousel-control-next {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    padding: 10px;
+    z-index: 10;
+}
+
+/* Hover effect for carousel control icons */
+.carousel-control-prev-icon:hover,
+.carousel-control-next-icon:hover {
+    background-color: #0056b3;
+}
+
+/* Media Queries for responsiveness */
+@media (max-width: 768px) {
+    .carousel-inner {
+        flex-direction: column;
+    }
+
+    .achievement-frame {
+        padding: 15px;
+    }
+}
+
   </style>
 </head>
 <body>
@@ -365,74 +352,69 @@
 </section>
     <section id="achievements" class="my-5">
     <div class="container">
-        <h2 class="text-center">Latest Achievements</h2>
-        <div id="achievementCarousel" class="carousel-container">
+        <h2 class="text-center mb-4">Latest Achievements</h2>
+        <div id="achievementCarousel" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
                 <!-- Google Cloud Cybersecurity Badge -->
                 <div class="carousel-item active">
-                    <div class="achievement-frame">
+                    <div class="achievement-frame text-center">
                         <h4>Achieved a Google Cloud Cybersecurity Certificate!</h4>
                         <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="c45a92ac-2f59-4316-814b-90195f482734" data-share-badge-host="https://www.credly.com"></div>
                         <script type="text/javascript" async src="//cdn.credly.com/assets/utilities/embed.js"></script>
-                        <a href="https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url" target="_blank" class="btn btn-link">View Certificate</a>
+                        <a href="https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url" target="_blank" class="btn btn-link mt-3">View Certificate</a>
                     </div>
                 </div>
                 <!-- Diploma in Information Technology -->
                 <div class="carousel-item">
-                    <div class="achievement-frame">
+                    <div class="achievement-frame text-center">
                         <h4>Completed a Diploma in Information Technology at Kisii University!</h4>
-                        <div id="certificate-viewer" style="margin-top: 10px;">
+                        <div id="certificate-viewer" class="mt-3">
                             <embed src="certificates/MANURAJ KSU.pdf" class="responsive-pdf" type="application/pdf">
                         </div>
                     </div>
                 </div>
                 <!-- NHIF IT Work -->
                 <div class="carousel-item">
-                    <div class="achievement-frame">
+                    <div class="achievement-frame text-center">
                         <h4>Worked in IT at NHIF, Kericho!</h4>
                         <p>Gained hands-on experience in managing IT systems and support.</p>
-                        <div id="certificate-viewer" style="margin-top: 10px;">
+                        <div id="certificate-viewer" class="mt-3">
                             <embed src="certificates/Recomentation NHIF.pdf" class="responsive-pdf" type="application/pdf">
                         </div>
                     </div>
                 </div>
                 <!-- Car Rental Project -->
                 <div class="carousel-item">
-                    <div class="achievement-frame">
+                    <div class="achievement-frame text-center">
                         <h4>Created a Car Rental System as a campus project!</h4>
-                        <a href="https://emmanuelkirui.42web.io/carrental" target="_blank" class="btn btn-link">View Project</a>
+                        <a href="https://emmanuelkirui.42web.io/carrental" target="_blank" class="btn btn-link mt-3">View Project</a>
                     </div>
                 </div>
                 <!-- Python & Cybersecurity Skills -->
                 <div class="carousel-item">
-                    <div class="achievement-frame">
+                    <div class="achievement-frame text-center">
                         <h4>Developed skills in Python programming and cybersecurity!</h4>
                         <p>Focused on ethical hacking and cloud security practices.</p>
                     </div>
                 </div>
                 <!-- Cybersecurity Labs -->
                 <div class="carousel-item">
-                    <div class="achievement-frame">
+                    <div class="achievement-frame text-center">
                         <h4>Participated in various cybersecurity labs!</h4>
                         <p>Hands-on experience with cloud cybersecurity tools and techniques.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Counter Display -->
-            <div id="achievementCounter" class="text-center my-3">
-                <span id="currentAchievement"></span> / <span id="totalAchievements"></span>
-            </div>
-
             <!-- Carousel Controls -->
-            <a class="carousel-control-prev" href="#achievementCarousel" role="button" data-slide="prev">
+            <button class="carousel-control-prev" type="button" data-bs-target="#achievementCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#achievementCarousel" role="button" data-slide="next">
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#achievementCarousel" data-bs-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
     </div>
 </section>
