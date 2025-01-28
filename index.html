@@ -607,20 +607,21 @@ body:not(.dark-mode) .whats-new h2 {
             </ul>
         </div>
     </div>
-    <section id="videos">
-        <h2 style="color: #ff0000; font-family: Arial, sans-serif;">Subscribe to Our YouTube Channel</h2>
-  <p>Stay updated with our latest videos on graphics, motion design, and predictions!</p>
+    <section style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+  <h2 style="color: #ff0000; font-family: Arial, sans-serif; font-size: 24px;">Subscribe to Our YouTube Channel</h2>
+  <p style="font-size: 16px; color: #333; margin: 0;">Stay updated with our latest videos on graphics, motion design, and predictions!</p>
   <a href="https://www.youtube.com/@emmanuelkirui9043?sub_confirmation=1" target="_blank" style="text-decoration: none;">
-    <button style="background-color: #ff0000; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer;">
+    <button style="background-color: #ff0000; color: white; border: none; padding: 10px 20px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">
       Subscribe Now
     </button>
   </a>
-
-  <!-- YouTube Subscribe Widget Button -->
-  <div class="text-center my-4">
-      <script src="https://apis.google.com/js/platform.js"></script>
-      <div class="g-ytsubscribe" data-channelid="UCowmIx_sYZ6qi8PtaAtCGUg" data-layout="full" data-count="default"></div>
+  <div style="margin-top: 20px;">
+    <script src="https://apis.google.com/js/platform.js"></script>
+    <div class="g-ytsubscribe" data-channelid="UCowmIx_sYZ6qi8PtaAtCGUg" data-layout="full" data-count="default"></div>
   </div>
+</section>
+    <section id="videos">
+        
   <h2>My YouTube Channel</h2>
   <div id="video-list" class="video-container"></div>
     </section>
