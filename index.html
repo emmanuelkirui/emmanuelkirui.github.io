@@ -755,18 +755,21 @@ body:not(.dark-mode) .whats-new h2 {
             })
             .catch(error => console.error('Error loading posts:', error));
 
-        // Add "What's New" items
+        // Add "What's New" items dynamically from the JSON file
+fetch('whatsnew.json')
+    .then(response => response.json())
+    .then(newsItems => {
         const whatsNewList = document.getElementById('whats-new-list');
-        const newsItems = [
-            'New Feature: Dark Mode for Better Reading',
-            'Fresh Blog Post: How to Implement API Security',
-            'Latest Update: New Cybersecurity Guidelines'
-        ];
         newsItems.forEach(item => {
             const li = document.createElement('li');
-            li.textContent = item;
+            li.innerHTML = `
+                <strong>${item.title}</strong><br>
+                <small style="color: #888;">Date: ${item.date}</small>
+            `;
             whatsNewList.appendChild(li);
         });
+    })
+    .catch(error => console.error('Error loading "What\'s New" items:', error));
         
 // Function to close the modal
 function closeCookieModal() {
