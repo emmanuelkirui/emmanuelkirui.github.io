@@ -182,21 +182,32 @@
         transition: border-color 0.3s ease;
     }
 /* Hamburger Menu */
+        
         .hamburger {
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 20px;
-            width: 25px;
-            cursor: pointer;
-        }
+    position: fixed; /* Keeps it floating at the top even when scrolling */
+    top: 10px; /* Distance from the top */
+    right: 10px; /* Distance from the right */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 25px;
+    cursor: pointer;
+    z-index: 9999; /* Keeps it above all elements */
+    background-color: transparent; /* No background blocking */
+}
 
-        .hamburger div {
-            background-color: white;
-            height: 3px;
-            border-radius: 2px;
-            transition: all 0.3s;
-        }
+.hamburger div {
+    background-color: #fff; /* Color of the hamburger lines */
+    height: 3px;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+body {
+    margin: 0; /* Ensure no unwanted margin pushes elements */
+    padding: 0;
+}
 
         .hamburger.open div:nth-child(1) {
             transform: rotate(45deg) translate(5px, 5px);
@@ -210,29 +221,32 @@
             transform: rotate(-45deg) translate(5px, -5px);
         }
 
-        /* Navigation */
         nav {
             display: none;
-            background-color: #333;
+            flex-direction: column;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #444;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         nav.open {
-            display: block;
-            position: absolute;
-            top: 60px;
-            left: 0;
-            width: 100%;
+            display: flex;
         }
 
         nav a {
             color: white;
             text-decoration: none;
-            padding: 10px 15px;
+            padding: 10px 20px;
             display: block;
+            text-align: center;
+            transition: background-color 0.3s ease;
         }
 
         nav a:hover {
-            background-color: #444;
+            background-color: #555;
         }
 
     </style>
@@ -284,11 +298,12 @@
     </div>
 
     <script>
-        const hamburger = document.getElementById('hamburger');
-        // Hamburger menu toggle
+              const hamburger = document.getElementById('hamburger');
+        const nav = document.getElementById('nav');
+
         hamburger.addEventListener('click', () => {
-            nav.classList.toggle('open');
             hamburger.classList.toggle('open');
+            nav.classList.toggle('open');
         });
 
         // Function to update the greeting with the name input
