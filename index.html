@@ -13,6 +13,26 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271"
      crossorigin="anonymous"></script>
     <style>
+        /* Root variables for color themes */
+:root {
+    --bg-color: #f8f9fa; /* Light background */
+    --text-color: #333; /* Dark text */
+    --border-color: #e9ecef;
+    --link-bg-color: #fff;
+    --link-text-color: #333;
+    --link-hover-shadow: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] {
+    --bg-color: #121212; /* Dark background */
+    --text-color: #f8f9fa; /* Light text */
+    --border-color: #333;
+    --link-bg-color: #333;
+    --link-text-color: #fff;
+    --link-hover-shadow: rgba(255, 255, 255, 0.15);
+}
+
+
         /* General Styles */
         body {
             font-family: 'Roboto', sans-serif;
@@ -395,19 +415,21 @@ body:not(.dark-mode) .whats-new h2 {
     }
 }
 
-    /* General Section Styling */
+/* General Section Styling */
 #social-links {
-    background-color: #f8f9fa; /* Light background */
-    padding: 20px 0;
+    background-color: var(--bg-color);
+    padding: 40px 0;
     text-align: center;
-    border-top: 2px solid #e9ecef;
+    border-top: 2px solid var(--border-color);
 }
 
 #social-links h2 {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
-    margin-bottom: 15px;
-    color: #333; /* Darker text for better contrast */
+    margin-bottom: 20px;
+    color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
 }
 
 /* List Styling */
@@ -418,7 +440,7 @@ body:not(.dark-mode) .whats-new h2 {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 15px; /* Space between items */
+    gap: 20px;
 }
 
 #social-accounts li {
@@ -428,23 +450,24 @@ body:not(.dark-mode) .whats-new h2 {
 /* Link Styling */
 #social-accounts a {
     text-decoration: none;
-    color: #fff;
+    color: var(--link-text-color);
     font-size: 16px;
     font-weight: 500;
-    padding: 10px 20px;
+    padding: 12px 25px;
     border-radius: 30px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    box-shadow: 0 4px 6px var(--link-hover-shadow);
 }
 
 /* Icon Styling */
 #social-accounts i {
-    font-size: 20px;
+    font-size: 22px;
 }
 
-/* Background Colors for Each Platform */
+/* Platform-Specific Colors */
 #social-accounts a[href*="facebook"] {
     background-color: #3b5998; /* Facebook Blue */
 }
@@ -475,19 +498,16 @@ body:not(.dark-mode) .whats-new h2 {
 
 /* Hover Effect */
 #social-accounts a:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle hover shadow */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px var(--link-hover-shadow);
     opacity: 0.9;
 }
 
 /* Accessibility: Add a focus effect for better navigation */
 #social-accounts a:focus {
-    outline: 2px dashed #0077b5; /* Dashed outline for focus */
+    outline: 2px dashed var(--link-text-color);
     outline-offset: 4px;
 }
-    </style>
-</head>
-<body>
     <header>
         <h1>Latest News Blog</h1>
         <div class="theme-toggle">
