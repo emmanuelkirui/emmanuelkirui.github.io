@@ -1,0 +1,53 @@
+{
+  "socialAccounts": [
+    {
+      "platform": "Facebook",
+      "username": "EmmanuelKiruiOfficial",
+      "profileLink": "https://www.facebook.com/EmmanuelKiruiOfficial",
+      "icon": "fab fa-facebook",
+      "description": "Follow for updates, news, and behind-the-scenes content."
+    },
+    {
+      "platform": "Twitter",
+      "username": "@ManurajTweets",
+      "profileLink": "https://twitter.com/ManurajTweets",
+      "icon": "fab fa-twitter",
+      "description": "Join the conversation and get the latest tweets."
+    },
+    {
+      "platform": "Instagram",
+      "username": "emmanuelkirui",
+      "profileLink": "https://www.instagram.com/emmanuelkirui",
+      "icon": "fab fa-instagram",
+      "description": "Explore photos, stories, and daily life moments."
+    },
+    {
+      "platform": "LinkedIn",
+      "username": "Emmanuel Kiprotich Kirui",
+      "profileLink": "https://www.linkedin.com/in/emmanuel-kirui",
+      "icon": "fab fa-linkedin",
+      "description": "Connect for professional updates and networking opportunities."
+    },
+    {
+      "platform": "YouTube",
+      "username": "Manuraj Channel",
+      "profileLink": "https://www.youtube.com/@manurajchannel",
+      "icon": "fab fa-youtube",
+      "description": "Watch videos and tutorials on tech and lifestyle topics."
+    },
+    {
+      "platform": "GitHub",
+      "username": "emmanuelkirui",
+      "profileLink": "https://github.com/emmanuelkirui",
+      "icon": "fab fa-github",
+      "description": "Explore projects, repositories, and open-source contributions."
+    },
+    {
+      "platform": "TikTok",
+      "username": "@ManurajTikTok",
+      "profileLink": "https://www.tiktok.com/@ManurajTikTok",
+      "icon": "fab fa-tiktok",
+      "description": "Discover creative short videos and behind-the-scenes fun."
+    }
+  ]
+}
