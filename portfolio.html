@@ -192,19 +192,31 @@
     }
     .badges {
   display: flex;
-  gap: 20px;
+  gap: 30px;
   flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
 }
 
-.badge img {
-  max-width: 100px;
+.badge {
+  text-align: center;
+}
+
+.badge p {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.badge iframe {
   border-radius: 8px;
+  box-shadow: var(--box-shadow);
   transition: transform 0.3s ease;
 }
 
-.badge img:hover {
+.badge iframe:hover {
   transform: scale(1.1);
-      }
+}
   </style>
 </head>
 <body>
