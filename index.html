@@ -753,129 +753,104 @@ body:not(.dark-mode) .whats-new h2 {
     }
 }
 
-/* Large Screen Layout for Desktops */
+/* For larger desktops and big screens */
 @media (min-width: 1024px) {
-    /* Header */
     header {
-        padding: 20px 50px;
-        justify-content: space-between;
+        padding: 20px 60px;
     }
 
     header h1 {
-        font-size: 2.5rem; /* Even larger heading for desktop */
+        font-size: 2.5rem;
     }
 
-    /* Navigation */
     nav {
         justify-content: space-between;
-        width: 100%;
     }
 
     nav a {
         padding: 15px 25px;
-        font-size: 1.1rem; /* Slightly larger font size */
     }
 
-    /* Blog Posts */
     .container {
-        display: flex;
-        flex-wrap: wrap;
         gap: 40px;
         justify-content: space-between;
     }
 
     .post {
-        width: 30%; /* Make posts more narrow to fit in 3 columns */
+        width: 30%; /* Three columns */
     }
 
-    /* New Section */
     .whats-new {
         padding: 40px;
-        gap: 30px;
     }
 
     .whats-new h2 {
-        font-size: 2.5rem; /* Larger heading */
+        font-size: 2.5rem;
     }
 
-    /* Footer Links */
     .footer-links {
-        justify-content: center;
+        justify-content: space-evenly;
     }
 
     .footer-links a {
         font-size: 18px;
-        padding: 10px 15px;
     }
 
-    /* Cookie Consent Modal */
     .cookie-consent-modal {
         width: 60%;
         padding: 30px;
     }
 
     .cookie-actions .btn {
-        font-size: 1.3rem;
         padding: 14px 30px;
     }
 }
 
-/* Large Desktops and Full Screens */
+/* For full-width large screens */
 @media (min-width: 1200px) {
-    /* Header */
     header {
         padding: 20px 80px;
     }
 
     header h1 {
-        font-size: 3rem; /* Large header for large desktops */
+        font-size: 3rem;
     }
 
-    /* Navigation */
     nav a {
         font-size: 1.2rem;
     }
 
-    /* Blog Posts */
     .container {
-        display: flex;
-        flex-wrap: wrap;
         gap: 50px;
         justify-content: space-between;
     }
 
     .post {
-        width: 30%;
+        width: 30%; /* Maintain three columns */
     }
 
-    /* New Section */
     .whats-new {
         padding: 50px;
-        gap: 40px;
     }
 
     .whats-new h2 {
-        font-size: 3rem; /* Larger heading */
+        font-size: 3rem;
     }
 
-    /* Footer Links */
     .footer-links {
-        justify-content: center;
+        justify-content: space-evenly;
     }
 
     .footer-links a {
         font-size: 20px;
-        padding: 12px 20px;
     }
 
-    /* Cookie Consent Modal */
     .cookie-consent-modal {
         width: 50%;
         padding: 35px;
     }
 
     .cookie-actions .btn {
-        font-size: 1.4rem;
         padding: 15px 35px;
     }
 }
