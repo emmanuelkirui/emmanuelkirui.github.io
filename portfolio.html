@@ -302,13 +302,15 @@
     object-fit: contain;
 }
     
-/* Make the image container scrollable */
+/* Make the image container scrollable in all directions */
 .image-container {
     max-height: 80vh; /* Adjust max height as needed */
-    overflow: auto;
+    max-width: 100%; /* Allow scrolling horizontally if content overflows */
+    overflow: auto;  /* Enables both horizontal and vertical scrolling */
     position: relative;
     display: inline-block;
     width: 100%;
+    white-space: nowrap; /* Prevent line breaks, useful if images are wide */
 }
 
 /* Make sure the image is responsive */
