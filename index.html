@@ -711,6 +711,12 @@ footer .disclaimer {
 #backToTop:hover {
   background-color: #0056b3;
 }
+    /* Show the button when scrolling on larger screens */
+@media (min-width: 1024px) {
+  #backToTop {
+    display: flex; /* Display the button for larger screens */
+  }
+}
   
 /* Style for the news slides */
 .news-slide {
