@@ -2,24 +2,24 @@
   "sectionTitle": "Latest News",
   "newsItems": [
     {
-      "headline": "News Headline 1",
-      "description": "This is the first latest news update."
+      "headline": "Breaking News: Cybersecurity Vulnerability Identified",
+      "description": "A new cybersecurity vulnerability has been discovered, impacting thousands of systems worldwide. Learn more about the latest threat."
     },
     {
-      "headline": "News Headline 2",
-      "description": "This is the second latest news update."
+      "headline": "Cloud Security Update: Best Practices for 2025",
+      "description": "The latest cloud security trends are out. Stay ahead with these best practices to safeguard your data in 2025."
     },
     {
-      "headline": "News Headline 3",
-      "description": "This is the third latest news update."
+      "headline": "New Cloud Backup Features in Google Cloud",
+      "description": "Google Cloud introduces exciting new features to its backup solutions, making data recovery even more seamless and efficient."
     },
     {
-      "headline": "News Headline 4",
-      "description": "This is the fourth latest news update."
+      "headline": "Threat Intelligence Report: Trends in Cyber Attacks",
+      "description": "A comprehensive report on the most recent trends in cyberattacks, including ransomware and phishing attacks, and how to protect yourself."
     },
     {
-      "headline": "News Headline 5",
-      "description": "This is the fifth latest news update."
+      "headline": "Disaster Recovery in the Cloud: What You Need to Know",
+      "description": "Disaster recovery in the cloud is evolving. Find out the best strategies and tools to ensure your business stays operational during a disaster."
     }
   ]
 }
