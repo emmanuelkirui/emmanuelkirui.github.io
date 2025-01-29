@@ -1,0 +1,534 @@
+<section class = "section background" >
+    <div class="section_title">Background</div>
+    <div class="card">
+        <div class="card-body">
+        <p>
+                I complete Diploma's  in Information Technology stream from
+                <a class = "underline-link" href="#" target="_blank">
+                Kisii University</a> in 2023 .
+                  While earning my diploma, I completed a 3 month internship at 
+                  <a class = "underline-link" href="#" target="_blank">National Health Insurance Fund.(NHIF)</a> 
+                  After graduating I joined 
+                  <a class = "underline-link" href="#" target="_blank">Google Cloud </a> 
+                  as a juniour cyber security analyst where i was certified with Cloud Cyber security Certificate. Recently, I completed a full-time a Artificial Intelligence(AI) course from 
+                  <a class = "underline-link" href="#" target="_blank">
+                  Google.</a> Currently, I'm working on my personal projects and spending my time advancing my skills in web-development.  	
+        </p>
+
+        <p>
+            As a developer, I enjoy bridging the gap between functionality and design. My goal is to always build applications that are scalable and efficient under the hood while providing engaging, pixel-perfect user experiences. In addition, I am highly responsive to client needs and also committed to helping people realize their vision.
+        </p>
+
+        <a class="status" href="Docs/Emmanuel Kiprotich Kirui Resume.docx" target="_blank"> 
+            <div class="status_light"> 
+                <div class="status_light_ring"></div> 
+                <div class="status_light_led"></div> 
+            </div> 
+            <div class="status_message">
+                Interested in working together? Reach out!
+            </div> 
+        </a>
+    </div>
+</div>
+</section>
+<section id="skills" class="my-5 text-center">
+    <div class="container">
+        <h2 class="mb-4">Skills</h2>
+        <div class="row justify-content-center">
+
+            <!-- Core Skills Card -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4>Core Skills</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="list-inline-item">Cybersecurity</li>
+                            <li class="list-inline-item">Cloud Backup</li>
+                            <li class="list-inline-item">Cloud Computing</li>
+                            <li class="list-inline-item">Cloud Security</li>
+                            <li class="list-inline-item">Compliance Lifecycle</li>
+                            <li class="list-inline-item">Data Protection</li>
+                            <li class="list-inline-item">Disaster Recovery</li>
+                            <li class="list-inline-item">Google Cloud</li>
+                            <li class="list-inline-item">IAM</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programming Languages Card -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h4>Programming Languages</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="list-inline-item">PHP</li>
+                            <li class="list-inline-item">JavaScript (ES5/ES6)</li>
+                            <li class="list-inline-item">CSS3</li>
+                            <li class="list-inline-item">HTML5</li>
+                            <li class="list-inline-item">C/C++</li>
+                            <li class="list-inline-item">Python3</li>
+                            <li class="list-inline-item">AJAX</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Frameworks & Tools Card -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-warning text-white">
+                        <h4>Frameworks & Tools</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="list-inline-item">Ruby on Rails</li>
+                            <li class="list-inline-item">Bootstrap4</li>
+                            <li class="list-inline-item">jQuery</li>
+                            <li class="list-inline-item">Materialize</li>
+                            <li class="list-inline-item">UIkit</li>
+                            <li class="list-inline-item">Git & GitHub</li>
+                            <li class="list-inline-item">Heroku</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Design Skills Card -->
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h4>Design Skills</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="list-inline-item">After Effects</li>
+                            <li class="list-inline-item">Photoshop</li>
+                            <li class="list-inline-item">Illustrator</li>
+                            <li class="list-inline-item">FL Studio</li>
+                            <li class="list-inline-item">Audition</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section experience">
+    <div class="section_title">
+        Experience
+    </div>
+    <div class="card">
+        <div class="card-body">
+    <div class="section_content">
+        <div class="jobs">
+            <div class="job">
+                <div class="time-place"> 
+                    <div class="job_company">
+                        <a href="#" target="_blank">National Health Insurance Fund</a>
+                    </div>
+                    <div class="job_time">       
+                        August 2023 – November 2023 
+                    </div>
+                  </div>
+                <div class="job_position">
+                    Provided technical support and troubleshooting for various software and hardware issues.
+                </div>
+            </div>
+            
+        <a href="images/myResume.pdf" target="_blank" class="arrow-link">View My Resume</a>
+    </div>
+</div>
+</div>
+</section>
+<section id="InternAttachment" class="my-5"></section>
+<div class="container">
+  <h2 class="text-center">Intern/Attachment</h2>
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="card-title">National Health Insurance Fund (NHIF) Kericho</h3>
+          <p class="card-text">Provided technical support and troubleshooting for various software and hardware issues.</p>
+          <a href="certificates/Recomentation NHIF.pdf" class="btn btn-primary" target="_blank">View Recomentation</a>
+        </div>
+      </div>
+    </div>
+    
+</section>
+
+
+
+<section id="projects" class="my-5">
+  <div class="container">
+      <h2 class="text-center">Projects</h2>
+      <div class="row">
+          <div class="col-md-6 mb-4">
+              <div class="card">
+                  <div class="card-body">
+                      <h3 class="card-title">Campus Project: Car Rental System</h3>
+                      <p class="card-text">A web application for managing car rentals. Technologies used: PHP, Bootstrap, Javascript, HTML, CSS, MySQL.</p>
+                      <a href="https://emmanuelkirui.42web.io/carrental" class="btn btn-primary" target="_blank">View Project</a>
+                      <button class="btn btn-primary" data-toggle="modal" data-target="#carRentalModal">View Documentation</button>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-6 mb-4">
+              <div class="card">
+                  <div class="card-body">
+                      <h3 class="card-title">Service Request System</h3>
+                      <p class="card-text">A web-based system to manage customer requests. Technologies used: PHP, Bootstrap, Javascript, HTML, CSS, MySQL.</p>
+                      <a href="https://emmanuelkirui.42web.io" class="btn btn-primary" target="_blank">View Project</a>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-6 mb-4">
+              <div class="card">
+                  <div class="card-body">
+                      <h3 class="card-title">Capstone Project: Cloud Security</h3>
+                      <p class="card-text">A cloud-based security project using Google Cloud's Security Command Center to secure environments.</p>
+                      <a href="https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url" class="btn btn-primary" target="_blank">View Project</a>
+                  </div>
+              </div>
+          </div>
+          <div class="col-md-6 mb-4">
+              <div class="card">
+                  <div class="card-body">
+                      <h3 class="card-title">Other: Employ Management System</h3>
+                      <p class="card-text">A desktop-based system to manage employees. Technologies used: VB, Visual Studio, MySQL.</p>
+                      <a href="#" class="btn btn-primary" target="_blank">View Project</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <section class="section other-projects">
+        <div class="section_title">Other Projects</div>
+        <div class="card">
+            <div class="card-body">
+
+            <details>
+                <summary>Car Rental System</summary>
+                <div class="project"> 
+                    <p>short description.</p> 
+                    <div class="project_used"> 
+                        <span class="project_used_item">PHP</span> 
+                        <span class="project_used_item">JAVASCRIPT</span>
+                        <span class="project_used_item">CSS</span>
+                        <span class="project_used_item">HTML</span> 
+                    </div> 
+                    <div class="project_links"> 
+                        <a href="#" target="_blank">
+                            <img src="images/" alt="image">
+                        </a>
+                        <a href="#" target="_blank">
+                            <img src="image/wwwlogo.png" alt="image">
+                        </a>
+                    </div>
+                </div>
+            </details>
+
+            <details>
+                <summary>Online Shopping System</summary>
+                <div class="project"> 
+                    <p>short description.</p> 
+                    <div class="project_used"> 
+                        <span class="project_used_item">PHP</span> 
+                        <span class="project_used_item">JAVASCRIPT</span>
+                        <span class="project_used_item">CSS</span>
+                        <span class="project_used_item">HTML</span> 
+                    </div> 
+                    <div class="project_links"> 
+                        <a href="#" target="_blank">
+                            <img src="image/" alt="image">
+                        </a>
+                        <a href="#" target="_blank">
+                            <img src="image/wwwlogo.png" alt="image">
+                        </a>
+                    </div>  
+                </div>
+            </details>
+
+            <details>
+                <summary>Online Chatting System</summary>
+                <div class="project"> 
+                    <p>short description.</p> 
+                    <div class="project_used"> 
+                        <span class="project_used_item">PHP</span> 
+                        <span class="project_used_item">JAVASCRIPT</span>
+                        <span class="project_used_item">CSS</span>
+                        <span class="project_used_item">HTML</span> 
+                    </div> 
+                </div>
+            </details>
+
+            <details>
+                <summary>Employ Management System</summary>
+                <div class="project"> 
+                    <p>short description.</p> 
+                    <div class="project_used"> 
+                        <span class="project_used_item">PHP</span> 
+                        <span class="project_used_item">JAVASCRIPT</span>
+                        <span class="project_used_item">CSS</span>
+                        <span class="project_used_item">HTML</span> 
+                    </div> 
+                </div>
+            </details>
+
+            <details>
+                <summary>Portfolio Website</summary>
+                <div class="project"> 
+                    <p>short description.</p> 
+                    <div class="project_used"> 
+                        <span class="project_used_item">PHP</span> 
+                        <span class="project_used_item">JAVASCRIPT</span>
+                        <span class="project_used_item">CSS</span>
+                        <span class="project_used_item">HTML</span> 
+                    </div> 
+                </div>
+            </details>
+        </div>
+    </section>
+    <section class="section featured-projects"> 
+        <div class="section_title">Recent Projects</div> 
+            <div class="card"> 
+                <div class="card-body">
+                <div class="project salzakshipment">
+                    <figure class="project_pic"> 
+                        <a href="#link" target="_blank">
+                            <img src="image/admin panel.png" alt="image">
+                        </a> 
+                    </figure> 
+                </div><br>
+                <details>
+                    <summary>Online  Service System</summary>
+                    <div class="project_name">
+                            <a href="#link" target="_blank">  </a>
+                    </div>
+                    <div class = "featured-projects-content"> 
+                        <p>Short description</p>
+                        
+                    </div>
+                    <div class="project_used">
+                            <span class="project_used_item">RUBY ON RAILS</span>
+                            <span class="project_used_item">COFFEE SCRIPT</span>
+                            <span class="project_used_item">CSS3</span>
+                            <span class="project_used_item">HTML5</span>
+                            <span class="project_used_item">BOOTSTAP 4</span>  
+                            <span class="project_used_item">POSTGRES</span>
+                            <span class="project_used_item">HEROKU</span>
+                    </div> 
+                    <div class="project_links"> 
+                            <a href="#link" target="_blank">
+                                <img src="images/3vm-instances created.png" alt="image">
+                            </a>
+                            <a href="#link" target="_blank">
+                                <img src="images/BackupandDR.png" alt="image">
+                            </a>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+  </div>
+</section>
+
+<!-- Modal for Car Rental System Documentation -->
+<div class="modal fade" id="carRentalModal" tabindex="-1" role="dialog" aria-labelledby="carRentalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="carRentalModalLabel">Documentation for Car Rental System</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body text-center">
+              <p>Click the link below to view the documentation for the Car Rental System:</p>
+              <a href="Docs/CAR%20RENTAL%20SYSTEM1.2.docx" target="_blank" class="btn btn-primary">View Documentation</a>
+          </div>
+      </div>
+  </div>
+</div>
+
+  <section id="Certifications" class="my-5">
+    <div class="container">
+        <h2 class="text-center">Certifications</h2>
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Google</h3>
+                        <p class="card-text">Earned a certificate in cloud cybersecurity.</p>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#googleModal">View Certificate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Kisii University</h3>
+                        <p class="card-text">Diploma in Information Technology</p>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#kisiiModal">View Certificate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Kabungt Boys High School</h3>
+                        <p class="card-text">Earned a certificate in leadership as ICT prefect.</p>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#kabungtModal">View Certificate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">St. John's Ambulance</h3>
+                        <p class="card-text">First Aid Course</p>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#stJohnModal">View Certificate</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Structures -->
+<div class="modal fade" id="googleModal" tabindex="-1" role="dialog" aria-labelledby="googleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="googleModalLabel">Google Certificate</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body text-center">
+            <p>Click the link below to view your Google Certificate:</p>
+            <a href="https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url" target="_blank" class="btn btn-primary">View Certificate</a>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="modal fade" id="kisiiModal" tabindex="-1" role="dialog" aria-labelledby="kisiiModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="kisiiModalLabel">Kisii University Certificate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <embed src="certificates/MANURAJ KSU.pdf" class="responsive-iframe" type="application/pdf">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="kabungtModal" tabindex="-1" role="dialog" aria-labelledby="kabungtModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="kabungtModalLabel">Kabungt Boys High School Certificate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <embed src="certificates/EPSON050 ICT-PREFECT.PDF" class="responsive-iframe" type="application/pdf">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="stJohnModal" tabindex="-1" role="dialog" aria-labelledby="stJohnModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stJohnModalLabel">St. John's Ambulance Certificate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <embed src="certificates/EPSON048 ST JOHN'S.PDF" class="responsive-iframe" type="application/pdf">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  
+
+  <section id="samples" class="my-5">
+    <div class="container">
+      <h2 class="text-center mb-4">Sample Code</h2>
+      <div id="sampleCodeCarousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+          <!-- Carousel Item 1 -->
+          <div class="carousel-item active">
+            <div class="sample-code bg-light p-3 rounded">
+              <pre class="code-block">
+  # Sample Python Code 1
+  def hello_world():
+      return "Hello, World!"
+  
+  print(hello_world())
+              </pre>
+              <h4 class="mt-3">Output:</h4>
+              <pre id="output1" class="output-block bg-dark text-white p-2 rounded"></pre>
+            </div>
+          </div>
+  
+          <!-- Carousel Item 2 -->
+          <div class="carousel-item">
+            <div class="sample-code bg-light p-3 rounded">
+              <pre class="code-block">
+  # Sample Python Code 2
+  def add_numbers(a, b):
+      return a + b
+  
+  print(add_numbers(5, 3))
+              </pre>
+              <h4 class="mt-3">Output:</h4>
+              <pre id="output2" class="output-block bg-dark text-white p-2 rounded"></pre>
+            </div>
+          </div>
+  
+          <!-- Carousel Item 3 -->
+          <div class="carousel-item">
+            <div class="sample-code bg-light p-3 rounded">
+              <pre class="code-block">
+  # Sample Cloud Commands
+  gcloud compute networks create labnet --subnet-mode=custom
+              </pre>
+              <h4 class="mt-3">Output:</h4>
+              <pre id="output3" class="output-block bg-dark text-white p-2 rounded">This Command creates a custom mode network called labnet</pre>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Carousel controls -->
+        <a class="carousel-control-prev" href="#sampleCodeCarousel" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#sampleCodeCarousel" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+  
+      <!-- Run Code Button -->
+      <div class="text-center mt-4">
+        <button class="btn btn-success" onclick="runCode()">Run Code</button>
+      </div>
+    </div>
+  </section>
