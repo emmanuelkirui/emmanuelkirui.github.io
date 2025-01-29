@@ -638,10 +638,42 @@ body:not(.dark-mode) .whats-new h2 {
         <a href="valentinesday.html">Valentine's</a>
     </nav>
     <!-- Latest News Slideshow -->
+
 <section class="section" id="latest-news">
-  <h2 id="sectionTitle">Latest News</h2>
+  <h2>Latest News</h2>
   <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div id="carouselItems" class="carousel-inner"></div>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="news-slide">
+          <h3>Breaking News: Cybersecurity Vulnerability Identified</h3>
+          <p>A new cybersecurity vulnerability has been discovered, impacting thousands of systems worldwide. Learn more about the latest threat.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="news-slide">
+          <h3>Cloud Security Update: Best Practices for 2025</h3>
+          <p>The latest cloud security trends are out. Stay ahead with these best practices to safeguard your data in 2025.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="news-slide">
+          <h3>New Cloud Backup Features in Google Cloud</h3>
+          <p>Google Cloud introduces exciting new features to its backup solutions, making data recovery even more seamless and efficient.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="news-slide">
+          <h3>Threat Intelligence Report: Trends in Cyber Attacks</h3>
+          <p>A comprehensive report on the most recent trends in cyberattacks, including ransomware and phishing attacks, and how to protect yourself.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="news-slide">
+          <h3>Disaster Recovery in the Cloud: What You Need to Know</h3>
+          <p>Disaster recovery in the cloud is evolving. Find out the best strategies and tools to ensure your business stays operational during a disaster.</p>
+        </div>
+      </div>
+    </div>
 
     <!-- Left and Right Arrows -->
     <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
@@ -661,54 +693,19 @@ body:not(.dark-mode) .whats-new h2 {
 </section>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  fetch('newsData.json') // Load the JSON file
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById("sectionTitle").textContent = data.sectionTitle;
+  document.addEventListener("DOMContentLoaded", function () {
+    var carousel = document.getElementById("newsCarousel");
+    var totalSlides = document.querySelectorAll("#newsCarousel .carousel-item").length;
+    var currentSlideElement = document.getElementById("current-slide");
+    var totalSlidesElement = document.getElementById("total-slides");
 
-      const carouselItemsContainer = document.getElementById("carouselItems");
+    totalSlidesElement.textContent = totalSlides; // Set total slides count
 
-      data.newsItems.forEach((item, index) => {
-        const isActive = index === 0 ? "active" : ""; // First slide should be active
-
-        const carouselItem = document.createElement("div");
-        carouselItem.classList.add("carousel-item", isActive);
-
-        const newsSlide = document.createElement("div");
-        newsSlide.classList.add("news-slide");
-
-        const headline = document.createElement("h3");
-        headline.textContent = item.headline;
-
-        const description = document.createElement("p");
-        description.textContent = item.description;
-
-        newsSlide.appendChild(headline);
-        newsSlide.appendChild(description);
-        carouselItem.appendChild(newsSlide);
-
-        carouselItemsContainer.appendChild(carouselItem);
-      });
-
-      // Set total slides count
-      const totalSlides = data.newsItems.length;
-      document.getElementById("total-slides").textContent = totalSlides;
-
-      // Manually initialize the Bootstrap carousel AFTER loading JSON
-      const carouselElement = document.getElementById("newsCarousel");
-      const carousel = new bootstrap.Carousel(carouselElement, {
-        interval: 3000, // Auto-slide every 3 seconds
-        ride: "carousel"
-      });
-
-      // Update slide counter on slide change
-      carouselElement.addEventListener("slid.bs.carousel", function (event) {
-        document.getElementById("current-slide").textContent = event.to + 1;
-      });
-    })
-    .catch(error => console.error("Error loading news data:", error));
-});
+    carousel.addEventListener("slid.bs.carousel", function (event) {
+      var activeIndex = event.to + 1; // Carousel index starts at 0, so we add 1
+      currentSlideElement.textContent = activeIndex;
+    });
+  });
 </script>
 
 
