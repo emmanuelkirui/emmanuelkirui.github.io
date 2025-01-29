@@ -301,7 +301,7 @@
     max-height: 80vh;
     object-fit: contain;
 }
-    
+
 /* Make the image container scrollable in both vertical and horizontal directions */
 .image-container {
     max-height: 80vh; /* Adjust max height as needed */
@@ -310,9 +310,6 @@
     position: relative;
     display: inline-block;
     white-space: nowrap; /* Prevent line breaks, useful if images are wide */
-    display: flex;
-    justify-content: center; /* Center the image initially */
-    align-items: center; /* Center the image vertically */
 }
 
 /* Make sure the image is responsive and can zoom */
@@ -321,6 +318,7 @@
     transition: transform 0.3s ease;
     transform-origin: center center; /* Ensure zoom happens from the center */
     max-width: none; /* Allow the image to exceed its container */
+    user-select: none; /* Prevent accidental text selection */
 }
 
 /* Optional: Prevent accidental image dragging */
