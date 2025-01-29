@@ -1,31 +1,41 @@
-// Select modal and buttons
-const cookieModal = document.getElementById("cookie-consent-modal");
-const acceptBtn = document.getElementById("accept-cookies");
-const rejectBtn = document.getElementById("reject-cookies");
+// Function to check if cookie consent is already given
+function checkCookieConsent() {
+    if (!localStorage.getItem("cookieConsent")) {
+        showModal();
+    }
+}
 
-// Show the modal
+// Function to show the modal
 function showModal() {
+    const cookieModal = document.getElementById("cookie-consent-modal");
     cookieModal.classList.add("show");
+    cookieModal.style.display = "block";  // Ensure the modal is visible
 }
 
-// Hide the modal
+// Function to hide the modal
 function hideModal() {
+    const cookieModal = document.getElementById("cookie-consent-modal");
     cookieModal.classList.remove("show");
+    cookieModal.style.display = "none";  // Ensure the modal is hidden
 }
 
-// Check cookie consent status
-if (!localStorage.getItem("cookieConsent")) {
-    showModal();
-}
-
-// Accept cookies
-acceptBtn.addEventListener("click", () => {
+// Function to handle cookie acceptance
+function acceptCookies() {
     localStorage.setItem("cookieConsent", "accepted");
     hideModal();
-});
+    alert("Cookies accepted!");
+}
 
-// Reject cookies
-rejectBtn.addEventListener("click", () => {
+// Function to handle cookie rejection
+function rejectCookies() {
     localStorage.setItem("cookieConsent", "rejected");
     hideModal();
-});
+    alert("Cookies rejected!");
+}
+
+// Select the buttons and assign event listeners
+document.getElementById("accept-cookies").addEventListener("click", acceptCookies);
+document.getElementById("reject-cookies").addEventListener("click", rejectCookies);
+
+// Check cookie consent status when the page loads
+document.addEventListener("DOMContentLoaded", checkCookieConsent);
