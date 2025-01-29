@@ -446,60 +446,47 @@ nav {
 
                 // Display the uploaded image if available
                 const posterImage = document.getElementById('poster-image');
-                if (image) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        posterImage.src = e.target.result;
-                        posterImage.style.display = 'block';
-                    };
-                    reader.readAsDataURL(image);
-                } else {
-                    posterImage.style.display = 'none';
-                }
 
-                document.getElementById('poster-container').style.display = 'block';
-            });
+// Check if an image is uploaded
+if (image) {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        posterImage.src = event.target.result;
+        posterImage.style.display = 'block'; // Show the image
+    };
+    reader.readAsDataURL(image);
+}
 
-            document.addEventListener('DOMContentLoaded', function() {
+// Fill in the event details on the poster
+document.getElementById('poster-title').textContent = title;
+document.getElementById('poster-date').textContent = date;
+document.getElementById('poster-details').textContent = details;
+
+// Show the generated poster section
+document.getElementById('poster-container').style.display = 'block';
         // Function to download the generated poster
-        document.getElementById('download-btn').addEventListener('click', function() {
-            const poster = document.getElementById('poster-container');
-            html2canvas(poster).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = imgData;
-                link.download = 'generated_poster.png';
-                link.click();
-            }).catch(err => {
-                console.error('Error capturing poster:', err);
-            });
-        });
+        const downloadBtn = document.getElementById('download-btn');
+downloadBtn.addEventListener('click', function() {
+    html2canvas(document.getElementById('poster')).then(function(canvas) {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'event-poster.png';
+        link.click();
+    });
+});
 
         // Function to share the generated poster
         document.getElementById('share-btn').addEventListener('click', function() {
-            const poster = document.getElementById('poster-container');
-            html2canvas(poster).then(canvas => {
-                canvas.toBlob(blob => {
-                    if (navigator.share) {
-                        const file = new File([blob], 'generated_poster.png', { type: 'image/png' });
-                        navigator.share({
-                            files: [file],
-                            title: 'Generated Poster',
-                            text: 'Check out this event poster!'
-                        }).then(() => {
-                            console.log('Poster shared successfully!');
-                        }).catch(err => {
-                            console.error('Error sharing the poster:', err);
-                        });
-                    } else {
-                        console.log('Web Share API not supported');
-                    }
-                }, 'image/png');
-            }).catch(err => {
-                console.error('Error capturing poster:', err);
-            });
-        });
+    // Capture the poster container and convert it to an image
+    html2canvas(document.getElementById('poster')).then(function(canvas) {
+        // Create a link to download the image
+        const imgData = canvas.toDataURL("image/png");
+        const link = document.createElement('a');
+        link.href = imgData;
+        link.download = 'poster.png';  // Name of the image file
+        link.click();  // Trigger the download
     });
+});
     </script>
 </body>
 </html>
