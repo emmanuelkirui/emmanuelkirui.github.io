@@ -26,7 +26,7 @@
     --link-bg-color: #fff;
     --link-text-color: #333;
     --link-hover-shadow: rgba(0, 0, 0, 0.15);
-
+    
     /* Additional styles for carousel */
     --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     --counter-bg: rgba(0, 0, 0, 0.7);
@@ -52,8 +52,8 @@
 /* General Styles */
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-color);
+    background-color: #f4f4f4;
+    color: #333;
     margin: 0;
     padding: 0;
     transition: background-color 0.3s, color 0.3s;
@@ -172,7 +172,6 @@ nav.dark-mode {
     background-color: #1e1e1e;
 }
 
-/* View More Button */
 .view-more-btn {
     background-color: #007bff;
     color: white;
@@ -361,88 +360,18 @@ body:not(.dark-mode) .whats-new h2 {
     background-color: #e67e22;
 }
 
-/* Footer Links */
-.footer-links {
-    list-style: none;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.footer-links li {
-    display: inline;
-}
-
-.footer-links a {
-    text-decoration: none;
-    color: #007bff;
-    font-size: 1rem;
-}
-
-.footer-links a:hover {
-    text-decoration: underline;
-}
-
-@media (max-width: 768px) {
-    .hamburger {
-        display: flex;
+/* Responsive Design */
+@media (max-width: 600px) {
+    .cookie-consent-modal {
+        padding: 10px; /* Reduce padding on small screens */
     }
-
-    nav {
-        position: fixed;
-        top: 60px;
-        left: 0;
-        right: 0;
-        background-color: #333;
-        z-index: 1000;
-        padding-top: 10px;
+    .cookie-consent-content h2 {
+        font-size: 1.25rem; /* Smaller heading */
     }
-
-    nav a {
-        padding: 10px;
-        font-size: 1.2rem;
-    }
-
-    .view-more-btn {
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .cookie-consent-content {
-        max-width: 100%; /* Full width for mobile */
-    }
-
-    .cookie-actions .btn {
-        flex: 1;
-        max-width: 120px;
+    .cookie-consent-content p {
+        font-size: 0.9rem; /* Smaller text */
     }
 }
-
-@media (max-width: 480px) {
-    header h1 {
-        font-size: 1.5rem;
-    }
-
-    .view-more-btn {
-        padding: 12px 20px;
-    }
-
-    .cookie-actions .btn {
-        padding: 10px 15px;
-    }
-}
-
-@media (min-width: 1024px) {
-    header h1 {
-        font-size: 2rem;
-    }
-
-    nav a {
-        font-size: 1.5rem;
-    }
-}
-
 
      </style>
 </head>
