@@ -541,10 +541,12 @@
         </div>
       </div>
     </section>
-    <section id="screenshots" class="my-5">
+    
+
+<section id="screenshots" class="my-5">
     <div class="container">
         <h2 class="text-center">Screenshots</h2>
-        <div id="screenshotCarousel" class="carousel slide" data-ride="carousel">
+        <div id="screenshotCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
             <div class="carousel-inner" id="carouselImages"></div>
             <a class="carousel-control-prev" href="#screenshotCarousel" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -554,7 +556,6 @@
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
             </a>
-            <!-- Counter to display current image number out of total -->
             <div class="text-center mt-2">
                 <span id="currentSlide">1</span> / <span id="totalSlides"></span>
             </div>
@@ -564,34 +565,29 @@
 
 <!-- Modal for Viewing Images -->
 <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document"> <!-- Adjusted modal dialog width to 105% -->
-      <div class="modal-content" style="width: 150%;">
-          <div class="modal-header">
-              <h5 class="modal-title" id="imageModalLabel">Image Details</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-          </div>
-          <div class="modal-body" style="width: 90%;"> <!-- Adjusted outer container width to 125% -->
-              <div class="zoom-controls text-center mb-2" style="position: relative; z-index: 10;">
-                  <button type="button" id="zoomIn" class="btn btn-primary">Zoom In</button>
-                  <button type="button" id="zoomOut" class="btn btn-secondary">Zoom Out</button>
-                  <button type="button" class="btn btn-danger" data-dismiss="modal">Exit</button>
-              </div>
-              <div class="zoom-container" style="overflow: auto; max-height: 70vh; position: relative; width: 110%;"> <!-- Inner container width remains 120% -->
-                  <div style="display: inline-block; position: relative; width: 100%;">
-                      <img id="modalImage" src="" alt="Image Preview" class="img-fluid" style="transition: transform 0.3s ease; max-width: none;">
-                  </div>
-              </div>
-              <p id="imageName" class="text-center mt-2"></p> <!-- Display image name -->
-              <p id="imageDescription" class="text-center text-muted"></p> <!-- Display image description -->
-          </div>
-      </div>
-  </div>
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Image Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="Image Preview" class="img-fluid">
+                <p id="imageName" class="mt-2 font-weight-bold"></p>
+                <p id="imageDescription" class="text-muted"></p>
+            </div>
+        </div>
+    </div>
 </div>
+
 <script>
+    // Folder where images are stored
     const imageFolder = 'images/';
-  const images = ['image1.png', 'image2.png', 'image3.png', '3vm-instances created.png',
+
+    // Full list of images
+    const images = ['image1.png', 'image2.png', 'image3.png', '3vm-instances created.png',
       'Active vulnerabilities.png', 'Assigning roles to principals.png', 'Audit log.png', 'audits_logs dataset.png',
       'Backup and DR.png', 'Backup and Recovery successfully.png', 'Backup recovery in a different project.png', 
       'Backup.png', 'BackupandDR.png', 'badactordemo.png', 'Big query data editor.png', 'bucket removal.png', 
@@ -613,60 +609,34 @@
       'vm backup plans.png', 'Vm instances.png', 'vm instances1.png', 'vm-instances for the new project2.png', 'vm3.png',
       'vmsearch.png', 'vpcwith firewall terraform.png'];
 
+    const carouselImagesContainer = document.getElementById('carouselImages');
+    const totalSlides = images.length; 
+    document.getElementById('totalSlides').textContent = totalSlides;
 
-  const carouselImagesContainer = document.getElementById('carouselImages');
-  const itemsPerSlide = 3; // Number of images per carousel item
-  const totalSlides = Math.ceil(images.length / itemsPerSlide); // Calculate total number of slides
+    images.forEach((image, index) => {
+        const isActive = index === 0 ? 'active' : '';
+        const itemHTML = `
+            <div class="carousel-item ${isActive}">
+                <img src="${imageFolder}${image}" class="d-block w-100" 
+                     alt="Screenshot ${index + 1}" data-toggle="modal" 
+                     data-target="#imageModal" onclick="showImage('${imageFolder}${image}', '${image}')">
+            </div>
+        `;
+        carouselImagesContainer.innerHTML += itemHTML;
+    });
 
-  // Set the total number of slides in the counter
-  document.getElementById('totalSlides').textContent = totalSlides;
+    function showImage(imageSrc, imageName) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageName').textContent = imageName;
+        document.getElementById('imageDescription').textContent = "Screenshot from the project.";
+    }
 
-  for (let i = 0; i < images.length; i += itemsPerSlide) {
-      const isActive = i === 0 ? 'active' : '';
-      const itemHTML = `
-          <div class="carousel-item ${isActive}">
-              <div class="d-flex justify-content-between">
-                  ${images.slice(i, i + itemsPerSlide).map((image, index) => `
-                      <img src="${imageFolder}${image}" alt="Screenshot ${i + index + 1}" class="d-block w-33" data-toggle="modal" data-target="#imageModal" onclick="showImage('${imageFolder}${image}', '${image}')">
-                  `).join('')}
-              </div>
-          </div>
-      `;
-      carouselImagesContainer.innerHTML += itemHTML;
-  }
-
-  function showImage(imageSrc, imageName) {
-      document.getElementById('modalImage').src = imageSrc;
-      document.getElementById('imageName').textContent = imageName; // Display image name in the modal
-      const description = imageName.replace('.png', ''); // Remove .png for the description
-      document.getElementById('imageDescription').textContent = description; // Display description in the modal
-
-      // Reset zoom scale when opening a new image
-      document.getElementById('modalImage').style.transform = 'scale(1)';
-      zoomLevel = 1; // Reset zoom level
-  }
-
-  // Zoom functionality
-  let zoomLevel = 1; // Initial zoom level
-
-  document.getElementById('zoomIn').addEventListener('click', function() {
-      zoomLevel += 0.1;
-      document.getElementById('modalImage').style.transform = `scale(${zoomLevel})`;
-  });
-
-  document.getElementById('zoomOut').addEventListener('click', function() {
-      if (zoomLevel > 0.1) { // Prevent negative or zero zoom
-          zoomLevel -= 0.1;
-          document.getElementById('modalImage').style.transform = `scale(${zoomLevel})`;
-      }
-  });
-
-  // Event listener to update the counter on slide change
-  $('#screenshotCarousel').on('slide.bs.carousel', function (event) {
-      const currentSlideIndex = event.to + 1; // Carousel event gives 0-based index
-      document.getElementById('currentSlide').textContent = currentSlideIndex;
-  });
+    $('#screenshotCarousel').on('slide.bs.carousel', function (event) {
+        document.getElementById('currentSlide').textContent = event.to + 1;
+    });
 </script>
+
+
   </div>
 
   <!-- Footer -->
