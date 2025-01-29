@@ -306,19 +306,21 @@
 .image-container {
     max-height: 80vh; /* Adjust max height as needed */
     width: 100%; /* Ensure it can expand horizontally */
-    overflow-x: auto; /* Enable horizontal scrolling */
-    overflow-y: auto; /* Enable vertical scrolling */
+    overflow: auto; /* Enable both horizontal and vertical scrolling */
     position: relative;
     display: inline-block;
     white-space: nowrap; /* Prevent line breaks, useful if images are wide */
+    display: flex;
+    justify-content: center; /* Center the image initially */
+    align-items: center; /* Center the image vertically */
 }
 
 /* Make sure the image is responsive and can zoom */
 #modalImage {
     cursor: grab;
-    max-width: none; /* Allow the image to exceed its container */
     transition: transform 0.3s ease;
-    transform-origin: center center; /* Ensure zooming happens from the center */
+    transform-origin: center center; /* Ensure zoom happens from the center */
+    max-width: none; /* Allow the image to exceed its container */
 }
 
 /* Optional: Prevent accidental image dragging */
