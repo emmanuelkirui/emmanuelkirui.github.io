@@ -476,16 +476,15 @@
       </div>
     </section>
     
-
 <!-- Bootstrap Carousel Section -->
 <section id="screenshots">
     <div class="container text-center">
         <h2>Project Screenshots</h2>
-        
+
         <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
             <!-- Carousel Indicators -->
             <div class="carousel-indicators" id="carouselIndicators"></div>
-            
+
             <!-- Carousel Inner (Images will be added dynamically) -->
             <div class="carousel-inner" id="carouselImages"></div>
 
@@ -502,20 +501,6 @@
             </button>
         </div>
     </div>
-
-    <!-- Bootstrap Modal for Enlarged Image -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img id="modalImage" src="" class="img-fluid">
-                </div>
-            </div>
-        </div>
-    </div>
 </section>
 
 <!-- Modal for Viewing Images -->
@@ -523,19 +508,19 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">Image Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
                 <img id="modalImage" src="" alt="Image Preview" class="img-fluid">
                 <p id="imageName" class="mt-2 font-weight-bold"></p>
-                <p id="imageDescription" class="text-muted"></p>
             </div>
         </div>
     </div>
 </div>
+
+
+
 
 <script>
     // Folder where images are stored
