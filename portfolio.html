@@ -15,6 +15,7 @@
     :root {
       --bg-color: #f4f4f9;
       --text-color: #333;
+      --primary-color: #007bff;
       --secondary-color: #007BFF;
       --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       --hover-color: rgba(0, 123, 255, 0.2); /* Professional hover effect */
@@ -38,12 +39,22 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
+  body.light-mode {
+    background-color: var(--bg-light);
+    color: var(--text-light);
+  }
+
+  body.dark-mode {
+    background-color: var(--bg-dark);
+    color: var(--text-dark);
+    }
+    
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 20px;
     }
-
+  
     /* Header */
     header {
       background-color: var(--secondary-color);
@@ -568,6 +579,51 @@ opacity: 1;
     }
 }
 
+  .project-card {
+    background: var(--bg-light);
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .dark-mode .project-card {
+    background: #1e1e1e;
+    color: var(--text-dark);
+  }
+
+  .btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+  }
+
+  .btn-outline-primary {
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .section_title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+
+  .project_pic img {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 10px;
+    transition: transform 0.3s;
+  }
+
+  .project_pic img:hover {
+    transform: scale(1.05);
+  }
+
+  details summary {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 0;
+  }
+
   </style>
 </head>
 <body>
@@ -768,6 +824,146 @@ opacity: 1;
         </div>
       </div>
     </section>
+    <!-- Projects Section -->
+<section id="projects" class="my-5">
+  <div class="container">
+    <h2 class="text-center mb-4">Projects</h2>
+    <div class="row">
+      <!-- Car Rental System -->
+      <div class="col-md-6 mb-4">
+        <div class="card project-card">
+          <div class="card-body">
+            <h3 class="card-title">Campus Project: Car Rental System</h3>
+            <p class="card-text">
+              A web application for managing car rentals.
+              Technologies: PHP, Bootstrap, JavaScript, HTML, CSS, MySQL.
+            </p>
+            <a href="https://emmanuelkirui.42web.io/carrental" class="btn btn-primary" target="_blank">View Project</a>
+            <button class="btn btn-outline-primary" data-toggle="modal" data-target="#carRentalModal">
+              View Documentation
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Service Request System -->
+      <div class="col-md-6 mb-4">
+        <div class="card project-card">
+          <div class="card-body">
+            <h3 class="card-title">Service Request System</h3>
+            <p class="card-text">
+              A web-based system to manage customer requests.
+              Technologies: PHP, Bootstrap, JavaScript, HTML, CSS, MySQL.
+            </p>
+            <a href="https://emmanuelkirui.42web.io" class="btn btn-primary" target="_blank">View Project</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Capstone Project -->
+      <div class="col-md-6 mb-4">
+        <div class="card project-card">
+          <div class="card-body">
+            <h3 class="card-title">Capstone Project: Cloud Security</h3>
+            <p class="card-text">
+              A cloud-based security project using Google Cloud's Security Command Center.
+            </p>
+            <a href="https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url" 
+               class="btn btn-primary" target="_blank">View Project</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employ Management System -->
+      <div class="col-md-6 mb-4">
+        <div class="card project-card">
+          <div class="card-body">
+            <h3 class="card-title">Employ Management System</h3>
+            <p class="card-text">
+              A desktop-based system to manage employees.
+              Technologies: VB, Visual Studio, MySQL.
+            </p>
+            <a href="#" class="btn btn-primary" target="_blank">View Project</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other Projects Section -->
+    <section class="section other-projects mt-5">
+      <h3 class="section_title">Other Projects</h3>
+      <div class="card project-card">
+        <div class="card-body">
+          <details>
+            <summary>Online Shopping System</summary>
+            <p>A PHP-based online shopping system.</p>
+            <div class="project_used">
+              <span class="badge badge-secondary">PHP</span>
+              <span class="badge badge-secondary">JavaScript</span>
+              <span class="badge badge-secondary">CSS</span>
+              <span class="badge badge-secondary">HTML</span>
+            </div>
+          </details>
+
+          <details>
+            <summary>Online Chatting System</summary>
+            <p>A real-time chatting system with PHP & AJAX.</p>
+          </details>
+
+          <details>
+            <summary>Portfolio Website</summary>
+            <p>A modern portfolio website with animations.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Projects Section -->
+    <section class="section featured-projects mt-5">
+      <h3 class="section_title">Recent Projects</h3>
+      <div class="card project-card">
+        <div class="card-body">
+          <figure class="project_pic">
+            <a href="#" target="_blank">
+              <img src="image/admin panel.png" alt="Admin Panel Screenshot">
+            </a>
+          </figure>
+          <details>
+            <summary>Online Service System</summary>
+            <p>A cloud-based service management system.</p>
+            <div class="project_used">
+              <span class="badge badge-secondary">Ruby on Rails</span>
+              <span class="badge badge-secondary">CoffeeScript</span>
+              <span class="badge badge-secondary">CSS3</span>
+              <span class="badge badge-secondary">HTML5</span>
+              <span class="badge badge-secondary">Postgres</span>
+              <span class="badge badge-secondary">Heroku</span>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- Modal for Car Rental System Documentation -->
+<div class="modal fade" id="carRentalModal" tabindex="-1" role="dialog" aria-labelledby="carRentalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="carRentalModalLabel">Car Rental System Documentation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Click the button below to view the documentation.</p>
+        <a href="Docs/CAR%20RENTAL%20SYSTEM1.2.docx" target="_blank" class="btn btn-primary">View Documentation</a>
+      </div>
+    </div>
+  </div>
+</div>
+
     
 <!-- Bootstrap Carousel Section -->
 <section id="screenshots">
