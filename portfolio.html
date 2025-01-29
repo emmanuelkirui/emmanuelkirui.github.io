@@ -219,7 +219,24 @@
 .badge iframe:hover {
   transform: scale(1.1);
 }
+    
+<!-- Add CSS for better styling -->
+  #latest-news {
+    text-align: center;
+    padding: 20px;
+  }
 
+  .news-slide {
+    background-color: var(--bg-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+    text-align: center;
+  }
+
+  .news-slide h3 {
+    color: var(--secondary-color);
+  }
   </style>
 </head>
 <body>
@@ -247,6 +264,44 @@
       <h2>Welcome</h2>
       <p>Welcome to my professional portfolio, where you can explore my achievements, certifications, and skills!</p>
     </section>
+
+<!-- Latest News Section -->
+<section class="section" id="latest-news">
+  <h2>Latest News</h2>
+  <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="news-slide">
+          <h3>Cybersecurity Trends 2025</h3>
+          <p>New AI-driven security solutions are reshaping the industry.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="news-slide">
+          <h3>Google Cloud Security Update</h3>
+          <p>Google introduces new compliance tools for cloud security.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="news-slide">
+          <h3>AI in Ethical Hacking</h3>
+          <p>How AI is being used to enhance penetration testing techniques.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Carousel Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+</section>
+
+
 <section class="section" id="achievements">
   <h2>Achievements</h2>
   <div class="badges">
