@@ -795,6 +795,9 @@ body:not(.dark-mode) .whats-new h2 {
         </div>
     </div>
 </div>
+
+<!-- Link to external JavaScript -->
+<script src="cookies.js"></script>
     <section id="social-links">
     <h2>Connect With Me</h2>
     <ul id="social-accounts"></ul>
@@ -951,31 +954,9 @@ fetch('whatsnew.json')
     })
     .catch(error => console.error('Error loading "What\'s New" items:', error));
         
-// Function to close the modal
-function closeCookieModal() {
-    const modal = document.getElementById('cookie-consent-modal');
-    modal.style.display = 'none';
-}
 
-// Function to handle cookie acceptance
-function acceptCookies() {
-    // Add logic to set cookies or handle acceptance
-    alert('Cookies accepted!');
-    closeCookieModal();
-}
 
-// Function to handle cookie rejection
-function rejectCookies() {
-    // Add logic to handle rejection
-    alert('Cookies rejected!');
-    closeCookieModal();
-}
 
-// Show the modal when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('cookie-consent-modal');
-    modal.classList.add('show'); // Ensure the modal is visible
-});
 
         // Configuration
 const apiKey = 'AIzaSyDcSumOnzyzKYSegyMMlwfuOJ1LM1uU6ng'; // Replace with your YouTube Data API key
@@ -1039,8 +1020,7 @@ fetchVideos(); // Fetch videos from YouTube
 startSlideshow(); // Start the slideshow
         
     </script>
-        <script src="cookies.js"></script> <!-- Link to the separate cookies.js file -->
-
+        
 <script>
     // Fetch social links from socialaccount.json
     fetch('socialaccount.json')
