@@ -232,11 +232,24 @@
     border-radius: 10px;
     box-shadow: var(--box-shadow);
   }
-  
+
   .carousel-control-prev-icon,
   .carousel-control-next-icon {
-    background-color: rgba(0, 0, 0, 0.5); /* Darker background for better visibility */
+    background-color: rgba(0, 0, 0, 0.5);
     border-radius: 50%;
+  }
+
+  /* Style for the slide counter */
+  .carousel-counter {
+    position: absolute;
+    bottom: 10px;
+    right: 50%;
+    transform: translateX(50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
   }
   </style>
 </head>
@@ -289,6 +302,18 @@
           <p>This is the third latest news update.</p>
         </div>
       </div>
+      <div class="carousel-item">
+        <div class="news-slide">
+          <h3>News Headline 4</h3>
+          <p>This is the fourth latest news update.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="news-slide">
+          <h3>News Headline 5</h3>
+          <p>This is the fifth latest news update.</p>
+        </div>
+      </div>
     </div>
 
     <!-- Left and Right Arrows -->
@@ -300,8 +325,28 @@
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Next</span>
     </button>
+
+    <!-- Slide Counter -->
+    <div class="carousel-counter">
+      <span id="current-slide">1</span> / <span id="total-slides"></span>
+    </div>
   </div>
 </section>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var carousel = document.getElementById("newsCarousel");
+    var totalSlides = document.querySelectorAll("#newsCarousel .carousel-item").length;
+    var currentSlideElement = document.getElementById("current-slide");
+    var totalSlidesElement = document.getElementById("total-slides");
+
+    totalSlidesElement.textContent = totalSlides; // Set total slides count
+
+    carousel.addEventListener("slid.bs.carousel", function (event) {
+      var activeIndex = event.to + 1; // Carousel index starts at 0, so we add 1
+      currentSlideElement.textContent = activeIndex;
+    });
+  });
+</script>
 
 
 
