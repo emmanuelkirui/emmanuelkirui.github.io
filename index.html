@@ -446,24 +446,101 @@ body:not(.dark-mode) .whats-new h2 {
 }
     /* Responsive Design for Footer on Large Screens */
 @media (min-width: 1200px) {
-    .footer-links {
-        flex-direction: row; /* Aligns links horizontally on large screens */
-        justify-content: space-between; /* Spaces out the links */
-        align-items: center; /* Centers links vertically */
-    }
-
-    .footer-links a {
-        font-size: 18px; /* Adjusts font size for large screens */
-        margin: 0 15px; /* Adds space between links */
-    }
-
-    .disclaimer {
-        font-size: 16px; /* Larger font size for large screens */
-        line-height: 1.6; /* Adjusted line height */
-        text-align: center; /* Centers disclaimer text */
-        margin-top: 20px; /* Adds margin above disclaimer */
-    }
+    /* Footer Styling */
+footer {
+  background-color: #333;
+  color: #fff;
+  padding: 50px 15%;
+  text-align: center;
+  border-top: 5px solid #ff7f50;
 }
+
+/* Footer container */
+footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Footer content section */
+footer .footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Footer copyright */
+footer .footer-content p {
+  font-size: 1.2rem;
+  color: #fff;
+  margin: 0;
+}
+
+/* Footer links */
+footer .footer-links {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 25px;
+}
+
+footer .footer-links li {
+  font-size: 1.1rem;
+}
+
+footer .footer-links li a {
+  text-decoration: none;
+  color: #ff7f50;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+footer .footer-links li a:hover {
+  color: #fff;
+}
+
+/* Disclaimer section */
+footer .disclaimer {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #ddd;
+  max-width: 900px;
+  margin: 0 auto;
+  font-weight: 400;
+}
+
+/* Responsive design for large screens */
+@media (min-width: 1200px) {
+  footer {
+    padding: 70px 10%;
+  }
+
+  footer .footer-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 50px;
+  }
+
+  footer .footer-content p {
+    font-size: 1.5rem;
+  }
+
+  footer .footer-links {
+    gap: 40px;
+  }
+
+  footer .footer-links li a {
+    font-size: 1.2rem;
+  }
+
+  footer .disclaimer {
+    font-size: 1.1rem;
+  }
+}
+
 
 
 
@@ -664,6 +741,111 @@ body:not(.dark-mode) .whats-new h2 {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 14px;
+}
+/* Container for the latest news section */
+#latest-news {
+  padding: 50px 15%;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+}
+
+/* Title of the section */
+#latest-news h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* Carousel container */
+#newsCarousel {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* News slide styles */
+.news-slide {
+  padding: 30px;
+  text-align: center;
+  background-color: #e9ecef;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.news-slide h3 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.news-slide p {
+  font-size: 1.1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Carousel control buttons */
+.carousel-control-prev, .carousel-control-next {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  padding: 10px;
+  color: #fff;
+}
+
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  font-size: 2rem;
+}
+
+/* Slide counter styling */
+.carousel-counter {
+  position: absolute;
+  bottom: 15px;
+  right: 30px;
+  color: #333;
+  font-size: 1.2rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 5px 15px;
+  border-radius: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-counter span {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Responsiveness for large screens */
+@media (min-width: 1200px) {
+  #latest-news {
+    padding: 80px 10%;
+  }
+
+  #latest-news h2 {
+    font-size: 3rem;
+  }
+
+  .carousel-control-prev, .carousel-control-next {
+    padding: 15px;
+  }
+
+  .news-slide h3 {
+    font-size: 2rem;
+  }
+
+  .news-slide p {
+    font-size: 1.2rem;
+  }
+
+  .carousel-counter {
+    font-size: 1.5rem;
+  }
 }
 
 
