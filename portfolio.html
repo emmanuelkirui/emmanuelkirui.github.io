@@ -251,130 +251,78 @@
   border-radius: 5px;
   font-size: 14px;
 }
-   /* General Styles */
+   /* General Section Styling */
 #screenshots {
-    background-color: #f8f9fa;
-    padding: 40px 0;
+    background-color: #f8f9fa;  /* Light gray background */
+    padding: 50px 0;
+    border-radius: 8px;
 }
 
-#screenshots h2 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
+/* Carousel Container */
+.carousel {
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Carousel Styles */
-#screenshotCarousel .carousel-inner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.carousel-item {
-    text-align: center;
-}
-
-.carousel-item img {
-    width: 30%; /* Adjust image width */
-    max-height: 200px; /* Prevent excessive height */
+/* Carousel Images */
+.carousel img {
+    max-height: 450px;
     object-fit: cover;
     border-radius: 8px;
-    cursor: pointer;
     transition: transform 0.3s ease-in-out;
+    cursor: pointer;
 }
 
-.carousel-item img:hover {
-    transform: scale(1.05);
+/* Image Hover Effect */
+.carousel img:hover {
+    transform: scale(1.03);
 }
 
-/* Carousel Navigation */
-.carousel-control-prev,
-.carousel-control-next {
-    width: 5%;
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    padding: 10px;
+/* Navigation Arrows */
+.carousel-control-prev, .carousel-control-next {
+    filter: invert(100%); /* Makes arrows visible on all backgrounds */
 }
 
 /* Slide Counter */
-#screenshotCarousel .text-center {
-    font-size: 1rem;
+.text-center span {
     font-weight: bold;
-    color: #555;
+    font-size: 16px;
+    color: #333;
 }
 
-/* Modal Styles */
-.modal-content {
-    border-radius: 10px;
-}
-
-.modal-header {
-    background-color: #343a40;
-    color: white;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
-
-.modal-header .close {
-    color: white;
-    opacity: 0.8;
-}
-
-.modal-header .close:hover {
-    opacity: 1;
-}
-
-.modal-body {
-    text-align: center;
-}
-
-.zoom-container {
-    overflow: auto;
-    max-height: 70vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#modalImage {
-    max-width: 100%;
-    height: auto;
-    transition: transform 0.3s ease;
-}
-
-/* Zoom Controls */
-.zoom-controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-}
-
-.zoom-controls button {
-    font-size: 14px;
-    padding: 8px 12px;
+/* Modal Styling */
+.modal-body img {
+    width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
     border-radius: 5px;
-    transition: all 0.3s ease;
 }
 
-.zoom-controls button:hover {
-    opacity: 0.8;
+/* Modal Background */
+.modal-content {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Image Description */
-#imageName {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-top: 10px;
+/* Modal Close Button */
+.modal-header .close {
+    font-size: 24px;
+    color: #333;
 }
 
-#imageDescription {
-    font-size: 1rem;
-    color: #666;
-} 
+/* Responsive Design */
+@media (max-width: 768px) {
+    .carousel img {
+        max-height: 300px;
+    }
+}
+
+
+
   </style>
 </head>
 <body>
