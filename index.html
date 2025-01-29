@@ -639,41 +639,10 @@ body:not(.dark-mode) .whats-new h2 {
         <a href="valentinesday.html">Valentine's</a>
     </nav>
     <!-- Latest News Slideshow -->
-<section class="section" id="latest-news">
-  <h2>Latest News</h2>
+    <section class="section" id="latest-news">
+  <h2 id="sectionTitle">Latest News</h2>
   <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <div class="news-slide">
-          <h3>News Headline 1</h3>
-          <p>This is the first latest news update.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <div class="news-slide">
-          <h3>News Headline 2</h3>
-          <p>This is the second latest news update.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <div class="news-slide">
-          <h3>News Headline 3</h3>
-          <p>This is the third latest news update.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <div class="news-slide">
-          <h3>News Headline 4</h3>
-          <p>This is the fourth latest news update.</p>
-        </div>
-      </div>
-      <div class="carousel-item">
-        <div class="news-slide">
-          <h3>News Headline 5</h3>
-          <p>This is the fifth latest news update.</p>
-        </div>
-      </div>
-    </div>
+    <div id="carouselItems" class="carousel-inner"></div>
 
     <!-- Left and Right Arrows -->
     <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
@@ -691,19 +660,56 @@ body:not(.dark-mode) .whats-new h2 {
     </div>
   </div>
 </section>
+
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    var carousel = document.getElementById("newsCarousel");
-    var totalSlides = document.querySelectorAll("#newsCarousel .carousel-item").length;
-    var currentSlideElement = document.getElementById("current-slide");
-    var totalSlidesElement = document.getElementById("total-slides");
+    // Fetch data from the JSON file
+    fetch('newsData.json')
+      .then(response => response.json())
+      .then(data => {
+        // Set section title
+        document.getElementById("sectionTitle").textContent = data.sectionTitle;
 
-    totalSlidesElement.textContent = totalSlides; // Set total slides count
+        // Get the carousel items container
+        const carouselItemsContainer = document.getElementById("carouselItems");
 
-    carousel.addEventListener("slid.bs.carousel", function (event) {
-      var activeIndex = event.to + 1; // Carousel index starts at 0, so we add 1
-      currentSlideElement.textContent = activeIndex;
-    });
+        // Loop through news items and create carousel slides dynamically
+        data.newsItems.forEach((item, index) => {
+          const isActive = index === 0 ? "active" : ""; // Mark the first item as active
+
+          const carouselItem = document.createElement("div");
+          carouselItem.classList.add("carousel-item", isActive);
+
+          const newsSlide = document.createElement("div");
+          newsSlide.classList.add("news-slide");
+
+          const headline = document.createElement("h3");
+          headline.textContent = item.headline;
+
+          const description = document.createElement("p");
+          description.textContent = item.description;
+
+          newsSlide.appendChild(headline);
+          newsSlide.appendChild(description);
+          carouselItem.appendChild(newsSlide);
+
+          carouselItemsContainer.appendChild(carouselItem);
+        });
+
+        // Set the total number of slides
+        const totalSlides = data.newsItems.length;
+        document.getElementById("total-slides").textContent = totalSlides;
+
+        // Handle carousel slide change event to update the counter
+        const carousel = document.getElementById("newsCarousel");
+        const currentSlideElement = document.getElementById("current-slide");
+
+        carousel.addEventListener("slid.bs.carousel", function (event) {
+          const activeIndex = event.to + 1; // Carousel index starts at 0, so we add 1
+          currentSlideElement.textContent = activeIndex;
+        });
+      })
+      .catch(error => console.error('Error loading news data:', error));
   });
 </script>
 
