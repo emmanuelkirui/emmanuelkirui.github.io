@@ -333,6 +333,110 @@
         max-height: 300px;
     }
 }
+    /* Section Title */
+.section_title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+/* Card Container */
+.card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+}
+
+/* Card Body */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between paragraphs */
+    width: 100%;
+}
+
+/* Paragraph Styling */
+.card-body p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #444;
+}
+
+/* Links Styling */
+.underline-link {
+    text-decoration: underline;
+    color: #007bff;
+}
+
+.underline-link:hover {
+    color: #0056b3;
+}
+
+/* Status Section (Button-like element) */
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-decoration: none;
+    color: #333;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #e0f7fa;
+    width: fit-content;
+    transition: background-color 0.3s;
+}
+
+.status:hover {
+    background-color: #b2ebf2;
+}
+
+/* Status Light */
+.status_light {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.status_light_ring {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #4caf50;
+    margin-right: 5px;
+}
+
+.status_light_led {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #00bcd4;
+}
+
+/* Status Message */
+.status_message {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+    .card-body {
+        align-items: center; /* Center align for small screens */
+    }
+
+    .status {
+        justify-content: center; /* Center the status button */
+    }
+}
 
   </style>
 </head>
@@ -458,7 +562,41 @@
     </div>
   </div>
 </section>
-    
+    <section id="background">
+    <div class="section_title">Background</div>
+    <div class="card">
+        <div class="card-body">
+            <p>
+                I completed a Diploma in Information Technology at 
+                <a class="underline-link" href="#" target="_blank">Kisii University</a> in 2023.
+                While earning my diploma, I completed a 3-month internship at 
+                <a class="underline-link" href="#" target="_blank">National Health Insurance Fund (NHIF)</a>. 
+                After graduating, I joined 
+                <a class="underline-link" href="#" target="_blank">Google Cloud</a> as a junior cybersecurity analyst, 
+                where I received a Cloud Cybersecurity Certificate. Recently, I completed a full-time 
+                Artificial Intelligence (AI) course from <a class="underline-link" href="#" target="_blank">Google</a>.
+                Currently, I'm working on my personal projects and advancing my skills in web development.
+            </p>
+
+            <p>
+                As a developer, I enjoy bridging the gap between functionality and design. 
+                My goal is to always build applications that are scalable and efficient under the hood 
+                while providing engaging, pixel-perfect user experiences. Additionally, I am highly responsive to client needs 
+                and committed to helping people realize their vision.
+            </p>
+
+            <a class="status" href="Docs/Emmanuel_Kiprotich_Kirui_Resume.docx" target="_blank"> 
+                <div class="status_light"> 
+                    <div class="status_light_ring"></div> 
+                    <div class="status_light_led"></div> 
+                </div> 
+                <div class="status_message">
+                    Interested in working together? Reach out!
+                </div> 
+            </a>
+        </div>
+    </div>
+</section>
     <!-- Internship Section -->
     <section class="section" id="internship">
       <h2>Attachment/Internship</h2>
