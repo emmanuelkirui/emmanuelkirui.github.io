@@ -624,6 +624,72 @@ opacity: 1;
     padding: 10px 0;
   }
 
+    /* Certifications Section */
+.certifications-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.certifications-container .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    width: 280px;
+    height: 220px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.certifications-container .card:hover {
+    transform: scale(1.05);
+}
+
+.certifications-container .card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.certifications-container .btn {
+    width: 100%;
+}
+
+/* Sample Code Section */
+.sample-code-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.sample-code {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.code-block {
+    text-align: left;
+    width: 100%;
+}
+
+.output-block {
+    width: 100%;
+    text-align: left;
+}
   </style>
 </head>
 <body>
@@ -964,7 +1030,86 @@ opacity: 1;
   </div>
 </div>
 
-    
+    <!-- Certifications Section -->
+<section id="Certifications" class="my-5">
+    <div class="container">
+        <h2 class="text-center">Certifications</h2>
+        <div class="certifications-container">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Google</h3>
+                    <p class="card-text">Earned a certificate in cloud cybersecurity.</p>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#googleModal">View Certificate</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Kisii University</h3>
+                    <p class="card-text">Diploma in Information Technology</p>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#kisiiModal">View Certificate</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">Kabungut Boys High School</h3>
+                    <p class="card-text">Earned a certificate in leadership as ICT prefect.</p>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#kabungtModal">View Certificate</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title">St. John's Ambulance</h3>
+                    <p class="card-text">First Aid Course</p>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#stJohnModal">View Certificate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Sample Code Section -->
+<section id="samples" class="my-5">
+    <div class="container">
+        <h2 class="text-center mb-4">Sample Code</h2>
+        <div class="sample-code-container">
+            <div class="sample-code">
+                <pre class="code-block">
+# Sample Python Code 1
+def hello_world():
+    return "Hello, World!"
+
+print(hello_world())
+                </pre>
+                <h4 class="mt-3">Output:</h4>
+                <pre class="output-block bg-dark text-white p-2 rounded"></pre>
+            </div>
+
+            <div class="sample-code">
+                <pre class="code-block">
+# Sample Python Code 2
+def add_numbers(a, b):
+    return a + b
+
+print(add_numbers(5, 3))
+                </pre>
+                <h4 class="mt-3">Output:</h4>
+                <pre class="output-block bg-dark text-white p-2 rounded"></pre>
+            </div>
+
+            <div class="sample-code">
+                <pre class="code-block">
+# Sample Cloud Commands
+gcloud compute networks create labnet --subnet-mode=custom
+                </pre>
+                <h4 class="mt-3">Output:</h4>
+                <pre class="output-block bg-dark text-white p-2 rounded">This command creates a custom mode network called labnet</pre>
+            </div>
+        </div>
+    </div>
+        </section>
 <!-- Bootstrap Carousel Section -->
 <section id="screenshots">
     <div class="container text-center">
