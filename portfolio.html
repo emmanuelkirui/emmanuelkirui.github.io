@@ -251,6 +251,130 @@
   border-radius: 5px;
   font-size: 14px;
 }
+   /* General Styles */
+#screenshots {
+    background-color: #f8f9fa;
+    padding: 40px 0;
+}
+
+#screenshots h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Carousel Styles */
+#screenshotCarousel .carousel-inner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel-item {
+    text-align: center;
+}
+
+.carousel-item img {
+    width: 30%; /* Adjust image width */
+    max-height: 200px; /* Prevent excessive height */
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+}
+
+.carousel-item img:hover {
+    transform: scale(1.05);
+}
+
+/* Carousel Navigation */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 5%;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 10px;
+}
+
+/* Slide Counter */
+#screenshotCarousel .text-center {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #555;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-header {
+    background-color: #343a40;
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-header .close {
+    color: white;
+    opacity: 0.8;
+}
+
+.modal-header .close:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    text-align: center;
+}
+
+.zoom-container {
+    overflow: auto;
+    max-height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#modalImage {
+    max-width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+/* Zoom Controls */
+.zoom-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.zoom-controls button {
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.zoom-controls button:hover {
+    opacity: 0.8;
+}
+
+/* Image Description */
+#imageName {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#imageDescription {
+    font-size: 1rem;
+    color: #666;
+} 
   </style>
 </head>
 <body>
@@ -417,6 +541,132 @@
         </div>
       </div>
     </section>
+    <section id="screenshots" class="my-5">
+    <div class="container">
+        <h2 class="text-center">Screenshots</h2>
+        <div id="screenshotCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner" id="carouselImages"></div>
+            <a class="carousel-control-prev" href="#screenshotCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#screenshotCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+            <!-- Counter to display current image number out of total -->
+            <div class="text-center mt-2">
+                <span id="currentSlide">1</span> / <span id="totalSlides"></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal for Viewing Images -->
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document"> <!-- Adjusted modal dialog width to 105% -->
+      <div class="modal-content" style="width: 150%;">
+          <div class="modal-header">
+              <h5 class="modal-title" id="imageModalLabel">Image Details</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+          <div class="modal-body" style="width: 90%;"> <!-- Adjusted outer container width to 125% -->
+              <div class="zoom-controls text-center mb-2" style="position: relative; z-index: 10;">
+                  <button type="button" id="zoomIn" class="btn btn-primary">Zoom In</button>
+                  <button type="button" id="zoomOut" class="btn btn-secondary">Zoom Out</button>
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Exit</button>
+              </div>
+              <div class="zoom-container" style="overflow: auto; max-height: 70vh; position: relative; width: 110%;"> <!-- Inner container width remains 120% -->
+                  <div style="display: inline-block; position: relative; width: 100%;">
+                      <img id="modalImage" src="" alt="Image Preview" class="img-fluid" style="transition: transform 0.3s ease; max-width: none;">
+                  </div>
+              </div>
+              <p id="imageName" class="text-center mt-2"></p> <!-- Display image name -->
+              <p id="imageDescription" class="text-center text-muted"></p> <!-- Display image description -->
+          </div>
+      </div>
+  </div>
+</div>
+<script>
+    const imageFolder = 'images/';
+  const images = ['image1.png', 'image2.png', 'image3.png', '3vm-instances created.png',
+      'Active vulnerabilities.png', 'Assigning roles to principals.png', 'Audit log.png', 'audits_logs dataset.png',
+      'Backup and DR.png', 'Backup and Recovery successfully.png', 'Backup recovery in a different project.png', 
+      'Backup.png', 'BackupandDR.png', 'badactordemo.png', 'Big query data editor.png', 'bucket removal.png', 
+      'Buckets.png', 'Cloudaudit.png', 'compliance.png', 'compliance1.1.png', 'compute instances findings.png', 
+      'confirmation.png', 'creating a back plan.png', 'creating firewall rule.png', 'Cymbal.png', 'demo key qlabs.png',
+      'demo keys.png', 'demo-assymetric key.png', 'deny-http output.png', 'enabling backup for compute engines.png',
+      'Findings by resource type.png', 'firewall and vpc.png', 'firewall rules 1.1 enabling logs.png', 'firewalldeny-http.png',
+      'firewallqlabs.png', 'firewallqlabs1.png', 'gauth list.png', 'gcloud storage bucket 1.png', 'gcloud storage bucket.png',
+      'IAM grant.png', 'IAM roles.png', 'IAM service account.png', 'IAM.png', 'job succeeded.png', 'jsonpayload.png',
+      'keyqlabs.png', 'Logging-Logs Explorer.png', 'Logging.png', 'Logs explorer.png', 'logs filter qlabs.png',
+      'logs query builder.png', 'logs xplorer query builder.png', 'logs.png', 'major vulnerabilities resolved.png',
+      'manage appliance1.1.png', 'manage appliances.png', 'manage backup vm.png', 'mounting.png', 'nanossh.png',
+      'onboarding finish successfully.png', 'query results 2.png', 'queryqlabs.png', 'Recovery backup plan1.1.png',
+      'Recovery in progress.png', 'Rescan.png', 'scan qlabs.png', 'scan1cymbalbank.png', 'scan2cymbalbank.png',
+      'scanresults.png', 'secureboot.png', 'service account creation.png', 'sink details.png', 'sinks logs.png', 
+      'ssh.png', 'static ip qlabs.png', 'static ip return qlabs.png', 'stopping vm instance.png', 'storage bucket.png', 
+      'success for ll recovery and backups.png', 'summary of changes.png', 'Teraform running.png', 'terraform.png', 
+      'terraform apply complete.png', 'terraformapply.png', 'terraforminit.png', 'test-accountjson.png', 'unauthorized access.png',
+      'vm backup plans.png', 'Vm instances.png', 'vm instances1.png', 'vm-instances for the new project2.png', 'vm3.png',
+      'vmsearch.png', 'vpcwith firewall terraform.png'];
+
+
+  const carouselImagesContainer = document.getElementById('carouselImages');
+  const itemsPerSlide = 3; // Number of images per carousel item
+  const totalSlides = Math.ceil(images.length / itemsPerSlide); // Calculate total number of slides
+
+  // Set the total number of slides in the counter
+  document.getElementById('totalSlides').textContent = totalSlides;
+
+  for (let i = 0; i < images.length; i += itemsPerSlide) {
+      const isActive = i === 0 ? 'active' : '';
+      const itemHTML = `
+          <div class="carousel-item ${isActive}">
+              <div class="d-flex justify-content-between">
+                  ${images.slice(i, i + itemsPerSlide).map((image, index) => `
+                      <img src="${imageFolder}${image}" alt="Screenshot ${i + index + 1}" class="d-block w-33" data-toggle="modal" data-target="#imageModal" onclick="showImage('${imageFolder}${image}', '${image}')">
+                  `).join('')}
+              </div>
+          </div>
+      `;
+      carouselImagesContainer.innerHTML += itemHTML;
+  }
+
+  function showImage(imageSrc, imageName) {
+      document.getElementById('modalImage').src = imageSrc;
+      document.getElementById('imageName').textContent = imageName; // Display image name in the modal
+      const description = imageName.replace('.png', ''); // Remove .png for the description
+      document.getElementById('imageDescription').textContent = description; // Display description in the modal
+
+      // Reset zoom scale when opening a new image
+      document.getElementById('modalImage').style.transform = 'scale(1)';
+      zoomLevel = 1; // Reset zoom level
+  }
+
+  // Zoom functionality
+  let zoomLevel = 1; // Initial zoom level
+
+  document.getElementById('zoomIn').addEventListener('click', function() {
+      zoomLevel += 0.1;
+      document.getElementById('modalImage').style.transform = `scale(${zoomLevel})`;
+  });
+
+  document.getElementById('zoomOut').addEventListener('click', function() {
+      if (zoomLevel > 0.1) { // Prevent negative or zero zoom
+          zoomLevel -= 0.1;
+          document.getElementById('modalImage').style.transform = `scale(${zoomLevel})`;
+      }
+  });
+
+  // Event listener to update the counter on slide change
+  $('#screenshotCarousel').on('slide.bs.carousel', function (event) {
+      const currentSlideIndex = event.to + 1; // Carousel event gives 0-based index
+      document.getElementById('currentSlide').textContent = currentSlideIndex;
+  });
+</script>
   </div>
 
   <!-- Footer -->
