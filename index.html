@@ -646,14 +646,12 @@ body:not(.dark-mode) .whats-new h2 {
       <!-- Carousel items will be injected here by JavaScript -->
     </div>
 
-    <!-- Left and Right Arrows (using Bootstrap icons) -->
+    <!-- Left and Right Arrows -->
     <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
     </button>
     <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
     </button>
 
     <!-- Slide Counter -->
@@ -669,7 +667,7 @@ body:not(.dark-mode) .whats-new h2 {
     fetch('newsData.json')
       .then(response => response.json())
       .then(data => {
-        // Set section title
+        // Set section title dynamically from JSON
         document.getElementById("sectionTitle").textContent = data.sectionTitle;
 
         // Get the carousel items container
@@ -714,6 +712,8 @@ body:not(.dark-mode) .whats-new h2 {
       .catch(error => console.error('Error loading news data:', error));
   });
 </script>
+
+
 
     <div class="container" id="blog-posts-container">
         <!-- Posts will be dynamically loaded here -->
