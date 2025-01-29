@@ -711,10 +711,17 @@ footer .disclaimer {
 #backToTop:hover {
   background-color: #0056b3;
 }
-    /* Show the button when scrolling on larger screens */
+ /* Show the button when scrolling on larger screens */
 @media (min-width: 1024px) {
   #backToTop {
     display: flex; /* Display the button for larger screens */
+  }
+}
+
+/* Make sure the button shows when the user scrolls down */
+@media (min-width: 1024px) {
+  #backToTop.visible {
+    display: flex; /* Show the button when scrolled down */
   }
 }
   
