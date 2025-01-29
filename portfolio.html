@@ -301,7 +301,32 @@
     max-height: 80vh;
     object-fit: contain;
 }
+    
+/* Make the image container scrollable */
+.image-container {
+    max-height: 80vh; /* Adjust max height as needed */
+    overflow: auto;
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
 
+/* Make sure the image is responsive */
+#modalImage {
+    cursor: grab;
+    max-width: 100%;
+    transition: transform 0.3s ease;
+}
+
+/* Optional: Prevent accidental image dragging */
+#modalImage:active {
+    cursor: grabbing;
+}
+
+.zoom-controls button {
+    margin: 0 10px;
+    font-size: 16px;
+}
 /* Responsive Design */
 @media (max-width: 768px) {
     .carousel img {
@@ -503,17 +528,22 @@
     </div>
 </section>
 
-<!-- Modal for Viewing Images -->
-<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<!-- Bootstrap Modal for Enlarged Image -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="imageCounter">Image 1 of X</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
-                <img id="modalImage" src="" alt="Image Preview" class="img-fluid">
-                <p id="imageName" class="mt-2 font-weight-bold"></p>
+                <div class="image-container">
+                    <img id="modalImage" src="" class="img-fluid" style="transition: transform 0.3s; cursor: grab;">
+                </div>
+                <div class="zoom-controls text-center mt-3">
+                    <button id="zoomIn" class="btn btn-primary">Zoom In</button>
+                    <button id="zoomOut" class="btn btn-primary">Zoom Out</button>
+                </div>
             </div>
         </div>
     </div>
@@ -521,9 +551,9 @@
 
 
 
-
 <script>
- document.addEventListener("DOMContentLoaded", function () {
+ 
+    document.addEventListener("DOMContentLoaded", function () {
     const imageFolder = 'images/'; // Ensure correct path
     const images = [
         'image1.png', 'image2.png', 'image3.png', '3vm-instances created.png',
@@ -552,6 +582,10 @@
 
     const carouselIndicators = document.getElementById("carouselIndicators");
     const carouselContainer = document.getElementById("carouselImages");
+    const modalImage = document.getElementById("modalImage");
+    const imageCounter = document.getElementById("imageCounter");
+    let currentIndex = 0;
+    let zoomLevel = 1;
 
     if (!carouselIndicators || !carouselContainer) {
         console.error("Carousel elements not found. Check your HTML structure.");
@@ -570,16 +604,38 @@
         // Add Image Slide
         carouselContainer.innerHTML += `
             <div class="carousel-item ${isActive}">
-                <img src="${imageFolder}${encodedImg}" class="d-block w-100" alt="Screenshot ${index + 1}" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal('${imageFolder}${encodedImg}', '${img}')">
+                <img src="${imageFolder}${encodedImg}" class="d-block w-100" alt="Screenshot ${index + 1}" 
+                    data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal(${index})">
             </div>`;
     });
-});
 
-// Open Modal with Image Preview
-function openModal(imageSrc, imageName) {
-    document.getElementById("modalImage").src = imageSrc;
-    document.getElementById("imageName").textContent = imageName;
-}
+    // Open Modal with Image Preview and Counter
+    window.openModal = function (index) {
+        currentIndex = index;
+        const encodedImg = encodeURIComponent(images[index]);
+        modalImage.src = `${imageFolder}${encodedImg}`;
+        imageCounter.textContent = `Image ${index + 1} of ${images.length}`;
+    };
+
+    // Zoom In functionality
+    document.getElementById('zoomIn').addEventListener('click', function () {
+        zoomLevel += 0.1; // Zoom in incrementally
+        updateZoom();
+    });
+
+    // Zoom Out functionality
+    document.getElementById('zoomOut').addEventListener('click', function () {
+        zoomLevel = Math.max(zoomLevel - 0.1, 1); // Prevent zooming out too much
+        updateZoom();
+    });
+
+    function updateZoom() {
+        modalImage.style.transform = `scale(${zoomLevel})`;
+        modalImage.style.cursor = 'grab';
+        modalImage.parentElement.scrollTop = 0; // Reset scroll on zoom change
+        modalImage.parentElement.scrollLeft = 0; // Reset scroll on zoom change
+    }
+});
 </script>
 
 
