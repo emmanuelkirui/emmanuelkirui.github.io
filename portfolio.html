@@ -523,57 +523,63 @@
 
 
 <script>
-    // Folder where images are stored
-    const imageFolder = 'images/';
+ document.addEventListener("DOMContentLoaded", function () {
+    const imageFolder = 'images/'; // Ensure correct path
+    const images = [
+        'image1.png', 'image2.png', 'image3.png', '3vm-instances created.png',
+        'Active vulnerabilities.png', 'Assigning roles to principals.png', 'Audit log.png', 
+        'audits_logs dataset.png', 'Backup and DR.png', 'Backup and Recovery successfully.png',
+        'Backup recovery in a different project.png', 'Backup.png', 'BackupandDR.png', 'badactordemo.png',
+        'Big query data editor.png', 'bucket removal.png', 'Buckets.png', 'Cloudaudit.png', 'compliance.png',
+        'compliance1.1.png', 'compute instances findings.png', 'confirmation.png', 'creating a back plan.png',
+        'creating firewall rule.png', 'Cymbal.png', 'demo key qlabs.png', 'demo keys.png', 'demo-assymetric key.png',
+        'deny-http output.png', 'enabling backup for compute engines.png', 'Findings by resource type.png', 
+        'firewall and vpc.png', 'firewall rules 1.1 enabling logs.png', 'firewalldeny-http.png', 'firewallqlabs.png',
+        'firewallqlabs1.png', 'gauth list.png', 'gcloud storage bucket 1.png', 'gcloud storage bucket.png', 
+        'IAM grant.png', 'IAM roles.png', 'IAM service account.png', 'IAM.png', 'job succeeded.png', 'jsonpayload.png',
+        'keyqlabs.png', 'Logging-Logs Explorer.png', 'Logging.png', 'Logs explorer.png', 'logs filter qlabs.png', 
+        'logs query builder.png', 'logs xplorer query builder.png', 'logs.png', 'major vulnerabilities resolved.png', 
+        'manage appliance1.1.png', 'manage appliances.png', 'manage backup vm.png', 'mounting.png', 'nanossh.png', 
+        'onboarding finish successfully.png', 'query results 2.png', 'queryqlabs.png', 'Recovery backup plan1.1.png', 
+        'Recovery in progress.png', 'Rescan.png', 'scan qlabs.png', 'scan1cymbalbank.png', 'scan2cymbalbank.png', 
+        'scanresults.png', 'secureboot.png', 'service account creation.png', 'sink details.png', 'sinks logs.png', 
+        'ssh.png', 'static ip qlabs.png', 'static ip return qlabs.png', 'stopping vm instance.png', 'storage bucket.png', 
+        'success for ll recovery and backups.png', 'summary of changes.png', 'Teraform running.png', 'terraform.png', 
+        'terraform apply complete.png', 'terraformapply.png', 'terraforminit.png', 'test-accountjson.png', 'unauthorized access.png',
+        'vm backup plans.png', 'Vm instances.png', 'vm instances1.png', 'vm-instances for the new project2.png', 'vm3.png',
+        'vmsearch.png', 'vpcwith firewall terraform.png'
+    ];
 
-    // Full list of images
-    const images = ['image1.png', 'image2.png', 'image3.png', '3vm-instances created.png',
-      'Active vulnerabilities.png', 'Assigning roles to principals.png', 'Audit log.png', 'audits_logs dataset.png',
-      'Backup and DR.png', 'Backup and Recovery successfully.png', 'Backup recovery in a different project.png', 
-      'Backup.png', 'BackupandDR.png', 'badactordemo.png', 'Big query data editor.png', 'bucket removal.png', 
-      'Buckets.png', 'Cloudaudit.png', 'compliance.png', 'compliance1.1.png', 'compute instances findings.png', 
-      'confirmation.png', 'creating a back plan.png', 'creating firewall rule.png', 'Cymbal.png', 'demo key qlabs.png',
-      'demo keys.png', 'demo-assymetric key.png', 'deny-http output.png', 'enabling backup for compute engines.png',
-      'Findings by resource type.png', 'firewall and vpc.png', 'firewall rules 1.1 enabling logs.png', 'firewalldeny-http.png',
-      'firewallqlabs.png', 'firewallqlabs1.png', 'gauth list.png', 'gcloud storage bucket 1.png', 'gcloud storage bucket.png',
-      'IAM grant.png', 'IAM roles.png', 'IAM service account.png', 'IAM.png', 'job succeeded.png', 'jsonpayload.png',
-      'keyqlabs.png', 'Logging-Logs Explorer.png', 'Logging.png', 'Logs explorer.png', 'logs filter qlabs.png',
-      'logs query builder.png', 'logs xplorer query builder.png', 'logs.png', 'major vulnerabilities resolved.png',
-      'manage appliance1.1.png', 'manage appliances.png', 'manage backup vm.png', 'mounting.png', 'nanossh.png',
-      'onboarding finish successfully.png', 'query results 2.png', 'queryqlabs.png', 'Recovery backup plan1.1.png',
-      'Recovery in progress.png', 'Rescan.png', 'scan qlabs.png', 'scan1cymbalbank.png', 'scan2cymbalbank.png',
-      'scanresults.png', 'secureboot.png', 'service account creation.png', 'sink details.png', 'sinks logs.png', 
-      'ssh.png', 'static ip qlabs.png', 'static ip return qlabs.png', 'stopping vm instance.png', 'storage bucket.png', 
-      'success for ll recovery and backups.png', 'summary of changes.png', 'Teraform running.png', 'terraform.png', 
-      'terraform apply complete.png', 'terraformapply.png', 'terraforminit.png', 'test-accountjson.png', 'unauthorized access.png',
-      'vm backup plans.png', 'Vm instances.png', 'vm instances1.png', 'vm-instances for the new project2.png', 'vm3.png',
-      'vmsearch.png', 'vpcwith firewall terraform.png'];
+    const carouselIndicators = document.getElementById("carouselIndicators");
+    const carouselContainer = document.getElementById("carouselImages");
 
-    const carouselImagesContainer = document.getElementById('carouselImages');
-    const totalSlides = images.length; 
-    document.getElementById('totalSlides').textContent = totalSlides;
-
-    images.forEach((image, index) => {
-        const isActive = index === 0 ? 'active' : '';
-        const itemHTML = `
-            <div class="carousel-item ${isActive}">
-                <img src="${imageFolder}${image}" class="d-block w-100" 
-                     alt="Screenshot ${index + 1}" data-toggle="modal" 
-                     data-target="#imageModal" onclick="showImage('${imageFolder}${image}', '${image}')">
-            </div>
-        `;
-        carouselImagesContainer.innerHTML += itemHTML;
-    });
-
-    function showImage(imageSrc, imageName) {
-        document.getElementById('modalImage').src = imageSrc;
-        document.getElementById('imageName').textContent = imageName;
-        document.getElementById('imageDescription').textContent = "Screenshot from the project.";
+    if (!carouselIndicators || !carouselContainer) {
+        console.error("Carousel elements not found. Check your HTML structure.");
+        return;
     }
 
-    $('#screenshotCarousel').on('slide.bs.carousel', function (event) {
-        document.getElementById('currentSlide').textContent = event.to + 1;
+    images.forEach((img, index) => {
+        const isActive = index === 0 ? 'active' : ''; // First image should be active
+        const encodedImg = encodeURIComponent(img); // Fix spaces and special characters
+
+        // Add Indicator Button
+        carouselIndicators.innerHTML += `
+            <button type="button" data-bs-target="#imageCarousel" data-bs-slide-to="${index}" class="${isActive}" aria-label="Slide ${index + 1}"></button>
+        `;
+
+        // Add Image Slide
+        carouselContainer.innerHTML += `
+            <div class="carousel-item ${isActive}">
+                <img src="${imageFolder}${encodedImg}" class="d-block w-100" alt="Screenshot ${index + 1}" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="openModal('${imageFolder}${encodedImg}', '${img}')">
+            </div>`;
     });
+});
+
+// Open Modal with Image Preview
+function openModal(imageSrc, imageName) {
+    document.getElementById("modalImage").src = imageSrc;
+    document.getElementById("imageName").textContent = imageName;
+}
 </script>
 
 
