@@ -415,10 +415,10 @@
     background-color: #4caf50;
     margin-right: 5px;
     position: relative;
-    animation: pulse 2s infinite ease-in-out; /* Pulse effect */
+    animation: pulse 2s infinite ease-in-out; /* Continuous pulse */
 }
 
-/* Status Light LED at the Center */
+/* Status Light LED at the Center (No pulse) */
 .status_light_led {
     width: 10px;
     height: 10px;
@@ -437,15 +437,14 @@
         opacity: 1;
     }
     50% {
-        transform: scale(1.5); /* Increase size */
-        opacity: 0.5; /* Decrease opacity */
+        transform: scale(2); /* Ring expands */
+        opacity: 0.5; /* Ring becomes less opaque */
     }
     100% {
         transform: scale(1);
         opacity: 1;
     }
 }
-
 /* Status Message */
 .status_message {
     font-size: 1rem;
