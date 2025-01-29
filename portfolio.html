@@ -406,19 +406,38 @@
     margin-right: 10px;
 }
 
+/* Status Light Ring with Pulse Effect */
 .status_light_ring {
     width: 15px;
     height: 15px;
     border-radius: 50%;
     background-color: #4caf50;
     margin-right: 5px;
+    animation: pulse 2s infinite ease-in-out; /* Pulse effect */
 }
 
+/* Status Light LED */
 .status_light_led {
     width: 10px;
     height: 10px;
     border-radius: 50%;
     background-color: #00bcd4;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5); /* Increase size */
+        opacity: 0.5; /* Decrease opacity */
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* Status Message */
