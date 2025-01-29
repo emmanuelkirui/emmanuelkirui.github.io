@@ -667,6 +667,170 @@ body:not(.dark-mode) .whats-new h2 {
 }
 
 
+    /* General Styles for desktop */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.container {
+    max-width: 1200px; /* Limits container width */
+    margin: 0 auto; /* Centers the container */
+    padding: 20px;
+}
+
+header {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+/* Hamburger Menu - Ensure visibility on larger screens */
+.hamburger {
+    display: none; /* Hidden on larger screens */
+}
+
+nav {
+    display: flex;
+    justify-content: flex-end; /* Align navigation items to the right on desktop */
+}
+
+nav a {
+    color: var(--text-color);
+    padding: 10px 15px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+nav a:hover {
+    background-color: var(--link-hover-bg-color);
+}
+
+.view-more-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.view-more-btn:hover {
+    background-color: #0056b3;
+}
+
+/* New Section - Center the content on desktop */
+.whats-new {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.whats-new h2 {
+    margin-bottom: 10px;
+}
+
+.image-slideshow {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Footer styling */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    background-color: #333;
+    border-top: 2px solid #f39c12;
+}
+
+.footer-links a {
+    color: #f39c12;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #e67e22;
+    text-decoration: underline;
+}
+
+.disclaimer {
+    font-size: 14px;
+    color: #ddd;
+    text-align: center;
+    background-color: #333;
+    padding: 10px;
+}
+
+/* Larger Screen Styles (for desktop) */
+@media (min-width: 1024px) {
+    .container {
+        padding: 40px; /* Increase padding on larger screens */
+    }
+
+    header {
+        padding: 20px 40px;
+    }
+
+    .whats-new {
+        margin: 40px 0; /* Increase margin for larger screens */
+    }
+
+    .footer-links {
+        justify-content: space-between;
+        padding: 30px 50px;
+    }
+
+    .footer-links a {
+        font-size: 18px;
+        margin: 0 15px;
+    }
+
+    .disclaimer {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+}
+
+/* Desktop-specific image styling */
+.image-slideshow img {
+    max-width: 100%; /* Ensure images fill the container */
+    object-fit: cover; /* Cover the entire slideshow area */
+}
+
+/* Additional adjustments for desktop */
+body {
+    font-size: 1rem; /* Adjust font size for readability */
+}
+
+nav {
+    position: relative; /* Ensure nav doesn't overlap content */
+}
+
+
 
      </style>
 </head>
