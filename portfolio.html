@@ -251,19 +251,20 @@
   border-radius: 5px;
   font-size: 14px;
 }
-   /* General Section Styling */
+   
+
+/* Section Styling */
 #screenshots {
-    background-color: #f8f9fa;  /* Light gray background */
+    background-color: #f8f9fa;
     padding: 50px 0;
     border-radius: 8px;
 }
 
-/* Carousel Container */
+/* Carousel Styling */
 .carousel {
     max-width: 900px;
-    margin: 0 auto;
+    margin: auto;
     border-radius: 10px;
-    overflow: hidden;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -276,42 +277,28 @@
     cursor: pointer;
 }
 
-/* Image Hover Effect */
+/* Hover Effect */
 .carousel img:hover {
     transform: scale(1.03);
 }
 
 /* Navigation Arrows */
 .carousel-control-prev, .carousel-control-next {
-    filter: invert(100%); /* Makes arrows visible on all backgrounds */
-}
-
-/* Slide Counter */
-.text-center span {
-    font-weight: bold;
-    font-size: 16px;
-    color: #333;
+    width: 5%;
+    filter: invert(100%);
 }
 
 /* Modal Styling */
-.modal-body img {
-    width: 100%;
-    max-height: 80vh;
-    object-fit: contain;
-    border-radius: 5px;
-}
-
-/* Modal Background */
 .modal-content {
     background: #fff;
     border-radius: 10px;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* Modal Close Button */
-.modal-header .close {
-    font-size: 24px;
-    color: #333;
+.modal-body img {
+    width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
 }
 
 /* Responsive Design */
@@ -320,7 +307,6 @@
         max-height: 300px;
     }
 }
-
 
 
   </style>
@@ -491,21 +477,42 @@
     </section>
     
 
-<section id="screenshots" class="my-5">
-    <div class="container">
-        <h2 class="text-center">Screenshots</h2>
-        <div id="screenshotCarousel" class="carousel slide" data-ride="carousel" data-interval="3000">
+<!-- Bootstrap Carousel Section -->
+<section id="screenshots">
+    <div class="container text-center">
+        <h2>Project Screenshots</h2>
+        
+        <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators" id="carouselIndicators"></div>
+            
+            <!-- Carousel Inner (Images will be added dynamically) -->
             <div class="carousel-inner" id="carouselImages"></div>
-            <a class="carousel-control-prev" href="#screenshotCarousel" role="button" data-slide="prev">
+
+            <!-- Previous Button -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#screenshotCarousel" role="button" data-slide="next">
+                <span class="visually-hidden">Previous</span>
+            </button>
+
+            <!-- Next Button -->
+            <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-            <div class="text-center mt-2">
-                <span id="currentSlide">1</span> / <span id="totalSlides"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap Modal for Enlarged Image -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="modalImage" src="" class="img-fluid">
+                </div>
             </div>
         </div>
     </div>
