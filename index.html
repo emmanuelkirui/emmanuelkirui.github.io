@@ -647,107 +647,239 @@ body:not(.dark-mode) .whats-new h2 {
 }
 
 
-/* General Styles for Larger Screens (Tablets, Desktops) */
+/* Large Screen Layout for Tablets and Desktops */
 @media (min-width: 768px) {
-    body {
-        padding: 20px;
-    }
-
+    /* Header */
     header {
+        padding: 20px 40px;
         justify-content: space-between;
     }
 
-    .hamburger {
-        display: none; /* Hide hamburger on large screens */
+    header h1 {
+        font-size: 2rem; /* Larger font for better visibility */
     }
 
+    /* Hamburger Menu */
+    .hamburger {
+        display: none; /* Hide on larger screens */
+    }
+
+    /* Navigation */
     nav {
         display: flex;
-        justify-content: center;
+        justify-content: space-around;
+        align-items: center;
         position: static;
         width: auto;
         background-color: transparent;
+        box-shadow: none;
     }
 
     nav a {
-        padding: 15px 20px;
-        font-size: 1rem;
+        padding: 12px 20px;
+        font-size: 1rem; /* Larger font size */
+    }
+
+    nav a:hover {
+        background-color: #444;
     }
 
     /* Blog Posts */
     .container {
-        max-width: 1200px;
-        margin: 0 auto;
         display: flex;
-        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 30px;
         justify-content: space-between;
-        gap: 20px;
     }
 
     .post {
-        width: 48%; /* Adjust blog posts to 2 columns */
+        width: 48%; /* Make posts responsive with flexible width */
+        padding: 20px;
+        margin-bottom: 30px;
     }
 
-    /* Image Slideshow */
-    .image-slideshow {
-        max-width: 900px;
-        margin: 40px auto;
+    .post.dark-mode {
+        background-color: #1e1e1e;
+        color: #f9f9f9;
     }
 
     /* New Section */
     .whats-new {
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        flex-direction: column;
+        padding: 30px;
+        margin-bottom: 40px;
+        gap: 20px;
     }
 
     .whats-new h2 {
-        font-size: 2rem;
+        font-size: 2rem; /* Larger heading font */
+        margin-bottom: 20px;
+    }
+
+    /* Image Slideshow */
+    .image-slideshow {
+        max-width: 100%;
+        margin: 40px auto;
+    }
+
+    .slideshow-images img {
+        display: block;
+        width: 100%;
     }
 
     /* Footer Links */
     .footer-links {
-        flex-direction: row; /* Display links in a row */
-        justify-content: center;
+        justify-content: space-evenly; /* Space links evenly */
     }
 
     .footer-links a {
-        font-size: 18px; /* Larger font size for readability */
+        font-size: 18px; /* Increase font size */
+    }
+
+    .footer-links li {
+        margin: 0 15px;
     }
 
     /* Cookie Consent Modal */
     .cookie-consent-modal {
-        flex-direction: row; /* Adjust modal content to be in a row */
+        width: 80%;
+        padding: 25px;
+    }
+
+    .cookie-actions .btn {
+        font-size: 1.2rem;
+        padding: 12px 25px;
+    }
+}
+
+/* Large Screen Layout for Desktops */
+@media (min-width: 1024px) {
+    /* Header */
+    header {
+        padding: 20px 50px;
         justify-content: space-between;
     }
 
-    .cookie-consent-content {
-        max-width: 45%; /* Adjust content width */
+    header h1 {
+        font-size: 2.5rem; /* Even larger heading for desktop */
     }
 
-    .cookie-actions {
-        gap: 15px;
+    /* Navigation */
+    nav {
+        justify-content: space-between;
+        width: 100%;
     }
 
-    /* Social Links Section */
-    #social-links {
-        padding: 60px 0;
+    nav a {
+        padding: 15px 25px;
+        font-size: 1.1rem; /* Slightly larger font size */
     }
 
-    #social-links h2 {
-        font-size: 36px; /* Larger title for better visibility */
-    }
-
-    #social-accounts {
-        gap: 25px;
-    }
-
-    /* General Layout Adjustments */
-    .post, .whats-new, .footer-links, #social-links {
+    /* Blog Posts */
+    .container {
         display: flex;
         flex-wrap: wrap;
+        gap: 40px;
+        justify-content: space-between;
+    }
+
+    .post {
+        width: 30%; /* Make posts more narrow to fit in 3 columns */
+    }
+
+    /* New Section */
+    .whats-new {
+        padding: 40px;
+        gap: 30px;
+    }
+
+    .whats-new h2 {
+        font-size: 2.5rem; /* Larger heading */
+    }
+
+    /* Footer Links */
+    .footer-links {
+        justify-content: center;
+    }
+
+    .footer-links a {
+        font-size: 18px;
+        padding: 10px 15px;
+    }
+
+    /* Cookie Consent Modal */
+    .cookie-consent-modal {
+        width: 60%;
+        padding: 30px;
+    }
+
+    .cookie-actions .btn {
+        font-size: 1.3rem;
+        padding: 14px 30px;
     }
 }
+
+/* Large Desktops and Full Screens */
+@media (min-width: 1200px) {
+    /* Header */
+    header {
+        padding: 20px 80px;
+    }
+
+    header h1 {
+        font-size: 3rem; /* Large header for large desktops */
+    }
+
+    /* Navigation */
+    nav a {
+        font-size: 1.2rem;
+    }
+
+    /* Blog Posts */
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 50px;
+        justify-content: space-between;
+    }
+
+    .post {
+        width: 30%;
+    }
+
+    /* New Section */
+    .whats-new {
+        padding: 50px;
+        gap: 40px;
+    }
+
+    .whats-new h2 {
+        font-size: 3rem; /* Larger heading */
+    }
+
+    /* Footer Links */
+    .footer-links {
+        justify-content: center;
+    }
+
+    .footer-links a {
+        font-size: 20px;
+        padding: 12px 20px;
+    }
+
+    /* Cookie Consent Modal */
+    .cookie-consent-modal {
+        width: 50%;
+        padding: 35px;
+    }
+
+    .cookie-actions .btn {
+        font-size: 1.4rem;
+        padding: 15px 35px;
+    }
+}
+
 
 
      </style>
