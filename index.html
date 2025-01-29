@@ -27,6 +27,12 @@
     --link-bg-color: #fff;
     --link-text-color: #333;
     --link-hover-shadow: rgba(0, 0, 0, 0.15);
+    
+    /* Additional styles for carousel */
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --counter-bg: rgba(0, 0, 0, 0.7);
+    --counter-text: white;
+    --control-bg: rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="dark"] {
@@ -36,6 +42,12 @@
     --link-bg-color: #333;
     --link-text-color: #fff;
     --link-hover-shadow: rgba(255, 255, 255, 0.15);
+
+    /* Dark mode adjustments */
+    --box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+    --counter-bg: rgba(255, 255, 255, 0.7);
+    --counter-text: black;
+    --control-bg: rgba(255, 255, 255, 0.5);
 }
         /* General Styles */
         body {
@@ -588,31 +600,34 @@ body:not(.dark-mode) .whats-new h2 {
 }
   
 /* Style for the news slides */
-  .news-slide {
+.news-slide {
     padding: 20px;
     text-align: center;
     background: var(--bg-color);
+    color: var(--text-color);
     border-radius: 10px;
     box-shadow: var(--box-shadow);
-  }
+    border: 1px solid var(--border-color);
+}
 
-  .carousel-control-prev-icon,
-  .carousel-control-next-icon {
-    background-color: rgba(0, 0, 0, 0.5);
+/* Style for the carousel controls */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: var(--control-bg);
     border-radius: 50%;
-  }
+}
 
 /* Style for the slide counter */
 .carousel-counter {
-  position: absolute;
-  bottom: -30px; /* Moves the counter further down */
-  right: 50%;
-  transform: translateX(50%);
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 14px;
+    position: absolute;
+    bottom: -30px; /* Moves the counter further down */
+    right: 50%;
+    transform: translateX(50%);
+    background: var(--counter-bg);
+    color: var(--counter-text);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
 }
      </style>
 </head>
