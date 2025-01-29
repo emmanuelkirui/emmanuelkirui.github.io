@@ -647,77 +647,105 @@ body:not(.dark-mode) .whats-new h2 {
 }
 
 
-/* Large Screens */
-@media (min-width: 1200px) {
-    /* Body and text size */
+/* General Styles for Larger Screens (Tablets, Desktops) */
+@media (min-width: 768px) {
     body {
-        font-size: 18px; /* Adjusts font size for larger screens */
+        padding: 20px;
     }
 
-    header h1 {
-        font-size: 2.2rem; /* Larger heading on big screens */
+    header {
+        justify-content: space-between;
     }
 
-    .container {
-        padding: 40px; /* More padding for larger containers */
-    }
-
-    .post {
-        margin-bottom: 30px; /* More space between blog posts */
-        padding: 30px; /* More padding for blog posts */
-    }
-
-    .whats-new {
-        padding: 40px; /* Larger padding for the 'What's New' section */
-    }
-
-    .image-slideshow {
-        max-width: 800px; /* Larger max-width for the slideshow */
-    }
-
-    .cookie-consent-modal {
-        padding: 30px; /* More padding for the cookie modal */
-    }
-
-    .footer-links {
-        gap: 30px; /* More space between footer links */
-    }
-
-    .footer-links a {
-        font-size: 18px; /* Larger font size for footer links */
-    }
-
-    /* Hamburger and Nav Links for large screens */
-    .hamburger-menu {
+    .hamburger {
         display: none; /* Hide hamburger on large screens */
     }
 
-    .nav-links {
-        display: flex; /* Show nav links as flex for large screens */
-        justify-content: flex-start; /* Align the nav links to the left */
+    nav {
+        display: flex;
+        justify-content: center;
+        position: static;
+        width: auto;
+        background-color: transparent;
     }
 
-    .nav-links a {
-        font-size: 18px; /* Larger font size for nav links */
-        margin-right: 30px; /* Spacing between navigation links */
+    nav a {
+        padding: 15px 20px;
+        font-size: 1rem;
     }
 
-    /* Cookie Consent Modal */
-    .cookie-consent-modal {
-        width: 80%; /* Limit width to make it fit better on large screens */
+    /* Blog Posts */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .post {
+        width: 48%; /* Adjust blog posts to 2 columns */
+    }
+
+    /* Image Slideshow */
+    .image-slideshow {
+        max-width: 900px;
+        margin: 40px auto;
+    }
+
+    /* New Section */
+    .whats-new {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .whats-new h2 {
+        font-size: 2rem;
     }
 
     /* Footer Links */
     .footer-links {
-        justify-content: space-between; /* Space out footer links evenly */
+        flex-direction: row; /* Display links in a row */
+        justify-content: center;
     }
 
+    .footer-links a {
+        font-size: 18px; /* Larger font size for readability */
+    }
+
+    /* Cookie Consent Modal */
+    .cookie-consent-modal {
+        flex-direction: row; /* Adjust modal content to be in a row */
+        justify-content: space-between;
+    }
+
+    .cookie-consent-content {
+        max-width: 45%; /* Adjust content width */
+    }
+
+    .cookie-actions {
+        gap: 15px;
+    }
+
+    /* Social Links Section */
     #social-links {
-        padding: 60px 0; /* Increased padding for large screens */
+        padding: 60px 0;
+    }
+
+    #social-links h2 {
+        font-size: 36px; /* Larger title for better visibility */
     }
 
     #social-accounts {
-        gap: 30px; /* Increase the gap between social links */
+        gap: 25px;
+    }
+
+    /* General Layout Adjustments */
+    .post, .whats-new, .footer-links, #social-links {
+        display: flex;
+        flex-wrap: wrap;
     }
 }
 
