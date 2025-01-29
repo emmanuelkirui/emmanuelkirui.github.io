@@ -404,6 +404,7 @@
     display: flex;
     align-items: center;
     margin-right: 10px;
+    position: relative;
 }
 
 /* Status Light Ring with Pulse Effect */
@@ -413,15 +414,20 @@
     border-radius: 50%;
     background-color: #4caf50;
     margin-right: 5px;
+    position: relative;
     animation: pulse 2s infinite ease-in-out; /* Pulse effect */
 }
 
-/* Status Light LED */
+/* Status Light LED at the Center */
 .status_light_led {
     width: 10px;
     height: 10px;
     border-radius: 50%;
     background-color: #00bcd4;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centers the LED inside the ring */
 }
 
 /* Pulse Animation */
