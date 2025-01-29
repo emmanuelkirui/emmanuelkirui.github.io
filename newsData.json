@@ -1,0 +1,25 @@
+{
+  "sectionTitle": "Latest News",
+  "newsItems": [
+    {
+      "headline": "News Headline 1",
+      "description": "This is the first latest news update."
+    },
+    {
+      "headline": "News Headline 2",
+      "description": "This is the second latest news update."
+    },
+    {
+      "headline": "News Headline 3",
+      "description": "This is the third latest news update."
+    },
+    {
+      "headline": "News Headline 4",
+      "description": "This is the fourth latest news update."
+    },
+    {
+      "headline": "News Headline 5",
+      "description": "This is the fifth latest news update."
+    }
+  ]
+}
