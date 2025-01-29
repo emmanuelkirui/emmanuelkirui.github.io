@@ -14,7 +14,6 @@
 
 <!-- Bootstrap JS (with Popper.js) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0-alpha1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271"
      crossorigin="anonymous"></script>
@@ -640,20 +639,21 @@ body:not(.dark-mode) .whats-new h2 {
     </nav>
     <!-- Latest News Slideshow -->
 
-        
 <section class="section" id="latest-news">
   <h2 id="sectionTitle">Latest News</h2>
   <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
     <div id="carouselItems" class="carousel-inner">
-      <!-- Carousel items will be injected here by JavaScript -->
+      <!-- Carousel items will be dynamically injected here -->
     </div>
 
     <!-- Left and Right Arrows -->
     <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
     </button>
     <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
     </button>
 
     <!-- Slide Counter -->
@@ -665,60 +665,61 @@ body:not(.dark-mode) .whats-new h2 {
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // Fetch data from the JSON file
-    fetch('newsData.json')
-      .then(response => response.json())
-      .then(data => {
-        // Set section title dynamically from JSON
-        document.getElementById("sectionTitle").textContent = data.sectionTitle;
+  // Fetch the data from JSON
+  fetch('newsData.json')
+    .then(response => response.json())
+    .then(data => {
+      // Set the section title from JSON
+      document.getElementById("sectionTitle").textContent = data.sectionTitle;
 
-        // Get the carousel items container
-        const carouselItemsContainer = document.getElementById("carouselItems");
+      const carouselItemsContainer = document.getElementById("carouselItems");
 
-        // Loop through news items and create carousel slides dynamically
-        data.newsItems.forEach((item, index) => {
-          const isActive = index === 0 ? "active" : ""; // Mark the first item as active
+      // Loop through the news items and create the slides dynamically
+      data.newsItems.forEach((item, index) => {
+        const isActive = index === 0 ? "active" : ""; // Make the first item active
 
-          const carouselItem = document.createElement("div");
-          carouselItem.classList.add("carousel-item", isActive);
+        const carouselItem = document.createElement("div");
+        carouselItem.classList.add("carousel-item", isActive);
 
-          const newsSlide = document.createElement("div");
-          newsSlide.classList.add("news-slide");
+        const newsSlide = document.createElement("div");
+        newsSlide.classList.add("news-slide");
 
-          const headline = document.createElement("h3");
-          headline.textContent = item.headline;
+        const headline = document.createElement("h3");
+        headline.textContent = item.headline;
 
-          const description = document.createElement("p");
-          description.textContent = item.description;
+        const description = document.createElement("p");
+        description.textContent = item.description;
 
-          newsSlide.appendChild(headline);
-          newsSlide.appendChild(description);
-          carouselItem.appendChild(newsSlide);
+        newsSlide.appendChild(headline);
+        newsSlide.appendChild(description);
+        carouselItem.appendChild(newsSlide);
 
-          carouselItemsContainer.appendChild(carouselItem);
-        });
+        carouselItemsContainer.appendChild(carouselItem);
+      });
 
-        // Set the total number of slides
-        const totalSlides = data.newsItems.length;
-        document.getElementById("total-slides").textContent = totalSlides;
+      // Set the total number of slides
+      const totalSlides = data.newsItems.length;
+      document.getElementById("total-slides").textContent = totalSlides;
 
-        // Initialize Bootstrap carousel manually after fetching and rendering the slides
-        const carouselElement = new bootstrap.Carousel(document.getElementById('newsCarousel'), {
-          interval: 2000, // Optional: You can set an interval for auto-slide (in milliseconds)
-          ride: 'carousel', // Start the carousel immediately after loading
-        });
+      // Initialize the carousel manually
+      const carouselElement = new bootstrap.Carousel(document.getElementById('newsCarousel'), {
+        interval: 2000, // Automatic slide every 2 seconds
+        ride: 'carousel' // Starts the carousel immediately
+      });
 
-        // Handle carousel slide change event to update the counter
-        const carousel = document.getElementById("newsCarousel");
-        const currentSlideElement = document.getElementById("current-slide");
+      // Update the slide counter when the slide changes
+      const carousel = document.getElementById("newsCarousel");
+      const currentSlideElement = document.getElementById("current-slide");
 
-        carousel.addEventListener("slid.bs.carousel", function (event) {
-          const activeIndex = event.to + 1; // Carousel index starts at 0, so we add 1
-          currentSlideElement.textContent = activeIndex;
-        });
-      })
-      .catch(error => console.error('Error loading news data:', error));
-  });
+      carousel.addEventListener("slid.bs.carousel", function (event) {
+        const activeIndex = event.to + 1; // Add 1 because the index starts from 0
+        currentSlideElement.textContent = activeIndex;
+      });
+    })
+    .catch(error => console.error('Error loading news data:', error));
+});
+
+          
 </script>
 
     <div class="container" id="blog-posts-container">
