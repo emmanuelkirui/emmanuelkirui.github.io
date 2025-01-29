@@ -88,58 +88,58 @@
 
 
 /* Hamburger Menu */
-        .hamburger {
-            display: block;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 20px;
-            width: 25px;
-            cursor: pointer;
-        }
+.hamburger {
+    display: flex; /* Show hamburger menu on all screen sizes */
+    flex-direction: column;
+    justify-content: space-between;
+    height: 20px;
+    width: 25px;
+    cursor: pointer;
+}
 
-        .hamburger div {
-            background-color: white;
-            height: 3px;
-            border-radius: 2px;
-            transition: all 0.3s;
-        }
+.hamburger div {
+    background-color: white;
+    height: 3px;
+    border-radius: 2px;
+    transition: all 0.3s;
+}
 
-        .hamburger.open div:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
+.hamburger.open div:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
 
-        .hamburger.open div:nth-child(2) {
-            opacity: 0;
-        }
+.hamburger.open div:nth-child(2) {
+    opacity: 0;
+}
 
-        .hamburger.open div:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
-        }
+.hamburger.open div:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
 
-        /* Navigation */
-        nav {
-            display: none;
-            background-color: #333;
-        }
+/* Navigation */
+nav {
+    display: none; /* Hide navigation links by default */
+    background-color: #333;
+}
 
-        nav.open {
-            display: block;
-            position: absolute;
-            top: 60px;
-            left: 0;
-            width: 100%;
-        }
+nav.open {
+    display: block;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+}
 
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 10px 15px;
-            display: block;
-        }
+nav a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+}
 
-        nav a:hover {
-            background-color: #444;
-        }
+nav a:hover {
+    background-color: #444;
+}
 
         /* Blog Posts */
         .container {
