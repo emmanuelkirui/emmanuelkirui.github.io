@@ -397,53 +397,120 @@
 
 .status:hover {
     background-color: #b2ebf2;
-}
+} 
 
 /* Status Light */
 .status_light {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-    position: relative;
+width: 30px;
+height: 30px;
+display: -webkit-box;
+display: -ms-flexbox;
+display: flex;
+-webkit-box-pack: center;
+-ms-flex-pack: center;
+justify-content: center;
+-webkit-box-align: center;
+-ms-flex-align: center;
+align-items: center;
 }
 
-/* Status Light Ring with Pulse Effect */
 .status_light_ring {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background-color: #4caf50;
-    margin-right: 5px;
-    position: relative;
-    animation: pulse 2s infinite ease-in-out; /* Continuous pulse */
+position: absolute;
+width: 25px;
+height: 25px;
+-webkit-animation: pulsate 2s ease-out;
+animation: pulsate 2s ease-out;
+-webkit-animation-iteration-count: infinite;
+animation-iteration-count: infinite;
+opacity: 0;
+border: 3px solid #bada55;
+border-radius: 30px;
 }
 
-/* Status Light LED at the Center (No pulse) */
 .status_light_led {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #00bcd4;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Centers the LED inside the ring */
+position: absolute;
+width: 13px;
+height: 13px;
+background: #bada55;
+border-radius: 100%;
+}
+    /*All Keyframes*/
+@keyframes wave{
+0% {transform: rotate(0deg);}
+/*10%{transform: rotate(90deg);}*/
+20% {transform: rotate(90deg);}  
+/*30%{transform: rotate(90deg);}*/
+40% {transform: rotate(15deg);}
+/*50% {transform: rotate(90deg);}*/
+60% {transform: rotate(90deg);}
+/*70%{transform: rotate(90deg);}*/
+80%{transform: rotate(15deg);}
+/*90% {transform: rotate(90deg);}*/
+100% {transform: rotate(0deg);}
 }
 
-/* Pulse Animation */
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: scale(2); /* Ring expands */
-        opacity: 0.5; /* Ring becomes less opaque */
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
+@-webkit-keyframes wave{
+0% {transform: rotate(0deg);}
+/*10%{transform: rotate(90deg);}*/
+20% {transform: rotate(90deg);}  
+/*30%{transform: rotate(90deg);}*/
+40% {transform: rotate(15deg);}
+/*50% {transform: rotate(90deg);}*/
+60% {transform: rotate(90deg);}
+/*70%{transform: rotate(90deg);}*/
+80%{transform: rotate(15deg);}
+/*90% {transform: rotate(90deg);}*/
+100% {transform: rotate(0deg);}
+}
+
+@-webkit-keyframes pulsate {
+0% {
+transform: scale(0.1, 0.1);
+opacity: 0;
+}
+50% {
+opacity: 1;
+}
+100% {
+transform: scale(1.2, 1.2);
+opacity: 0;
+}
+}
+
+@keyframes pulsate {
+0% {
+transform: scale(0.1, 0.1);
+opacity: 0;
+}
+50% {
+opacity: 1;
+}
+100% {
+transform: scale(1.2, 1.2);
+opacity: 0;
+}
+}
+
+@-webkit-keyframes fadeIn {
+/* keyframes must have at least two intervals from/to or 0%/100% */
+0% {
+opacity: 0;
+}
+
+100% {
+opacity: 1;
+}
+}
+
+@keyframes fadeIn {
+/* keyframes must have at least two intervals from/to or 0%/100% */
+0% {
+opacity: 0;
+}
+
+100% {
+opacity: 1;
+}
 }
 /* Status Message */
 .status_message {
