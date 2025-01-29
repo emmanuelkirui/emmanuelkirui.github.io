@@ -428,6 +428,42 @@ body:not(.dark-mode) .whats-new h2 {
     background-color: #333; /* Matches footer background */
     padding: 10px; /* Adds padding for a cleaner look */
 }
+/* Responsive Design for Footer */
+@media (max-width: 600px) {
+    .footer-links {
+        flex-direction: column; /* Stacks links vertically */
+        align-items: center; /* Centers links vertically */
+    }
+
+    .footer-links a {
+        font-size: 14px; /* Adjusts font size for small screens */
+    }
+
+    .disclaimer {
+        font-size: 12px; /* Smaller font size for small screens */
+        line-height: 1.4;
+    }
+}
+    /* Responsive Design for Footer on Large Screens */
+@media (min-width: 1200px) {
+    .footer-links {
+        flex-direction: row; /* Aligns links horizontally on large screens */
+        justify-content: space-between; /* Spaces out the links */
+        align-items: center; /* Centers links vertically */
+    }
+
+    .footer-links a {
+        font-size: 18px; /* Adjusts font size for large screens */
+        margin: 0 15px; /* Adds space between links */
+    }
+
+    .disclaimer {
+        font-size: 16px; /* Larger font size for large screens */
+        line-height: 1.6; /* Adjusted line height */
+        text-align: center; /* Centers disclaimer text */
+        margin-top: 20px; /* Adds margin above disclaimer */
+    }
+}
 
 
 
