@@ -9,7 +9,7 @@
     <style>
         /* Global Styles */
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Lora', serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
@@ -460,47 +460,46 @@ nav {
                 document.getElementById('poster-container').style.display = 'block';
             });
 
-            // Function to download the generated poster
-            document.getElementById('download-btn').addEventListener('click', function() {
-                const poster = document.getElementById('poster-container');
-                html2canvas(poster).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
-                    const link = document.createElement('a');
-                    link.href = imgData;
-                    link.download = 'generated_poster.png';
-                    link.click();
-                });
+            document.addEventListener('DOMContentLoaded', function() {
+        // Function to download the generated poster
+        document.getElementById('download-btn').addEventListener('click', function() {
+            const poster = document.getElementById('poster-container');
+            html2canvas(poster).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'generated_poster.png';
+                link.click();
+            }).catch(err => {
+                console.error('Error capturing poster:', err);
             });
+        });
 
-            // Function to share the generated poster
-            document.getElementById('share-btn').addEventListener('click', function() {
-                const poster = document.getElementById('poster-container');
-                html2canvas(poster).then(canvas => {
-                    const imgData = canvas.toDataURL('image/png');
+        // Function to share the generated poster
+        document.getElementById('share-btn').addEventListener('click', function() {
+            const poster = document.getElementById('poster-container');
+            html2canvas(poster).then(canvas => {
+                canvas.toBlob(blob => {
                     if (navigator.share) {
-                        fetch(imgData)
-                            .then(res => res.blob())
-                            .then(blob => {
-                                const file = new File([blob], 'generated_poster.png', { type: 'image/png' });
-                                navigator.share({
-                                    files: [file],
-                                    title: 'Generated Poster',
-                                    text: 'Check out this event poster!'
-                                }).then(() => {
-                                    console.log('Poster shared successfully!');
-                                }).catch(err => {
-                                    console.error('Error sharing the poster:', err);
-                                });
-                            })
-                            .catch(err => {
-                                console.error('Error converting image data:', err);
-                            });
+                        const file = new File([blob], 'generated_poster.png', { type: 'image/png' });
+                        navigator.share({
+                            files: [file],
+                            title: 'Generated Poster',
+                            text: 'Check out this event poster!'
+                        }).then(() => {
+                            console.log('Poster shared successfully!');
+                        }).catch(err => {
+                            console.error('Error sharing the poster:', err);
+                        });
                     } else {
                         console.log('Web Share API not supported');
                     }
-                });
+                }, 'image/png');
+            }).catch(err => {
+                console.error('Error capturing poster:', err);
             });
         });
+    });
     </script>
 </body>
 </html>
