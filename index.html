@@ -642,6 +642,179 @@ body:not(.dark-mode) .whats-new h2 {
     border-radius: 5px;
     font-size: 14px;
 }
+
+    /* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    nav {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background-color: var(--bg-color);
+    }
+
+    nav.open {
+        display: block;
+    }
+
+    nav a {
+        padding: 12px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+    /* Adjust header layout */
+    header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    /* Adjust slideshow size */
+    .image-slideshow {
+        max-width: 100%;
+    }
+
+    /* Blog Post Styles */
+    .container {
+        padding: 15px;
+    }
+
+    .post {
+        padding: 15px;
+        font-size: 14px;
+    }
+
+    .whats-new {
+        padding: 15px;
+    }
+
+    .whats-new h2 {
+        font-size: 20px;
+    }
+
+    /* Adjust buttons */
+    .view-more-btn {
+        width: 100%;
+        text-align: center;
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* Footer Adjustments */
+    .footer-links {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-links a {
+        font-size: 14px;
+    }
+
+    .disclaimer {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    /* Social Links Section */
+    #social-accounts {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+}
+
+/* Responsive Design for Extra Small Screens */
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.4rem;
+    }
+
+    .hamburger {
+        width: 30px;
+        height: 22px;
+    }
+
+    .post {
+        font-size: 13px;
+    }
+
+    .whats-new h2 {
+        font-size: 18px;
+    }
+
+    /* Adjust Cookie Modal */
+    .cookie-consent-modal {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .cookie-consent-content h2 {
+        font-size: 1.2rem;
+    }
+
+    .cookie-consent-content p {
+        font-size: 0.9rem;
+    }
+
+    .cookie-actions .btn {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+}
+
+/* Responsive Adjustments for Medium Screens */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        padding: 20px;
+    }
+
+    .post {
+        font-size: 16px;
+    }
+
+    .whats-new h2 {
+        font-size: 22px;
+    }
+
+    .view-more-btn {
+        font-size: 15px;
+    }
+
+    .cookie-consent-modal {
+        padding: 15px;
+    }
+
+    .cookie-consent-content h2 {
+        font-size: 1.3rem;
+    }
+
+    .cookie-actions .btn {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+}
+
+/* Larger Screens Adjustments */
+@media (min-width: 1025px) {
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .post {
+        font-size: 18px;
+    }
+
+    .whats-new h2 {
+        font-size: 24px;
+    }
+}
      </style>
 </head>
 <body>
