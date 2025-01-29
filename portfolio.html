@@ -294,14 +294,45 @@
     background: #fff;
     border-radius: 10px;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 100%; /* Make modal content stretch across the entire screen */
+    max-height: 90vh; /* Set max height relative to the viewport */
+    overflow-y: auto; /* Allow scrolling if content exceeds the screen height */
 }
-
+.modal-body {
+    padding: 0; /* Remove extra padding to fit the image better */
+  }
 .modal-body img {
     width: 100%;
     max-height: 80vh;
     object-fit: contain;
+    width: 100%; /* Image takes full modal width */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 5px; /* Optional rounded corners */
 }
 
+/* Responsive media queries for small screens */
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 90%; /* Reduce modal size slightly on smaller screens */
+        margin: 5% auto; /* Adjust margin for a better fit */
+    }
+
+    .modal-content {
+        max-height: 80vh; /* Adjust max height on smaller screens */
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-dialog {
+        max-width: 95%; /* Even smaller width for very small devices */
+        margin: 5% auto; /* Consistent margin on very small devices */
+    }
+
+    .modal-content {
+        max-height: 70vh; /* Further reduce max height on very small screens */
+    }
+}
+    
 /* Make the image container scrollable in both vertical and horizontal directions */
 .image-container {
     max-height: 80vh; /* Adjust max height as needed */
@@ -319,6 +350,8 @@
     transform-origin: center center; /* Ensure zoom happens from the center */
     max-width: none; /* Allow the image to exceed its container */
     user-select: none; /* Prevent accidental text selection */
+    display: block; /* Ensure the image behaves like a block element */
+    margin: 0 auto; /* Center image initially */
 }
 
 /* Optional: Prevent accidental image dragging */
@@ -330,6 +363,7 @@
 .zoom-controls button {
     margin: 0 10px;
     font-size: 16px;
+    padding: 5px 10px;
 }
 /* Responsive Design */
 @media (max-width: 768px) {
