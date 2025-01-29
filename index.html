@@ -638,13 +638,10 @@ body:not(.dark-mode) .whats-new h2 {
         <a href="valentinesday.html">Valentine's</a>
     </nav>
     <!-- Latest News Slideshow -->
-
 <section class="section" id="latest-news">
   <h2 id="sectionTitle">Latest News</h2>
   <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
-    <div id="carouselItems" class="carousel-inner">
-      <!-- Carousel items will be dynamically injected here -->
-    </div>
+    <div id="carouselItems" class="carousel-inner"></div>
 
     <!-- Left and Right Arrows -->
     <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
@@ -664,19 +661,16 @@ body:not(.dark-mode) .whats-new h2 {
 </section>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-  // Fetch the data from JSON
-  fetch('newsData.json')
+document.addEventListener("DOMContentLoaded", function () {
+  fetch('newsData.json') // Load the JSON file
     .then(response => response.json())
     .then(data => {
-      // Set the section title from JSON
       document.getElementById("sectionTitle").textContent = data.sectionTitle;
 
       const carouselItemsContainer = document.getElementById("carouselItems");
 
-      // Loop through the news items and create the slides dynamically
       data.newsItems.forEach((item, index) => {
-        const isActive = index === 0 ? "active" : ""; // Make the first item active
+        const isActive = index === 0 ? "active" : ""; // First slide should be active
 
         const carouselItem = document.createElement("div");
         carouselItem.classList.add("carousel-item", isActive);
@@ -697,30 +691,26 @@ body:not(.dark-mode) .whats-new h2 {
         carouselItemsContainer.appendChild(carouselItem);
       });
 
-      // Set the total number of slides
+      // Set total slides count
       const totalSlides = data.newsItems.length;
       document.getElementById("total-slides").textContent = totalSlides;
 
-      // Initialize the carousel manually
-      const carouselElement = new bootstrap.Carousel(document.getElementById('newsCarousel'), {
-        interval: 2000, // Automatic slide every 2 seconds
-        ride: 'carousel' // Starts the carousel immediately
+      // Manually initialize the Bootstrap carousel AFTER loading JSON
+      const carouselElement = document.getElementById("newsCarousel");
+      const carousel = new bootstrap.Carousel(carouselElement, {
+        interval: 3000, // Auto-slide every 3 seconds
+        ride: "carousel"
       });
 
-      // Update the slide counter when the slide changes
-      const carousel = document.getElementById("newsCarousel");
-      const currentSlideElement = document.getElementById("current-slide");
-
-      carousel.addEventListener("slid.bs.carousel", function (event) {
-        const activeIndex = event.to + 1; // Add 1 because the index starts from 0
-        currentSlideElement.textContent = activeIndex;
+      // Update slide counter on slide change
+      carouselElement.addEventListener("slid.bs.carousel", function (event) {
+        document.getElementById("current-slide").textContent = event.to + 1;
       });
     })
-    .catch(error => console.error('Error loading news data:', error));
+    .catch(error => console.error("Error loading news data:", error));
 });
-
-          
 </script>
+
 
     <div class="container" id="blog-posts-container">
         <!-- Posts will be dynamically loaded here -->
