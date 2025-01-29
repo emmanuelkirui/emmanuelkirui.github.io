@@ -639,6 +639,8 @@ body:not(.dark-mode) .whats-new h2 {
         <a href="valentinesday.html">Valentine's</a>
     </nav>
     <!-- Latest News Slideshow -->
+
+        
 <section class="section" id="latest-news">
   <h2 id="sectionTitle">Latest News</h2>
   <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
@@ -700,6 +702,12 @@ body:not(.dark-mode) .whats-new h2 {
         const totalSlides = data.newsItems.length;
         document.getElementById("total-slides").textContent = totalSlides;
 
+        // Initialize Bootstrap carousel manually after fetching and rendering the slides
+        const carouselElement = new bootstrap.Carousel(document.getElementById('newsCarousel'), {
+          interval: 2000, // Optional: You can set an interval for auto-slide (in milliseconds)
+          ride: 'carousel', // Start the carousel immediately after loading
+        });
+
         // Handle carousel slide change event to update the counter
         const carousel = document.getElementById("newsCarousel");
         const currentSlideElement = document.getElementById("current-slide");
@@ -712,8 +720,6 @@ body:not(.dark-mode) .whats-new h2 {
       .catch(error => console.error('Error loading news data:', error));
   });
 </script>
-
-
 
     <div class="container" id="blog-posts-container">
         <!-- Posts will be dynamically loaded here -->
