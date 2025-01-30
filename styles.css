@@ -493,7 +493,19 @@ header .btn-group {
     text-align: center;
     padding: 10px 0;
 }
+.view-more-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    margin-top: 5px;
+    border-radius: 4px;
+}
 
+.view-more-btn:hover {
+    background-color: #0056b3;
+  }
 
 
 /*-----------------------------------*\ 
