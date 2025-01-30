@@ -888,34 +888,61 @@
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
   <script>
-    // Fetch posts dynamically
+// Fetch posts dynamically
 fetch('posts.json')
     .then(response => response.json())
     .then(posts => {
         const postsContainer = document.getElementById('blog-posts-container');
         posts.forEach(post => {
             const postElement = document.createElement('div');
-            postElement.classList.add('post');
+            postElement.classList.add('blog-card'); // Add the blog card class
 
             if (document.body.classList.contains('dark-mode')) {
                 postElement.classList.add('dark-mode');
             }
 
-            // Create the post content with a "View More" button
+            // Create the post content with classes for styling
             postElement.innerHTML = `
-                <h2>${post.title}</h2>
-                <p class="short-content">${post.content.substring(0, 100)}...</p>
-                <p class="full-content" style="display: none;">${post.content}</p>
-                <p style="font-style: italic; color: #888; font-size: 14px;">Author: ${post.author}</p>
+                <div class="blog-card-banner">
+                    <img src="${post.image}" alt="${post.title}" class="blog-banner-img" width="250">
+                </div>
+
+                <div class="blog-content-wrapper">
+                    <button class="blog-topic text-tiny">${post.topic}</button>
+
+                    <h3><a href="${post.url}" class="h3">${post.title}</a></h3>
+
+                    <p class="blog-text">
+                        ${post.content.substring(0, 100)}...
+                    </p>
+
+                    <div class="wrapper-flex">
+                        <div class="profile-wrapper">
+                            <img src="${post.authorImage}" alt="${post.author}" width="50">
+                        </div>
+
+                        <div class="wrapper">
+                            <a href="#" class="h4">${post.author}</a>
+                            <p class="text-sm">
+                                <time datetime="${post.date}">${post.date}</time>
+                                <span class="separator"></span>
+                                <ion-icon name="time-outline"></ion-icon>
+                                <time datetime="PT${post.readTime}M">${post.readTime} min</time>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <button class="view-more-btn">View More</button>
+                <p class="full-content" style="display: none;">${post.content}</p>
             `;
 
-            // Append to the container
+            // Append the post element to the container
             postsContainer.appendChild(postElement);
 
             // Add event listener for "View More" button
             const viewMoreBtn = postElement.querySelector('.view-more-btn');
-            const shortContent = postElement.querySelector('.short-content');
+            const shortContent = postElement.querySelector('.blog-text');
             const fullContent = postElement.querySelector('.full-content');
 
             viewMoreBtn.addEventListener('click', () => {
