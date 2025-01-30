@@ -87,66 +87,72 @@
         }
 
         .poster-container {
-            width: 100%;
-            max-width: 500px;
-            height: 600px;
-            background-color: #fff;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow: hidden;
-            position: relative;
-        }
+    width: 100%;
+    max-width: 500px;
+    height: 650px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.3)), url('your-background.jpg') no-repeat center center / cover;
+    border-radius: 10px;
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
+    padding: 20px;
+    text-align: center;
+    color: white;
+    position: relative;
+}
 
-        .poster-header {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 20px;
-            color: #2c3e50;
-        }
+.poster-header {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #f8f9fa;
+    margin-top: 20px;
+}
 
-        .poster-date, .poster-details {
-            font-size: 1.2rem;
-            color: #34495e;
-            text-align: center;
-            margin: 10px 0;
-        }
+.poster-date {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #ffcc00;
+    margin: 10px 0;
+}
 
-        .poster-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease-in-out;
-        }
+.poster-details {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: #ddd;
+    padding: 10px;
+}
 
-        .poster-image:hover {
-            transform: scale(1.05);
-        }
+.poster-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin: 15px 0;
+    border: 3px solid white;
+}
 
-        .poster-actions {
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
-        }
+.poster-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
 
-        .poster-actions button {
-            padding: 12px 20px;
-            font-size: 1rem;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
+.poster-actions button {
+    padding: 12px 18px;
+    font-size: 1rem;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    background-color: #ff5722;
+    color: white;
+    transition: all 0.3s;
+}
 
-        .poster-actions button:hover {
-            background-color: #2ecc71;
-            color: #fff;
-        }
+.poster-actions button:hover {
+    background-color: #e64a19;
+}
 
         /* Dark Mode */
         body.dark-mode {
@@ -447,44 +453,77 @@ nav {
                 // Display the uploaded image if available
                 const posterImage = document.getElementById('poster-image');
 
-// Check if an image is uploaded
-if (image) {
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        posterImage.src = event.target.result;
-        posterImage.style.display = 'block'; // Show the image
-    };
-    reader.readAsDataURL(image);
-}
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("event-form");
+    const posterContainer = document.getElementById("poster-container");
+    const poster = document.getElementById("poster");
+    const titleElement = document.getElementById("poster-title");
+    const dateElement = document.getElementById("poster-date");
+    const detailsElement = document.getElementById("poster-details");
+    const imageElement = document.getElementById("poster-image");
+    const imageInput = document.getElementById("event-image");
 
-// Fill in the event details on the poster
-document.getElementById('poster-title').textContent = title;
-document.getElementById('poster-date').textContent = date;
-document.getElementById('poster-details').textContent = details;
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-// Show the generated poster section
-document.getElementById('poster-container').style.display = 'block';
-        // Function to download the generated poster
-        const downloadBtn = document.getElementById('download-btn');
-downloadBtn.addEventListener('click', function() {
-    html2canvas(document.getElementById('poster')).then(function(canvas) {
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL();
-        link.download = 'event-poster.png';
-        link.click();
+        // Get user inputs
+        const title = document.getElementById("event-title").value;
+        const date = document.getElementById("event-date").value;
+        const details = document.getElementById("event-details").value;
+        const file = imageInput.files[0];
+
+        // Set text content
+        titleElement.textContent = title;
+        dateElement.textContent = date;
+        detailsElement.textContent = details;
+
+        // Handle image upload
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                imageElement.src = event.target.result;
+                imageElement.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        } else {
+            imageElement.style.display = "none";
+        }
+
+        // Show the poster section
+        posterContainer.style.display = "block";
     });
-});
 
-        // Function to share the generated poster
-        document.getElementById('share-btn').addEventListener('click', function() {
-    // Capture the poster container and convert it to an image
-    html2canvas(document.getElementById('poster')).then(function(canvas) {
-        // Create a link to download the image
-        const imgData = canvas.toDataURL("image/png");
-        const link = document.createElement('a');
-        link.href = imgData;
-        link.download = 'poster.png';  // Name of the image file
-        link.click();  // Trigger the download
+    // Download Poster as Image
+    document.getElementById("download-btn").addEventListener("click", function () {
+        html2canvas(poster, {
+            scale: 2,
+            backgroundColor: null
+        }).then(canvas => {
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png");
+            link.download = "Event-Poster.png";
+            link.click();
+        });
+    });
+
+    // Share Poster
+    document.getElementById("share-btn").addEventListener("click", function () {
+        html2canvas(poster, {
+            scale: 2,
+            backgroundColor: null
+        }).then(canvas => {
+            canvas.toBlob(blob => {
+                const file = new File([blob], "Event-Poster.png", { type: "image/png" });
+                if (navigator.share) {
+                    navigator.share({
+                        title: "Check out this event!",
+                        files: [file]
+                    });
+                } else {
+                    alert("Sharing is not supported on this browser.");
+                }
+            });
+        });
     });
 });
     </script>
