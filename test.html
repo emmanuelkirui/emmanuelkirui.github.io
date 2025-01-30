@@ -341,8 +341,33 @@
   </main>
 
 
+<!-- Back to Top Button -->
+<button id="backToTop" title="Go to top">
+  <i class="fa fa-arrow-up"></i>
+</button>
+<!-- Cookie Consent Modal -->
+<div id="cookie-consent-modal" class="cookie-consent-modal">
+    <!-- Close Button -->
+    <button id="close-cookie-modal" class="cookie-close-btn" onclick="closeCookieModal()">✖</button>
+    
+    <!-- Modal Content -->
+    <div class="cookie-consent-content">
+        <h2>Cookie Consent</h2>
+        <p>We use cookies to personalize content and ads, provide social media features, and analyze our traffic. By using our site, you consent to our use of cookies.
+            Please review our
+            <a href="privacy-policy.html" target="_blank">Privacy Policy</a> and 
+            <a href="terms-and-conditions.html" target="_blank">Terms and Conditions</a>.
+        </p>
+        <!-- Action Buttons -->
+        <div class="cookie-actions">
+            <button id="accept-cookies" class="btn" onclick="acceptCookies()">Accept</button>
+            <button id="reject-cookies" class="btn" onclick="rejectCookies()">Reject</button>
+        </div>
+    </div>
+</div>
 
-
+<!-- Link to external JavaScript -->
+<script src="cookies.js"></script>
 
   <!--
     - #FOOTER
@@ -502,6 +527,24 @@ fetch('post.json')
         });
     })
     .catch(error => console.error('Error loading posts:', error));
+
+    // Back to Top Script
+const backToTopButton = document.getElementById("backToTop");
+
+// Show or hide the button based on scroll position
+window.onscroll = function () {
+  if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+    backToTopButton.style.display = "flex";
+  } else {
+    backToTopButton.style.display = "none";
+  }
+};
+
+// Scroll back to the top when the button is clicked
+backToTopButton.onclick = function () {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
   </script>
 </body>
 
