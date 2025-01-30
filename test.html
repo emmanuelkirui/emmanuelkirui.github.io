@@ -197,6 +197,10 @@
         <!--
           - BLOG SECTION
         -->
+        <div class="container" id="blog-posts-container">
+        <!-- Posts will be dynamically loaded here -->
+        
+    </div>
 
         <div class="blog">
 
@@ -882,6 +886,52 @@
   -->
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+  <script>
+    // Fetch posts dynamically
+fetch('posts.json')
+    .then(response => response.json())
+    .then(posts => {
+        const postsContainer = document.getElementById('blog-posts-container');
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.classList.add('post');
+
+            if (document.body.classList.contains('dark-mode')) {
+                postElement.classList.add('dark-mode');
+            }
+
+            // Create the post content with a "View More" button
+            postElement.innerHTML = `
+                <h2>${post.title}</h2>
+                <p class="short-content">${post.content.substring(0, 100)}...</p>
+                <p class="full-content" style="display: none;">${post.content}</p>
+                <p style="font-style: italic; color: #888; font-size: 14px;">Author: ${post.author}</p>
+                <button class="view-more-btn">View More</button>
+            `;
+
+            // Append to the container
+            postsContainer.appendChild(postElement);
+
+            // Add event listener for "View More" button
+            const viewMoreBtn = postElement.querySelector('.view-more-btn');
+            const shortContent = postElement.querySelector('.short-content');
+            const fullContent = postElement.querySelector('.full-content');
+
+            viewMoreBtn.addEventListener('click', () => {
+                if (fullContent.style.display === 'none') {
+                    fullContent.style.display = 'block';
+                    shortContent.style.display = 'none';
+                    viewMoreBtn.textContent = 'View Less';
+                } else {
+                    fullContent.style.display = 'none';
+                    shortContent.style.display = 'block';
+                    viewMoreBtn.textContent = 'View More';
+                }
+            });
+        });
+    })
+    .catch(error => console.error('Error loading posts:', error));
+  </script>
 </body>
 
 </html>
