@@ -8,32 +8,70 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         /* Global Styles */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f4f4f4;
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
             transition: background-color 0.3s, color 0.3s;
         }
 
         header {
             background-color: #333;
             color: #fff;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
+        /* Theme Toggle Button */
         .theme-toggle {
-            position: absolute;
-            top: 15px;
-            right: 20px;
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
             color: white;
+            margin-right: 20px;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+
+        /* Navigation */
+        .nav-menu {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-menu li {
+            margin: 0 15px;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            transition: 0.3s;
+        }
+
+        .nav-menu a:hover {
+            color: #1d5a87;
         }
 
         .container {
@@ -90,8 +128,6 @@
             border-radius: 15px;
             padding: 20px;
             box-sizing: border-box;
-            overflow: hidden;
-            position: relative;
             text-align: center;
         }
 
@@ -105,7 +141,6 @@
 
         .poster-date, .poster-details {
             font-size: 1.2rem;
-            text-align: center;
             margin: 10px 0;
         }
 
@@ -145,24 +180,51 @@
             color: white;
         }
 
-        .poster-container.dark-mode {
+        .dark-mode .poster-container {
             background: linear-gradient(to bottom, #34495e, #2c3e50);
+        }
+
+        .dark-mode .nav-menu a {
+            color: white;
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .poster-container {
-                height: auto;
-                max-width: 100%;
+            .hamburger {
+                display: block;
+            }
+
+            .nav-menu {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                right: 0;
+                background: #333;
+                width: 200px;
+                padding: 10px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            .nav-menu.show {
+                display: flex;
             }
         }
     </style>
 </head>
 <body>
     <header>
-        <button class="theme-toggle" id="toggle-theme">🌙</button>
+        <button class="hamburger" id="hamburger">&#9776;</button>
         <h1>Professional Poster Generator</h1>
+        <button class="theme-toggle" id="toggle-theme">🌙</button>
     </header>
+
+    <ul class="nav-menu" id="nav-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="Birthday.html">Birthday</a></li>
+        <li><a href="Events.html">Events</a></li>
+        <li><a href="Poster.html">Posters</a></li>
+    </ul>
 
     <div class="container">
         <div class="input-section">
@@ -191,45 +253,36 @@
                 <p id="poster-date" class="poster-date">Event Date</p>
                 <p id="poster-details" class="poster-details">Event Details</p>
             </div>
-
-            <div class="poster-actions">
-                <button id="download-btn">Download Poster</button>
-            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('event-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Hamburger Menu Toggle
+document.getElementById('hamburger').addEventListener('click', function () {
+    document.getElementById('nav-menu').classList.toggle('show');
+});
 
-            document.getElementById('poster-section').style.display = "block";
-            document.getElementById('poster-title').textContent = document.getElementById('event-title').value;
-            document.getElementById('poster-date').textContent = document.getElementById('event-date').value;
-            document.getElementById('poster-details').textContent = document.getElementById('event-details').value;
+// Dark Mode Toggle
+const themeToggle = document.getElementById('toggle-theme');
+const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
 
-            const file = document.getElementById('event-image').files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('poster-image').src = e.target.result;
-                    document.getElementById('poster-image').style.display = "block";
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+// Apply saved theme
+if (isDarkMode) {
+    document.body.classList.add('dark-mode');
+}
 
-        document.getElementById('download-btn').addEventListener('click', function() {
-            html2canvas(document.getElementById('poster')).then(canvas => {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL();
-                link.download = 'poster.png';
-                link.click();
-            });
-        });
+// Toggle & Save Preference
+themeToggle.addEventListener('click', function () {
+    document.body.classList.toggle('dark-mode');
 
-        document.getElementById('toggle-theme').addEventListener('click', function() {
-            document.body.classList.toggle('dark-mode');
-        });
+    if (document.body.classList.contains('dark-mode')) {
+        localStorage.setItem('darkMode', 'enabled');
+        themeToggle.textContent = '☀'; // Change to sun icon
+    } else {
+        localStorage.setItem('darkMode', 'disabled');
+        themeToggle.textContent = '🌙'; // Change to moon icon
+    }
+});
     </script>
 </body>
 </html>
