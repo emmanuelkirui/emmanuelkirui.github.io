@@ -587,6 +587,8 @@ fetch('post.json')
                         ${post.content.substring(0, 100)}...
                     </p>
 
+                    <p class="full-content" style="display: none;">${post.content}</p>
+
                     <div class="wrapper-flex">
                         <div class="profile-wrapper">
                             <img src="${post.authorImage}" alt="${post.author}" width="50">
@@ -604,8 +606,9 @@ fetch('post.json')
                     </div>
                 </div>
 
-                <button class="view-more-btn">View More</button>
-                <p class="full-content" style="display: none;">${post.content}</p>
+                <div class="view-more-container">
+                    <button class="view-more-btn">View More</button>
+                </div>
             `;
 
             // Append the post element to the container
