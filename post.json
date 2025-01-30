@@ -1,0 +1,112 @@
+[
+    {
+        "title": "Lyrics Composition",
+        "content": "Crafting compelling lyrics is a creative process that blends rhythm, storytelling, and linguistic artistry. Effective songwriting involves developing engaging verses, hooks, and choruses that resonate with audiences on an emotional level.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-1.png",
+        "topic": "Music",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 21, 2024",
+        "readTime": 5,
+        "url": "#"
+    },
+    {
+        "title": "Web Design",
+        "content": "Web design encompasses the strategic planning and development of visually appealing, user-friendly websites. This involves layout structuring, color theory, typography, and intuitive navigation to enhance user experience and brand identity.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-2.png",
+        "topic": "Design",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 22, 2024",
+        "readTime": 6,
+        "url": "#"
+    },
+    {
+        "title": "Graphics & Motion Design",
+        "content": "Graphics and motion design integrate visual storytelling with animation to create engaging multimedia content. These designs are widely used in advertising, digital marketing, entertainment, and social media to captivate audiences effectively.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-3.png",
+        "topic": "Design",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 23, 2024",
+        "readTime": 7,
+        "url": "#"
+    },
+    {
+        "title": "Football Analytics & Predictions",
+        "content": "Football predictions leverage data analysis, team performance insights, and historical statistics to forecast match outcomes. This service aids fans, analysts, and bettors in making well-informed decisions.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-4.png",
+        "topic": "Sports",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 24, 2024",
+        "readTime": 5,
+        "url": "#"
+    },
+    {
+        "title": "Video Editing",
+        "content": "Video editing is the art of refining raw footage into a polished, cohesive final product. Editors utilize advanced tools and techniques to enhance visual appeal, storytelling, and overall production quality.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-5.png",
+        "topic": "Video",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 25, 2024",
+        "readTime": 4,
+        "url": "#"
+    },
+    {
+        "title": "Animation",
+        "content": "Animation brings concepts to life using techniques such as 2D, 3D, and stop-motion. It plays a crucial role in filmmaking, game development, digital marketing, and educational content creation.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-6.png",
+        "topic": "Animation",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 26, 2024",
+        "readTime": 6,
+        "url": "#"
+    },
+    {
+        "title": "Poster & Flyer Design",
+        "content": "Professional poster and flyer design involves the strategic use of typography, color schemes, and imagery to create visually impactful promotional materials that effectively communicate messages and attract attention.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-7.png",
+        "topic": "Design",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 27, 2024",
+        "readTime": 4,
+        "url": "#"
+    },
+    {
+        "title": "Custom Invitation Cards",
+        "content": "Personalized birthday and wedding invitation cards add a unique and memorable touch to celebrations. These designs are tailored to reflect the sender’s style, theme, and heartfelt messages.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-8.png",
+        "topic": "Design",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 28, 2024",
+        "readTime": 4,
+        "url": "#"
+    },
+    {
+        "title": "Website Customization",
+        "content": "Website customization focuses on enhancing functionality, aesthetics, and user experience by implementing tailored features, integrating third-party tools, and optimizing performance to meet specific business needs.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-9.png",
+        "topic": "Web Development",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 29, 2024",
+        "readTime": 5,
+        "url": "#"
+    },
+    {
+        "title": "Digital Solutions & Online Services",
+        "content": "Comprehensive online solutions, including digital marketing, SEO optimization, e-commerce setup, and custom software development, are designed to enhance brand visibility, operational efficiency, and business growth.",
+        "author": "Emmanuel Kirui",
+        "image": "./assets/images/blog-10.png",
+        "topic": "Business",
+        "authorImage": "./assets/images/author.png",
+        "date": "Sep 30, 2024",
+        "readTime": 7,
+        "url": "#"
+    }
+]
