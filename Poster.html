@@ -156,7 +156,8 @@
                 max-width: 100%;
             }
         }
-        /* General Reset */
+        
+/* General Reset */
 * {
     margin: 0;
     padding: 0;
@@ -171,6 +172,7 @@
     background: #fff;
     padding: 15px 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative; /* Ensures hamburger stays in place */
 }
 
 /* Branding */
@@ -224,15 +226,23 @@
     cursor: pointer;
 }
 
-/* Hamburger Menu (Hidden on Desktop) */
+/* Hamburger Menu (Positioned at the Top-Left Corner) */
 .hamburger {
     display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    z-index: 1000;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     .hamburger {
-        display: block;
+        display: block; /* Show on small screens */
     }
 
     .nav-menu {
@@ -240,10 +250,10 @@
         flex-direction: column;
         position: absolute;
         top: 60px;
-        right: 0;
+        left: 0; /* Aligns menu to the left */
         background: #fff;
         width: 200px;
-        text-align: right;
+        text-align: left;
         padding: 10px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
@@ -255,7 +265,7 @@
     .dark-mode .nav-menu {
         background: #333;
     }
-}
+            
     </style>
 </head>
 <body>
