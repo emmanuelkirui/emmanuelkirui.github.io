@@ -1236,3 +1236,34 @@ footer .wrapper { text-align: center; }
 #backToTop:hover {
   background-color: #0056b3;
 }
+
+  /* Style for the news slides */
+.news-slide {
+    padding: 20px;
+    text-align: center;
+    background: var(--bg-color);
+    color: var(--text-color);
+    border-radius: 10px;
+    box-shadow: var(--box-shadow);
+    border: 1px solid var(--border-color);
+}
+
+/* Style for the carousel controls */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: var(--control-bg);
+    border-radius: 50%;
+}
+
+/* Style for the slide counter */
+.carousel-counter {
+    position: absolute;
+    bottom: -30px; /* Moves the counter further down */
+    right: 50%;
+    transform: translateX(50%);
+    background: var(--counter-bg);
+    color: var(--counter-text);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
