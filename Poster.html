@@ -338,14 +338,20 @@
         });
 
         document.getElementById('download-btn').addEventListener('click', function() {
-            html2canvas(document.getElementById('poster')).then(canvas => {
-                const link = document.createElement('a');
-                link.href = canvas.toDataURL();
-                link.download = 'poster.png';
-                link.click();
-            });
+    // Wait until the image has been fully loaded
+    const posterImage = document.getElementById('poster-image');
+    
+    if (posterImage.src && posterImage.complete) {
+        html2canvas(document.getElementById('poster')).then(canvas => {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL();
+            link.download = 'poster.png';
+            link.click();
         });
-
+    } else {
+        alert('Please make sure the image is fully loaded before downloading.');
+    }
+});
         // Hamburger Menu Toggle
 document.getElementById('hamburger').addEventListener('click', function () {
     document.getElementById('nav-menu').classList.toggle('show');
