@@ -501,18 +501,10 @@ header .btn-group {
 
 .blog ion-icon { --ionicon-stroke-width: 50px; }
 
-/* Dark Mode Styles */
-@media (prefers-color-scheme: dark) {
-  .blog-text,
-  .profile-wrapper {
-    display: block; /* Example: Show these elements in dark mode */
-  }
-
-  .blog .wrapper {
-    background-color: #333; /* Example: Dark background for wrapper */
-    color: #fff; /* Example: Light text color */
-  }
-}
+.blog-text.dark-mode {
+            background-color: #1e1e1e;
+            color: #f9f9f9;
+        }
 
 .load-more {
   margin-inline: auto;
