@@ -31,7 +31,13 @@
   --foreground-tertiary: hsl(214, 20%, 69%);
 
   --accent: hsl(229, 76%, 66%);
-
+  
+/* Additional styles for carousel */
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --counter-bg: rgba(0, 0, 0, 0.7);
+    --counter-text: white;
+    --control-bg: rgba(0, 0, 0, 0.5);
+}
 }
 
 .dark-theme {
@@ -51,6 +57,12 @@
   --foreground-tertiary: hsl(214, 20%, 69%);
 
   --accent: hsl(229, 76%, 66%);
+  /* Dark mode adjustments */
+    --box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+    --counter-bg: rgba(255, 255, 255, 0.7);
+    --counter-text: black;
+    --control-bg: rgba(255, 255, 255, 0.5);
+}
 
 }
 
@@ -540,6 +552,7 @@ footer .wrapper { text-align: center; }
   max-width: 300px;
   margin-inline: auto;
   margin: auto; /* fallback for margin-inline */
+  border-top: 2px solid #f39c12; /* Accent border for a professional look */
 }
 
 .footer-title {
