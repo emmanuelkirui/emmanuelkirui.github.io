@@ -627,7 +627,7 @@ fetch('post.json')
                 </div>
 
                 <div class="view-more-container">
-                    <button class="load-more">View More</button>
+                    <button class="view-more-btn">View More</button>
                 </div>
             `;
 
@@ -635,19 +635,19 @@ fetch('post.json')
             postsContainer.appendChild(postElement);
 
             // Add event listener for "View More" button
-            const loadMoreBtn = postElement.querySelector('.load-more');
+            const viewMoreBtn = postElement.querySelector('.view-more-btn');
             const shortContent = postElement.querySelector('.blog-text');
             const fullContent = postElement.querySelector('.full-content');
 
-            loadMoreBtn.addEventListener('click', () => {
+            viewMoreBtn.addEventListener('click', () => {
                 if (fullContent.style.display === 'none') {
                     fullContent.style.display = 'block';
                     shortContent.style.display = 'none';
-                    loadMoreBtn.textContent = 'View Less';
+                    viewMoreBtn.textContent = 'View Less';
                 } else {
                     fullContent.style.display = 'none';
                     shortContent.style.display = 'block';
-                    loadMoreBtn.textContent = 'View More';
+                    viewMoreBtn.textContent = 'View More';
                 }
             });
         });
