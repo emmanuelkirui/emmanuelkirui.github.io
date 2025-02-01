@@ -108,5 +108,16 @@
         "date": "Sep 30, 2024",
         "readTime": 7,
         "url": "#"
+    },
+    {
+        "title": "Collaboration Opportunities",
+        "content": "Collaborate with Emmanuel Kirui on projects related to cybersecurity, web development, AI, and design. Open to innovative partnerships and joint ventures to create impactful digital solutions.",
+        "author": "Emmanuel Kirui",
+        "image": "./img/team.jpg",
+        "topic": "Collaboration",
+        "authorImage": "./Profile-Pic/ekm.png",
+        "date": "Oct 1, 2024",
+        "readTime": 5,
+        "url": "#"
     }
 ]
