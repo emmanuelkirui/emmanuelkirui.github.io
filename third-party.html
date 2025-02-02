@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Third-Party Services</title>
-    <link rel="stylesheet" href="styles.css">
     <style>
         /* Global Styles */
         body {
@@ -24,11 +23,13 @@
             align-items: center;
             background-color: #333;
             color: white;
-            padding: 10px 20px;
+            padding: 15px 20px;
+            position: relative;
         }
 
         header h1 {
             margin: 0;
+            font-size: 24px;
         }
 
         /* Hamburger Menu */
@@ -36,20 +37,21 @@
             display: none;
             flex-direction: column;
             justify-content: space-between;
-            height: 20px;
-            width: 25px;
+            height: 25px;
+            width: 30px;
             cursor: pointer;
         }
 
         .hamburger div {
             background-color: white;
-            height: 3px;
+            height: 4px;
+            width: 100%;
             border-radius: 2px;
-            transition: all 0.3s;
+            transition: all 0.3s ease-in-out;
         }
 
         .hamburger.open div:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
+            transform: rotate(45deg) translate(5px, 6px);
         }
 
         .hamburger.open div:nth-child(2) {
@@ -57,54 +59,76 @@
         }
 
         .hamburger.open div:nth-child(3) {
-            transform: rotate(-45deg) translate(5px, -5px);
+            transform: rotate(-45deg) translate(5px, -6px);
         }
 
+        /* Navigation */
         nav {
-            display: none;
-            flex-direction: column;
-            background-color: #333;
-        }
-
-        nav.open {
             display: flex;
+            background-color: #444;
+            justify-content: center;
+            padding: 10px 0;
         }
 
         nav a {
             color: white;
             text-decoration: none;
-            padding: 10px 15px;
-            border-bottom: 1px solid #444;
+            padding: 10px 20px;
+            transition: background 0.3s;
         }
 
         nav a:hover {
-            background-color: #444;
+            background-color: #555;
         }
 
-        /* Flexbox Container */
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            nav {
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                display: none;
+            }
+
+            nav.open {
+                display: flex;
+            }
+
+            nav a {
+                text-align: center;
+                padding: 12px;
+                border-bottom: 1px solid #666;
+            }
+        }
+
+        /* Container */
         .container {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 80%;
-            margin: 20px auto;
-            background-color: #fff;
+            max-width: 800px;
+            margin: 30px auto;
+            background-color: white;
             padding: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .content {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #555;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
             text-align: center;
         }
 
         h1 {
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        .content {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+            text-align: left;
         }
 
         .service-list {
@@ -113,43 +137,32 @@
         }
 
         .service-list li {
-            margin: 10px 0;
+            margin: 12px 0;
         }
 
         .service-list a {
             color: #0066cc;
             text-decoration: none;
+            font-weight: bold;
         }
 
         .service-list a:hover {
             text-decoration: underline;
         }
 
+        /* Footer */
         footer {
             background-color: #333;
-            color: #fff;
+            color: white;
             text-align: center;
-            padding: 10px;
-        }
-
-        /* Responsive Layout */
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-
-            nav {
-                display: none;
-            }
-
-            nav.open {
-                display: flex;
-            }
+            padding: 12px;
+            margin-top: auto;
         }
     </style>
 </head>
 
 <body>
+
     <header>
         <h1>Cookies</h1>
         <div class="hamburger" id="hamburger">
@@ -171,15 +184,15 @@
     <div class="container">
         <h1>Third-Party Services</h1>
         <div class="content">
-            <p>Our website uses third-party services, including cookies and advertisements, to enhance your experience and provide you with tailored content. Below is a list of third-party services that may be used on this website:</p>
+            <p>Our website uses third-party services, including cookies and advertisements, to enhance your experience and provide tailored content. Below is a list of third-party services that may be used on this website:</p>
             <ul class="service-list">
-                <li><a href="https://www.google.com/policies/technologies/ads/" target="_blank">Google Ads</a> - To display personalized ads based on your interests and browsing history.</li>
-                <li><a href="https://www.google.com/intl/en/policies/privacy/" target="_blank">Google Analytics</a> - To analyze website traffic and usage patterns.</li>
-                <li><a href="https://www.facebook.com/policy.php" target="_blank">Facebook</a> - To integrate social media features and advertisements.</li>
-                <li><a href="https://www.youtube.com/static?template=terms" target="_blank">YouTube</a> - For video content embedding and advertising.</li>
-                <li><a href="https://www.cloudflare.com/terms/" target="_blank">Cloudflare</a> - For website performance and security optimization.</li>
+                <li><a href="https://www.google.com/policies/technologies/ads/" target="_blank">Google Ads</a> - Displays personalized ads based on your interests and browsing history.</li>
+                <li><a href="https://www.google.com/intl/en/policies/privacy/" target="_blank">Google Analytics</a> - Analyzes website traffic and usage patterns.</li>
+                <li><a href="https://www.facebook.com/policy.php" target="_blank">Facebook</a> - Integrates social media features and advertisements.</li>
+                <li><a href="https://www.youtube.com/static?template=terms" target="_blank">YouTube</a> - Embeds video content and advertisements.</li>
+                <li><a href="https://www.cloudflare.com/terms/" target="_blank">Cloudflare</a> - Enhances website performance and security.</li>
             </ul>
-            <p>By using this site, you agree to the use of these third-party services. Please read their terms and conditions and privacy policies to understand how they collect and process your data.</p>
+            <p>By using this site, you agree to the use of these third-party services. Please read their privacy policies and terms to understand how they collect and process your data.</p>
         </div>
     </div>
 
@@ -191,12 +204,12 @@
         const hamburger = document.getElementById('hamburger');
         const nav = document.getElementById('nav');
 
-        // Toggle hamburger menu and navigation
         hamburger.addEventListener('click', () => {
             nav.classList.toggle('open');
             hamburger.classList.toggle('open');
         });
     </script>
+
 </body>
 
 </html>
