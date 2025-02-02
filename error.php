@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/network-status.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <title>Error | Something Went Wrong</title>
     <style>
         body {
@@ -45,26 +46,6 @@
             animation: fadeIn 1.5s ease-in-out;
         }
 
-        .animated-character {
-            margin: 20px auto;
-            width: 100px;
-            height: 100px;
-            position: relative;
-            animation: move 4s infinite ease-in-out;
-        }
-
-        /* Character body */
-        .character-body {
-            fill: #3498db;
-            animation: bounce 1.5s infinite ease-in-out;
-        }
-
-        .character-arm {
-            fill: #3498db;
-            animation: wave 1.5s infinite ease-in-out;
-            transform-origin: 80% 20%;
-        }
-
         .button-group {
             display: flex;
             justify-content: center;
@@ -88,14 +69,21 @@
             width: 150px;
         }
 
-        /* Button Colors */
         .button-back {
             background-color: #27ae60;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .button-back:hover {
             background-color: #2ecc71;
             transform: translateY(-3px);
+        }
+
+        .spinner {
+            display: none;
         }
 
         .button-home {
@@ -136,42 +124,6 @@
             }
         }
 
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-
-        @keyframes wave {
-            0%, 100% {
-                transform: rotate(0deg);
-            }
-            50% {
-                transform: rotate(15deg);
-            }
-        }
-
-        @keyframes move {
-            0% {
-                transform: translateY(0);
-            }
-            25% {
-                transform: translateY(-10px);
-            }
-            50% {
-                transform: translateY(0);
-            }
-            75% {
-                transform: translateY(10px);
-            }
-            100% {
-                transform: translateY(0);
-            }
-        }
-
         @media (max-width: 768px) {
             .error-container h1 {
                 font-size: 2rem;
@@ -179,11 +131,6 @@
 
             .error-container p {
                 font-size: 0.9rem;
-            }
-
-            .animated-character {
-                width: 80px;
-                height: 80px;
             }
 
             .button-group a, .button-group button {
@@ -200,11 +147,6 @@
 
             .error-container p {
                 font-size: 0.85rem;
-            }
-
-            .animated-character {
-                width: 70px;
-                height: 70px;
             }
 
             .button-group a, .button-group button {
@@ -245,26 +187,32 @@
         }
         ?>
         <p><?php echo $errorMessage; ?></p>
-        <div class="animated-character">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Character body -->
-                <circle cx="50" cy="60" r="20" class="character-body" />
-                <!-- Arms -->
-                <line x1="30" y1="60" x2="15" y2="50" stroke="#3498db" stroke-width="4" class="character-arm" />
-                <line x1="70" y1="60" x2="85" y2="50" stroke="#3498db" stroke-width="4" class="character-arm" />
-            </svg>
-        </div>
         <div class="button-group">
-            <button class="button-back" onclick="goBack()">Reload</button>
+            <button class="button-back" onclick="reloadPage()">
+                <i class="fa fa-spinner spinner"></i> Reload
+            </button>
             <a href="/" class="button-home">Go to Homepage</a>
             <a href="mailto:emmanuelkirui042@gmail.com" class="button-support">Contact Support</a>
         </div>
     </div>
 
     <script>
-        function goBack() {
-            window.history.back();
+        function reloadPage() {
+            let reloadButton = document.querySelector('.button-back');
+            let spinner = document.querySelector('.spinner');
+            
+            spinner.style.display = 'inline-block';
+            reloadButton.setAttribute('disabled', true);
+
+            setTimeout(() => {
+                window.history.back();
+            }, 2000); // Reload after 2 seconds for better UX
         }
+
+        // Auto-reload page after 5 seconds if user does nothing
+        setTimeout(() => {
+            reloadPage();
+        }, 5000);
     </script>
     <script src="network-status.js"></script>
 </body>
