@@ -1,89 +1,97 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<b:template xmlns="http://www.w3.org/1999/xhtml">
-  <b:includable id="default">
-    <html>
-    <head>
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title><data:blog.title/></title>
-        <b:skin><![CDATA[
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #007bff;
-            color: white;
-            text-align: center;
-            padding: 15px;
-        }
-        nav {
-            background-color: #0056b3;
-            text-align: center;
-            padding: 10px;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            padding: 10px;
-            margin: 5px;
-            display: inline-block;
-        }
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-        }
-        footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 15px;
-            margin-top: 30px;
-        }
-        ]]></b:skin>
-    </head>
-    <body>
-        <header>
-            <h1><data:blog.title/></h1>
-        </header>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/p/templates.html">Templates</a>
-            <a href="/p/about.html">About</a>
-            <a href="/p/contact.html">Contact</a>
-        </nav>
+<!DOCTYPE html>
+<html b:css='false' b:defaultwidgetversion='2' b:layoutsVersion='3' b:responsive='true' b:templateVersion='1.3.0' expr:class='data:blog.languageDirection' expr:dir='data:blog.languageDirection' expr:lang='data:blog.localeUnderscoreDelimited' xmlns='http://www.w3.org/1999/xhtml' xmlns:b='http://www.google.com/2005/gml/b' xmlns:data='http://www.google.com/2005/gml/data' xmlns:expr='http://www.google.com/2005/gml/expr'>
+  <head>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <title><data:view.title.escaped/></title>
+    <meta expr:content='&quot;text/html; charset=&quot; + data:blog.encoding' http-equiv='Content-Type'/>
+    <meta content='blogger' name='generator'/>
+    <b:skin><![CDATA[
+      /* Custom Styles */
+      body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; text-align: center; }
+      header { background: #002ce6; color: white; padding: 20px; text-align: center; }
+      section { padding: 30px; background: white; margin: 20px auto; width: 80%; border-radius: 8px; }
+      h2 { color: #002ce6; }
+      footer { background: #333; color: white; padding: 20px; margin-top: 20px; }
+    ]]></b:skin>
+  </head>
+  <body>
+    <header>
+      <h1>Welcome to My Showcase</h1>
+      <nav>
+        <ul>
+          <li><a href='#templates'>Templates</a></li>
+          <li><a href='#lyrics'>Lyrics</a></li>
+          <li><a href='#animations'>Animations</a></li>
+          <li><a href='#ads'>Advertisements</a></li>
+        </ul>
+      </nav>
+    </header>
 
-        <div class="container">
-            <h2>Featured Templates</h2>
-            <div class="product-grid">
-                <!-- Product 1 -->
-                <div class="product">
-                    <img src="https://via.placeholder.com/300" alt="Template 1">
-                    <h3>Modern Blogger Theme</h3>
-                    <p>A responsive Blogger template for personal blogs.</p>
-                    <a href="#">View Demo</a>
-                    <a href="#">Buy Now</a>
-                </div>
-                <!-- Product 2 -->
-                <div class="product">
-                    <img src="https://via.placeholder.com/300" alt="Template 2">
-                    <h3>SEO Optimized Theme</h3>
-                    <p>Fast-loading and SEO-friendly Blogger template.</p>
-                    <a href="#">View Demo</a>
-                    <a href="#">Buy Now</a>
-                </div>
-            </div>
-        </div>
+    <b:section id='templates' class='main'>
+      <b:widget id='TemplateStore' type='HTML' title='Buy Templates'>
+        <b:includable id='main'>
+          <h2>Buy Templates</h2>
+          <div class='template-item'>
+            <h3>Template 1</h3>
+            <p>A modern design template.</p>
+            <a href='https://yourbuylink.com/template1' target='_blank'>Buy Now</a>
+          </div>
+          <div class='template-item'>
+            <h3>Template 2</h3>
+            <p>Perfect for businesses.</p>
+            <a href='https://yourbuylink.com/template2' target='_blank'>Buy Now</a>
+          </div>
+        </b:includable>
+      </b:widget>
+    </b:section>
 
-        <footer>
-            <p>&copy; 2025 Manuraj Templates - All Rights Reserved</p>
-        </footer>
-    </body>
-    </html>
-  </b:includable>
-</b:template>
+    <b:section id='lyrics' class='main'>
+      <b:widget id='LyricsShowcase' type='HTML' title='Lyrics'>
+        <b:includable id='main'>
+          <h2>My Lyrics</h2>
+          <div class='lyric-item'>
+            <h3>Song Title 1</h3>
+            <p>[Your Lyrics Here]</p>
+          </div>
+          <div class='lyric-item'>
+            <h3>Song Title 2</h3>
+            <p>[Your Lyrics Here]</p>
+          </div>
+        </b:includable>
+      </b:widget>
+    </b:section>
+
+    <b:section id='animations' class='main'>
+      <b:widget id='AnimationsGallery' type='HTML' title='My Animations'>
+        <b:includable id='main'>
+          <h2>My Animations</h2>
+          <div class='video-item'>
+            <iframe width='560' height='315' src='https://www.youtube.com/embed/yourvideo1' allowfullscreen></iframe>
+          </div>
+          <div class='video-item'>
+            <iframe width='560' height='315' src='https://www.youtube.com/embed/yourvideo2' allowfullscreen></iframe>
+          </div>
+        </b:includable>
+      </b:widget>
+    </b:section>
+
+    <b:section id='ads' class='main'>
+      <b:widget id='AdSection' type='HTML' title='Sponsored Ads'>
+        <b:includable id='main'>
+          <h2>Sponsored Ads</h2>
+          <div class='ad-item'>
+            <img src='https://your-ad-image1.jpg' width='300' height='250' alt='Ad 1'/>
+          </div>
+          <div class='ad-item'>
+            <img src='https://your-ad-image2.jpg' width='300' height='250' alt='Ad 2'/>
+          </div>
+        </b:includable>
+      </b:widget>
+    </b:section>
+
+    <footer>
+      <p>© 2025 Emmanuel Kirui. All Rights Reserved.</p>
+    </footer>
+  </body>
+</html>
