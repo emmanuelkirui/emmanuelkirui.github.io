@@ -46,6 +46,27 @@
             animation: fadeIn 1.5s ease-in-out;
         }
 
+        .animated-character {
+            margin: 20px auto;
+            width: 100px;
+            height: 100px;
+            position: relative;
+            animation: move 4s infinite ease-in-out;
+        }
+
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .fa-spinner {
+            font-size: 2rem;
+            color: #e74c3c;
+            animation: spin 1s infinite linear;
+        }
+
         .button-group {
             display: flex;
             justify-content: center;
@@ -69,21 +90,14 @@
             width: 150px;
         }
 
+        /* Button Colors */
         .button-back {
             background-color: #27ae60;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
         .button-back:hover {
             background-color: #2ecc71;
             transform: translateY(-3px);
-        }
-
-        .spinner {
-            display: none;
         }
 
         .button-home {
@@ -124,6 +138,24 @@
             }
         }
 
+        @keyframes move {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
         @media (max-width: 768px) {
             .error-container h1 {
                 font-size: 2rem;
@@ -131,6 +163,11 @@
 
             .error-container p {
                 font-size: 0.9rem;
+            }
+
+            .animated-character {
+                width: 80px;
+                height: 80px;
             }
 
             .button-group a, .button-group button {
@@ -147,6 +184,11 @@
 
             .error-container p {
                 font-size: 0.85rem;
+            }
+
+            .animated-character {
+                width: 70px;
+                height: 70px;
             }
 
             .button-group a, .button-group button {
@@ -167,51 +209,54 @@
         // Define error message based on error code
         switch ($errorCode) {
             case '429':
-                $errorMessage = "Error Code: 429 - You have made too many requests in a short period of time. Please try again later.";
+                $errorMessage = "Error Code: 429 - Too many requests. Please try again later.";
                 break;
             case '404':
-                $errorMessage = "Error Code: 404 - The page you are looking for could not be found.";
+                $errorMessage = "Error Code: 404 - Page not found.";
                 break;
             case '500':
-                $errorMessage = "Error Code: 500 - There was a problem on our server. Please try again later.";
+                $errorMessage = "Error Code: 500 - Server error. Please try again later.";
                 break;
             case '403':
-                $errorMessage = "Error Code: 403 - You do not have permission to access this page.";
+                $errorMessage = "Error Code: 403 - Access denied.";
                 break;
             case '400':
-                $errorMessage = "Error Code: 400 - Bad request. Please check your input and try again.";
+                $errorMessage = "Error Code: 400 - Bad request.";
                 break;
             default:
-                $errorMessage = "Error Code: $errorCode - An unexpected error occurred.";
+                $errorMessage = "Error Code: $errorCode - Unexpected error.";
                 break;
         }
         ?>
         <p><?php echo $errorMessage; ?></p>
+
+        <div class="animated-character">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="60" r="20" class="character-body" fill="#3498db"/>
+                <line x1="30" y1="60" x2="15" y2="50" stroke="#3498db" stroke-width="4"/>
+                <line x1="70" y1="60" x2="85" y2="50" stroke="#3498db" stroke-width="4"/>
+            </svg>
+        </div>
+
+        <div class="spinner-container">
+            <i class="fa fa-spinner"></i> Reloading...
+        </div>
+
         <div class="button-group">
-            <button class="button-back" onclick="reloadPage()">
-                <i class="fa fa-spinner spinner"></i> Reload
-            </button>
+            <button class="button-back" onclick="goBack()">Reload</button>
             <a href="/" class="button-home">Go to Homepage</a>
             <a href="mailto:emmanuelkirui042@gmail.com" class="button-support">Contact Support</a>
         </div>
     </div>
 
     <script>
-        function reloadPage() {
-            let reloadButton = document.querySelector('.button-back');
-            let spinner = document.querySelector('.spinner');
-            
-            spinner.style.display = 'inline-block';
-            reloadButton.setAttribute('disabled', true);
-
-            setTimeout(() => {
-                window.history.back();
-            }, 2000); // Reload after 2 seconds for better UX
+        function goBack() {
+            window.history.back();
         }
 
-        // Auto-reload page after 5 seconds if user does nothing
+        // Auto-reload the page after 5 seconds
         setTimeout(() => {
-            reloadPage();
+            window.history.back();
         }, 5000);
     </script>
     <script src="network-status.js"></script>
