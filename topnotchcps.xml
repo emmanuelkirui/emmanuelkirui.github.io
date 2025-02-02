@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html>
-<html xmlns='http://www.w3.org/1999/xhtml'>
+<b:html xmlns='http://www.w3.org/1999/xhtml'>
+
 <head>
     <meta charset='UTF-8'/>
     <meta content='width=device-width, initial-scale=1' name='viewport'/>
     <title><data:blog.title/></title>
-    <style>
+    <b:skin><![CDATA[
         /* General Styles */
         body {
             font-family: Arial, sans-serif;
@@ -113,68 +113,77 @@
             cursor: pointer;
             border-radius: 5px;
         }
-    </style>
+    ]]></b:skin>
 </head>
+
 <body>
+    <header>
+        <h1><data:blog.title/></h1>
+    </header>
 
-<header>
-    <h1>Manuraj Templates</h1>
-</header>
+    <nav>
+        <a expr:href='data:blog.homepageUrl'>Home</a>
+        <a href="/p/templates.html">Templates</a>
+        <a href="/p/about.html">About</a>
+        <a href="/p/contact.html">Contact</a>
+    </nav>
 
-<nav>
-    <a href="/">Home</a>
-    <a href="/p/templates.html">Templates</a>
-    <a href="/p/about.html">About</a>
-    <a href="/p/contact.html">Contact</a>
-</nav>
+    <button class="toggle-mode" onclick="toggleDarkMode()">🌙 Dark Mode</button>
 
-<button class="toggle-mode" onclick="toggleDarkMode()">🌙 Dark Mode</button>
+    <div class="container">
+        <h2>Featured Templates</h2>
+        <div class="product-grid">
+            <b:section id='products' class='product-list' showaddelement='yes'>
+                <b:widget id='Product1' type='HTML' title='Modern Blogger Theme'>
+                    <b:includable id='main'>
+                        <div class="product">
+                            <img src="https://via.placeholder.com/300" alt="Template 1">
+                            <h3>Modern Blogger Theme</h3>
+                            <p>A responsive Blogger template for personal blogs.</p>
+                            <a href="#">View Demo</a>
+                            <a href="#">Buy Now</a>
+                        </div>
+                    </b:includable>
+                </b:widget>
 
-<div class="container">
-    <h2>Featured Templates</h2>
-    <div class="product-grid">
-        <!-- Product 1 -->
-        <div class="product">
-            <img src="https://via.placeholder.com/300" alt="Template 1">
-            <h3>Modern Blogger Theme</h3>
-            <p>A responsive Blogger template for personal blogs.</p>
-            <a href="#">View Demo</a>
-            <a href="#">Buy Now</a>
+                <b:widget id='Product2' type='HTML' title='SEO Optimized Theme'>
+                    <b:includable id='main'>
+                        <div class="product">
+                            <img src="https://via.placeholder.com/300" alt="Template 2">
+                            <h3>SEO Optimized Theme</h3>
+                            <p>Fast-loading and SEO-friendly Blogger template.</p>
+                            <a href="#">View Demo</a>
+                            <a href="#">Buy Now</a>
+                        </div>
+                    </b:includable>
+                </b:widget>
+            </b:section>
         </div>
-        <!-- Product 2 -->
-        <div class="product">
-            <img src="https://via.placeholder.com/300" alt="Template 2">
-            <h3>SEO Optimized Theme</h3>
-            <p>Fast-loading and SEO-friendly Blogger template.</p>
-            <a href="#">View Demo</a>
-            <a href="#">Buy Now</a>
-        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h3>Categories</h3>
+            <ul>
+                <li><a href="#">Business</a></li>
+                <li><a href="#">Portfolio</a></li>
+                <li><a href="#">E-commerce</a></li>
+            </ul>
+
+            <h3>Advertisements</h3>
+            <img src="https://via.placeholder.com/300x250" alt="Ad">
+        </aside>
     </div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h3>Categories</h3>
-        <ul>
-            <li><a href="#">Business</a></li>
-            <li><a href="#">Portfolio</a></li>
-            <li><a href="#">E-commerce</a></li>
-        </ul>
+    <footer>
+        <p>&copy; 2025 Manuraj Templates - All Rights Reserved</p>
+    </footer>
 
-        <h3>Advertisements</h3>
-        <img src="https://via.placeholder.com/300x250" alt="Ad">
-    </div>
-</div>
-
-<footer>
-    <p>&copy; 2025 Manuraj Templates - All Rights Reserved</p>
-</footer>
-
-<script>
-    // Dark Mode Toggle
-    function toggleDarkMode() {
-        document.body.classList.toggle("dark-mode");
-    }
-</script>
-
+    <script>
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
 </body>
-</html>
+
+</b:html>
