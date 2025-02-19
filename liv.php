@@ -703,7 +703,6 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                 <th>Status</th>
                 <th>Score</th>
                 <th>Prediction</th>
-                  <th>Predicted Goals</th> <!-- New Column for Predicted Goals -->
                 <th>Match Result</th>
                 <th>Matchday</th>
               </tr>";
@@ -780,8 +779,9 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                 </td>
                 <td>$status</td>
                 <td>$score</td>
-                <td>$prediction</td>
-               <td>$predicted_goals</td> <!-- Display Predicted Goals -->
+                <td>$prediction
+                 <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
+                </td>
                 <td>$match_result</td>
                 <td>$venue</td>
             </tr>";
