@@ -151,12 +151,12 @@ function predictMatch($home_metrics, $away_metrics, $advantages) {
     $score_difference = $home_score - $away_score;
 
     if ($score_difference > 0.8) {  
-    return '<span style="color: green; font-weight: bold;">Win for Home</span>';
-} elseif ($score_difference < -0.8) {  
-    return '<span style="color: red; font-weight: bold;">Win for Away</span>';
-} else {
-    return '<span style="color: orange; font-weight: bold;">Draw</span>';
-}
+        return "Win for Home";
+    } elseif ($score_difference < -0.8) {  
+        return "Win for Away";
+    } else {
+        return "Draw";
+    }
 }
 
 
