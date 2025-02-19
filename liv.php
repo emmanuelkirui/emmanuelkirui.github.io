@@ -157,6 +157,7 @@ if ($score_difference > 0.8) {
 } else {
     return "<span style='color: blue;'>Draw</span>";
 }
+}
 
 
 function predictGoals($home_metrics, $away_metrics, $advantages) {
