@@ -724,15 +724,19 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
             // Team crests
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
-              // Determine the color based on the prediction value
-$predictionColor = "";
-if ($prediction === "Win for Home") {
-    $predictionColor = "color: green; font-weight: bold;";
-} elseif ($prediction === "Win for Away") {
-    $predictionColor = "color: red; font-weight: bold;";
-} elseif ($prediction === "Draw") {
-    $predictionColor = "color: orange; font-weight: bold;";
+// Ensure $prediction is defined and holds the correct value
+$predictionColor = "color: black; font-weight: bold;"; // Default color
+
+if (isset($prediction)) {
+    if ($prediction === "Win for Home") {
+        $predictionColor = "color: green; font-weight: bold;";
+    } elseif ($prediction === "Win for Away") {
+        $predictionColor = "color: red; font-weight: bold;";
+    } elseif ($prediction === "Draw") {
+        $predictionColor = "color: orange; font-weight: bold;";
+    }
 }
+
             // Check if score matches prediction
             $prediction = '';
             $match_result = '';
@@ -786,7 +790,7 @@ if ($prediction === "Win for Home") {
                 </td>
                 <td>$status</td>
                 <td>$score</td>
-               <td style='$predictionColor'>
+                <td style='$predictionColor'>
         $prediction
         <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
     </td>
