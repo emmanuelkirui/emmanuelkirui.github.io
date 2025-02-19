@@ -724,6 +724,15 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
             // Team crests
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
+              // Define colors based on prediction type
+$predictionColor = "";
+if ($prediction === "Win for Home") {
+    $predictionColor = "color: green; font-weight: bold;";
+} elseif ($prediction === "Win for Away") {
+    $predictionColor = "color: red; font-weight: bold;";
+} elseif ($prediction === "Draw") {
+    $predictionColor = "color: orange; font-weight: bold;";
+}
 
             // Check if score matches prediction
             $prediction = '';
@@ -778,7 +787,10 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                 </td>
                 <td>$status</td>
                 <td>$score</td>
-                <td style='font-weight: bold; color: blue;'>$prediction ($predicted_goals)</td> <!-- Fixed issue -->
+                 <td style='$predictionColor'>
+        $prediction
+        <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
+    </td>
                 <td>$match_result</td>
                 <td>$venue</td>
             </tr>";
