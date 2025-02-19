@@ -150,13 +150,12 @@ function predictMatch($home_metrics, $away_metrics, $advantages) {
     // Adjust thresholds with added consideration for draws
     $score_difference = $home_score - $away_score;
 
-    if ($score_difference > 0.8) {  
+if ($score_difference > 0.8) {  
     return "<span style='color: green;'>Win for Home</span>";
 } elseif ($score_difference < -0.8) {  
     return "<span style='color: red;'>Win for Away</span>";
 } else {
-    return "<span style='color: orange;'>Draw</span>";
-}
+    return "<span style='color: blue;'>Draw</span>";
 }
 
 
