@@ -787,9 +787,9 @@ if ($prediction === "Win for Home") {
                 </td>
                 <td>$status</td>
                 <td>$score</td>
-                 <td style='$predictionColor'>
+              <td style='$predictionColor'>
         $prediction
-        <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
+        <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>EG: $predicted_goals</div>
     </td>
                 <td>$match_result</td>
                 <td>$venue</td>
