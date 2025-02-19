@@ -151,12 +151,12 @@ function predictMatch($home_metrics, $away_metrics, $advantages) {
     $score_difference = $home_score - $away_score;
 
     if ($score_difference > 0.8) {  
-        return "Win for Home";
-    } elseif ($score_difference < -0.8) {  
-        return "Win for Away";
-    } else {
-        return "Draw";
-    }
+    return "<span style='color: green;'>Win for Home</span>";
+} elseif ($score_difference < -0.8) {  
+    return "<span style='color: red;'>Win for Away</span>";
+} else {
+    return "<span style='color: orange;'>Draw</span>";
+}
 }
 
 
@@ -724,18 +724,7 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
             // Team crests
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
-// Ensure $prediction is defined and holds the correct value
-$predictionColor = "color: black; font-weight: bold;"; // Default color
 
-if (isset($prediction)) {
-    if ($prediction === "Win for Home") {
-        $predictionColor = "color: green; font-weight: bold;";
-    } elseif ($prediction === "Win for Away") {
-        $predictionColor = "color: red; font-weight: bold;";
-    } elseif ($prediction === "Draw") {
-        $predictionColor = "color: orange; font-weight: bold;";
-    }
-}
 
             // Check if score matches prediction
             $prediction = '';
@@ -790,10 +779,10 @@ if (isset($prediction)) {
                 </td>
                 <td>$status</td>
                 <td>$score</td>
-                <td style='$predictionColor'>
-        $prediction
-        <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
-    </td>
+                <td>
+    $prediction
+    <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
+</td>
                 <td>$match_result</td>
                 <td>$venue</td>
             </tr>";
