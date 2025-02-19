@@ -150,13 +150,13 @@ function predictMatch($home_metrics, $away_metrics, $advantages) {
     // Adjust thresholds with added consideration for draws
     $score_difference = $home_score - $away_score;
 
-if ($score_difference > 0.8) {  
-    return "<span style='color: green;'>Win for Home</span>";
-} elseif ($score_difference < -0.8) {  
-    return "<span style='color: red;'>Win for Away</span>";
-} else {
-    return "<span style='color: orange;'>Draw</span>";
-}
+    if ($score_difference > 0.8) {  
+        return "Win for Home";
+    } elseif ($score_difference < -0.8) {  
+        return "Win for Away";
+    } else {
+        return "Draw";
+    }
 }
 
 
@@ -182,8 +182,9 @@ function predictGoals($home_metrics, $away_metrics, $advantages) {
                 + $away_advantage; // Include away advantage
 
     // Use the scores to predict goals
-    $predicted_home_goals = max(0, round($home_score, 1)); // Round to 1 decimal place
-    $predicted_away_goals = max(0, round($away_score, 1)); // Round to 1 decimal place
+    $predicted_home_goals = max(0, round($home_score)); // Round to whole number
+    $predicted_away_goals = max(0, round($away_score)); // Round to whole number
+
     return [
         'home_goals' => $predicted_home_goals,
         'away_goals' => $predicted_away_goals
@@ -702,7 +703,7 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                 <th>Status</th>
                 <th>Score</th>
                 <th>Prediction</th>
-                <th>EG</th>
+                  <th>Predicted Goals</th> <!-- New Column for Predicted Goals -->
                 <th>Match Result</th>
                 <th>Matchday</th>
               </tr>";
@@ -725,7 +726,6 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
             // Team crests
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
-
 
             // Check if score matches prediction
             $prediction = '';
@@ -780,10 +780,8 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                 </td>
                 <td>$status</td>
                 <td>$score</td>
-                <td> $prediction</td>
-                <td>
-                <span style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</span>
-
+                <td>$prediction</td>
+               <td>$predicted_goals</td> <!-- Display Predicted Goals -->
                 <td>$match_result</td>
                 <td>$venue</td>
             </tr>";
