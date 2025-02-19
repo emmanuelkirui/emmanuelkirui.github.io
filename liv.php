@@ -155,7 +155,7 @@ if ($score_difference > 0.8) {
 } elseif ($score_difference < -0.8) {  
     return "<span style='color: red;'>Win for Away</span>";
 } else {
-    return "<span style='color: blue;'>Draw</span>";
+    return "<span style='color: orange;'>Draw</span>";
 }
 }
 
@@ -781,7 +781,7 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                 <td>$score</td>
                 <td>
     $prediction
-    <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
+    <span style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</span>
 </td>
                 <td>$match_result</td>
                 <td>$venue</td>
