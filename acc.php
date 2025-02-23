@@ -32,7 +32,7 @@ function fetchLeagueData($leagueId) {
         CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId . '&season=2024',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => array(
-            'x-apisports-key: YOUR_API_KEY_HERE', // Replace with your API key
+            'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Replace with your API key
         ),
     ));
     $response = curl_exec($curl);
