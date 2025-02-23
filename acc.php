@@ -25,11 +25,11 @@ function fetchLeagues() {
     curl_close($curl);
     return json_decode($response, true);
 }
-// Function to fetch league data
-function fetchLeagueData($leagueId) {
+// Function to fetch fixtures data
+function fetchFixturesData($leagueId) {
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId,
+        CURLOPT_URL => 'https://v3.football.api-sports.io/fixtures?league=' . $leagueId . '&season=2023', // Use a supported season
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => array(
             'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Your actual API key
@@ -50,11 +50,11 @@ function fetchLeagueData($leagueId) {
 $leagues = fetchLeagues();
 
 // Check if form is submitted
-$selectedLeagueData = null;
+$selectedFixturesData = null;
 $selectedLeagueId = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
     $selectedLeagueId = $_POST['league_id'];
-    $selectedLeagueData = fetchLeagueData($selectedLeagueId);
+    $selectedFixturesData = fetchFixturesData($selectedLeagueId);
 }
 
 ?>
@@ -104,17 +104,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
         }
         ?>
     </select>
-    <button type="submit">Get League Data</button>
+    <button type="submit">Get Fixtures Data</button>
 </form>
 
 <?php
-if ($selectedLeagueData) {
-    if (empty($selectedLeagueData['response'])) {
-        echo '<p>No data available for the selected league. Please try a different league or check your API plan.</p>';
+if ($selectedFixturesData) {
+    if (empty($selectedFixturesData['response'])) {
+        echo '<p>No fixtures data available for the selected league. Please try a different league or check your API plan.</p>';
     } else {
-        echo '<h2>League Data:</h2>';
+        echo '<h2>Fixtures Data:</h2>';
         echo '<pre>';
-        print_r($selectedLeagueData);
+        print_r($selectedFixturesData);
         echo '</pre>';
     }
 } else {
