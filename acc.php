@@ -25,11 +25,11 @@ function fetchLeagues() {
     curl_close($curl);
     return json_decode($response, true);
 }
-// Function to fetch fixtures data
-function fetchFixturesData($leagueId) {
+// Function to fetch standings data
+function fetchStandingsData($leagueId) {
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://v3.football.api-sports.io/fixtures?league=' . $leagueId . '&season=2023', // Use a supported season
+        CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId . '&season=2023',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => array(
             'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Your actual API key
@@ -51,25 +51,32 @@ $leagues = fetchLeagues();
 
 // Check if form is submitted
 $selectedFixturesData = null;
+$selectedStandingsData = null;
 $selectedLeagueId = null;
+$fromDate = null;
+$toDate = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
     $selectedLeagueId = $_POST['league_id'];
-    $selectedFixturesData = fetchFixturesData($selectedLeagueId);
+    $fromDate = $_POST['from_date'];
+    $toDate = $_POST['to_date'];
+    $selectedFixturesData = fetchFixturesData($selectedLeagueId, $fromDate, $toDate);
+    $selectedStandingsData = fetchStandingsData($selectedLeagueId);
 }
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Leagues Fixtures</title>
+    <title>Football Leagues Fixtures and Standings</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
         }
-        select, button {
+        select, button, input[type="date"] {
             width: 220px;
             padding: 8px;
             font-size: 16px;
@@ -77,8 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
             border: 1px solid #ccc;
             background-color: #f9f9f9;
             transition: border-color 0.3s;
+            margin-bottom: 10px;
         }
-        select:focus, button:focus {
+select:focus, button:focus, input[type="date"]:focus {
             border-color: #007BFF;
             outline: none;
         }
@@ -88,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
             color: white;
             border: none;
         }
-       table {
+        table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
@@ -117,33 +125,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
             echo '<option>No leagues found</option>';
         }
         ?>
-    </select> 
-  <button type="submit">Get Fixtures Data</button>
+    </select>
+    <br>
+    <label for="from_date">From Date:</label>
+    <input type="date" name="from_date" value="<?php echo $fromDate; ?>" required>
+    <br>
+    <label for="to_date">To Date:</label>
+    <input type="date" name="to_date" value="<?php echo $toDate; ?>" required>
+    <br>
+    <button type="submit">Get Data</button>
 </form>
-
 <?php
 if ($selectedFixturesData) {
     if (empty($selectedFixturesData['response'])) {
-        echo '<p>No fixtures data available for the selected league. Please try a different league or check your API plan.</p>';
+        echo '<p>No fixtures data available for the selected league and date range. Please try a different league or check your API plan.</p>';
     } else {
         echo '<h2>Fixtures Data:</h2>';
         echo '<table>';
-        echo '<tr><th>Date</th><th>Home Team</th><th>Away Team</th><th>Status</th></tr>';
+        echo '<tr><th>Date</th><th>Home Team</th><th>Away Team</th><th>Score</th><th>Status</th></tr>';
         foreach ($selectedFixturesData['response'] as $fixture) {
             $date = date('Y-m-d H:i', strtotime($fixture['fixture']['date']));
             $homeTeam = $fixture['teams']['home']['name'];
             $awayTeam = $fixture['teams']['away']['name'];
+            $homeScore = $fixture['goals']['home'] !== null ? $fixture['goals']['home'] : '-';
+            $awayScore = $fixture['goals']['away'] !== null ? $fixture['goals']['away'] : '-';
             $status = $fixture['fixture']['status']['long'];
-            echo "<tr><td>$date</td><td>$homeTeam</td><td>$awayTeam</td><td>$status</td></tr>";
+            echo "<tr><td>$date</td><td>$homeTeam</td><td>$awayTeam</td><td>$homeScore - $awayScore</td><td>$status</td></tr>";
         }
         echo '</table>';
     }
-} else {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        echo '<p>No data found for the selected league or an error occurred.</p>';
+}
+
+if ($selectedStandingsData) {
+    if (empty($selectedStandingsData['response'])) {
+        echo '<p>No standings data available for the selected league. Please try a different league or check your API plan.</p>';
+    } else {
+        echo '<h2>Standings Data:</h2>';
+        echo '<table>';
+        echo '<tr><th>Position</th><th>Team</th><th>Points</th><th>Played</th><th>Won</th><th>Drawn</th><th>Lost</th></tr>';
+        foreach ($selectedStandingsData['response'][0]['league']['standings'][0] as $standing) {
+            $position = $standing['rank'];
+            $team = $standing['team']['name'];
+            $points = $standing['points'];
+            $played = $standing['all']['played'];
+            $won = $standing['all']['win'];
+            $drawn = $standing['all']['draw'];
+            $lost = $standing['all']['lose'];
+            echo "<tr><td>$position</td><td>$team</td><td>$points</td><td>$played</td><td>$won</td><td>$drawn</td><td>$lost</td></tr>";
+        }
+        echo '</table>';
     }
 }
 ?>
 
 </body>
-</html>  
+</html>
