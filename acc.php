@@ -16,34 +16,18 @@ function fetchLeagues() {
         ),
     ));
     $response = curl_exec($curl);
-    curl_close($curl);
-    return json_decode($response, true);
-}
 
-// Function to fetch league data
-function fetchLeagueData($leagueId) {
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId . '&season=2024',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => array(
-            'x-apisports-key: YOUR_API_KEY_HERE', // Replace with your API key
-        ),
-    ));
-    $response = curl_exec($curl);
+    // Check for cURL errors
+    if ($response === false) {
+        die('Curl error: ' . curl_error($curl));
+    }
+
     curl_close($curl);
     return json_decode($response, true);
 }
 
 // Fetch leagues
 $leagues = fetchLeagues();
-
-// Check if form is submitted
-$selectedLeagueData = null;
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
-    $selectedLeagueId = $_POST['league_id'];
-    $selectedLeagueData = fetchLeagueData($selectedLeagueId);
-}
 
 ?>
 <!DOCTYPE html>
@@ -79,7 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
     </style>
 </head>
 <body>
-
 <form method="POST">
     <select name="league_id">
         <?php
@@ -89,20 +72,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
             }
         } else {
             echo '<option>No leagues found</option>';
+            // Debugging output
+            echo '<pre>';
+            print_r($leagues);
+            echo '</pre>';
         }
         ?>
     </select>
     <button type="submit">Get League Data</button>
 </form>
-
-<?php
-if ($selectedLeagueData) {
-    echo '<h2>League Data:</h2>';
-    echo '<pre>';
-    print_r($selectedLeagueData);
-    echo '</pre>';
-}
-?>
 
 </body>
 </html>
