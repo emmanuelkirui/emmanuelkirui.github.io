@@ -14,7 +14,7 @@ curl_setopt_array($curl, array(
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => 'GET',
     CURLOPT_HTTPHEADER => array(
-        'x-apisports-key: YOUR_API_KEY_HERE', // Replace with your API key
+        'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Replace with your API key
     ),
 ));
 // Execute cURL request and get the response
