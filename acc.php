@@ -49,20 +49,45 @@ function fetchStandingsData($leagueId) {
 // Fetch leagues
 $leagues = fetchLeagues();
 
+// Set default date values
+$today = date('Y-m-d');
+$yesterday = date('Y-m-d', strtotime('-1 day'));
+$tomorrow = date('Y-m-d', strtotime('+1 day'));
+
 // Check if form is submitted
 $selectedFixturesData = null;
 $selectedStandingsData = null;
 $selectedLeagueId = null;
-$fromDate = null;
-$toDate = null;
+$fromDate = $today;
+$toDate = $today;
+$dateOption = 'today';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
     $selectedLeagueId = $_POST['league_id'];
-    $fromDate = $_POST['from_date'];
-    $toDate = $_POST['to_date'];
+    $dateOption = $_POST['date_option'];
+
+    switch ($dateOption) {
+        case 'yesterday':
+            $fromDate = $yesterday;
+            $toDate = $yesterday;
+            break;
+        case 'today':
+            $fromDate = $today;
+            $toDate = $today;
+            break;
+        case 'tomorrow':
+            $fromDate = $tomorrow;
+            $toDate = $tomorrow;
+            break;
+        case 'custom':
+            $fromDate = $_POST['from_date'];
+            $toDate = $_POST['to_date'];
+            break;
+    }
+
     $selectedFixturesData = fetchFixturesData($selectedLeagueId, $fromDate, $toDate);
     $selectedStandingsData = fetchStandingsData($selectedLeagueId);
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
             transition: border-color 0.3s;
             margin-bottom: 10px;
         }
-select:focus, button:focus, input[type="date"]:focus {
+        select:focus, button:focus, input[type="date"]:focus {
             border-color: #007BFF;
             outline: none;
         }
@@ -127,15 +152,35 @@ select:focus, button:focus, input[type="date"]:focus {
         ?>
     </select>
     <br>
-    <label for="from_date">From Date:</label>
-    <input type="date" name="from_date" value="<?php echo $fromDate; ?>" required>
+    <select name="date_option" onchange="toggleCustomDateFields(this.value)">
+        <option value="yesterday" <?php echo $dateOption === 'yesterday' ? 'selected' : ''; ?>>Yesterday</option>
+        <option value="today" <?php echo $dateOption === 'today' ? 'selected' : ''; ?>>Today</option>
+        <option value="tomorrow" <?php echo $dateOption === 'tomorrow' ? 'selected' : ''; ?>>Tomorrow</option>
+        <option value="custom" <?php echo $dateOption === 'custom' ? 'selected' : ''; ?>>Custom</option>
+    </select>
     <br>
-    <label for="to_date">To Date:</label>
-    <input type="date" name="to_date" value="<?php echo $toDate; ?>" required>
-    <br>
+    <div id="customDateFields" style="display: <?php echo $dateOption === 'custom' ? 'block' : 'none'; ?>;">
+        <label for="from_date">From Date:</label>
+        <input type="date" name="from_date" value="<?php echo $fromDate; ?>">
+        <br>
+        <label for="to_date">To Date:</label>
+        <input type="date" name="to_date" value="<?php echo $toDate; ?>">
+        <br>
+    </div>
     <button type="submit">Get Data</button>
 </form>
-<?php
+
+<script>
+function toggleCustomDateFields(value) {
+    const customDateFields = document.getElementById('customDateFields');
+    if (value === 'custom') {
+        customDateFields.style.display = 'block';
+    } else {
+        customDateFields.style.display = 'none';
+    }
+}
+</script>
+    <?php
 if ($selectedFixturesData) {
     if (empty($selectedFixturesData['response'])) {
         echo '<p>No fixtures data available for the selected league and date range. Please try a different league or check your API plan.</p>';
