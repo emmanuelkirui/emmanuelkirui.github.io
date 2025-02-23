@@ -29,7 +29,7 @@ function fetchLeagues() {
 function fetchLeagueData($leagueId) {
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId . '&season=2024',
+        CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId . '&season=2023', // Use a supported season
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => array(
             'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Your actual API key
@@ -51,6 +51,7 @@ $leagues = fetchLeagues();
 
 // Check if form is submitted
 $selectedLeagueData = null;
+$selectedLeagueId = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
     $selectedLeagueId = $_POST['league_id'];
     $selectedLeagueData = fetchLeagueData($selectedLeagueId);
@@ -90,13 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
     </style>
 </head>
 <body>
-
 <form method="POST">
     <select name="league_id">
         <?php
         if (isset($leagues['response'])) {
             foreach ($leagues['response'] as $league) {
-                echo '<option value="' . $league['league']['id'] . '">' . $league['league']['name'] . '</option>';
+                $isSelected = ($league['league']['id'] == $selectedLeagueId) ? 'selected' : '';
+                echo '<option value="' . $league['league']['id'] . '" ' . $isSelected . '>' . $league['league']['name'] . '</option>';
             }
         } else {
             echo '<option>No leagues found</option>';
