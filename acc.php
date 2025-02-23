@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Leagues Dropdown</title>
+    <title>Football Leagues Fixtures</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -88,9 +88,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
             color: white;
             border: none;
         }
+       table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
+
 <form method="POST">
     <select name="league_id">
         <?php
@@ -103,8 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
             echo '<option>No leagues found</option>';
         }
         ?>
-    </select>
-    <button type="submit">Get Fixtures Data</button>
+    </select> 
+  <button type="submit">Get Fixtures Data</button>
 </form>
 
 <?php
@@ -113,9 +127,16 @@ if ($selectedFixturesData) {
         echo '<p>No fixtures data available for the selected league. Please try a different league or check your API plan.</p>';
     } else {
         echo '<h2>Fixtures Data:</h2>';
-        echo '<pre>';
-        print_r($selectedFixturesData);
-        echo '</pre>';
+        echo '<table>';
+        echo '<tr><th>Date</th><th>Home Team</th><th>Away Team</th><th>Status</th></tr>';
+        foreach ($selectedFixturesData['response'] as $fixture) {
+            $date = date('Y-m-d H:i', strtotime($fixture['fixture']['date']));
+            $homeTeam = $fixture['teams']['home']['name'];
+            $awayTeam = $fixture['teams']['away']['name'];
+            $status = $fixture['fixture']['status']['long'];
+            echo "<tr><td>$date</td><td>$homeTeam</td><td>$awayTeam</td><td>$status</td></tr>";
+        }
+        echo '</table>';
     }
 } else {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -123,5 +144,6 @@ if ($selectedFixturesData) {
     }
 }
 ?>
+
 </body>
-</html>
+</html>  
