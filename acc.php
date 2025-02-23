@@ -29,7 +29,7 @@ function fetchLeagues() {
 function fetchLeagueData($leagueId) {
     $curl = curl_init();
     curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId . '&season=2023', // Use a supported season
+        CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => array(
             'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Your actual API key
@@ -109,16 +109,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
 
 <?php
 if ($selectedLeagueData) {
-    echo '<h2>League Data:</h2>';
-    echo '<pre>';
-    print_r($selectedLeagueData);
-    echo '</pre>';
+    if (empty($selectedLeagueData['response'])) {
+        echo '<p>No data available for the selected league. Please try a different league or check your API plan.</p>';
+    } else {
+        echo '<h2>League Data:</h2>';
+        echo '<pre>';
+        print_r($selectedLeagueData);
+        echo '</pre>';
+    }
 } else {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo '<p>No data found for the selected league or an error occurred.</p>';
     }
 }
 ?>
-
 </body>
 </html>
