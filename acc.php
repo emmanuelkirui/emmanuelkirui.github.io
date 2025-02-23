@@ -12,11 +12,12 @@ function fetchLeagues() {
         CURLOPT_URL => 'https://v3.football.api-sports.io/leagues?current=true',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => array(
-            'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Replace with your API key
+            'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Your actual API key
         ),
     ));
     $response = curl_exec($curl);
 
+    // Check for cURL errors
     if ($response === false) {
         die('Curl error: ' . curl_error($curl));
     }
@@ -24,7 +25,6 @@ function fetchLeagues() {
     curl_close($curl);
     return json_decode($response, true);
 }
-
 // Function to fetch league data
 function fetchLeagueData($leagueId) {
     $curl = curl_init();
@@ -32,11 +32,12 @@ function fetchLeagueData($leagueId) {
         CURLOPT_URL => 'https://v3.football.api-sports.io/standings?league=' . $leagueId . '&season=2024',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => array(
-            'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Replace with your API key
+            'x-apisports-key: f8be56e9365110d1887b69f11f3db11c', // Your actual API key
         ),
     ));
     $response = curl_exec($curl);
 
+    // Check for cURL errors
     if ($response === false) {
         die('Curl error: ' . curl_error($curl));
     }
@@ -48,11 +49,10 @@ function fetchLeagueData($leagueId) {
 // Fetch leagues
 $leagues = fetchLeagues();
 
-// Handle form submission
+// Check if form is submitted
 $selectedLeagueData = null;
-$selectedLeagueId = $_POST['league_id'] ?? '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($selectedLeagueId)) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['league_id'])) {
+    $selectedLeagueId = $_POST['league_id'];
     $selectedLeagueData = fetchLeagueData($selectedLeagueId);
 }
 
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($selectedLeagueId)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Leagues</title>
+    <title>Football Leagues Dropdown</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -87,37 +87,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($selectedLeagueId)) {
             color: white;
             border: none;
         }
-        .league-container {
-            margin-top: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #007BFF;
-            color: white;
-        }
     </style>
 </head>
 <body>
 
 <form method="POST">
     <select name="league_id">
-        <option value="">Select a League</option>
         <?php
-        if (!empty($leagues['response'])) {
+        if (isset($leagues['response'])) {
             foreach ($leagues['response'] as $league) {
-                $leagueId = $league['league']['id'];
-                $leagueName = $league['league']['name'];
-                $selected = ($leagueId == $selectedLeagueId) ? 'selected' : '';
-                echo "<option value=\"$leagueId\" $selected>$leagueName</option>";
+                echo '<option value="' . $league['league']['id'] . '">' . $league['league']['name'] . '</option>';
             }
         } else {
             echo '<option>No leagues found</option>';
@@ -128,24 +107,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($selectedLeagueId)) {
 </form>
 
 <?php
-if (!empty($selectedLeagueData) && isset($selectedLeagueData['response'][0]['league']['standings'][0])) {
-    echo '<div class="league-container">';
-    echo '<h2>League Standings</h2>';
-    echo '<table>';
-    echo '<tr><th>Rank</th><th>Team</th><th>Points</th></tr>';
-
-    foreach ($selectedLeagueData['response'][0]['league']['standings'][0] as $team) {
-        echo '<tr>';
-        echo '<td>' . $team['rank'] . '</td>';
-        echo '<td>' . $team['team']['name'] . '</td>';
-        echo '<td>' . $team['points'] . '</td>';
-        echo '</tr>';
+if ($selectedLeagueData) {
+    echo '<h2>League Data:</h2>';
+    echo '<pre>';
+    print_r($selectedLeagueData);
+    echo '</pre>';
+} else {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        echo '<p>No data found for the selected league or an error occurred.</p>';
     }
-
-    echo '</table>';
-    echo '</div>';
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo '<p>No data found for the selected league.</p>';
 }
 ?>
 
