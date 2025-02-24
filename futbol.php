@@ -8,10 +8,19 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #f9f9f9;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
         }
         .form-group {
             margin-bottom: 15px;
@@ -19,23 +28,22 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
         }
         .form-group input, .form-group select {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         .opponent-group {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .result {
-            margin-top: 20px;
+            border: 1px solid #ddd;
             padding: 15px;
-            background-color: #f4f4f4;
+            margin-bottom: 15px;
             border-radius: 5px;
+            background-color: #fafafa;
         }
         .add-opponent {
             margin-bottom: 15px;
@@ -45,9 +53,56 @@
             padding: 10px 15px;
             cursor: pointer;
             border-radius: 5px;
+            font-size: 16px;
         }
         .add-opponent:hover {
             background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-radius: 5px;
+        }
+        .result h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .result p {
+            font-size: 18px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .toggle-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .toggle-button:hover {
+            background-color: #0056b3;
+        }
+        .data-string {
+            display: none; /* Hidden by default */
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -72,8 +127,8 @@
                         <input type="text" name="opponents[]" required>
                     </div>
                     <div class="form-group">
-                        <label for="score1">Score (Team 1 vs Opponent, e.g., 2-0)</label>
-                        <input type="text" name="scores[]" placeholder="e.g., 2-0" required>
+                        <label for="score1">Score (Team 1 vs Opponent, e.g., 2-1)</label>
+                        <input type="text" name="scores[]" placeholder="e.g., 2-1" required>
                     </div>
                     <div class="form-group">
                         <label for="location1">Team 1 Played</label>
@@ -83,8 +138,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="score2">Score (Team 2 vs Opponent, e.g., 1-1)</label>
-                        <input type="text" name="scores[]" placeholder="e.g., 1-1" required>
+                        <label for="score2">Score (Team 2 vs Opponent, e.g., 1-2)</label>
+                        <input type="text" name="scores[]" placeholder="e.g., 1-2" required>
                     </div>
                     <div class="form-group">
                         <label for="location2">Team 2 Played</label>
@@ -144,8 +199,32 @@
             echo "<div class='result'>
                     <h2>Prediction Result</h2>
                     <p>$prediction</p>
-                    <h3>Data Saved as String:</h3>
-                    <pre>" . htmlspecialchars($dataString) . "</pre>
+                    <h3>Summary Table</h3>
+                    <table>
+                        <tr>
+                            <th>Opponent</th>
+                            <th>Team 1 Score</th>
+                            <th>Team 1 Location</th>
+                            <th>Team 2 Score</th>
+                            <th>Team 2 Location</th>
+                        </tr>";
+
+            for ($i = 0; $i < count($opponents); $i++) {
+                echo "<tr>
+                        <td>{$opponents[$i]}</td>
+                        <td>{$scores[$i * 2]}</td>
+                        <td>{$locations[$i * 2]}</td>
+                        <td>{$scores[$i * 2 + 1]}</td>
+                        <td>{$locations[$i * 2 + 1]}</td>
+                      </tr>";
+            }
+
+            echo "</table>
+                  <button class='toggle-button' onclick='toggleData()'>Show/Hide Data</button>
+                  <div class='data-string' id='dataString'>
+                      <h3>Data Saved as String:</h3>
+                      <pre>" . htmlspecialchars($dataString) . "</pre>
+                  </div>
                   </div>";
         }
         ?>
@@ -164,8 +243,8 @@
                         <input type="text" name="opponents[]" required>
                     </div>
                     <div class="form-group">
-                        <label for="score${opponentCount}">Score (Team 1 vs Opponent, e.g., 2-0)</label>
-                        <input type="text" name="scores[]" placeholder="e.g., 2-0" required>
+                        <label for="score${opponentCount}">Score (Team 1 vs Opponent, e.g., 2-1)</label>
+                        <input type="text" name="scores[]" placeholder="e.g., 2-1" required>
                     </div>
                     <div class="form-group">
                         <label for="location${opponentCount}">Team 1 Played</label>
@@ -175,8 +254,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="score${opponentCount}">Score (Team 2 vs Opponent, e.g., 1-1)</label>
-                        <input type="text" name="scores[]" placeholder="e.g., 1-1" required>
+                        <label for="score${opponentCount}">Score (Team 2 vs Opponent, e.g., 1-2)</label>
+                        <input type="text" name="scores[]" placeholder="e.g., 1-2" required>
                     </div>
                     <div class="form-group">
                         <label for="location${opponentCount}">Team 2 Played</label>
@@ -187,6 +266,15 @@
                     </div>
                 `;
                 container.appendChild(newOpponentGroup);
+            }
+
+            function toggleData() {
+                const dataDiv = document.getElementById('dataString');
+                if (dataDiv.style.display === 'none') {
+                    dataDiv.style.display = 'block';
+                } else {
+                    dataDiv.style.display = 'none';
+                }
             }
         </script>
     </div>
