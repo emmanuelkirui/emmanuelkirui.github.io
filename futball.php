@@ -118,7 +118,7 @@
             <div class="form-group">
                 <label for="competition">Competition</label>
                 <select id="competition" name="competition" required>
-                    <!-- Options will be populated dynamically -->
+                    <option value="">Loading competitions...</option>
                 </select>
             </div>
 
@@ -136,13 +136,13 @@
             <div class="form-group">
                 <label for="team1">Team 1</label>
                 <select id="team1" name="team1" required>
-                    <!-- Options will be populated dynamically -->
+                    <option value="">Select Team 1</option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="team2">Team 2</label>
                 <select id="team2" name="team2" required>
-                    <!-- Options will be populated dynamically -->
+                    <option value="">Select Team 2</option>
                 </select>
             </div>
 
@@ -259,7 +259,7 @@
 
                     // Populate the dropdown
                     const competitionDropdown = document.getElementById('competition');
-                    competitionDropdown.innerHTML = ''; // Clear existing options
+                    competitionDropdown.innerHTML = '<option value="">Select a competition</option>'; // Clear existing options
 
                     data.competitions.forEach(competition => {
                         const option = document.createElement('option');
@@ -335,8 +335,8 @@
                     // Populate team dropdowns
                     const team1Dropdown = document.getElementById('team1');
                     const team2Dropdown = document.getElementById('team2');
-                    team1Dropdown.innerHTML = '';
-                    team2Dropdown.innerHTML = '';
+                    team1Dropdown.innerHTML = '<option value="">Select Team 1</option>';
+                    team2Dropdown.innerHTML = '<option value="">Select Team 2</option>';
 
                     teams.forEach(team => {
                         const option1 = document.createElement('option');
@@ -372,6 +372,16 @@
                 } catch (error) {
                     console.error('Error fetching fixtures and opponents:', error);
                     alert('Failed to fetch fixtures and opponents. Check the console for details.');
+                }
+            }
+
+            // Function to toggle data visibility
+            function toggleData() {
+                const dataDiv = document.getElementById('dataString');
+                if (dataDiv.style.display === 'none') {
+                    dataDiv.style.display = 'block';
+                } else {
+                    dataDiv.style.display = 'none';
                 }
             }
 
