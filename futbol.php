@@ -20,7 +20,7 @@
             display: block;
             margin-bottom: 5px;
         }
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 8px;
             box-sizing: border-box;
@@ -72,12 +72,26 @@
                         <input type="text" name="opponents[]" required>
                     </div>
                     <div class="form-group">
-                        <label for="team1_score1">Team 1 Score vs Opponent</label>
-                        <input type="number" name="team1_scores[]" required>
+                        <label for="score1">Score (Team 1 vs Opponent, e.g., 2-0)</label>
+                        <input type="text" name="scores[]" placeholder="e.g., 2-0" required>
                     </div>
                     <div class="form-group">
-                        <label for="team2_score1">Team 2 Score vs Opponent</label>
-                        <input type="number" name="team2_scores[]" required>
+                        <label for="location1">Team 1 Played</label>
+                        <select name="locations[]" required>
+                            <option value="home">Home</option>
+                            <option value="away">Away</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="score2">Score (Team 2 vs Opponent, e.g., 1-1)</label>
+                        <input type="text" name="scores[]" placeholder="e.g., 1-1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location2">Team 2 Played</label>
+                        <select name="locations[]" required>
+                            <option value="home">Home</option>
+                            <option value="away">Away</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -91,26 +105,37 @@
             $team1 = $_POST['team1'];
             $team2 = $_POST['team2'];
             $opponents = $_POST['opponents'];
-            $team1_scores = $_POST['team1_scores'];
-            $team2_scores = $_POST['team2_scores'];
+            $scores = $_POST['scores'];
+            $locations = $_POST['locations'];
 
             // Combine data into a string (e.g., JSON)
             $data = [
                 'team1' => $team1,
                 'team2' => $team2,
                 'opponents' => $opponents,
-                'team1_scores' => $team1_scores,
-                'team2_scores' => $team2_scores,
+                'scores' => $scores,
+                'locations' => $locations,
             ];
-            $dataString = json_encode($data);
+            $dataString = json_encode($data, JSON_PRETTY_PRINT);
+
+            // Parse scores and calculate totals
+            $team1_total_goals = 0;
+            $team2_total_goals = 0;
+
+            for ($i = 0; $i < count($scores); $i += 2) {
+                // Team 1's score vs opponent
+                list($team1_goals, $opponent_goals) = explode('-', $scores[$i]);
+                $team1_total_goals += (int)$team1_goals;
+
+                // Team 2's score vs opponent
+                list($opponent_goals, $team2_goals) = explode('-', $scores[$i + 1]);
+                $team2_total_goals += (int)$team2_goals;
+            }
 
             // Simple prediction logic
-            $team1_total = array_sum($team1_scores);
-            $team2_total = array_sum($team2_scores);
-
-            if ($team1_total > $team2_total) {
+            if ($team1_total_goals > $team2_total_goals) {
                 $prediction = "$team1 is predicted to win against $team2.";
-            } elseif ($team1_total < $team2_total) {
+            } elseif ($team1_total_goals < $team2_total_goals) {
                 $prediction = "$team2 is predicted to win against $team1.";
             } else {
                 $prediction = "The match between $team1 and $team2 is predicted to be a draw.";
@@ -139,12 +164,26 @@
                         <input type="text" name="opponents[]" required>
                     </div>
                     <div class="form-group">
-                        <label for="team1_score${opponentCount}">Team 1 Score vs Opponent</label>
-                        <input type="number" name="team1_scores[]" required>
+                        <label for="score${opponentCount}">Score (Team 1 vs Opponent, e.g., 2-0)</label>
+                        <input type="text" name="scores[]" placeholder="e.g., 2-0" required>
                     </div>
                     <div class="form-group">
-                        <label for="team2_score${opponentCount}">Team 2 Score vs Opponent</label>
-                        <input type="number" name="team2_scores[]" required>
+                        <label for="location${opponentCount}">Team 1 Played</label>
+                        <select name="locations[]" required>
+                            <option value="home">Home</option>
+                            <option value="away">Away</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="score${opponentCount}">Score (Team 2 vs Opponent, e.g., 1-1)</label>
+                        <input type="text" name="scores[]" placeholder="e.g., 1-1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location${opponentCount}">Team 2 Played</label>
+                        <select name="locations[]" required>
+                            <option value="home">Home</option>
+                            <option value="away">Away</option>
+                        </select>
                     </div>
                 `;
                 container.appendChild(newOpponentGroup);
