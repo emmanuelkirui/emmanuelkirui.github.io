@@ -30,8 +30,10 @@ if (!isset($_SESSION['competitions'])) {
     $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
 }
 
-// Fetch data for the selected competition
+// Fetch data for the selected competition and date
 $selected_competition = isset($_POST['competition']) ? $_POST['competition'] : null;
+$selected_date = isset($_POST['dateFilter']) ? $_POST['dateFilter'] : 'today';
+
 if ($selected_competition) {
     $competition_id = $selected_competition;
     $fixtures_url = "https://api.football-data.org/v4/competitions/$competition_id/matches";
@@ -54,7 +56,7 @@ if ($selected_competition) {
             background-color: #f9f9f9;
         }
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
@@ -81,41 +83,13 @@ if ($selected_competition) {
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .add-opponent {
-            margin-bottom: 15px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        .add-opponent:hover {
-            background-color: #218838;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f4f4f4;
-            border-radius: 5px;
-        }
-        .result h2 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .result p {
-            font-size: 18px;
-            color: #555;
-        }
         .table-container {
             overflow-x: auto;
-            margin-top: 15px;
+            margin-top: 20px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px;
         }
         table, th, td {
             border: 1px solid #ddd;
@@ -127,22 +101,17 @@ if ($selected_competition) {
         th {
             background-color: #f2f2f2;
         }
-        .toggle-button {
+        .action-button {
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 5px 10px;
             cursor: pointer;
-            border-radius: 5px;
-            font-size: 14px;
-            margin-top: 10px;
+            border-radius: 4px;
+            margin-right: 5px;
         }
-        .toggle-button:hover {
+        .action-button:hover {
             background-color: #0056b3;
-        }
-        .data-string {
-            display: none;
-            margin-top: 15px;
         }
     </style>
 </head>
@@ -160,39 +129,6 @@ if ($selected_competition) {
                         foreach ($_SESSION['competitions'] as $competition) {
                             $selected = ($selected_competition == $competition['id']) ? 'selected' : '';
                             echo "<option value='{$competition['id']}' $selected>{$competition['name']}</option>";
-                        }
-                    }
-                    ?>
-                </select>
-            </div>
-
-            <!-- Team Selection Dropdowns -->
-            <div class="form-group">
-                <label for="team1">Team 1</label>
-                <select id="team1" name="team1" required>
-                    <option value="">Select Team 1</option>
-                    <?php
-                    if ($fixtures_data) {
-                        $teams = [];
-                        foreach ($fixtures_data['matches'] as $match) {
-                            $teams[$match['homeTeam']['id']] = $match['homeTeam']['name'];
-                            $teams[$match['awayTeam']['id']] = $match['awayTeam']['name'];
-                        }
-                        foreach ($teams as $id => $name) {
-                            echo "<option value='$id'>$name</option>";
-                        }
-                    }
-                    ?>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="team2">Team 2</label>
-                <select id="team2" name="team2" required>
-                    <option value="">Select Team 2</option>
-                    <?php
-                    if ($fixtures_data) {
-                        foreach ($teams as $id => $name) {
-                            echo "<option value='$id'>$name</option>";
                         }
                     }
                     ?>
@@ -218,30 +154,51 @@ if ($selected_competition) {
                 <input type="date" id="dateTo" name="dateTo">
             </div>
 
-            <!-- Button to Find Opponents -->
-            <button type="button" class="add-opponent" onclick="fetchFixturesAndTeams()">Find Fixtures and Opponents</button>
-            <button type="submit">Predict</button>
+            <button type="submit">Fetch Fixtures</button>
         </form>
 
         <?php
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $team1 = $_POST['team1'];
-            $team2 = $_POST['team2'];
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && $fixtures_data) {
+            echo "<div class='table-container'>
+                    <h2>Fixtures</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Home Team</th>
+                                <th>Away Team</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
 
-            // Simple prediction logic
-            $prediction = "The match between $team1 and $team2 is predicted to be a draw."; // Default prediction
+            foreach ($fixtures_data['matches'] as $match) {
+                $homeTeam = $match['homeTeam']['name'];
+                $awayTeam = $match['awayTeam']['name'];
+                $matchDate = date('Y-m-d H:i', strtotime($match['utcDate']));
+                $status = $match['status'];
 
-            echo "<div class='result'>
-                    <h2>Prediction Result</h2>
-                    <p>$prediction</p>
+                echo "<tr>
+                        <td>$homeTeam</td>
+                        <td>$awayTeam</td>
+                        <td>$matchDate</td>
+                        <td>$status</td>
+                        <td>
+                            <button class='action-button' onclick='findSharedOpponents(\"$homeTeam\", \"$awayTeam\")'>Find Shared Opponents</button>
+                            <button class='action-button' onclick='predictMatch(\"$homeTeam\", \"$awayTeam\")'>Predict</button>
+                        </td>
+                      </tr>";
+            }
+
+            echo "</tbody>
+                  </table>
                   </div>";
         }
         ?>
     </div>
 
     <script>
-        const apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
-
         // Function to update date range based on selected filter
         function updateDateRange() {
             const dateFilter = document.getElementById('dateFilter').value;
@@ -254,86 +211,16 @@ if ($selected_competition) {
             }
         }
 
-        // Function to fetch fixtures and teams
-        async function fetchFixturesAndTeams() {
-            const competitionId = document.getElementById('competition').value;
-            const dateFilter = document.getElementById('dateFilter').value;
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
+        // Function to find shared opponents
+        function findSharedOpponents(homeTeam, awayTeam) {
+            alert(`Finding shared opponents for ${homeTeam} and ${awayTeam}`);
+            // Add logic to find shared opponents here
+        }
 
-            let dateRange = '';
-            switch (dateFilter) {
-                case 'yesterday':
-                    const yesterday = new Date();
-                    yesterday.setDate(yesterday.getDate() - 1);
-                    dateRange = `dateFrom=${yesterday.toISOString().split('T')[0]}&dateTo=${yesterday.toISOString().split('T')[0]}`;
-                    break;
-                case 'today':
-                    const today = new Date();
-                    dateRange = `dateFrom=${today.toISOString().split('T')[0]}&dateTo=${today.toISOString().split('T')[0]}`;
-                    break;
-                case 'tomorrow':
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    dateRange = `dateFrom=${tomorrow.toISOString().split('T')[0]}&dateTo=${tomorrow.toISOString().split('T')[0]}`;
-                    break;
-                case 'custom':
-                    if (!dateFrom || !dateTo) {
-                        alert('Please select a date range.');
-                        return;
-                    }
-                    dateRange = `dateFrom=${dateFrom}&dateTo=${dateTo}`;
-                    break;
-                default:
-                    alert('Invalid date filter.');
-                    return;
-            }
-
-            try {
-                // Fetch fixtures for the selected competition and date range
-                const fixturesResponse = await fetch(
-                    `https://api.football-data.org/v4/competitions/${competitionId}/matches?${dateRange}`,
-                    {
-                        headers: {
-                            'X-Auth-Token': apiKey
-                        }
-                    }
-                );
-
-                if (!fixturesResponse.ok) {
-                    throw new Error(`HTTP error! Status: ${fixturesResponse.status}`);
-                }
-
-                const fixturesData = await fixturesResponse.json();
-
-                // Extract unique teams from fixtures
-                const teams = new Set();
-                fixturesData.matches.forEach(match => {
-                    teams.add(match.homeTeam.name);
-                    teams.add(match.awayTeam.name);
-                });
-
-                // Populate team dropdowns
-                const team1Dropdown = document.getElementById('team1');
-                const team2Dropdown = document.getElementById('team2');
-                team1Dropdown.innerHTML = '<option value="">Select Team 1</option>';
-                team2Dropdown.innerHTML = '<option value="">Select Team 2</option>';
-
-                teams.forEach(team => {
-                    const option1 = document.createElement('option');
-                    option1.value = team;
-                    option1.textContent = team;
-                    team1Dropdown.appendChild(option1);
-
-                    const option2 = document.createElement('option');
-                    option2.value = team;
-                    option2.textContent = team;
-                    team2Dropdown.appendChild(option2);
-                });
-            } catch (error) {
-                console.error('Error fetching fixtures and teams:', error);
-                alert('Failed to fetch fixtures and teams. Check the console for details.');
-            }
+        // Function to predict match outcome
+        function predictMatch(homeTeam, awayTeam) {
+            alert(`Predicting match between ${homeTeam} and ${awayTeam}`);
+            // Add logic to predict match outcome here
         }
     </script>
 </body>
