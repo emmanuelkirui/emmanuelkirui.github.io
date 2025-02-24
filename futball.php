@@ -30,8 +30,17 @@ if (!isset($_SESSION['competitions'])) {
     $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
 }
 
+// Set default competition to Premier League
+$default_competition_id = null;
+foreach ($_SESSION['competitions'] as $competition) {
+    if ($competition['name'] === 'Premier League') {
+        $default_competition_id = $competition['id'];
+        break;
+    }
+}
+
 // Fetch data for the selected competition and date
-$selected_competition = isset($_POST['competition']) ? $_POST['competition'] : null;
+$selected_competition = isset($_POST['competition']) ? $_POST['competition'] : $default_competition_id;
 $selected_date = isset($_POST['dateFilter']) ? $_POST['dateFilter'] : 'today';
 
 if ($selected_competition) {
@@ -215,12 +224,14 @@ if ($selected_competition) {
         function findSharedOpponents(homeTeam, awayTeam) {
             alert(`Finding shared opponents for ${homeTeam} and ${awayTeam}`);
             // Add logic to find shared opponents here
+            // Example: Fetch fixtures for both teams and find common opponents
         }
 
         // Function to predict match outcome
         function predictMatch(homeTeam, awayTeam) {
             alert(`Predicting match between ${homeTeam} and ${awayTeam}`);
             // Add logic to predict match outcome here
+            // Example: Use historical data or a prediction model
         }
     </script>
 </body>
