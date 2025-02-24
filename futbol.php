@@ -6,26 +6,23 @@ $apiKey = "d2ef1a157a0d4c83ba4023d1fbd28b5c";
 $apiBaseUrl = "https://api.football-data.org/v4/";
 
 // Function to fetch API data
-function apiRequest($endpoint)
-{
+function apiRequest($endpoint) {
     global $apiKey, $apiBaseUrl;
     $url = $apiBaseUrl . $endpoint;
-    
+
     $headers = [
-        "X-Auth-Token: $apiKey",
-        "Content-Type: application/json"
+        "X-Auth-Token: $apiKey"
     ];
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     if ($httpCode !== 200) {
-        return ["error" => "API request failed: HTTP $httpCode"];
+        return ["error" => "API failed with HTTP code $httpCode"];
     }
 
     return json_decode($response, true);
@@ -37,10 +34,12 @@ if (isset($_GET['action'])) {
     ob_clean();
 
     if ($_GET['action'] == "getLeagues") {
-        $data = apiRequest("competitions");
-        echo json_encode($data['competitions'] ?? []);
-        exit;
-    }
+    $data = apiRequest("competitions");
+    header('Content-Type: application/json');
+    ob_clean();
+    echo json_encode($data);
+    exit;
+}
 
     if ($_GET['action'] == "getMatches") {
         $league = $_GET['league'] ?? 'PL'; // Default to Premier League
