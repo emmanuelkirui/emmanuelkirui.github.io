@@ -5,8 +5,9 @@ ini_set('display_errors', 1);
 $apiKey = "d2ef1a157a0d4c83ba4023d1fbd28b5c";
 $apiBaseUrl = "https://api.football-data.org/v4/";
 
-// Function to fetch API data
-function apiRequest($endpoint) {
+// Function to fetch API data using cURL
+function apiRequest($endpoint)
+{
     global $apiKey, $apiBaseUrl;
     $url = $apiBaseUrl . $endpoint;
 
@@ -14,15 +15,17 @@ function apiRequest($endpoint) {
         "X-Auth-Token: $apiKey"
     ];
 
-    $ch = curl_init($url);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     if ($httpCode !== 200) {
-        return ["error" => "API failed with HTTP code $httpCode"];
+        return ["error" => "API request failed: HTTP $httpCode"];
     }
 
     return json_decode($response, true);
@@ -34,12 +37,16 @@ if (isset($_GET['action'])) {
     ob_clean();
 
     if ($_GET['action'] == "getLeagues") {
-    $data = apiRequest("competitions");
-    header('Content-Type: application/json');
-    ob_clean();
-    echo json_encode($data);
-    exit;
-}
+        $data = apiRequest("competitions");
+        
+        if (isset($data['error'])) {
+            echo json_encode(["error" => "Failed to fetch leagues. " . $data['error']]);
+            exit;
+        }
+
+        echo json_encode($data['competitions'] ?? []);
+        exit;
+    }
 
     if ($_GET['action'] == "getMatches") {
         $league = $_GET['league'] ?? 'PL'; // Default to Premier League
@@ -64,6 +71,12 @@ if (isset($_GET['action'])) {
         }
 
         $data = apiRequest("matches?competitions=$league&dateFrom=$dateFrom&dateTo=$dateTo");
+        
+        if (isset($data['error'])) {
+            echo json_encode(["error" => "Failed to fetch matches. " . $data['error']]);
+            exit;
+        }
+
         echo json_encode($data['matches'] ?? []);
         exit;
     }
@@ -131,6 +144,12 @@ function loadLeagues() {
     .then(data => {
         let leagueSelect = document.getElementById("league");
         leagueSelect.innerHTML = "";
+        
+        if (data.error) {
+            document.getElementById("error").textContent = data.error;
+            return;
+        }
+
         data.forEach(league => {
             let option = document.createElement("option");
             option.value = league.code;
@@ -160,6 +179,12 @@ function fetchMatches() {
     .then(data => {
         let matchesDiv = document.getElementById("matches");
         matchesDiv.innerHTML = "";
+
+        if (data.error) {
+            document.getElementById("error").textContent = data.error;
+            return;
+        }
+
         if (data.length === 0) {
             matchesDiv.innerHTML = "<p>No matches found.</p>";
             return;
