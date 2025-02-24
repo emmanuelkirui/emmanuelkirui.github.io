@@ -34,7 +34,6 @@ if (!isset($_SESSION['competitions'])) {
 $selected_competition = isset($_POST['competition']) ? $_POST['competition'] : null;
 if ($selected_competition) {
     $competition_id = $selected_competition;
-    $standings_url = "https://api.football-data.org/v4/competitions/$competition_id/standings";
     $fixtures_url = "https://api.football-data.org/v4/competitions/$competition_id/matches";
     $fixtures_data = fetchAPI($fixtures_url, $api_key);
 } else {
@@ -219,6 +218,8 @@ if ($selected_competition) {
                 <input type="date" id="dateTo" name="dateTo">
             </div>
 
+            <!-- Button to Find Opponents -->
+            <button type="button" class="add-opponent" onclick="fetchFixturesAndTeams()">Find Fixtures and Opponents</button>
             <button type="submit">Predict</button>
         </form>
 
@@ -239,6 +240,8 @@ if ($selected_competition) {
     </div>
 
     <script>
+        const apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
+
         // Function to update date range based on selected filter
         function updateDateRange() {
             const dateFilter = document.getElementById('dateFilter').value;
@@ -248,6 +251,88 @@ if ($selected_competition) {
                 customDateRange.style.display = 'block';
             } else {
                 customDateRange.style.display = 'none';
+            }
+        }
+
+        // Function to fetch fixtures and teams
+        async function fetchFixturesAndTeams() {
+            const competitionId = document.getElementById('competition').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+
+            let dateRange = '';
+            switch (dateFilter) {
+                case 'yesterday':
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    dateRange = `dateFrom=${yesterday.toISOString().split('T')[0]}&dateTo=${yesterday.toISOString().split('T')[0]}`;
+                    break;
+                case 'today':
+                    const today = new Date();
+                    dateRange = `dateFrom=${today.toISOString().split('T')[0]}&dateTo=${today.toISOString().split('T')[0]}`;
+                    break;
+                case 'tomorrow':
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    dateRange = `dateFrom=${tomorrow.toISOString().split('T')[0]}&dateTo=${tomorrow.toISOString().split('T')[0]}`;
+                    break;
+                case 'custom':
+                    if (!dateFrom || !dateTo) {
+                        alert('Please select a date range.');
+                        return;
+                    }
+                    dateRange = `dateFrom=${dateFrom}&dateTo=${dateTo}`;
+                    break;
+                default:
+                    alert('Invalid date filter.');
+                    return;
+            }
+
+            try {
+                // Fetch fixtures for the selected competition and date range
+                const fixturesResponse = await fetch(
+                    `https://api.football-data.org/v4/competitions/${competitionId}/matches?${dateRange}`,
+                    {
+                        headers: {
+                            'X-Auth-Token': apiKey
+                        }
+                    }
+                );
+
+                if (!fixturesResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${fixturesResponse.status}`);
+                }
+
+                const fixturesData = await fixturesResponse.json();
+
+                // Extract unique teams from fixtures
+                const teams = new Set();
+                fixturesData.matches.forEach(match => {
+                    teams.add(match.homeTeam.name);
+                    teams.add(match.awayTeam.name);
+                });
+
+                // Populate team dropdowns
+                const team1Dropdown = document.getElementById('team1');
+                const team2Dropdown = document.getElementById('team2');
+                team1Dropdown.innerHTML = '<option value="">Select Team 1</option>';
+                team2Dropdown.innerHTML = '<option value="">Select Team 2</option>';
+
+                teams.forEach(team => {
+                    const option1 = document.createElement('option');
+                    option1.value = team;
+                    option1.textContent = team;
+                    team1Dropdown.appendChild(option1);
+
+                    const option2 = document.createElement('option');
+                    option2.value = team;
+                    option2.textContent = team;
+                    team2Dropdown.appendChild(option2);
+                });
+            } catch (error) {
+                console.error('Error fetching fixtures and teams:', error);
+                alert('Failed to fetch fixtures and teams. Check the console for details.');
             }
         }
     </script>
