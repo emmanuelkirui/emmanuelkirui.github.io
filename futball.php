@@ -114,19 +114,34 @@
     <div class="container">
         <h1>Football Fixture Predictor</h1>
         <form method="post" id="predictionForm">
-            <div class="form-group">
-                <label for="team1">Team 1</label>
-                <input type="text" id="team1" name="team1" required>
-            </div>
-            <div class="form-group">
-                <label for="team2">Team 2</label>
-                <input type="text" id="team2" name="team2" required>
-            </div>
-
-            <!-- League Selection Dropdown -->
+            <!-- Competition Selection Dropdown -->
             <div class="form-group">
                 <label for="competition">Competition</label>
                 <select id="competition" name="competition" required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+
+            <!-- Date Filters -->
+            <div class="form-group">
+                <label for="dateFrom">Date From</label>
+                <input type="date" id="dateFrom" name="dateFrom" required>
+            </div>
+            <div class="form-group">
+                <label for="dateTo">Date To</label>
+                <input type="date" id="dateTo" name="dateTo" required>
+            </div>
+
+            <!-- Team Selection Dropdowns -->
+            <div class="form-group">
+                <label for="team1">Team 1</label>
+                <select id="team1" name="team1" required>
+                    <!-- Options will be populated dynamically -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="team2">Team 2</label>
+                <select id="team2" name="team2" required>
                     <!-- Options will be populated dynamically -->
                 </select>
             </div>
@@ -136,7 +151,7 @@
                 <!-- Opponent groups will be populated dynamically -->
             </div>
 
-            <button type="button" class="add-opponent" onclick="fetchSharedOpponents()">Find Shared Opponents</button>
+            <button type="button" class="add-opponent" onclick="fetchFixturesAndOpponents()">Find Fixtures and Opponents</button>
             <button type="submit">Predict</button>
         </form>
 
@@ -247,126 +262,91 @@
                 }
             }
 
-            // Function to fetch shared opponents
-            async function fetchSharedOpponents() {
-                const team1 = document.getElementById('team1').value.trim();
-                const team2 = document.getElementById('team2').value.trim();
+            // Function to fetch fixtures and opponents
+            async function fetchFixturesAndOpponents() {
                 const competitionId = document.getElementById('competition').value;
+                const dateFrom = document.getElementById('dateFrom').value;
+                const dateTo = document.getElementById('dateTo').value;
 
-                if (!team1 || !team2) {
-                    alert('Please enter both Team 1 and Team 2.');
+                if (!competitionId || !dateFrom || !dateTo) {
+                    alert('Please select a competition and date range.');
                     return;
                 }
 
                 try {
-                    // Fetch team IDs for Team 1 and Team 2
-                    const teamsResponse = await fetch(`https://api.football-data.org/v4/competitions/${competitionId}/teams`, {
-                        headers: {
-                            'X-Auth-Token': apiKey
+                    // Fetch fixtures for the selected competition and date range
+                    const fixturesResponse = await fetch(
+                        `https://api.football-data.org/v4/competitions/${competitionId}/matches?dateFrom=${dateFrom}&dateTo=${dateTo}`,
+                        {
+                            headers: {
+                                'X-Auth-Token': apiKey
+                            }
                         }
+                    );
+                    const fixturesData = await fixturesResponse.json();
+
+                    // Extract teams and opponents from fixtures
+                    const teams = new Set();
+                    const opponents = new Map(); // Key: team, Value: list of opponents
+
+                    fixturesData.matches.forEach(match => {
+                        const homeTeam = match.homeTeam.name;
+                        const awayTeam = match.awayTeam.name;
+
+                        teams.add(homeTeam);
+                        teams.add(awayTeam);
+
+                        if (!opponents.has(homeTeam)) {
+                            opponents.set(homeTeam, []);
+                        }
+                        if (!opponents.has(awayTeam)) {
+                            opponents.set(awayTeam, []);
+                        }
+
+                        opponents.get(homeTeam).push(awayTeam);
+                        opponents.get(awayTeam).push(homeTeam);
                     });
-                    const teamsData = await teamsResponse.json();
 
-                    const team1Data = teamsData.teams.find(team => team.name.toLowerCase() === team1.toLowerCase());
-                    const team2Data = teamsData.teams.find(team => team.name.toLowerCase() === team2.toLowerCase());
+                    // Populate team dropdowns
+                    const team1Dropdown = document.getElementById('team1');
+                    const team2Dropdown = document.getElementById('team2');
+                    team1Dropdown.innerHTML = '';
+                    team2Dropdown.innerHTML = '';
 
-                    if (!team1Data || !team2Data) {
-                        alert('One or both teams not found in the selected competition.');
-                        return;
-                    }
+                    teams.forEach(team => {
+                        const option1 = document.createElement('option');
+                        option1.value = team;
+                        option1.textContent = team;
+                        team1Dropdown.appendChild(option1);
 
-                    // Fetch fixtures for Team 1 and Team 2
-                    const team1Fixtures = await fetchFixtures(team1Data.id, competitionId);
-                    const team2Fixtures = await fetchFixtures(team2Data.id, competitionId);
+                        const option2 = document.createElement('option');
+                        option2.value = team;
+                        option2.textContent = team;
+                        team2Dropdown.appendChild(option2);
+                    });
 
-                    // Find shared opponents
-                    const sharedOpponents = findSharedOpponents(team1Fixtures, team2Fixtures, team1Data.id, team2Data.id);
+                    // Populate opponents container
+                    const container = document.getElementById('opponentsContainer');
+                    container.innerHTML = ''; // Clear existing content
 
-                    // Populate the form with shared opponents
-                    populateOpponents(sharedOpponents);
+                    opponents.forEach((opponentList, team) => {
+                        const opponentGroup = document.createElement('div');
+                        opponentGroup.className = 'opponent-group';
+                        opponentGroup.innerHTML = `
+                            <div class="form-group">
+                                <label>Team: ${team}</label>
+                                <input type="text" name="teams[]" value="${team}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Opponents</label>
+                                <input type="text" name="opponents[]" value="${opponentList.join(', ')}" readonly>
+                            </div>
+                        `;
+                        container.appendChild(opponentGroup);
+                    });
                 } catch (error) {
-                    console.error('Error fetching shared opponents:', error);
+                    console.error('Error fetching fixtures and opponents:', error);
                 }
-            }
-
-            // Function to fetch fixtures for a team
-            async function fetchFixtures(teamId, competitionId) {
-                const url = `https://api.football-data.org/v4/teams/${teamId}/matches?status=FINISHED&competitions=${competitionId}`;
-                const response = await fetch(url, {
-                    headers: {
-                        'X-Auth-Token': apiKey
-                    }
-                });
-                const data = await response.json();
-                return data.matches;
-            }
-
-            // Function to find shared opponents
-            function findSharedOpponents(team1Fixtures, team2Fixtures, team1Id, team2Id) {
-                const team1Opponents = new Set();
-                const team2Opponents = new Set();
-
-                // Get opponents for Team 1
-                team1Fixtures.forEach(match => {
-                    const opponent = match.homeTeam.id === team1Id ? match.awayTeam : match.homeTeam;
-                    team1Opponents.add(opponent);
-                });
-
-                // Get opponents for Team 2
-                team2Fixtures.forEach(match => {
-                    const opponent = match.homeTeam.id === team2Id ? match.awayTeam : match.homeTeam;
-                    team2Opponents.add(opponent);
-                });
-
-                // Find intersection (shared opponents)
-                const sharedOpponents = [];
-                team1Opponents.forEach(opponent => {
-                    if (team2Opponents.has(opponent)) {
-                        sharedOpponents.push(opponent);
-                    }
-                });
-
-                return sharedOpponents;
-            }
-
-            // Function to populate the form with shared opponents
-            function populateOpponents(sharedOpponents) {
-                const container = document.getElementById('opponentsContainer');
-                container.innerHTML = ''; // Clear existing content
-
-                sharedOpponents.forEach(opponent => {
-                    const opponentGroup = document.createElement('div');
-                    opponentGroup.className = 'opponent-group';
-                    opponentGroup.innerHTML = `
-                        <div class="form-group">
-                            <label>Shared Opponent</label>
-                            <input type="text" name="opponents[]" value="${opponent.name}" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Score (Team 1 vs ${opponent.name})</label>
-                            <input type="text" name="scores[]" placeholder="e.g., 2-1" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Team 1 Played</label>
-                            <select name="locations[]" required>
-                                <option value="home">Home</option>
-                                <option value="away">Away</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Score (Team 2 vs ${opponent.name})</label>
-                            <input type="text" name="scores[]" placeholder="e.g., 1-2" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Team 2 Played</label>
-                            <select name="locations[]" required>
-                                <option value="home">Home</option>
-                                <option value="away">Away</option>
-                            </select>
-                        </div>
-                    `;
-                    container.appendChild(opponentGroup);
-                });
             }
 
             // Call the function to fetch competitions on page load
