@@ -339,6 +339,9 @@ if (!isset($_SESSION['competitions'])) {
                         opponents.get(awayTeam).push(homeTeam);
                     });
 
+                    // Log the extracted teams
+                    console.log('Extracted Teams:', Array.from(teams));
+
                     // Populate team dropdowns
                     const team1Dropdown = document.getElementById('team1');
                     const team2Dropdown = document.getElementById('team2');
@@ -356,6 +359,10 @@ if (!isset($_SESSION['competitions'])) {
                         option2.textContent = team;
                         team2Dropdown.appendChild(option2);
                     });
+
+                    // Log the populated dropdowns
+                    console.log('Team 1 Dropdown:', team1Dropdown.innerHTML);
+                    console.log('Team 2 Dropdown:', team2Dropdown.innerHTML);
 
                     // Populate opponents container
                     const container = document.getElementById('opponentsContainer');
