@@ -1,90 +1,128 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    header("Content-Type: application/json");
+    header("Access-Control-Allow-Origin: *");
 
-$apiKey = "d2ef1a157a0d4c83ba4023d1fbd28b5c";
-$apiBaseUrl = "https://api.football-data.org/v4/";
+    $apiKey = "d2ef1a157a0d4c83ba4023d1fbd28b5c";
 
-// Function to fetch API data using cURL
-function apiRequest($endpoint)
-{
-    global $apiKey, $apiBaseUrl;
-    $url = $apiBaseUrl . $endpoint;
+    function apiRequest($endpoint) {
+        global $apiKey;
+        $url = "https://api.football-data.org/v4/" . $endpoint;
 
-    $headers = [
-        "X-Auth-Token: $apiKey"
-    ];
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
+        $response = curl_exec($ch);
+        curl_close($ch);
 
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode !== 200) {
-        return ["error" => "API request failed: HTTP $httpCode"];
+        return json_decode($response, true);
     }
 
-    return json_decode($response, true);
-}
+    if (isset($_GET['action'])) {
+        $action = $_GET['action'];
 
-// Handle AJAX request
-if (isset($_GET['action'])) {
-    header('Content-Type: application/json');
-    ob_clean();
-
-    if ($_GET['action'] == "getLeagues") {
-        $data = apiRequest("competitions");
-        
-        if (isset($data['error'])) {
-            echo json_encode(["error" => "Failed to fetch leagues. " . $data['error']]);
+        // Get available leagues
+        if ($action === "getLeagues") {
+            $data = apiRequest("competitions");
+            echo json_encode($data['competitions'] ?? []);
             exit;
         }
 
-        echo json_encode($data['competitions'] ?? []);
-        exit;
+        // Get matches based on league & date filter
+        if ($action === "getMatches") {
+            $league = $_GET['league'] ?? 'PL'; 
+            $dateFilter = $_GET['dateFilter'] ?? 'today';
+
+            $today = date("Y-m-d");
+            $tomorrow = date("Y-m-d", strtotime("+1 day"));
+            $yesterday = date("Y-m-d", strtotime("-1 day"));
+
+            if ($dateFilter == "today") {
+                $dateFrom = $dateTo = $today;
+            } elseif ($dateFilter == "tomorrow") {
+                $dateFrom = $dateTo = $tomorrow;
+            } elseif ($dateFilter == "yesterday") {
+                $dateFrom = $dateTo = $yesterday;
+            } elseif ($dateFilter == "custom") {
+                $dateFrom = $_GET['fromDate'] ?? $today;
+                $dateTo = $_GET['toDate'] ?? $today;
+            } else {
+                $dateFrom = $dateTo = $today;
+            }
+
+            $data = apiRequest("matches?competitions=$league&dateFrom=$dateFrom&dateTo=$dateTo");
+
+            echo json_encode($data['matches'] ?? []);
+            exit;
+        }
+
+        // Predict match outcome
+        if ($action === "predictMatch") {
+            $team1 = $_GET['team1'] ?? "";
+            $team2 = $_GET['team2'] ?? "";
+
+            if (!$team1 || !$team2) {
+                echo json_encode(["error" => "Teams not selected."]);
+                exit;
+            }
+
+            $matches = apiRequest("matches?dateFrom=" . date("Y-m-d", strtotime("-30 days")) . "&dateTo=" . date("Y-m-d"));
+            $shared_opponents = [];
+            $team1_matches = [];
+            $team2_matches = [];
+
+            foreach ($matches['matches'] as $match) {
+                if ($match['homeTeam']['name'] == $team1 || $match['awayTeam']['name'] == $team1) {
+                    $team1_matches[] = $match;
+                }
+                if ($match['homeTeam']['name'] == $team2 || $match['awayTeam']['name'] == $team2) {
+                    $team2_matches[] = $match;
+                }
+            }
+
+            foreach ($team1_matches as $match1) {
+                foreach ($team2_matches as $match2) {
+                    if ($match1['homeTeam']['name'] == $match2['homeTeam']['name'] ||
+                        $match1['awayTeam']['name'] == $match2['awayTeam']['name']) {
+                        $shared_opponents[] = $match1;
+                    }
+                }
+            }
+
+            if (empty($shared_opponents)) {
+                echo json_encode(["error" => "No shared opponent data found."]);
+                exit;
+            }
+
+            $team1_goals = 0;
+            $team2_goals = 0;
+            $count = count($shared_opponents);
+
+            foreach ($shared_opponents as $match) {
+                if ($match['homeTeam']['name'] == $team1) {
+                    $team1_goals += $match['score']['fullTime']['home'];
+                    $team2_goals += $match['score']['fullTime']['away'];
+                } elseif ($match['awayTeam']['name'] == $team1) {
+                    $team1_goals += $match['score']['fullTime']['away'];
+                    $team2_goals += $match['score']['fullTime']['home'];
+                }
+            }
+
+            $predicted_score1 = round($team1_goals / $count);
+            $predicted_score2 = round($team2_goals / $count);
+
+            echo json_encode([
+                "team1" => $team1,
+                "team2" => $team2,
+                "predicted_score1" => $predicted_score1,
+                "predicted_score2" => $predicted_score2
+            ]);
+            exit;
+        }
     }
-
-    if ($_GET['action'] == "getMatches") {
-    $league = $_GET['league'] ?? 'PL'; // Default to Premier League
-    $dateFilter = $_GET['dateFilter'] ?? 'today';
-
-    $today = date("Y-m-d");
-    $tomorrow = date("Y-m-d", strtotime("+1 day"));
-    $yesterday = date("Y-m-d", strtotime("-1 day"));
-
-    if ($dateFilter == "today") {
-        $dateFrom = $dateTo = $today;
-    } elseif ($dateFilter == "tomorrow") {
-        $dateFrom = $dateTo = $tomorrow;
-    } elseif ($dateFilter == "yesterday") {
-        $dateFrom = $dateTo = $yesterday;
-    } elseif ($dateFilter == "custom") {
-        $dateFrom = $_GET['fromDate'] ?? $today;
-        $dateTo = $_GET['toDate'] ?? $today;
-    } else {
-        $dateFrom = $dateTo = $today;
-    }
-
-    // Log URL to debug
-    error_log("Fetching matches: competitions=$league&dateFrom=$dateFrom&dateTo=$dateTo");
-
-    $data = apiRequest("matches?competitions=$league&dateFrom=$dateFrom&dateTo=$dateTo");
-
-    if (isset($data['error'])) {
-        echo json_encode(["error" => "Failed to fetch matches. " . $data['error']]);
-        exit;
-    }
-
-    // Debug API response
-    error_log(json_encode($data));
-
-    echo json_encode($data['matches'] ?? []);
-    exit;
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -94,112 +132,71 @@ if (isset($_GET['action'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Football Match Predictor</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; text-align: center; padding: 20px; }
-        .container { width: 90%; max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); }
-        select, input, button { width: 100%; padding: 10px; margin: 10px 0; font-size: 16px; }
-        button { background: #28a745; color: white; border: none; cursor: pointer; }
-        button:hover { background: #218838; }
-        .error { color: red; }
+        body { font-family: Arial, sans-serif; text-align: center; }
+        select, button { padding: 8px; margin: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Football Match Predictor</h2>
-    
-    <label for="league">Select League:</label>
-    <select id="league"></select>
+<h2>Football Match Predictor</h2>
 
-    <label for="dateFilter">Select Date:</label>
-    <select id="dateFilter">
-        <option value="today" selected>Today</option>
-        <option value="yesterday">Yesterday</option>
-        <option value="tomorrow">Tomorrow</option>
-        <option value="custom">Custom Range</option>
-    </select>
+<select id="league"></select>
+<select id="dateFilter">
+    <option value="today">Today</option>
+    <option value="yesterday">Yesterday</option>
+    <option value="tomorrow">Tomorrow</option>
+    <option value="custom">Custom</option>
+</select>
+<input type="date" id="fromDate" style="display:none;">
+<input type="date" id="toDate" style="display:none;">
+<button onclick="fetchMatches()">Get Matches</button>
 
-    <div id="customDateRange" style="display: none;">
-        <input type="date" id="fromDate">
-        <input type="date" id="toDate">
-    </div>
+<h3>Matches</h3>
+<ul id="matchList"></ul>
 
-    <button onclick="fetchMatches()">Get Matches</button>
-
-    <h3>Upcoming Matches</h3>
-    <div id="matches"></div>
-
-    <p class="error" id="error"></p>
-</div>
+<h3>Predict Match</h3>
+<select id="team1"></select> vs <select id="team2"></select>
+<button onclick="predictMatch()">Predict</button>
+<p id="prediction"></p>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    loadLeagues();
-    document.getElementById("dateFilter").addEventListener("change", function() {
-        document.getElementById("customDateRange").style.display = this.value === "custom" ? "block" : "none";
-    });
+    fetchLeagues();
+    fetchMatches();
 });
 
-function loadLeagues() {
-    fetch("futbol.php?action=getLeagues")
-    .then(res => res.json())
-    .then(data => {
-        let leagueSelect = document.getElementById("league");
-        leagueSelect.innerHTML = "";
-        
-        if (data.error) {
-            document.getElementById("error").textContent = data.error;
-            return;
-        }
-
-        data.forEach(league => {
-            let option = document.createElement("option");
-            option.value = league.code;
-            option.textContent = league.name;
-            leagueSelect.appendChild(option);
+function fetchLeagues() {
+    fetch("?action=getLeagues")
+        .then(res => res.json())
+        .then(data => {
+            let dropdown = document.getElementById("league");
+            dropdown.innerHTML = data.map(league => `<option value="${league.code}">${league.name}</option>`).join("");
         });
-        leagueSelect.value = "PL"; // Default to Premier League
-    })
-    .catch(err => {
-        document.getElementById("error").textContent = "Failed to load leagues.";
-    });
 }
 
 function fetchMatches() {
     let league = document.getElementById("league").value;
     let dateFilter = document.getElementById("dateFilter").value;
-    let fromDate = document.getElementById("fromDate").value;
-    let toDate = document.getElementById("toDate").value;
 
-    let url = `futbol.php?action=getMatches&league=${league}&dateFilter=${dateFilter}`;
-    if (dateFilter === "custom") {
-        url += `&fromDate=${fromDate}&toDate=${toDate}`;
-    }
-
-    fetch(url)
-    .then(res => res.json())
-    .then(data => {
-        let matchesDiv = document.getElementById("matches");
-        matchesDiv.innerHTML = "";
-
-        if (data.error) {
-            document.getElementById("error").textContent = data.error;
-            return;
-        }
-
-        if (data.length === 0) {
-            matchesDiv.innerHTML = "<p>No matches found.</p>";
-            return;
-        }
-
-        data.forEach(match => {
-            let matchElement = document.createElement("p");
-            matchElement.textContent = `${match.homeTeam.name} vs ${match.awayTeam.name} - ${match.utcDate}`;
-            matchesDiv.appendChild(matchElement);
+    fetch(`?action=getMatches&league=${league}&dateFilter=${dateFilter}`)
+        .then(res => res.json())
+        .then(data => {
+            let list = document.getElementById("matchList");
+            list.innerHTML = data.map(match => 
+                `<li>${match.homeTeam.name} vs ${match.awayTeam.name}</li>`).join("");
         });
-    })
-    .catch(err => {
-        document.getElementById("error").textContent = "Failed to fetch matches.";
-    });
+}
+
+function predictMatch() {
+    let team1 = document.getElementById("team1").value;
+    let team2 = document.getElementById("team2").value;
+
+    fetch(`?action=predictMatch&team1=${team1}&team2=${team2}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("prediction").textContent = 
+                `Predicted Score: ${data.team1} ${data.predicted_score1} - ${data.predicted_score2} ${data.team2}`;
+        });
 }
 </script>
 
