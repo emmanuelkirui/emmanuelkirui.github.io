@@ -51,7 +51,7 @@ function getTeamMetrics($standings_data) {
         $losses = isset($team['lost']) ? $team['lost'] : 0;
 
         $metrics[$team_name] = [
-            'crest' => $team['team']['crest'], // Add team crest
+            'crest' => $team['team']['crest'],
             'played' => $played,
             'win_ratio' => $played > 0 ? round($wins / $played, 2) : 0,
             'avg_goals_scored' => $played > 0 ? round($goals_for / $played, 2) : 0,
@@ -62,6 +62,69 @@ function getTeamMetrics($standings_data) {
         ];
     }
     return $metrics;
+}
+// Function to calculate shared opponent metrics
+function getSharedOpponentMetrics($team1, $team2, $fixtures_data) {
+    $shared_opponents = [];
+    $team1_opponents = [];
+    $team2_opponents = [];
+
+    // Get opponents for team1
+    foreach ($fixtures_data['matches'] as $match) {
+        if ($match['homeTeam']['name'] == $team1) {
+            $team1_opponents[] = $match['awayTeam']['name'];
+        } elseif ($match['awayTeam']['name'] == $team1) {
+            $team1_opponents[] = $match['homeTeam']['name'];
+        }
+    }
+
+    // Get opponents for team2
+    foreach ($fixtures_data['matches'] as $match) {
+        if ($match['homeTeam']['name'] == $team2) {
+            $team2_opponents[] = $match['awayTeam']['name'];
+        } elseif ($match['awayTeam']['name'] == $team2) {
+            $team2_opponents[] = $match['homeTeam']['name'];
+        }
+    }
+
+    // Find shared opponents
+    $shared_opponents = array_intersect($team1_opponents, $team2_opponents);
+
+    // Calculate metrics for shared opponents
+    $team1_metrics = ['wins' => 0, 'draws' => 0, 'losses' => 0, 'goals_for' => 0, 'goals_against' => 0];
+    $team2_metrics = ['wins' => 0, 'draws' => 0, 'losses' => 0, 'goals_for' => 0, 'goals_against' => 0];
+
+    foreach ($fixtures_data['matches'] as $match) {
+        if (in_array($match['homeTeam']['name'], $shared_opponents) || in_array($match['awayTeam']['name'], $shared_opponents)) {
+            if ($match['homeTeam']['name'] == $team1 || $match['awayTeam']['name'] == $team1) {
+                $team1_metrics['goals_for'] += $match['score']['fullTime']['home'];
+                $team1_metrics['goals_against'] += $match['score']['fullTime']['away'];
+                if ($match['score']['fullTime']['home'] > $match['score']['fullTime']['away']) {
+                    $team1_metrics['wins']++;
+                } elseif ($match['score']['fullTime']['home'] < $match['score']['fullTime']['away']) {
+                    $team1_metrics['losses']++;
+                } else {
+                    $team1_metrics['draws']++;
+                }
+            }
+            if ($match['homeTeam']['name'] == $team2 || $match['awayTeam']['name'] == $team2) {
+                $team2_metrics['goals_for'] += $match['score']['fullTime']['home'];
+                $team2_metrics['goals_against'] += $match['score']['fullTime']['away'];
+                if ($match['score']['fullTime']['home'] > $match['score']['fullTime']['away']) {
+                    $team2_metrics['wins']++;
+                } elseif ($match['score']['fullTime']['home'] < $match['score']['fullTime']['away']) {
+                    $team2_metrics['losses']++;
+                } else {
+                    $team2_metrics['draws']++;
+                }
+            }
+        }
+    }
+
+    return [
+        'team1' => $team1_metrics,
+        'team2' => $team2_metrics
+    ];
 }
 
 // Helper function to calculate a numeric weight for recent form
@@ -125,8 +188,8 @@ function calculateHomeAwayAdvantage($fixtures_data) {
     return ['home_advantage' => $home_advantage, 'away_advantage' => $away_advantage];
 }
 
-// Function to predict match outcome with revised weights
-function predictMatch($home_metrics, $away_metrics, $advantages) {
+// Function to predict match outcome with shared opponent metrics
+function predictMatch($home_metrics, $away_metrics, $advantages, $shared_opponent_metrics) {
     $home_advantage = $advantages['home_advantage'];
     $away_advantage = $advantages['away_advantage'];
 
@@ -134,18 +197,22 @@ function predictMatch($home_metrics, $away_metrics, $advantages) {
     $home_recent_form_weight = calculateRecentFormWeight($home_metrics['recent_form'] ?? '');
     $away_recent_form_weight = calculateRecentFormWeight($away_metrics['recent_form'] ?? '');
 
-    // Calculate home and away scores with both advantages
+    // Calculate home and away scores with both advantages and shared opponent metrics
     $home_score = ($home_metrics['win_ratio'] * 1.3)  
                 + ($home_metrics['avg_goals_scored'] * 1.2) 
                 - ($home_metrics['avg_goals_conceded'] * 0.8)
                 + ($home_recent_form_weight * 0.7)
-                + $home_advantage; // Include home advantage
+                + $home_advantage
+                + ($shared_opponent_metrics['team1']['wins'] * 0.5)
+                - ($shared_opponent_metrics['team1']['losses'] * 0.5);
 
     $away_score = ($away_metrics['win_ratio'] * 1.3) 
                 + ($away_metrics['avg_goals_scored'] * 1.2) 
                 - ($away_metrics['avg_goals_conceded'] * 0.8)
                 + ($away_recent_form_weight * 0.7)
-                + $away_advantage; // Include away advantage
+                + $away_advantage
+                + ($shared_opponent_metrics['team2']['wins'] * 0.5)
+                - ($shared_opponent_metrics['team2']['losses'] * 0.5);
 
     // Adjust thresholds with added consideration for draws
     $score_difference = $home_score - $away_score;
