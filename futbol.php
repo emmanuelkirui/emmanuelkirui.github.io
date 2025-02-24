@@ -5,29 +5,21 @@ $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Replace with your API key
 // Base URL for the API
 $baseUrl = 'https://api.football-data.org/v4/';
 
-// Set default date filter to "Today"
-$dateFilter = isset($_GET['date_filter']) ? $_GET['date_filter'] : 'today';
+// Set default date filter and league
+$dateFilter = $_GET['date_filter'] ?? 'today';
+$league = $_GET['league'] ?? 'PL';
 
-// Set default league to "Premier League"
-$league = isset($_GET['league']) ? $_GET['league'] : 'PL';
-
-// Function to fetch data from the API
+// Function to fetch data from API
 function fetchData($url, $apiKey) {
     $context = stream_context_create([
-        'http' => [
-            'header' => "X-Auth-Token: $apiKey\r\n"
-        ]
+        'http' => ['header' => "X-Auth-Token: $apiKey\r\n"]
     ]);
     $response = file_get_contents($url, false, $context);
-    if ($response === FALSE) {
-        die('Error fetching data from the API.');
-    }
-    return json_decode($response, true);
+    return $response ? json_decode($response, true) : null;
 }
 
 // Fetch available leagues
-$leaguesUrl = $baseUrl . 'competitions';
-$leaguesData = fetchData($leaguesUrl, $apiKey);
+$leaguesData = fetchData($baseUrl . 'competitions', $apiKey);
 $leagues = [];
 foreach ($leaguesData['competitions'] as $comp) {
     if (isset($comp['code'])) {
@@ -35,151 +27,140 @@ foreach ($leaguesData['competitions'] as $comp) {
     }
 }
 
-// Determine the date range based on the filter
+// Set date range based on filter
 switch ($dateFilter) {
-    case 'yesterday':
-        $dateFrom = $dateTo = date('Y-m-d', strtotime('-1 day'));
-        break;
-    case 'tomorrow':
-        $dateFrom = $dateTo = date('Y-m-d', strtotime('+1 day'));
-        break;
+    case 'yesterday': $dateFrom = $dateTo = date('Y-m-d', strtotime('-1 day')); break;
+    case 'tomorrow':  $dateFrom = $dateTo = date('Y-m-d', strtotime('+1 day')); break;
     case 'custom':
-        $dateFrom = isset($_GET['custom_date_from']) ? $_GET['custom_date_from'] : date('Y-m-d');
-        $dateTo = isset($_GET['custom_date_to']) ? $_GET['custom_date_to'] : date('Y-m-d');
+        $dateFrom = $_GET['custom_date_from'] ?? date('Y-m-d');
+        $dateTo = $_GET['custom_date_to'] ?? date('Y-m-d');
         break;
     default: // today
         $dateFrom = $dateTo = date('Y-m-d');
 }
 
-// Fetch matches based on the date range and league
-$matchesUrl = $baseUrl . 'matches?competitions=' . $league . '&dateFrom=' . $dateFrom . '&dateTo=' . $dateTo;
+// Fetch matches
+$matchesUrl = "{$baseUrl}matches?competitions={$league}&dateFrom={$dateFrom}&dateTo={$dateTo}";
 $matchesData = fetchData($matchesUrl, $apiKey);
 
-// Function to generate predictions based on shared opponents
+// Generate predictions
 function generatePredictions($matches) {
-    $teamPerformance = [];
+    $teamStats = [];
 
-    // Analyze each match
+    // Process past results
     foreach ($matches as $match) {
-        $homeTeam = $match['homeTeam']['name'];
-        $awayTeam = $match['awayTeam']['name'];
+        $home = $match['homeTeam']['name'];
+        $away = $match['awayTeam']['name'];
         $homeGoals = $match['score']['fullTime']['home'] ?? 0;
         $awayGoals = $match['score']['fullTime']['away'] ?? 0;
 
-        // Initialize team performance data if not already set
-        if (!isset($teamPerformance[$homeTeam])) {
-            $teamPerformance[$homeTeam] = ['goalsScored' => 0, 'goalsConceded' => 0, 'wins' => 0, 'losses' => 0];
-        }
-        if (!isset($teamPerformance[$awayTeam])) {
-            $teamPerformance[$awayTeam] = ['goalsScored' => 0, 'goalsConceded' => 0, 'wins' => 0, 'losses' => 0];
-        }
+        if (!isset($teamStats[$home])) $teamStats[$home] = ['scored' => 0, 'conceded' => 0, 'wins' => 0, 'losses' => 0];
+        if (!isset($teamStats[$away])) $teamStats[$away] = ['scored' => 0, 'conceded' => 0, 'wins' => 0, 'losses' => 0];
 
-        // Update home team performance
-        $teamPerformance[$homeTeam]['goalsScored'] += $homeGoals;
-        $teamPerformance[$homeTeam]['goalsConceded'] += $awayGoals;
-        if ($homeGoals > $awayGoals) {
-            $teamPerformance[$homeTeam]['wins'] += 1;
-        } elseif ($homeGoals < $awayGoals) {
-            $teamPerformance[$homeTeam]['losses'] += 1;
-        }
+        $teamStats[$home]['scored'] += $homeGoals;
+        $teamStats[$home]['conceded'] += $awayGoals;
+        if ($homeGoals > $awayGoals) $teamStats[$home]['wins']++;
+        if ($homeGoals < $awayGoals) $teamStats[$home]['losses']++;
 
-        // Update away team performance
-        $teamPerformance[$awayTeam]['goalsScored'] += $awayGoals;
-        $teamPerformance[$awayTeam]['goalsConceded'] += $homeGoals;
-        if ($awayGoals > $homeGoals) {
-            $teamPerformance[$awayTeam]['wins'] += 1;
-        } elseif ($awayGoals < $homeGoals) {
-            $teamPerformance[$awayTeam]['losses'] += 1;
-        }
+        $teamStats[$away]['scored'] += $awayGoals;
+        $teamStats[$away]['conceded'] += $homeGoals;
+        if ($awayGoals > $homeGoals) $teamStats[$away]['wins']++;
+        if ($awayGoals < $homeGoals) $teamStats[$away]['losses']++;
     }
 
-    // Generate predictions for upcoming matches
+    // Generate predictions
     $predictions = [];
     foreach ($matches as $match) {
-        $homeTeam = $match['homeTeam']['name'];
-        $awayTeam = $match['awayTeam']['name'];
+        $home = $match['homeTeam']['name'];
+        $away = $match['awayTeam']['name'];
 
-        // Skip if performance data is not available for either team
-        if (!isset($teamPerformance[$homeTeam]) || !isset($teamPerformance[$awayTeam])) {
-            continue;
-        }
+        if (!isset($teamStats[$home]) || !isset($teamStats[$away])) continue;
 
-        // Calculate prediction based on performance
-        $homeStrength = ($teamPerformance[$homeTeam]['wins'] + $teamPerformance[$homeTeam]['goalsScored']) - $teamPerformance[$homeTeam]['losses'];
-        $awayStrength = ($teamPerformance[$awayTeam]['wins'] + $teamPerformance[$awayTeam]['goalsScored']) - $teamPerformance[$awayTeam]['losses'];
+        $homeStrength = ($teamStats[$home]['wins'] + $teamStats[$home]['scored']) - $teamStats[$home]['losses'];
+        $awayStrength = ($teamStats[$away]['wins'] + $teamStats[$away]['scored']) - $teamStats[$away]['losses'];
 
         if ($homeStrength > $awayStrength) {
-            $prediction = "$homeTeam is likely to win against $awayTeam.";
+            $prediction = "$home is likely to win.";
         } elseif ($homeStrength < $awayStrength) {
-            $prediction = "$awayTeam is likely to win against $homeTeam.";
+            $prediction = "$away is likely to win.";
         } else {
-            $prediction = "The match between $homeTeam and $awayTeam is likely to be a draw.";
+            $prediction = "Likely a draw.";
         }
 
-        $predictions[] = $prediction;
+        $predictions[$home . ' vs ' . $away] = $prediction;
     }
 
     return $predictions;
 }
 
-// Generate predictions
-$predictions = generatePredictions($matchesData['matches'] ?? []);
+// Generate predictions based on fixtures
+$matches = $matchesData['matches'] ?? [];
+$predictions = generatePredictions($matches);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Football Predictions</title>
+    <title>Football Fixtures & Predictions</title>
 </head>
 <body>
-    <h1>Football Predictions</h1>
+    <h1>Football Fixtures & Predictions</h1>
     <form method="GET">
         <label for="date_filter">Date Filter:</label>
         <select name="date_filter" id="date_filter">
-            <option value="today" <?php echo $dateFilter == 'today' ? 'selected' : ''; ?>>Today</option>
-            <option value="yesterday" <?php echo $dateFilter == 'yesterday' ? 'selected' : ''; ?>>Yesterday</option>
-            <option value="tomorrow" <?php echo $dateFilter == 'tomorrow' ? 'selected' : ''; ?>>Tomorrow</option>
-            <option value="custom" <?php echo $dateFilter == 'custom' ? 'selected' : ''; ?>>Custom</option>
+            <option value="today" <?= $dateFilter == 'today' ? 'selected' : ''; ?>>Today</option>
+            <option value="yesterday" <?= $dateFilter == 'yesterday' ? 'selected' : ''; ?>>Yesterday</option>
+            <option value="tomorrow" <?= $dateFilter == 'tomorrow' ? 'selected' : ''; ?>>Tomorrow</option>
+            <option value="custom" <?= $dateFilter == 'custom' ? 'selected' : ''; ?>>Custom</option>
         </select>
 
-        <div id="custom_date" style="<?php echo $dateFilter == 'custom' ? 'display:block;' : 'display:none;'; ?>">
+        <div id="custom_date" style="<?= $dateFilter == 'custom' ? 'display:block;' : 'display:none;'; ?>">
             <label for="custom_date_from">From:</label>
-            <input type="date" name="custom_date_from" id="custom_date_from" value="<?php echo $dateFrom; ?>">
+            <input type="date" name="custom_date_from" id="custom_date_from" value="<?= $dateFrom; ?>">
             <label for="custom_date_to">To:</label>
-            <input type="date" name="custom_date_to" id="custom_date_to" value="<?php echo $dateTo; ?>">
+            <input type="date" name="custom_date_to" id="custom_date_to" value="<?= $dateTo; ?>">
         </div>
 
         <label for="league">League:</label>
         <select name="league" id="league">
             <?php foreach ($leagues as $code => $name): ?>
-                <option value="<?php echo $code; ?>" <?php echo $league == $code ? 'selected' : ''; ?>><?php echo $name; ?></option>
+                <option value="<?= $code; ?>" <?= $league == $code ? 'selected' : ''; ?>><?= $name; ?></option>
             <?php endforeach; ?>
         </select>
 
         <button type="submit">Filter</button>
     </form>
 
-    <h2>Predictions</h2>
-    <?php if (!empty($predictions)): ?>
-        <ul>
-            <?php foreach ($predictions as $prediction): ?>
-                <li><?php echo $prediction; ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p>No predictions available for the selected date range and league.</p>
-    <?php endif; ?>
+    <h2>Fixtures & Predictions</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Home Team</th>
+                <th>Away Team</th>
+                <th>Prediction</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (!empty($matches)): ?>
+                <?php foreach ($matches as $match): ?>
+                    <tr>
+                        <td><?= date('Y-m-d', strtotime($match['utcDate'])); ?></td>
+                        <td><?= $match['homeTeam']['name']; ?></td>
+                        <td><?= $match['awayTeam']['name']; ?></td>
+                        <td><?= $predictions[$match['homeTeam']['name'] . ' vs ' . $match['awayTeam']['name']] ?? 'No prediction'; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr><td colspan="4">No matches found.</td></tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
 
     <script>
-        // Show/hide custom date fields based on the selected date filter
         document.getElementById('date_filter').addEventListener('change', function() {
-            var customDateDiv = document.getElementById('custom_date');
-            if (this.value == 'custom') {
-                customDateDiv.style.display = 'block';
-            } else {
-                customDateDiv.style.display = 'none';
-            }
+            document.getElementById('custom_date').style.display = this.value == 'custom' ? 'block' : 'none';
         });
     </script>
 </body>
