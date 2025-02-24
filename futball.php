@@ -6,10 +6,28 @@ date_default_timezone_set('Africa/Nairobi'); // EAT (UTC+3)
 $apiBaseUrl = "https://api.football-data.org/v4";
 $apiKey = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 
+// Function to fetch competitions from the API
+function fetchCompetitions() {
+    global $apiBaseUrl, $apiKey;
+    $apiUrl = "$apiBaseUrl/competitions";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "X-Auth-Token: $apiKey"
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    return json_decode($response, true);
+}
+
 // Function to fetch fixtures from the API
-function fetchFixtures($competitionCode = 'PL') {
+function fetchFixtures($competitionCode, $dateFrom = null, $dateTo = null) {
     global $apiBaseUrl, $apiKey;
     $apiUrl = "$apiBaseUrl/competitions/$competitionCode/matches";
+    if ($dateFrom && $dateTo) {
+        $apiUrl .= "?dateFrom=$dateFrom&dateTo=$dateTo";
+    }
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $apiUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -104,10 +122,46 @@ function predictMatch($homeTeamId, $awayTeamId) {
     }
 }
 
-// Fetch fixtures
-$fixtures = fetchFixtures();
-$matches = $fixtures['matches'] ?? [];
+// Fetch competitions for the dropdown
+$competitions = fetchCompetitions();
+$competitionsList = [];
+foreach ($competitions['competitions'] as $competition) {
+    if (isset($competition['name'], $competition['code'])) {
+        $competitionsList[$competition['code'] = $competition['name'];
+    }
+}
 
+// Handle form submission
+$selectedCompetition = $_GET['competition'] ?? 'PL'; // Default to Premier League
+$dateFilter = $_GET['date_filter'] ?? 'all'; // Default to all dates
+$customDate = $_GET['custom_date'] ?? '';
+
+// Calculate date range based on filter
+$dateFrom = $dateTo = null;
+switch ($dateFilter) {
+    case 'yesterday':
+        $dateFrom = date('Y-m-d', strtotime('-1 day'));
+        $dateTo = $dateFrom;
+        break;
+    case 'today':
+        $dateFrom = date('Y-m-d');
+        $dateTo = $dateFrom;
+        break;
+    case 'tomorrow':
+        $dateFrom = date('Y-m-d', strtotime('+1 day'));
+        $dateTo = $dateFrom;
+        break;
+    case 'custom':
+        if (!empty($customDate)) {
+            $dateFrom = $customDate;
+            $dateTo = $customDate;
+        }
+        break;
+}
+
+// Fetch fixtures based on selected competition and date filter
+$fixtures = fetchFixtures($selectedCompetition, $dateFrom, $dateTo);
+$matches = $fixtures['matches'] ?? [];
 ?>
 
 <!DOCTYPE html>
@@ -136,7 +190,29 @@ $matches = $fixtures['matches'] ?? [];
             border: 1px solid #ddd;
             text-align: center;
         }
+        .custom-date-input {
+            display: none;
+        }
     </style>
+    <script>
+        function toggleCustomDateInput() {
+            const dateFilter = document.getElementById('date_filter').value;
+            const customDateInput = document.getElementById('custom_date_input');
+            customDateInput.style.display = (dateFilter === 'custom') ? 'block' : 'none';
+        }
+
+        function reloadPage() {
+            const competition = document.getElementById('competition').value;
+            const dateFilter = document.getElementById('date_filter').value;
+            const customDate = document.getElementById('custom_date').value;
+
+            if (dateFilter === 'custom' && customDate) {
+                window.location.href = `?competition=${competition}&date_filter=custom&custom_date=${customDate}`;
+            } else {
+                window.location.href = `?competition=${competition}&date_filter=${dateFilter}`;
+            }
+        }
+    </script>
 </head>
 <body>
     <section class="section">
@@ -144,6 +220,47 @@ $matches = $fixtures['matches'] ?? [];
             <h1 class="title">Football Predictions</h1>
             <h2 class="subtitle">Predictions Based on Shared Opponents</h2>
 
+            <!-- Filters Form -->
+            <form onchange="reloadPage()">
+                <div class="field">
+                    <label class="label">Select Competition:</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="competition" name="competition">
+                                <?php foreach ($competitionsList as $code => $name): ?>
+                                    <option value="<?= $code; ?>" <?= ($selectedCompetition == $code) ? 'selected' : ''; ?>>
+                                        <?= htmlspecialchars($name); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">Select Date:</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="date_filter" name="date_filter" onchange="toggleCustomDateInput()">
+                                <option value="all" <?= ($dateFilter == 'all') ? 'selected' : ''; ?>>All</option>
+                                <option value="yesterday" <?= ($dateFilter == 'yesterday') ? 'selected' : ''; ?>>Yesterday</option>
+                                <option value="today" <?= ($dateFilter == 'today') ? 'selected' : ''; ?>>Today</option>
+                                <option value="tomorrow" <?= ($dateFilter == 'tomorrow') ? 'selected' : ''; ?>>Tomorrow</option>
+                                <option value="custom" <?= ($dateFilter == 'custom') ? 'selected' : ''; ?>>Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field custom-date-input" id="custom_date_input" style="display: <?= ($dateFilter === 'custom') ? 'block' : 'none'; ?>;">
+                    <label class="label">Pick a Date:</label>
+                    <div class="control">
+                        <input class="input" type="date" id="custom_date" name="custom_date" value="<?= $customDate; ?>">
+                    </div>
+                </div>
+            </form>
+
+            <!-- Fixtures Table -->
             <?php if (!empty($matches)): ?>
                 <table class="fixture-table">
                     <thead>
@@ -174,7 +291,7 @@ $matches = $fixtures['matches'] ?? [];
                     </tbody>
                 </table>
             <?php else: ?>
-                <div class="notification is-warning">No fixtures found.</div>
+                <div class="notification is-warning">No fixtures found for the selected filter.</div>
             <?php endif; ?>
         </div>
     </section>
