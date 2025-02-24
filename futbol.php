@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function loadLeagues() {
-    fetch("index.php?action=getLeagues")
+    fetch("futbol.php?action=getLeagues")
     .then(res => res.json())
     .then(data => {
         let leagueSelect = document.getElementById("league");
@@ -150,7 +150,7 @@ function fetchMatches() {
     let fromDate = document.getElementById("fromDate").value;
     let toDate = document.getElementById("toDate").value;
 
-    let url = `index.php?action=getMatches&league=${league}&dateFilter=${dateFilter}`;
+    let url = `futbol.php?action=getMatches&league=${league}&dateFilter=${dateFilter}`;
     if (dateFilter === "custom") {
         url += `&fromDate=${fromDate}&toDate=${toDate}`;
     }
