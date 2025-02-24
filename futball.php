@@ -150,19 +150,17 @@ if (!isset($_SESSION['competitions'])) {
             <!-- Competition Selection Dropdown -->
             <div class="form-group">
                 <label for="competition">Competition</label>
-                <select id="competition" name="competition" required>
+                <select id="competition" name="competition" required onchange="fetchFixtures()">
                     <option value="">Loading competitions...</option>
                 </select>
             </div>
 
-            <!-- Date Filters -->
+            <!-- Fixture Selection Dropdown -->
             <div class="form-group">
-                <label for="dateFrom">Date From</label>
-                <input type="date" id="dateFrom" name="dateFrom" required>
-            </div>
-            <div class="form-group">
-                <label for="dateTo">Date To</label>
-                <input type="date" id="dateTo" name="dateTo" required>
+                <label for="fixture">Fixture</label>
+                <select id="fixture" name="fixture" required>
+                    <option value="">Select a fixture</option>
+                </select>
             </div>
 
             <!-- Team Selection Dropdowns -->
@@ -281,6 +279,81 @@ if (!isset($_SESSION['competitions'])) {
                     }
                     competitionDropdown.appendChild(option);
                 });
+            }
+
+            // Function to fetch fixtures for the selected competition
+            async function fetchFixtures() {
+                const competitionId = document.getElementById('competition').value;
+
+                if (!competitionId) {
+                    alert('Please select a competition.');
+                    return;
+                }
+
+                try {
+                    // Fetch fixtures for the selected competition
+                    const fixturesResponse = await fetch(
+                        `https://api.football-data.org/v4/competitions/${competitionId}/matches`,
+                        {
+                            headers: {
+                                'X-Auth-Token': apiKey
+                            }
+                        }
+                    );
+
+                    // Log the response status
+                    console.log('Fixtures Response Status:', fixturesResponse.status);
+
+                    if (!fixturesResponse.ok) {
+                        throw new Error(`HTTP error! Status: ${fixturesResponse.status}`);
+                    }
+
+                    const fixturesData = await fixturesResponse.json();
+
+                    // Log the fetched fixtures
+                    console.log('Fetched Fixtures:', fixturesData);
+
+                    // Populate fixtures dropdown
+                    const fixtureDropdown = document.getElementById('fixture');
+                    fixtureDropdown.innerHTML = '<option value="">Select a fixture</option>'; // Clear existing options
+
+                    fixturesData.matches.forEach((fixture, index) => {
+                        const option = document.createElement('option');
+                        option.value = index; // Use index as the value
+                        option.textContent = `${fixture.homeTeam.name} vs ${fixture.awayTeam.name} (${fixture.utcDate})`;
+                        fixtureDropdown.appendChild(option);
+                    });
+
+                    // Populate the first fixture by default
+                    if (fixturesData.matches.length > 0) {
+                        populateTeams(fixturesData.matches[0]);
+                    }
+                } catch (error) {
+                    console.error('Error fetching fixtures:', error);
+                    alert('Failed to fetch fixtures. Check the console for details.');
+                }
+            }
+
+            // Function to populate teams for a selected fixture
+            function populateTeams(fixture) {
+                const team1Dropdown = document.getElementById('team1');
+                const team2Dropdown = document.getElementById('team2');
+
+                team1Dropdown.innerHTML = '<option value="">Select Team 1</option>';
+                team2Dropdown.innerHTML = '<option value="">Select Team 2</option>';
+
+                const homeTeam = fixture.homeTeam.name;
+                const awayTeam = fixture.awayTeam.name;
+
+                const option1 = document.createElement('option');
+                option1.value = homeTeam;
+                option1.textContent = homeTeam;
+                team1Dropdown.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = awayTeam;
+                option2.textContent = awayTeam;
+                team2Dropdown.appendChild(option2);
             }
 
             // Function to fetch fixtures and opponents
