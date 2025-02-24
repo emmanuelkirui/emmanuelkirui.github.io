@@ -29,6 +29,17 @@ if (!isset($_SESSION['competitions'])) {
     $competitions_url = 'https://api.football-data.org/v4/competitions';
     $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
 }
+
+// Fetch data for the selected competition
+$selected_competition = isset($_POST['competition']) ? $_POST['competition'] : null;
+if ($selected_competition) {
+    $competition_id = $selected_competition;
+    $standings_url = "https://api.football-data.org/v4/competitions/$competition_id/standings";
+    $fixtures_url = "https://api.football-data.org/v4/competitions/$competition_id/matches";
+    $fixtures_data = fetchAPI($fixtures_url, $api_key);
+} else {
+    $fixtures_data = null;
+}
 ?>
 
 <!DOCTYPE html>
@@ -143,8 +154,16 @@ if (!isset($_SESSION['competitions'])) {
             <!-- Competition Selection Dropdown -->
             <div class="form-group">
                 <label for="competition">Competition</label>
-                <select id="competition" name="competition" required onchange="fetchTeams()">
-                    <option value="">Loading competitions...</option>
+                <select id="competition" name="competition" required>
+                    <option value="">Select a competition</option>
+                    <?php
+                    if (isset($_SESSION['competitions'])) {
+                        foreach ($_SESSION['competitions'] as $competition) {
+                            $selected = ($selected_competition == $competition['id']) ? 'selected' : '';
+                            echo "<option value='{$competition['id']}' $selected>{$competition['name']}</option>";
+                        }
+                    }
+                    ?>
                 </select>
             </div>
 
@@ -153,12 +172,31 @@ if (!isset($_SESSION['competitions'])) {
                 <label for="team1">Team 1</label>
                 <select id="team1" name="team1" required>
                     <option value="">Select Team 1</option>
+                    <?php
+                    if ($fixtures_data) {
+                        $teams = [];
+                        foreach ($fixtures_data['matches'] as $match) {
+                            $teams[$match['homeTeam']['id']] = $match['homeTeam']['name'];
+                            $teams[$match['awayTeam']['id']] = $match['awayTeam']['name'];
+                        }
+                        foreach ($teams as $id => $name) {
+                            echo "<option value='$id'>$name</option>";
+                        }
+                    }
+                    ?>
                 </select>
             </div>
             <div class="form-group">
                 <label for="team2">Team 2</label>
                 <select id="team2" name="team2" required>
                     <option value="">Select Team 2</option>
+                    <?php
+                    if ($fixtures_data) {
+                        foreach ($teams as $id => $name) {
+                            echo "<option value='$id'>$name</option>";
+                        }
+                    }
+                    ?>
                 </select>
             </div>
 
@@ -181,7 +219,6 @@ if (!isset($_SESSION['competitions'])) {
                 <input type="date" id="dateTo" name="dateTo">
             </div>
 
-            <button type="button" class="add-opponent" onclick="fetchFixturesAndTeams()">Fetch Fixtures and Teams</button>
             <button type="submit">Predict</button>
         </form>
 
@@ -202,24 +239,6 @@ if (!isset($_SESSION['competitions'])) {
     </div>
 
     <script>
-        const apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
-
-        // Function to populate competitions dropdown
-        function populateCompetitionsDropdown(competitions) {
-            const competitionDropdown = document.getElementById('competition');
-            competitionDropdown.innerHTML = '<option value="">Select a competition</option>'; // Clear existing options
-
-            competitions.forEach(competition => {
-                const option = document.createElement('option');
-                option.value = competition.id;
-                option.textContent = competition.name;
-                if (competition.name === 'Premier League') {
-                    option.selected = true; // Set Premier League as default
-                }
-                competitionDropdown.appendChild(option);
-            });
-        }
-
         // Function to update date range based on selected filter
         function updateDateRange() {
             const dateFilter = document.getElementById('dateFilter').value;
@@ -231,92 +250,6 @@ if (!isset($_SESSION['competitions'])) {
                 customDateRange.style.display = 'none';
             }
         }
-
-        // Function to fetch fixtures and teams
-        async function fetchFixturesAndTeams() {
-            const competitionId = document.getElementById('competition').value;
-            const dateFilter = document.getElementById('dateFilter').value;
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
-
-            let dateRange = '';
-            switch (dateFilter) {
-                case 'yesterday':
-                    const yesterday = new Date();
-                    yesterday.setDate(yesterday.getDate() - 1);
-                    dateRange = `dateFrom=${yesterday.toISOString().split('T')[0]}&dateTo=${yesterday.toISOString().split('T')[0]}`;
-                    break;
-                case 'today':
-                    const today = new Date();
-                    dateRange = `dateFrom=${today.toISOString().split('T')[0]}&dateTo=${today.toISOString().split('T')[0]}`;
-                    break;
-                case 'tomorrow':
-                    const tomorrow = new Date();
-                    tomorrow.setDate(tomorrow.getDate() + 1);
-                    dateRange = `dateFrom=${tomorrow.toISOString().split('T')[0]}&dateTo=${tomorrow.toISOString().split('T')[0]}`;
-                    break;
-                case 'custom':
-                    if (!dateFrom || !dateTo) {
-                        alert('Please select a date range.');
-                        return;
-                    }
-                    dateRange = `dateFrom=${dateFrom}&dateTo=${dateTo}`;
-                    break;
-                default:
-                    alert('Invalid date filter.');
-                    return;
-            }
-
-            try {
-                // Fetch fixtures for the selected competition and date range
-                const fixturesResponse = await fetch(
-                    `https://api.football-data.org/v4/competitions/${competitionId}/matches?${dateRange}`,
-                    {
-                        headers: {
-                            'X-Auth-Token': apiKey
-                        }
-                    }
-                );
-
-                if (!fixturesResponse.ok) {
-                    throw new Error(`HTTP error! Status: ${fixturesResponse.status}`);
-                }
-
-                const fixturesData = await fixturesResponse.json();
-
-                // Extract unique teams from fixtures
-                const teams = new Set();
-                fixturesData.matches.forEach(match => {
-                    teams.add(match.homeTeam.name);
-                    teams.add(match.awayTeam.name);
-                });
-
-                // Populate team dropdowns
-                const team1Dropdown = document.getElementById('team1');
-                const team2Dropdown = document.getElementById('team2');
-                team1Dropdown.innerHTML = '<option value="">Select Team 1</option>';
-                team2Dropdown.innerHTML = '<option value="">Select Team 2</option>';
-
-                teams.forEach(team => {
-                    const option1 = document.createElement('option');
-                    option1.value = team;
-                    option1.textContent = team;
-                    team1Dropdown.appendChild(option1);
-
-                    const option2 = document.createElement('option');
-                    option2.value = team;
-                    option2.textContent = team;
-                    team2Dropdown.appendChild(option2);
-                });
-            } catch (error) {
-                console.error('Error fetching fixtures and teams:', error);
-                alert('Failed to fetch fixtures and teams. Check the console for details.');
-            }
-        }
-
-        // Populate competitions dropdown on page load
-        const competitions = <?php echo json_encode($_SESSION['competitions']); ?>;
-        populateCompetitionsDropdown(competitions);
     </script>
 </body>
 </html>
