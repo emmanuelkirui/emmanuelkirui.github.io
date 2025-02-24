@@ -16,7 +16,14 @@ function fetchLeagues() {
 function fetchMatches($league, $date) {
     global $api_key, $base_url;
     $url = "$base_url/matches?competitions=$league&dateFrom=$date&dateTo=$date";
-    return apiRequest($url);
+    
+    $response = apiRequest($url);
+
+    if (isset($response["error"])) {
+        return ["error" => "API error: " . json_encode($response)];
+    }
+
+    return $response;
 }
 
 // Fetch past results for prediction
@@ -142,27 +149,39 @@ function predictScore($team1_results, $team2_results) {
         });
 
         function fetchMatches() {
-            let league = "PL"; 
-            let date = getSelectedDate();
+    let league = "PL"; 
+    let date = getSelectedDate();
 
-            fetch(`?action=getMatches&league=${league}&date=${date}`)
-            .then(res => res.json())
-            .then(data => {
-                let matchesTable = document.querySelector("#matchesTable tbody");
-                matchesTable.innerHTML = "";
-                data.matches.forEach(match => {
-                    let row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${match.homeTeam.shortName} vs ${match.awayTeam.shortName}</td>
-                        <td>${match.score.fullTime.home ?? "?"} - ${match.score.fullTime.away ?? "?"}</td>
-                        <td>${match.utcDate.split("T")[0]}</td>
-                        <td><button onclick="predict('${match.homeTeam.id}', '${match.awayTeam.id}')">Predict</button></td>
-                    `;
-                    matchesTable.appendChild(row);
-                });
-            })
-            .catch(() => document.getElementById("error").textContent = "Error loading matches");
+    fetch(`?action=getMatches&league=${league}&date=${date}`)
+    .then(res => res.json())
+    .then(data => {
+        let matchesTable = document.querySelector("#matchesTable tbody");
+        matchesTable.innerHTML = "";
+        
+        if (data.error) {
+            document.getElementById("error").textContent = "⚠️ " + data.error;
+            return;
         }
+
+        if (!data.matches || data.matches.length === 0) {
+            document.getElementById("error").textContent = "⚠️ No matches found.";
+            return;
+        }
+
+        document.getElementById("error").textContent = "";
+        data.matches.forEach(match => {
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${match.homeTeam.shortName} vs ${match.awayTeam.shortName}</td>
+                <td>${match.score.fullTime.home ?? "?"} - ${match.score.fullTime.away ?? "?"}</td>
+                <td>${match.utcDate.split("T")[0]}</td>
+                <td><button onclick="predict('${match.homeTeam.id}', '${match.awayTeam.id}')">Predict</button></td>
+            `;
+            matchesTable.appendChild(row);
+        });
+    })
+    .catch(err => document.getElementById("error").textContent = "Error: " + err);
+}
 
         function getSelectedDate() {
             let filter = document.getElementById("dateFilter").value;
