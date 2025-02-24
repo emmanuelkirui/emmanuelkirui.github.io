@@ -4,11 +4,9 @@ $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
 // Start session to store competitions and their data
-// Check if session is not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 
 // Function to fetch data from the API
 function fetchAPI($url, $api_key) {
@@ -21,17 +19,16 @@ function fetchAPI($url, $api_key) {
         ],
     ]);
     $response = curl_exec($curl);
-    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE); // Get the HTTP response code
+    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
 
-    if ($http_code != 200) { // Check if the HTTP code is not OK (200)
+    if ($http_code != 200) {
         header('Location: error');
         exit;
     }
 
     return json_decode($response, true);
 }
-
 
 // Fetch all competitions only once and store in session
 if (!isset($_SESSION['competitions'])) {
@@ -63,6 +60,7 @@ function getTeamMetrics($standings_data) {
     }
     return $metrics;
 }
+
 // Function to calculate shared opponent metrics
 function getSharedOpponentMetrics($team1, $team2, $fixtures_data) {
     $shared_opponents = [];
@@ -127,6 +125,44 @@ function getSharedOpponentMetrics($team1, $team2, $fixtures_data) {
     ];
 }
 
+// Function to predict match outcome with shared opponent metrics
+function predictMatch($home_metrics, $away_metrics, $advantages, $shared_opponent_metrics) {
+    $home_advantage = $advantages['home_advantage'];
+    $away_advantage = $advantages['away_advantage'];
+
+    // Calculate recent form weights
+    $home_recent_form_weight = calculateRecentFormWeight($home_metrics['recent_form'] ?? '');
+    $away_recent_form_weight = calculateRecentFormWeight($away_metrics['recent_form'] ?? '');
+
+    // Calculate home and away scores with both advantages and shared opponent metrics
+    $home_score = ($home_metrics['win_ratio'] * 1.3)  
+                + ($home_metrics['avg_goals_scored'] * 1.2) 
+                - ($home_metrics['avg_goals_conceded'] * 0.8)
+                + ($home_recent_form_weight * 0.7)
+                + $home_advantage
+                + ($shared_opponent_metrics['team1']['wins'] * 0.5)
+                - ($shared_opponent_metrics['team1']['losses'] * 0.5);
+
+    $away_score = ($away_metrics['win_ratio'] * 1.3) 
+                + ($away_metrics['avg_goals_scored'] * 1.2) 
+                - ($away_metrics['avg_goals_conceded'] * 0.8)
+                + ($away_recent_form_weight * 0.7)
+                + $away_advantage
+                + ($shared_opponent_metrics['team2']['wins'] * 0.5)
+                - ($shared_opponent_metrics['team2']['losses'] * 0.5);
+
+    // Adjust thresholds with added consideration for draws
+    $score_difference = $home_score - $away_score;
+
+    if ($score_difference > 0.8) {  
+        return "Win for Home";
+    } elseif ($score_difference < -0.8) {  
+        return "Win for Away";
+    } else {
+        return "Draw";
+    }
+}
+
 // Helper function to calculate a numeric weight for recent form
 function calculateRecentFormWeight($recent_form) {
     $form_weights = [
@@ -146,6 +182,7 @@ function calculateRecentFormWeight($recent_form) {
     return strlen($recent_form) > 0 ? $total_weight / strlen($recent_form) : 0;
 }
 
+// Function to calculate home and away advantage
 function calculateHomeAwayAdvantage($fixtures_data) {
     $home_points = 0;
     $away_points = 0;
@@ -188,45 +225,7 @@ function calculateHomeAwayAdvantage($fixtures_data) {
     return ['home_advantage' => $home_advantage, 'away_advantage' => $away_advantage];
 }
 
-// Function to predict match outcome with shared opponent metrics
-function predictMatch($home_metrics, $away_metrics, $advantages, $shared_opponent_metrics) {
-    $home_advantage = $advantages['home_advantage'];
-    $away_advantage = $advantages['away_advantage'];
-
-    // Calculate recent form weights
-    $home_recent_form_weight = calculateRecentFormWeight($home_metrics['recent_form'] ?? '');
-    $away_recent_form_weight = calculateRecentFormWeight($away_metrics['recent_form'] ?? '');
-
-    // Calculate home and away scores with both advantages and shared opponent metrics
-    $home_score = ($home_metrics['win_ratio'] * 1.3)  
-                + ($home_metrics['avg_goals_scored'] * 1.2) 
-                - ($home_metrics['avg_goals_conceded'] * 0.8)
-                + ($home_recent_form_weight * 0.7)
-                + $home_advantage
-                + ($shared_opponent_metrics['team1']['wins'] * 0.5)
-                - ($shared_opponent_metrics['team1']['losses'] * 0.5);
-
-    $away_score = ($away_metrics['win_ratio'] * 1.3) 
-                + ($away_metrics['avg_goals_scored'] * 1.2) 
-                - ($away_metrics['avg_goals_conceded'] * 0.8)
-                + ($away_recent_form_weight * 0.7)
-                + $away_advantage
-                + ($shared_opponent_metrics['team2']['wins'] * 0.5)
-                - ($shared_opponent_metrics['team2']['losses'] * 0.5);
-
-    // Adjust thresholds with added consideration for draws
-    $score_difference = $home_score - $away_score;
-
-    if ($score_difference > 0.8) {  
-        return "Win for Home";
-    } elseif ($score_difference < -0.8) {  
-        return "Win for Away";
-    } else {
-        return "Draw";
-    }
-}
-
-
+// Function to predict goals
 function predictGoals($home_metrics, $away_metrics, $advantages) {
     $home_advantage = $advantages['home_advantage'];
     $away_advantage = $advantages['away_advantage'];
@@ -258,6 +257,7 @@ function predictGoals($home_metrics, $away_metrics, $advantages) {
     ];
 }
 
+// Function to get last 6 matches for a team
 function getLast6Matches($team_name, $fixtures) {
     $results = []; // To store the results of the last 6 matches
     
@@ -318,9 +318,7 @@ function getLast6Matches($team_name, $fixtures) {
     return "N/A";
 }
 
-
-
-// Function to calculate date range filter (Yesterday, Today, Tomorrow)
+// Function to filter matches by date
 function filterMatchesByDate($matches, $filter, $start_date = null, $end_date = null) {
     $filtered_matches = [];
     $now = new DateTime('now', new DateTimeZone('Africa/Nairobi'));
@@ -374,8 +372,6 @@ function filterMatchesByDate($matches, $filter, $start_date = null, $end_date = 
     return $filtered_matches;
 }
 
-
-
 // Function to search matches by team
 function searchMatchesByTeam($matches, $team) {
     $filtered_matches = [];
@@ -411,7 +407,6 @@ if ($selected_competition) {
     $team_metrics = null;
 }
 
-
 // Display the competition dropdown
 echo "<h1>Football Match Predictions</h1>";
 
@@ -420,7 +415,6 @@ echo '<link rel="stylesheet" type="text/css" href="css/liv.css">';
 echo '<link rel="stylesheet" type="text/css" href="css/network-status.css">';
 
 echo "<?php include('search-form.php'); ?>";
-
 
 // Retrieve selected values from the query string
 $selected_competition = isset($_GET['competition']) ? $_GET['competition'] : '';
@@ -601,7 +595,6 @@ window.onload = function () {
 };
 </script>';
 
-
 // Competition dropdown
 echo '<form id="searchForm" method="GET" action="">';
 // Default selected competition and date filter values
@@ -666,7 +659,6 @@ echo '<div id="custom_range" style="' . ($selected_date_filter == 'custom' ? 'di
 echo '<input type="submit" value="Search" />
       </form>';
 
-
 // JavaScript for toggling the custom date range
 echo "<script>
 function toggleCustomRange(value) {
@@ -674,7 +666,6 @@ function toggleCustomRange(value) {
     customRange.style.display = value === 'custom' ? 'block' : 'none';
 }
 </script>";
-
 
 if ($selected_competition && $fixtures_data) {
     // Filter matches by date
@@ -690,77 +681,73 @@ if ($selected_competition && $fixtures_data) {
         // Display message if no matches found
         echo "<p style='color: red; font-weight: bold;'>No matches found for the selected date range.</p>";
     } else {
-  echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">';
+        echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">';
 
-echo '<div style="text-align: right; margin-bottom: 10px;">
-        <button id="shareButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;">
-            <i class="fas fa-share-alt" style="font-size: 24px; color: #007bff;"></i>
-        </button>
-        <button id="downloadButton" style="background: none; border: none; cursor: pointer;">
-            <i class="fas fa-download" style="font-size: 24px; color: #28a745;"></i>
-        </button>
-      </div>';
+        echo '<div style="text-align: right; margin-bottom: 10px;">
+                <button id="shareButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;">
+                    <i class="fas fa-share-alt" style="font-size: 24px; color: #007bff;"></i>
+                </button>
+                <button id="downloadButton" style="background: none; border: none; cursor: pointer;">
+                    <i class="fas fa-download" style="font-size: 24px; color: #28a745;"></i>
+                </button>
+              </div>';
 
-echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-      <script>
-      function getFormattedTimestamp() {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, "0");
-          const day = String(now.getDate()).padStart(2, "0");
-          const hours = String(now.getHours()).padStart(2, "0");
-          const minutes = String(now.getMinutes()).padStart(2, "0");
-          const seconds = String(now.getSeconds()).padStart(2, "0");
-          return `cps_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
-      }
+        echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+              <script>
+              function getFormattedTimestamp() {
+                  const now = new Date();
+                  const year = now.getFullYear();
+                  const month = String(now.getMonth() + 1).padStart(2, "0");
+                  const day = String(now.getDate()).padStart(2, "0");
+                  const hours = String(now.getHours()).padStart(2, "0");
+                  const minutes = String(now.getMinutes()).padStart(2, "0");
+                  const seconds = String(now.getSeconds()).padStart(2, "0");
+                  return `cps_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
+              }
 
-      function captureTable(callback) {
-          const table = document.querySelector("table");
+              function captureTable(callback) {
+                  const table = document.querySelector("table");
 
-          // Make sure the table is fully loaded before capturing
-          setTimeout(() => {
-              html2canvas(table, {
-                  scale: 3, // Increase scale for better quality
-                  useCORS: true, // Fixes cross-origin issues if images are inside the table
-                  backgroundColor: "#ffffff", // Ensures a white background
-                  width: table.scrollWidth, // Capture full table width
-                  height: table.scrollHeight // Capture full table height
-              }).then(canvas => callback(canvas));
-          }, 200); // Small delay to ensure rendering is done
-      }
+                  // Make sure the table is fully loaded before capturing
+                  setTimeout(() => {
+                      html2canvas(table, {
+                          scale: 3, // Increase scale for better quality
+                          useCORS: true, // Fixes cross-origin issues if images are inside the table
+                          backgroundColor: "#ffffff", // Ensures a white background
+                          width: table.scrollWidth, // Capture full table width
+                          height: table.scrollHeight // Capture full table height
+                      }).then(canvas => callback(canvas));
+                  }, 200); // Small delay to ensure rendering is done
+              }
 
-      document.getElementById("shareButton").addEventListener("click", async function() {
-          captureTable(canvas => {
-              canvas.toBlob(blob => {
-                  const fileName = getFormattedTimestamp();
-                  const file = new File([blob], fileName, { type: "image/png" });
+              document.getElementById("shareButton").addEventListener("click", async function() {
+                  captureTable(canvas => {
+                      canvas.toBlob(blob => {
+                          const fileName = getFormattedTimestamp();
+                          const file = new File([blob], fileName, { type: "image/png" });
 
-                  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                      navigator.share({
-                          files: [file],
-                          title: "Captured Table",
-                          text: "Here is a table snapshot"
-                      }).catch(error => console.error("Error sharing:", error));
-                  } else {
-                      alert("Web Share API not supported or cannot share images.");
-                  }
-              }, "image/png");
-          });
-      });
+                          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                              navigator.share({
+                                  files: [file],
+                                  title: "Captured Table",
+                                  text: "Here is a table snapshot"
+                              }).catch(error => console.error("Error sharing:", error));
+                          } else {
+                              alert("Web Share API not supported or cannot share images.");
+                          }
+                      }, "image/png");
+                  });
+              });
 
-      document.getElementById("downloadButton").addEventListener("click", function() {
-          captureTable(canvas => {
-              const link = document.createElement("a");
-              link.href = canvas.toDataURL("image/png");
-              link.download = getFormattedTimestamp();
-              link.click();
-          });
-      });
-      </script>';
-
-
-
-
+              document.getElementById("downloadButton").addEventListener("click", function() {
+                  captureTable(canvas => {
+                      const link = document.createElement("a");
+                      link.href = canvas.toDataURL("image/png");
+                      link.download = getFormattedTimestamp();
+                      link.click();
+                  });
+              });
+              </script>';
 
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
         echo "<tr>
@@ -775,7 +762,7 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
               </tr>";
 
         foreach ($filtered_matches as $match) {
-             // Calculate home and away advantage dynamically
+            // Calculate home and away advantage dynamically
             $advantages = calculateHomeAwayAdvantage($fixtures_data);
             $date_utc = $match['utcDate'];
             $date_eat = convertToEAT($date_utc); // Convert UTC to EAT
