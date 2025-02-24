@@ -71,13 +71,6 @@ if (!isset($_SESSION['competitions'])) {
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .opponent-group {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            background-color: #fafafa;
-        }
         .add-opponent {
             margin-bottom: 15px;
             background-color: #28a745;
@@ -188,12 +181,7 @@ if (!isset($_SESSION['competitions'])) {
                 <input type="date" id="dateTo" name="dateTo">
             </div>
 
-            <!-- Dynamic Opponent Inputs -->
-            <div id="opponentsContainer">
-                <!-- Opponent groups will be populated dynamically -->
-            </div>
-
-            <button type="button" class="add-opponent" onclick="fetchFixturesAndOpponents()">Find Fixtures and Opponents</button>
+            <button type="button" class="add-opponent" onclick="fetchFixturesAndTeams()">Fetch Fixtures and Teams</button>
             <button type="submit">Predict</button>
         </form>
 
@@ -201,308 +189,134 @@ if (!isset($_SESSION['competitions'])) {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $team1 = $_POST['team1'];
             $team2 = $_POST['team2'];
-            $opponents = $_POST['opponents'];
-            $scores = $_POST['scores'];
-            $locations = $_POST['locations'];
-
-            // Combine data into a string (e.g., JSON)
-            $data = [
-                'team1' => $team1,
-                'team2' => $team2,
-                'opponents' => $opponents,
-                'scores' => $scores,
-                'locations' => $locations,
-            ];
-            $dataString = json_encode($data, JSON_PRETTY_PRINT);
-
-            // Parse scores and calculate totals
-            $team1_total_goals = 0;
-            $team2_total_goals = 0;
-
-            for ($i = 0; $i < count($scores); $i += 2) {
-                // Team 1's score vs opponent
-                list($team1_goals, $opponent_goals) = explode('-', $scores[$i]);
-                $team1_total_goals += (int)$team1_goals;
-
-                // Team 2's score vs opponent
-                list($opponent_goals, $team2_goals) = explode('-', $scores[$i + 1]);
-                $team2_total_goals += (int)$team2_goals;
-            }
 
             // Simple prediction logic
-            if ($team1_total_goals > $team2_total_goals) {
-                $prediction = "$team1 is predicted to win against $team2.";
-            } elseif ($team1_total_goals < $team2_total_goals) {
-                $prediction = "$team2 is predicted to win against $team1.";
-            } else {
-                $prediction = "The match between $team1 and $team2 is predicted to be a draw.";
-            }
+            $prediction = "The match between $team1 and $team2 is predicted to be a draw."; // Default prediction
 
             echo "<div class='result'>
                     <h2>Prediction Result</h2>
                     <p>$prediction</p>
-                    <h3>Summary Table</h3>
-                    <div class='table-container'>
-                        <table>
-                            <tr>
-                                <th>Opponent</th>
-                                <th>Team 1 Score</th>
-                                <th>Team 1 Location</th>
-                                <th>Team 2 Score</th>
-                                <th>Team 2 Location</th>
-                            </tr>";
-
-            for ($i = 0; $i < count($opponents); $i++) {
-                echo "<tr>
-                        <td>{$opponents[$i]}</td>
-                        <td>{$scores[$i * 2]}</td>
-                        <td>{$locations[$i * 2]}</td>
-                        <td>{$scores[$i * 2 + 1]}</td>
-                        <td>{$locations[$i * 2 + 1]}</td>
-                      </tr>";
-            }
-
-            echo "</table>
-                  </div>
-                  <button class='toggle-button' onclick='toggleData()'>Show/Hide Data</button>
-                  <div class='data-string' id='dataString'>
-                      <h3>Data Saved as String:</h3>
-                      <pre>" . htmlspecialchars($dataString) . "</pre>
-                  </div>
                   </div>";
         }
         ?>
-
-        <script>
-            const apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
-
-            // Function to populate competitions dropdown
-            function populateCompetitionsDropdown(competitions) {
-                const competitionDropdown = document.getElementById('competition');
-                competitionDropdown.innerHTML = '<option value="">Select a competition</option>'; // Clear existing options
-
-                competitions.forEach(competition => {
-                    const option = document.createElement('option');
-                    option.value = competition.id;
-                    option.textContent = competition.name;
-                    if (competition.name === 'Premier League') {
-                        option.selected = true; // Set Premier League as default
-                    }
-                    competitionDropdown.appendChild(option);
-                });
-            }
-
-            // Function to fetch teams for the selected competition
-            async function fetchTeams() {
-                const competitionId = document.getElementById('competition').value;
-
-                if (!competitionId) {
-                    alert('Please select a competition.');
-                    return;
-                }
-
-                try {
-                    // Fetch teams for the selected competition
-                    const teamsResponse = await fetch(
-                        `https://api.football-data.org/v4/competitions/${competitionId}/teams`,
-                        {
-                            headers: {
-                                'X-Auth-Token': apiKey
-                            }
-                        }
-                    );
-
-                    // Log the response status
-                    console.log('Teams Response Status:', teamsResponse.status);
-
-                    if (!teamsResponse.ok) {
-                        throw new Error(`HTTP error! Status: ${teamsResponse.status}`);
-                    }
-
-                    const teamsData = await teamsResponse.json();
-
-                    // Log the fetched teams
-                    console.log('Fetched Teams:', teamsData);
-
-                    // Populate team dropdowns
-                    const team1Dropdown = document.getElementById('team1');
-                    const team2Dropdown = document.getElementById('team2');
-                    team1Dropdown.innerHTML = '<option value="">Select Team 1</option>';
-                    team2Dropdown.innerHTML = '<option value="">Select Team 2</option>';
-
-                    teamsData.teams.forEach(team => {
-                        const option1 = document.createElement('option');
-                        option1.value = team.name;
-                        option1.textContent = team.name;
-                        team1Dropdown.appendChild(option1);
-
-                        const option2 = document.createElement('option');
-                        option2.value = team.name;
-                        option2.textContent = team.name;
-                        team2Dropdown.appendChild(option2);
-                    });
-                } catch (error) {
-                    console.error('Error fetching teams:', error);
-                    alert('Failed to fetch teams. Check the console for details.');
-                }
-            }
-
-            // Function to update date range based on selected filter
-            function updateDateRange() {
-                const dateFilter = document.getElementById('dateFilter').value;
-                const customDateRange = document.getElementById('customDateRange');
-
-                if (dateFilter === 'custom') {
-                    customDateRange.style.display = 'block';
-                } else {
-                    customDateRange.style.display = 'none';
-                }
-            }
-
-            // Function to fetch fixtures and opponents
-            async function fetchFixturesAndOpponents() {
-                const competitionId = document.getElementById('competition').value;
-                const dateFilter = document.getElementById('dateFilter').value;
-                const dateFrom = document.getElementById('dateFrom').value;
-                const dateTo = document.getElementById('dateTo').value;
-
-                let dateRange = '';
-                switch (dateFilter) {
-                    case 'yesterday':
-                        const yesterday = new Date();
-                        yesterday.setDate(yesterday.getDate() - 1);
-                        dateRange = `dateFrom=${yesterday.toISOString().split('T')[0]}&dateTo=${yesterday.toISOString().split('T')[0]}`;
-                        break;
-                    case 'today':
-                        const today = new Date();
-                        dateRange = `dateFrom=${today.toISOString().split('T')[0]}&dateTo=${today.toISOString().split('T')[0]}`;
-                        break;
-                    case 'tomorrow':
-                        const tomorrow = new Date();
-                        tomorrow.setDate(tomorrow.getDate() + 1);
-                        dateRange = `dateFrom=${tomorrow.toISOString().split('T')[0]}&dateTo=${tomorrow.toISOString().split('T')[0]}`;
-                        break;
-                    case 'custom':
-                        if (!dateFrom || !dateTo) {
-                            alert('Please select a date range.');
-                            return;
-                        }
-                        dateRange = `dateFrom=${dateFrom}&dateTo=${dateTo}`;
-                        break;
-                    default:
-                        alert('Invalid date filter.');
-                        return;
-                }
-
-                try {
-                    // Fetch fixtures for the selected competition and date range
-                    const fixturesResponse = await fetch(
-                        `https://api.football-data.org/v4/competitions/${competitionId}/matches?${dateRange}`,
-                        {
-                            headers: {
-                                'X-Auth-Token': apiKey
-                            }
-                        }
-                    );
-
-                    // Log the response status
-                    console.log('Fixtures Response Status:', fixturesResponse.status);
-
-                    if (!fixturesResponse.ok) {
-                        throw new Error(`HTTP error! Status: ${fixturesResponse.status}`);
-                    }
-
-                    const fixturesData = await fixturesResponse.json();
-
-                    // Log the fetched fixtures
-                    console.log('Fetched Fixtures:', fixturesData);
-
-                    // Extract teams and opponents from fixtures
-                    const teams = new Set();
-                    const opponents = new Map(); // Key: team, Value: list of opponents
-
-                    fixturesData.matches.forEach(match => {
-                        const homeTeam = match.homeTeam.name;
-                        const awayTeam = match.awayTeam.name;
-
-                        teams.add(homeTeam);
-                        teams.add(awayTeam);
-
-                        if (!opponents.has(homeTeam)) {
-                            opponents.set(homeTeam, []);
-                        }
-                        if (!opponents.has(awayTeam)) {
-                            opponents.set(awayTeam, []);
-                        }
-
-                        opponents.get(homeTeam).push(awayTeam);
-                        opponents.get(awayTeam).push(homeTeam);
-                    });
-
-                    // Log the extracted teams
-                    console.log('Extracted Teams:', Array.from(teams));
-
-                    // Populate team dropdowns
-                    const team1Dropdown = document.getElementById('team1');
-                    const team2Dropdown = document.getElementById('team2');
-                    team1Dropdown.innerHTML = '<option value="">Select Team 1</option>';
-                    team2Dropdown.innerHTML = '<option value="">Select Team 2</option>';
-
-                    teams.forEach(team => {
-                        const option1 = document.createElement('option');
-                        option1.value = team;
-                        option1.textContent = team;
-                        team1Dropdown.appendChild(option1);
-
-                        const option2 = document.createElement('option');
-                        option2.value = team;
-                        option2.textContent = team;
-                        team2Dropdown.appendChild(option2);
-                    });
-
-                    // Log the populated dropdowns
-                    console.log('Team 1 Dropdown:', team1Dropdown.innerHTML);
-                    console.log('Team 2 Dropdown:', team2Dropdown.innerHTML);
-
-                    // Populate opponents container
-                    const container = document.getElementById('opponentsContainer');
-                    container.innerHTML = ''; // Clear existing content
-
-                    opponents.forEach((opponentList, team) => {
-                        const opponentGroup = document.createElement('div');
-                        opponentGroup.className = 'opponent-group';
-                        opponentGroup.innerHTML = `
-                            <div class="form-group">
-                                <label>Team: ${team}</label>
-                                <input type="text" name="teams[]" value="${team}" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label>Opponents</label>
-                                <input type="text" name="opponents[]" value="${opponentList.join(', ')}" readonly>
-                            </div>
-                        `;
-                        container.appendChild(opponentGroup);
-                    });
-                } catch (error) {
-                    console.error('Error fetching fixtures and opponents:', error);
-                    alert('Failed to fetch fixtures and opponents. Check the console for details.');
-                }
-            }
-
-            // Function to toggle data visibility
-            function toggleData() {
-                const dataDiv = document.getElementById('dataString');
-                if (dataDiv.style.display === 'none') {
-                    dataDiv.style.display = 'block';
-                } else {
-                    dataDiv.style.display = 'none';
-                }
-            }
-
-            // Populate competitions dropdown on page load
-            const competitions = <?php echo json_encode($_SESSION['competitions']); ?>;
-            populateCompetitionsDropdown(competitions);
-        </script>
     </div>
+
+    <script>
+        const apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
+
+        // Function to populate competitions dropdown
+        function populateCompetitionsDropdown(competitions) {
+            const competitionDropdown = document.getElementById('competition');
+            competitionDropdown.innerHTML = '<option value="">Select a competition</option>'; // Clear existing options
+
+            competitions.forEach(competition => {
+                const option = document.createElement('option');
+                option.value = competition.id;
+                option.textContent = competition.name;
+                if (competition.name === 'Premier League') {
+                    option.selected = true; // Set Premier League as default
+                }
+                competitionDropdown.appendChild(option);
+            });
+        }
+
+        // Function to update date range based on selected filter
+        function updateDateRange() {
+            const dateFilter = document.getElementById('dateFilter').value;
+            const customDateRange = document.getElementById('customDateRange');
+
+            if (dateFilter === 'custom') {
+                customDateRange.style.display = 'block';
+            } else {
+                customDateRange.style.display = 'none';
+            }
+        }
+
+        // Function to fetch fixtures and teams
+        async function fetchFixturesAndTeams() {
+            const competitionId = document.getElementById('competition').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+
+            let dateRange = '';
+            switch (dateFilter) {
+                case 'yesterday':
+                    const yesterday = new Date();
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    dateRange = `dateFrom=${yesterday.toISOString().split('T')[0]}&dateTo=${yesterday.toISOString().split('T')[0]}`;
+                    break;
+                case 'today':
+                    const today = new Date();
+                    dateRange = `dateFrom=${today.toISOString().split('T')[0]}&dateTo=${today.toISOString().split('T')[0]}`;
+                    break;
+                case 'tomorrow':
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    dateRange = `dateFrom=${tomorrow.toISOString().split('T')[0]}&dateTo=${tomorrow.toISOString().split('T')[0]}`;
+                    break;
+                case 'custom':
+                    if (!dateFrom || !dateTo) {
+                        alert('Please select a date range.');
+                        return;
+                    }
+                    dateRange = `dateFrom=${dateFrom}&dateTo=${dateTo}`;
+                    break;
+                default:
+                    alert('Invalid date filter.');
+                    return;
+            }
+
+            try {
+                // Fetch fixtures for the selected competition and date range
+                const fixturesResponse = await fetch(
+                    `https://api.football-data.org/v4/competitions/${competitionId}/matches?${dateRange}`,
+                    {
+                        headers: {
+                            'X-Auth-Token': apiKey
+                        }
+                    }
+                );
+
+                if (!fixturesResponse.ok) {
+                    throw new Error(`HTTP error! Status: ${fixturesResponse.status}`);
+                }
+
+                const fixturesData = await fixturesResponse.json();
+
+                // Extract unique teams from fixtures
+                const teams = new Set();
+                fixturesData.matches.forEach(match => {
+                    teams.add(match.homeTeam.name);
+                    teams.add(match.awayTeam.name);
+                });
+
+                // Populate team dropdowns
+                const team1Dropdown = document.getElementById('team1');
+                const team2Dropdown = document.getElementById('team2');
+                team1Dropdown.innerHTML = '<option value="">Select Team 1</option>';
+                team2Dropdown.innerHTML = '<option value="">Select Team 2</option>';
+
+                teams.forEach(team => {
+                    const option1 = document.createElement('option');
+                    option1.value = team;
+                    option1.textContent = team;
+                    team1Dropdown.appendChild(option1);
+
+                    const option2 = document.createElement('option');
+                    option2.value = team;
+                    option2.textContent = team;
+                    team2Dropdown.appendChild(option2);
+                });
+            } catch (error) {
+                console.error('Error fetching fixtures and teams:', error);
+                alert('Failed to fetch fixtures and teams. Check the console for details.');
+            }
+        }
+
+        // Populate competitions dropdown on page load
+        const competitions = <?php echo json_encode($_SESSION['competitions']); ?>;
+        populateCompetitionsDropdown(competitions);
+    </script>
 </body>
 </html>
