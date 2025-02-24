@@ -1,3 +1,36 @@
+<?php
+session_start(); // Start the session
+
+// Function to fetch data from the API
+function fetchAPI($url, $api_key) {
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Auth-Token: $api_key"
+        ],
+    ]);
+    $response = curl_exec($curl);
+    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE); // Get the HTTP response code
+    curl_close($curl);
+
+    if ($http_code != 200) { // Check if the HTTP code is not OK (200)
+        header('Location: error');
+        exit;
+    }
+
+    return json_decode($response, true);
+}
+
+// Fetch all competitions only once and store in session
+if (!isset($_SESSION['competitions'])) {
+    $api_key = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
+    $competitions_url = 'https://api.football-data.org/v4/competitions';
+    $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -234,46 +267,20 @@
         <script>
             const apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
 
-            // Function to fetch competitions from the API
-            async function fetchCompetitions() {
-                const url = 'https://api.football-data.org/v4/competitions';
+            // Function to populate competitions dropdown
+            function populateCompetitionsDropdown(competitions) {
+                const competitionDropdown = document.getElementById('competition');
+                competitionDropdown.innerHTML = '<option value="">Select a competition</option>'; // Clear existing options
 
-                try {
-                    const response = await fetch(url, {
-                        headers: {
-                            'X-Auth-Token': apiKey
-                        }
-                    });
-
-                    // Log the response status
-                    console.log('Response Status:', response.status);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! Status: ${response.status}`);
+                competitions.forEach(competition => {
+                    const option = document.createElement('option');
+                    option.value = competition.id;
+                    option.textContent = competition.name;
+                    if (competition.name === 'Premier League') {
+                        option.selected = true; // Set Premier League as default
                     }
-
-                    const data = await response.json();
-
-                    // Log the fetched data
-                    console.log('Fetched Competitions:', data);
-
-                    // Populate the dropdown
-                    const competitionDropdown = document.getElementById('competition');
-                    competitionDropdown.innerHTML = '<option value="">Select a competition</option>'; // Clear existing options
-
-                    data.competitions.forEach(competition => {
-                        const option = document.createElement('option');
-                        option.value = competition.id;
-                        option.textContent = competition.name;
-                        if (competition.name === 'Premier League') {
-                            option.selected = true; // Set Premier League as default
-                        }
-                        competitionDropdown.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error('Error fetching competitions:', error);
-                    alert('Failed to fetch competitions. Check the console for details.');
-                }
+                    competitionDropdown.appendChild(option);
+                });
             }
 
             // Function to fetch fixtures and opponents
@@ -385,8 +392,9 @@
                 }
             }
 
-            // Call the function to fetch competitions on page load
-            fetchCompetitions();
+            // Populate competitions dropdown on page load
+            const competitions = <?php echo json_encode($_SESSION['competitions']); ?>;
+            populateCompetitionsDropdown(competitions);
         </script>
     </div>
 </body>
