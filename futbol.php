@@ -1,6 +1,6 @@
 <?php
 // API key from football-data.org
-$apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
+$apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Replace with your API key
 
 // Base URL for the API
 $baseUrl = 'https://api.football-data.org/v4/';
@@ -19,6 +19,9 @@ function fetchData($url, $apiKey) {
         ]
     ]);
     $response = file_get_contents($url, false, $context);
+    if ($response === FALSE) {
+        die('Error fetching data from the API.');
+    }
     return json_decode($response, true);
 }
 
@@ -27,7 +30,9 @@ $leaguesUrl = $baseUrl . 'competitions';
 $leaguesData = fetchData($leaguesUrl, $apiKey);
 $leagues = [];
 foreach ($leaguesData['competitions'] as $comp) {
-    $leagues[$comp['code']] = $comp['name'];
+    if (isset($comp['code'])) {
+        $leagues[$comp['code']] = $comp['name'];
+    }
 }
 
 // Determine the date range based on the filter
@@ -39,8 +44,8 @@ switch ($dateFilter) {
         $dateFrom = $dateTo = date('Y-m-d', strtotime('+1 day'));
         break;
     case 'custom':
-        $dateFrom = $_GET['custom_date_from'];
-        $dateTo = $_GET['custom_date_to'];
+        $dateFrom = isset($_GET['custom_date_from']) ? $_GET['custom_date_from'] : date('Y-m-d');
+        $dateTo = isset($_GET['custom_date_to']) ? $_GET['custom_date_to'] : date('Y-m-d');
         break;
     default: // today
         $dateFrom = $dateTo = date('Y-m-d');
@@ -58,8 +63,8 @@ function generatePredictions($matches) {
     foreach ($matches as $match) {
         $homeTeam = $match['homeTeam']['name'];
         $awayTeam = $match['awayTeam']['name'];
-        $homeGoals = $match['score']['fullTime']['home'];
-        $awayGoals = $match['score']['fullTime']['away'];
+        $homeGoals = $match['score']['fullTime']['home'] ?? 0;
+        $awayGoals = $match['score']['fullTime']['away'] ?? 0;
 
         // Initialize team performance data if not already set
         if (!isset($teamPerformance[$homeTeam])) {
@@ -118,7 +123,7 @@ function generatePredictions($matches) {
 }
 
 // Generate predictions
-$predictions = generatePredictions($matchesData['matches']);
+$predictions = generatePredictions($matchesData['matches'] ?? []);
 ?>
 
 <!DOCTYPE html>
