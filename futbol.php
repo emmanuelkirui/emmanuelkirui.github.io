@@ -2,6 +2,9 @@
 $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c";
 $base_url = "https://api.football-data.org/v4";
 
+// Default to Premier League
+$default_league = "PL"; 
+
 // Fetch available leagues
 function fetchLeagues() {
     global $api_key, $base_url;
@@ -100,12 +103,14 @@ function predictScore($team1_results, $team2_results) {
     <h2>Football Match Predictor</h2>
 
     <label>Select League:</label>
-    <select id="league"></select>
+    <select id="league">
+        <option value="PL">Premier League (Default)</option>
+    </select>
 
     <label>Select Date:</label>
     <select id="dateFilter">
+        <option value="today" selected>Today (Default)</option>
         <option value="yesterday">Yesterday</option>
-        <option value="today">Today</option>
         <option value="tomorrow">Tomorrow</option>
         <option value="custom">Custom Date</option>
     </select>
@@ -132,28 +137,12 @@ function predictScore($team1_results, $team2_results) {
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            fetchLeagues();
+            fetchMatches();
             document.getElementById("dateFilter").addEventListener("change", toggleCustomDate);
         });
 
-        function fetchLeagues() {
-            fetch("?action=getLeagues")
-            .then(res => res.json())
-            .then(data => {
-                let leagueSelect = document.getElementById("league");
-                leagueSelect.innerHTML = "";
-                data.competitions.forEach(league => {
-                    let option = document.createElement("option");
-                    option.value = league.code;
-                    option.textContent = league.name;
-                    leagueSelect.appendChild(option);
-                });
-            })
-            .catch(() => document.getElementById("error").textContent = "Error loading leagues");
-        }
-
         function fetchMatches() {
-            let league = document.getElementById("league").value;
+            let league = "PL"; 
             let date = getSelectedDate();
 
             fetch(`?action=getMatches&league=${league}&date=${date}`)
