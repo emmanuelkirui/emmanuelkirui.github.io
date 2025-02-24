@@ -72,10 +72,14 @@
             font-size: 18px;
             color: #555;
         }
+        .table-container {
+            overflow-x: auto; /* Enable horizontal scrolling */
+            margin-top: 15px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            min-width: 600px; /* Ensure table is wide enough to be readable */
         }
         table, th, td {
             border: 1px solid #ddd;
@@ -200,14 +204,15 @@
                     <h2>Prediction Result</h2>
                     <p>$prediction</p>
                     <h3>Summary Table</h3>
-                    <table>
-                        <tr>
-                            <th>Opponent</th>
-                            <th>Team 1 Score</th>
-                            <th>Team 1 Location</th>
-                            <th>Team 2 Score</th>
-                            <th>Team 2 Location</th>
-                        </tr>";
+                    <div class='table-container'>
+                        <table>
+                            <tr>
+                                <th>Opponent</th>
+                                <th>Team 1 Score</th>
+                                <th>Team 1 Location</th>
+                                <th>Team 2 Score</th>
+                                <th>Team 2 Location</th>
+                            </tr>";
 
             for ($i = 0; $i < count($opponents); $i++) {
                 echo "<tr>
@@ -220,6 +225,7 @@
             }
 
             echo "</table>
+                  </div>
                   <button class='toggle-button' onclick='toggleData()'>Show/Hide Data</button>
                   <div class='data-string' id='dataString'>
                       <h3>Data Saved as String:</h3>
