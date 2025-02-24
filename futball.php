@@ -244,10 +244,23 @@
                             'X-Auth-Token': apiKey
                         }
                     });
+
+                    // Log the response status
+                    console.log('Response Status:', response.status);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
                     const data = await response.json();
+
+                    // Log the fetched data
+                    console.log('Fetched Competitions:', data);
 
                     // Populate the dropdown
                     const competitionDropdown = document.getElementById('competition');
+                    competitionDropdown.innerHTML = ''; // Clear existing options
+
                     data.competitions.forEach(competition => {
                         const option = document.createElement('option');
                         option.value = competition.id;
@@ -259,6 +272,7 @@
                     });
                 } catch (error) {
                     console.error('Error fetching competitions:', error);
+                    alert('Failed to fetch competitions. Check the console for details.');
                 }
             }
 
@@ -283,7 +297,18 @@
                             }
                         }
                     );
+
+                    // Log the response status
+                    console.log('Fixtures Response Status:', fixturesResponse.status);
+
+                    if (!fixturesResponse.ok) {
+                        throw new Error(`HTTP error! Status: ${fixturesResponse.status}`);
+                    }
+
                     const fixturesData = await fixturesResponse.json();
+
+                    // Log the fetched fixtures
+                    console.log('Fetched Fixtures:', fixturesData);
 
                     // Extract teams and opponents from fixtures
                     const teams = new Set();
@@ -346,6 +371,7 @@
                     });
                 } catch (error) {
                     console.error('Error fetching fixtures and opponents:', error);
+                    alert('Failed to fetch fixtures and opponents. Check the console for details.');
                 }
             }
 
