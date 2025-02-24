@@ -49,39 +49,40 @@ if (isset($_GET['action'])) {
     }
 
     if ($_GET['action'] == "getMatches") {
-        $league = $_GET['league'] ?? 'PL'; // Default to Premier League
-        $dateFilter = $_GET['dateFilter'] ?? 'today';
+    $league = $_GET['league'] ?? 'PL'; // Default to Premier League
+    $dateFilter = $_GET['dateFilter'] ?? 'today';
 
-        // Determine date range
-        $today = date("Y-m-d");
-        $tomorrow = date("Y-m-d", strtotime("+1 day"));
-        $yesterday = date("Y-m-d", strtotime("-1 day"));
+    $today = date("Y-m-d");
+    $tomorrow = date("Y-m-d", strtotime("+1 day"));
+    $yesterday = date("Y-m-d", strtotime("-1 day"));
 
-        if ($dateFilter == "today") {
-            $dateFrom = $dateTo = $today;
-        } elseif ($dateFilter == "tomorrow") {
-            $dateFrom = $dateTo = $tomorrow;
-        } elseif ($dateFilter == "yesterday") {
-            $dateFrom = $dateTo = $yesterday;
-        } elseif ($dateFilter == "custom") {
-            $dateFrom = $_GET['fromDate'] ?? $today;
-            $dateTo = $_GET['toDate'] ?? $today;
-        } else {
-            $dateFrom = $dateTo = $today;
-        }
+    if ($dateFilter == "today") {
+        $dateFrom = $dateTo = $today;
+    } elseif ($dateFilter == "tomorrow") {
+        $dateFrom = $dateTo = $tomorrow;
+    } elseif ($dateFilter == "yesterday") {
+        $dateFrom = $dateTo = $yesterday;
+    } elseif ($dateFilter == "custom") {
+        $dateFrom = $_GET['fromDate'] ?? $today;
+        $dateTo = $_GET['toDate'] ?? $today;
+    } else {
+        $dateFrom = $dateTo = $today;
+    }
 
-        $data = apiRequest("matches?competitions=$league&dateFrom=$dateFrom&dateTo=$dateTo");
-        
-        if (isset($data['error'])) {
-            echo json_encode(["error" => "Failed to fetch matches. " . $data['error']]);
-            exit;
-        }
+    // Log URL to debug
+    error_log("Fetching matches: competitions=$league&dateFrom=$dateFrom&dateTo=$dateTo");
 
-        echo json_encode($data['matches'] ?? []);
+    $data = apiRequest("matches?competitions=$league&dateFrom=$dateFrom&dateTo=$dateTo");
+
+    if (isset($data['error'])) {
+        echo json_encode(["error" => "Failed to fetch matches. " . $data['error']]);
         exit;
     }
 
-    echo json_encode(["error" => "Invalid action"]);
+    // Debug API response
+    error_log(json_encode($data));
+
+    echo json_encode($data['matches'] ?? []);
     exit;
 }
 ?>
