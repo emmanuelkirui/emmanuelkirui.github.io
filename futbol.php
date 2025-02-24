@@ -1,204 +1,181 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    header("Content-Type: application/json");
-    header("Access-Control-Allow-Origin: *");
+// API key from football-data.org
+$apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 
-    $apiKey = "d2ef1a157a0d4c83ba4023d1fbd28b5c";
+// Base URL for the API
+$baseUrl = 'https://api.football-data.org/v4/';
 
-    function apiRequest($endpoint) {
-        global $apiKey;
-        $url = "https://api.football-data.org/v4/" . $endpoint;
+// Set default date filter to "Today"
+$dateFilter = isset($_GET['date_filter']) ? $_GET['date_filter'] : 'today';
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
-        $response = curl_exec($ch);
-        curl_close($ch);
+// Set default league to "Premier League"
+$league = isset($_GET['league']) ? $_GET['league'] : 'PL';
 
-        return json_decode($response, true);
-    }
-
-    if (isset($_GET['action'])) {
-        $action = $_GET['action'];
-
-        // Get available leagues
-        if ($action === "getLeagues") {
-            $data = apiRequest("competitions");
-            echo json_encode($data['competitions'] ?? []);
-            exit;
-        }
-
-        // Get matches based on league & date filter
-        if ($action === "getMatches") {
-            $league = $_GET['league'] ?? 'PL'; 
-            $dateFilter = $_GET['dateFilter'] ?? 'today';
-
-            $today = date("Y-m-d");
-            $tomorrow = date("Y-m-d", strtotime("+1 day"));
-            $yesterday = date("Y-m-d", strtotime("-1 day"));
-
-            if ($dateFilter == "today") {
-                $dateFrom = $dateTo = $today;
-            } elseif ($dateFilter == "tomorrow") {
-                $dateFrom = $dateTo = $tomorrow;
-            } elseif ($dateFilter == "yesterday") {
-                $dateFrom = $dateTo = $yesterday;
-            } elseif ($dateFilter == "custom") {
-                $dateFrom = $_GET['fromDate'] ?? $today;
-                $dateTo = $_GET['toDate'] ?? $today;
-            } else {
-                $dateFrom = $dateTo = $today;
-            }
-
-            $data = apiRequest("matches?competitions=$league&dateFrom=$dateFrom&dateTo=$dateTo");
-
-            echo json_encode($data['matches'] ?? []);
-            exit;
-        }
-
-        // Predict match outcome
-        if ($action === "predictMatch") {
-            $team1 = $_GET['team1'] ?? "";
-            $team2 = $_GET['team2'] ?? "";
-
-            if (!$team1 || !$team2) {
-                echo json_encode(["error" => "Teams not selected."]);
-                exit;
-            }
-
-            $matches = apiRequest("matches?dateFrom=" . date("Y-m-d", strtotime("-30 days")) . "&dateTo=" . date("Y-m-d"));
-            $shared_opponents = [];
-            $team1_matches = [];
-            $team2_matches = [];
-
-            foreach ($matches['matches'] as $match) {
-                if ($match['homeTeam']['name'] == $team1 || $match['awayTeam']['name'] == $team1) {
-                    $team1_matches[] = $match;
-                }
-                if ($match['homeTeam']['name'] == $team2 || $match['awayTeam']['name'] == $team2) {
-                    $team2_matches[] = $match;
-                }
-            }
-
-            foreach ($team1_matches as $match1) {
-                foreach ($team2_matches as $match2) {
-                    if ($match1['homeTeam']['name'] == $match2['homeTeam']['name'] ||
-                        $match1['awayTeam']['name'] == $match2['awayTeam']['name']) {
-                        $shared_opponents[] = $match1;
-                    }
-                }
-            }
-
-            if (empty($shared_opponents)) {
-                echo json_encode(["error" => "No shared opponent data found."]);
-                exit;
-            }
-
-            $team1_goals = 0;
-            $team2_goals = 0;
-            $count = count($shared_opponents);
-
-            foreach ($shared_opponents as $match) {
-                if ($match['homeTeam']['name'] == $team1) {
-                    $team1_goals += $match['score']['fullTime']['home'];
-                    $team2_goals += $match['score']['fullTime']['away'];
-                } elseif ($match['awayTeam']['name'] == $team1) {
-                    $team1_goals += $match['score']['fullTime']['away'];
-                    $team2_goals += $match['score']['fullTime']['home'];
-                }
-            }
-
-            $predicted_score1 = round($team1_goals / $count);
-            $predicted_score2 = round($team2_goals / $count);
-
-            echo json_encode([
-                "team1" => $team1,
-                "team2" => $team2,
-                "predicted_score1" => $predicted_score1,
-                "predicted_score2" => $predicted_score2
-            ]);
-            exit;
-        }
-    }
+// Function to fetch data from the API
+function fetchData($url, $apiKey) {
+    $context = stream_context_create([
+        'http' => [
+            'header' => "X-Auth-Token: $apiKey\r\n"
+        ]
+    ]);
+    $response = file_get_contents($url, false, $context);
+    return json_decode($response, true);
 }
 
+// Fetch available leagues
+$leaguesUrl = $baseUrl . 'competitions';
+$leaguesData = fetchData($leaguesUrl, $apiKey);
+$leagues = [];
+foreach ($leaguesData['competitions'] as $comp) {
+    $leagues[$comp['code']] = $comp['name'];
+}
+
+// Determine the date range based on the filter
+switch ($dateFilter) {
+    case 'yesterday':
+        $dateFrom = $dateTo = date('Y-m-d', strtotime('-1 day'));
+        break;
+    case 'tomorrow':
+        $dateFrom = $dateTo = date('Y-m-d', strtotime('+1 day'));
+        break;
+    case 'custom':
+        $dateFrom = $_GET['custom_date_from'];
+        $dateTo = $_GET['custom_date_to'];
+        break;
+    default: // today
+        $dateFrom = $dateTo = date('Y-m-d');
+}
+
+// Fetch matches based on the date range and league
+$matchesUrl = $baseUrl . 'matches?competitions=' . $league . '&dateFrom=' . $dateFrom . '&dateTo=' . $dateTo;
+$matchesData = fetchData($matchesUrl, $apiKey);
+
+// Function to generate predictions based on shared opponents
+function generatePredictions($matches) {
+    $teamPerformance = [];
+
+    // Analyze each match
+    foreach ($matches as $match) {
+        $homeTeam = $match['homeTeam']['name'];
+        $awayTeam = $match['awayTeam']['name'];
+        $homeGoals = $match['score']['fullTime']['home'];
+        $awayGoals = $match['score']['fullTime']['away'];
+
+        // Initialize team performance data if not already set
+        if (!isset($teamPerformance[$homeTeam])) {
+            $teamPerformance[$homeTeam] = ['goalsScored' => 0, 'goalsConceded' => 0, 'wins' => 0, 'losses' => 0];
+        }
+        if (!isset($teamPerformance[$awayTeam])) {
+            $teamPerformance[$awayTeam] = ['goalsScored' => 0, 'goalsConceded' => 0, 'wins' => 0, 'losses' => 0];
+        }
+
+        // Update home team performance
+        $teamPerformance[$homeTeam]['goalsScored'] += $homeGoals;
+        $teamPerformance[$homeTeam]['goalsConceded'] += $awayGoals;
+        if ($homeGoals > $awayGoals) {
+            $teamPerformance[$homeTeam]['wins'] += 1;
+        } elseif ($homeGoals < $awayGoals) {
+            $teamPerformance[$homeTeam]['losses'] += 1;
+        }
+
+        // Update away team performance
+        $teamPerformance[$awayTeam]['goalsScored'] += $awayGoals;
+        $teamPerformance[$awayTeam]['goalsConceded'] += $homeGoals;
+        if ($awayGoals > $homeGoals) {
+            $teamPerformance[$awayTeam]['wins'] += 1;
+        } elseif ($awayGoals < $homeGoals) {
+            $teamPerformance[$awayTeam]['losses'] += 1;
+        }
+    }
+
+    // Generate predictions for upcoming matches
+    $predictions = [];
+    foreach ($matches as $match) {
+        $homeTeam = $match['homeTeam']['name'];
+        $awayTeam = $match['awayTeam']['name'];
+
+        // Skip if performance data is not available for either team
+        if (!isset($teamPerformance[$homeTeam]) || !isset($teamPerformance[$awayTeam])) {
+            continue;
+        }
+
+        // Calculate prediction based on performance
+        $homeStrength = ($teamPerformance[$homeTeam]['wins'] + $teamPerformance[$homeTeam]['goalsScored']) - $teamPerformance[$homeTeam]['losses'];
+        $awayStrength = ($teamPerformance[$awayTeam]['wins'] + $teamPerformance[$awayTeam]['goalsScored']) - $teamPerformance[$awayTeam]['losses'];
+
+        if ($homeStrength > $awayStrength) {
+            $prediction = "$homeTeam is likely to win against $awayTeam.";
+        } elseif ($homeStrength < $awayStrength) {
+            $prediction = "$awayTeam is likely to win against $homeTeam.";
+        } else {
+            $prediction = "The match between $homeTeam and $awayTeam is likely to be a draw.";
+        }
+
+        $predictions[] = $prediction;
+    }
+
+    return $predictions;
+}
+
+// Generate predictions
+$predictions = generatePredictions($matchesData['matches']);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Match Predictor</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        select, button { padding: 8px; margin: 5px; }
-    </style>
+    <title>Football Predictions</title>
 </head>
 <body>
+    <h1>Football Predictions</h1>
+    <form method="GET">
+        <label for="date_filter">Date Filter:</label>
+        <select name="date_filter" id="date_filter">
+            <option value="today" <?php echo $dateFilter == 'today' ? 'selected' : ''; ?>>Today</option>
+            <option value="yesterday" <?php echo $dateFilter == 'yesterday' ? 'selected' : ''; ?>>Yesterday</option>
+            <option value="tomorrow" <?php echo $dateFilter == 'tomorrow' ? 'selected' : ''; ?>>Tomorrow</option>
+            <option value="custom" <?php echo $dateFilter == 'custom' ? 'selected' : ''; ?>>Custom</option>
+        </select>
 
-<h2>Football Match Predictor</h2>
+        <div id="custom_date" style="<?php echo $dateFilter == 'custom' ? 'display:block;' : 'display:none;'; ?>">
+            <label for="custom_date_from">From:</label>
+            <input type="date" name="custom_date_from" id="custom_date_from" value="<?php echo $dateFrom; ?>">
+            <label for="custom_date_to">To:</label>
+            <input type="date" name="custom_date_to" id="custom_date_to" value="<?php echo $dateTo; ?>">
+        </div>
 
-<select id="league"></select>
-<select id="dateFilter">
-    <option value="today">Today</option>
-    <option value="yesterday">Yesterday</option>
-    <option value="tomorrow">Tomorrow</option>
-    <option value="custom">Custom</option>
-</select>
-<input type="date" id="fromDate" style="display:none;">
-<input type="date" id="toDate" style="display:none;">
-<button onclick="fetchMatches()">Get Matches</button>
+        <label for="league">League:</label>
+        <select name="league" id="league">
+            <?php foreach ($leagues as $code => $name): ?>
+                <option value="<?php echo $code; ?>" <?php echo $league == $code ? 'selected' : ''; ?>><?php echo $name; ?></option>
+            <?php endforeach; ?>
+        </select>
 
-<h3>Matches</h3>
-<ul id="matchList"></ul>
+        <button type="submit">Filter</button>
+    </form>
 
-<h3>Predict Match</h3>
-<select id="team1"></select> vs <select id="team2"></select>
-<button onclick="predictMatch()">Predict</button>
-<p id="prediction"></p>
+    <h2>Predictions</h2>
+    <?php if (!empty($predictions)): ?>
+        <ul>
+            <?php foreach ($predictions as $prediction): ?>
+                <li><?php echo $prediction; ?></li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p>No predictions available for the selected date range and league.</p>
+    <?php endif; ?>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    fetchLeagues();
-    fetchMatches();
-});
-
-function fetchLeagues() {
-    fetch("?action=getLeagues")
-        .then(res => res.json())
-        .then(data => {
-            let dropdown = document.getElementById("league");
-            dropdown.innerHTML = data.map(league => `<option value="${league.code}">${league.name}</option>`).join("");
+    <script>
+        // Show/hide custom date fields based on the selected date filter
+        document.getElementById('date_filter').addEventListener('change', function() {
+            var customDateDiv = document.getElementById('custom_date');
+            if (this.value == 'custom') {
+                customDateDiv.style.display = 'block';
+            } else {
+                customDateDiv.style.display = 'none';
+            }
         });
-}
-
-function fetchMatches() {
-    let league = document.getElementById("league").value;
-    let dateFilter = document.getElementById("dateFilter").value;
-
-    fetch(`?action=getMatches&league=${league}&dateFilter=${dateFilter}`)
-        .then(res => res.json())
-        .then(data => {
-            let list = document.getElementById("matchList");
-            list.innerHTML = data.map(match => 
-                `<li>${match.homeTeam.name} vs ${match.awayTeam.name}</li>`).join("");
-        });
-}
-
-function predictMatch() {
-    let team1 = document.getElementById("team1").value;
-    let team2 = document.getElementById("team2").value;
-
-    fetch(`?action=predictMatch&team1=${team1}&team2=${team2}`)
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("prediction").textContent = 
-                `Predicted Score: ${data.team1} ${data.predicted_score1} - ${data.predicted_score2} ${data.team2}`;
-        });
-}
-</script>
-
+    </script>
 </body>
 </html>
