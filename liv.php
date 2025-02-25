@@ -94,22 +94,34 @@ function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6
     $away_points = $standings[$away_team]['points'] ?? 0;
     $away_form_weight = calculateRecentFormWeight($away_last6);
 
-    // Compare metrics and generate suggestion
+    // Decision logic
     if ($home_position < $away_position && $home_form_weight > $away_form_weight) {
-        return "Home team is higher in the table and in better form.";
+        $decision = "Home Win";
+        $reason = "Home team is higher in the table and in better form.";
     } elseif ($home_position > $away_position && $home_form_weight < $away_form_weight) {
-        return "Away team is higher in the table and in better form.";
+        $decision = "Away Win";
+        $reason = "Away team is higher in the table and in better form.";
     } elseif ($home_gd > $away_gd && $home_gs > $away_gs) {
-        return "Home team has a stronger goal difference and scoring record.";
+        $decision = "Home Win";
+        $reason = "Home team has a stronger goal difference and scoring record.";
     } elseif ($home_gd < $away_gd && $home_gs < $away_gs) {
-        return "Away team has a stronger goal difference and scoring record.";
+        $decision = "Away Win";
+        $reason = "Away team has a stronger goal difference and scoring record.";
     } elseif ($home_points > $away_points) {
-        return "Home team has more points in the standings.";
+        $decision = "Home Win";
+        $reason = "Home team has more points in the standings.";
     } elseif ($home_points < $away_points) {
-        return "Away team has more points in the standings.";
+        $decision = "Away Win";
+        $reason = "Away team has more points in the standings.";
     } else {
-        return "Teams are evenly matched based on current data.";
+        $decision = "Draw";
+        $reason = "Teams are evenly matched based on current data.";
     }
+
+    return [
+        'decision' => $decision,
+        'reason' => $reason
+    ];
 }
 // Helper function to calculate a numeric weight for recent form
 function calculateRecentFormWeight($recent_form) {
@@ -762,8 +774,10 @@ if ($selected_competition && $fixtures_data) {
             // Team crests
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
-// Get prediction suggestion
-    $prediction_suggestion = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
+// Get prediction suggestion with decision
+    $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
+    $decision = $prediction['decision'];
+    $reason = $prediction['reason'];
             
             // Get standings position, goal difference, points, and goals scored
             $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
@@ -813,7 +827,8 @@ if ($selected_competition && $fixtures_data) {
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
                               <div style='font-size: 10px; color: #777; font-style: italic; margin-top: 2px;'>
-                        $prediction_suggestion
+                        <strong>Decision:</strong> $decision<br>
+                        <strong>Reason:</strong> $reason
                     </div>
                         </a>
                     </div>
@@ -826,7 +841,8 @@ if ($selected_competition && $fixtures_data) {
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</div>
                             <div style='font-size: 10px; color: #777; font-style: italic; margin-top: 2px;'>
-                        $prediction_suggestion
+                        <strong>Decision:</strong> $decision<br>
+                        <strong>Reason:</strong> $reason
                     </div>
                         </a>
                     </div>
