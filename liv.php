@@ -61,16 +61,20 @@ function getTeamMetrics($standings_data) {
     return $metrics;
 }
 
-// Function to get standings position and goal difference
-function getStandingsPositionAndGoalDifference($standings_data) {
+// Function to get standings position, goal difference, points, and goals scored
+function getStandingsData($standings_data) {
     $standings = [];
     foreach ($standings_data['standings'][0]['table'] as $team) {
         $team_name = $team['team']['name'];
         $position = $team['position'];
         $goal_difference = $team['goalDifference'];
+        $points = $team['points'];
+        $goals_scored = $team['goalsFor'];
         $standings[$team_name] = [
             'position' => $position,
-            'goal_difference' => $goal_difference
+            'goal_difference' => $goal_difference,
+            'points' => $points,
+            'goals_scored' => $goals_scored
         ];
     }
     return $standings;
@@ -348,7 +352,7 @@ if ($selected_competition) {
     $standings_data = fetchAPI($standings_url, $api_key);
     $fixtures_data = fetchAPI($fixtures_url, $api_key);
     $team_metrics = getTeamMetrics($standings_data);
-    $standings = getStandingsPositionAndGoalDifference($standings_data); // Get standings data
+    $standings = getStandingsData($standings_data); // Get standings data
 } else {
     $fixtures_data = null;
     $team_metrics = null;
@@ -728,11 +732,15 @@ if ($selected_competition && $fixtures_data) {
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
 
-            // Get standings position and goal difference
+            // Get standings position, goal difference, points, and goals scored
             $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
             $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
+            $home_points = isset($standings[$home_team]['points']) ? $standings[$home_team]['points'] : 'N/A';
+            $home_goals_scored = isset($standings[$home_team]['goals_scored']) ? $standings[$home_team]['goals_scored'] : 'N/A';
             $away_position = isset($standings[$away_team]['position']) ? $standings[$away_team]['position'] : 'N/A';
             $away_goal_diff = isset($standings[$away_team]['goal_difference']) ? $standings[$away_team]['goal_difference'] : 'N/A';
+            $away_points = isset($standings[$away_team]['points']) ? $standings[$away_team]['points'] : 'N/A';
+            $away_goals_scored = isset($standings[$away_team]['goals_scored']) ? $standings[$away_team]['goals_scored'] : 'N/A';
 
             // Check if score matches prediction
             $prediction = '';
@@ -771,7 +779,7 @@ if ($selected_competition && $fixtures_data) {
                             <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px;'>
-                                Pos: $home_position | GD: $home_goal_diff
+                                Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored
                             </div>
                         </a>
                     </div>
@@ -783,7 +791,7 @@ if ($selected_competition && $fixtures_data) {
                             <span style='font-weight: bold; font-size: 14px; color: #2980b9;'>$away_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px;'>
-                                Pos: $away_position | GD: $away_goal_diff
+                                Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored
                             </div>
                         </a>
                     </div>
