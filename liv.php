@@ -79,7 +79,26 @@ function getStandingsData($standings_data) {
     }
     return $standings;
 }
+function getSuggestion($team_name, $team_metrics, $standings, $last6_form) {
+    $position = $standings[$team_name]['position'] ?? 'N/A';
+    $goal_diff = $standings[$team_name]['goal_difference'] ?? 'N/A';
+    $points = $standings[$team_name]['points'] ?? 'N/A';
+    $goals_scored = $standings[$team_name]['goals_scored'] ?? 'N/A';
 
+    // Calculate recent form weight
+    $form_weight = calculateRecentFormWeight($last6_form);
+
+    // Generate suggestion based on position, form, and goals
+    if ($position <= 4 && $form_weight >= 2.0) {
+        return "Strong team in good form.";
+    } elseif ($position <= 10 && $form_weight >= 1.5) {
+        return "Decent team with consistent form.";
+    } elseif ($position > 10 && $form_weight < 1.0) {
+        return "Struggling team with poor form.";
+    } else {
+        return "Neutral form and performance.";
+    }
+}
 // Helper function to calculate a numeric weight for recent form
 function calculateRecentFormWeight($recent_form) {
     $form_weights = [
@@ -732,6 +751,10 @@ if ($selected_competition && $fixtures_data) {
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
 
+                // Get suggestions for home and away teams
+    $home_suggestion = getSuggestion($home_team, $team_metrics[$home_team], $standings, $last6_home);
+    $away_suggestion = getSuggestion($away_team, $team_metrics[$away_team], $standings, $last6_away);
+
             // Get standings position, goal difference, points, and goals scored
             $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
             $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
@@ -778,6 +801,9 @@ if ($selected_competition && $fixtures_data) {
                         <a href='#' style='text-decoration: none; color: inherit;'>
                             <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
+                            <span title='$home_suggestion' style='font-weight: bold; font-size: 14px; color: #2c3e50; cursor: help;'>
+                    $home_team
+                </span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
                         </a>
                     </div>
@@ -788,6 +814,9 @@ if ($selected_competition && $fixtures_data) {
                         <a href='#' style='text-decoration: none; color: inherit;'>
                             <span style='font-weight: bold; font-size: 14px; color: #2980b9;'>$away_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
+                            <span title='$away_suggestion' style='font-weight: bold; font-size: 14px; color: #2980b9; cursor: help;'>
+                    $away_team
+                </span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</div>
                         </a>
                     </div>
