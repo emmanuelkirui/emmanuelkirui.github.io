@@ -796,6 +796,35 @@ if ($selected_competition && $fixtures_data) {
                 <td>$score</td>
                 <td>$prediction
                     <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
+                     <!-- Prediction Section -->
+    <div style='text-align: center; font-size: 12px; color: #27ae60; font-weight: bold; margin-top: 5px;'>
+        <?php
+            function calculate_form_score($form) {
+                $form_points = 0;
+                $matches = str_split($form);
+                foreach ($matches as $match) {
+                    if ($match === 'W') $form_points += 3;
+                    elseif ($match === 'D') $form_points += 1;
+                }
+                return $form_points;
+            }
+
+            $home_form_score = calculate_form_score($last6_home);
+            $away_form_score = calculate_form_score($last6_away);
+
+            if ($home_points > $away_points + 3 && $home_form_score >= $away_form_score) {
+                echo "Prediction: $home_team to win";
+            } elseif ($away_points > $home_points + 3 && $away_form_score >= $home_form_score) {
+                echo "Prediction: $away_team to win";
+            } elseif ($home_goal_diff > $away_goal_diff && $home_form_score >= $away_form_score) {
+                echo "Prediction: Slight edge for $home_team";
+            } elseif ($away_goal_diff > $home_goal_diff && $away_form_score >= $home_form_score) {
+                echo "Prediction: Slight edge for $away_team";
+            } else {
+                echo "Prediction: Draw";
+            }
+        ?>
+    </div>
                 </td>
                 <td>$match_result</td>
                 <td>$venue</td>
