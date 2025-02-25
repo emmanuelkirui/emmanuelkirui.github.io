@@ -796,41 +796,47 @@ if ($selected_competition && $fixtures_data) {
                 <td>$score</td>
                 <td>$prediction
                     <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
-                     <!-- Prediction Section -->
-    <div style='text-align: center; font-size: 12px; color: #27ae60; font-weight: bold; margin-top: 5px;'>
-        <?php
-            function calculate_form_score($form) {
-                $form_points = 0;
-                $matches = str_split($form);
-                foreach ($matches as $match) {
-                    if ($match === 'W') $form_points += 3;
-                    elseif ($match === 'D') $form_points += 1;
-                }
-                return $form_points;
-            }
-
-            $home_form_score = calculate_form_score($last6_home);
-            $away_form_score = calculate_form_score($last6_away);
-
-            if ($home_points > $away_points + 3 && $home_form_score >= $away_form_score) {
-                echo "Prediction: $home_team to win";
-            } elseif ($away_points > $home_points + 3 && $away_form_score >= $home_form_score) {
-                echo "Prediction: $away_team to win";
-            } elseif ($home_goal_diff > $away_goal_diff && $home_form_score >= $away_form_score) {
-                echo "Prediction: Slight edge for $home_team";
-            } elseif ($away_goal_diff > $home_goal_diff && $away_form_score >= $home_form_score) {
-                echo "Prediction: Slight edge for $away_team";
-            } else {
-                echo "Prediction: Draw";
-            }
-        ?>
-    </div>
+                    <div style='text-align: center; font-size: 14px; font-weight: bold; padding: 8px; color: $prediction_color;'>
+                       Prediction: $prediction_text
+                    </div>
                 </td>
                 <td>$match_result</td>
                 <td>$venue</td>
             </tr>";
         }
 
+// Prediction logic
+function calculate_form_score($form) {
+    $form_points = 0;
+    $matches = str_split($form);
+    foreach ($matches as $match) {
+        if ($match === 'W') $form_points += 3;
+        elseif ($match === 'D') $form_points += 1;
+    }
+    return $form_points;
+}
+
+$home_form_score = calculate_form_score($last6_home);
+$away_form_score = calculate_form_score($last6_away);
+$prediction_text = "";
+$prediction_color = "";
+
+if ($home_points > $away_points + 3 && $home_form_score >= $away_form_score) {
+    $prediction_text = "$home_team to win";
+    $prediction_color = "#27ae60"; // Green for home win
+} elseif ($away_points > $home_points + 3 && $away_form_score >= $home_form_score) {
+    $prediction_text = "$away_team to win";
+    $prediction_color = "#e74c3c"; // Red for away win
+} elseif ($home_goal_diff > $away_goal_diff && $home_form_score >= $away_form_score) {
+    $prediction_text = "Slight edge for $home_team";
+    $prediction_color = "#2ecc71"; // Light green for slight home advantage
+} elseif ($away_goal_diff > $home_goal_diff && $away_form_score >= $home_form_score) {
+    $prediction_text = "Slight edge for $away_team";
+    $prediction_color = "#f39c12"; // Orange for slight away advantage
+} else {
+    $prediction_text = "Draw";
+    $prediction_color = "#3498db"; // Blue for draw
+}
         echo "</table>"; 
     }
 }
