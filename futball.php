@@ -49,9 +49,6 @@ foreach ($data['competitions'] as $competition) {
     }
 }
 
-
-
-
 // Default settings
 $defaultCompetition = 'PL'; // Default to Primeira Liga if no selection
 $defaultDateFilter = 'all'; // Show all matches by default
@@ -115,18 +112,91 @@ $matches = array_filter($data['matches'], function ($match) use ($dateFilter, $c
     return true; // 'all' shows all matches
 });
 
-
-
-
-
 // Pagination logic
 $totalItems = count($matches);
 $totalPages = ceil($totalItems / $itemsPerPage);
 $offset = ($page - 1) * $itemsPerPage;
 $paginatedMatches = array_slice($matches, $offset, $itemsPerPage);
+
+// Function to fetch historical matches for a team
+function fetchTeamMatches($teamId) {
+    global $apiKey;
+    $apiUrl = "https://api.football-data.org/v4/teams/$teamId/matches";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "X-Auth-Token: $apiKey"
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    return json_decode($response, true);
+}
+
+// Function to get common opponents
+function getCommonOpponents($homeTeamId, $awayTeamId) {
+    $homeMatches = fetchTeamMatches($homeTeamId);
+    $awayMatches = fetchTeamMatches($awayTeamId);
+
+    $homeOpponents = [];
+    foreach ($homeMatches['matches'] as $match) {
+        if ($match['homeTeam']['id'] == $homeTeamId) {
+            $homeOpponents[] = $match['awayTeam']['id'];
+        } else {
+            $homeOpponents[] = $match['homeTeam']['id'];
+        }
+    }
+
+    $awayOpponents = [];
+    foreach ($awayMatches['matches'] as $match) {
+        if ($match['homeTeam']['id'] == $awayTeamId) {
+            $awayOpponents[] = $match['awayTeam']['id'];
+        } else {
+            $awayOpponents[] = $match['homeTeam']['id'];
+        }
+    }
+
+    return array_intersect($homeOpponents, $awayOpponents);
+}
+
+// Function to analyze performance against common opponents
+function analyzePerformance($teamId, $opponentIds) {
+    $matches = fetchTeamMatches($teamId);
+    $performance = ['wins' => 0, 'draws' => 0, 'losses' => 0];
+
+    foreach ($matches['matches'] as $match) {
+        if (in_array($match['homeTeam']['id'], $opponentIds) || in_array($match['awayTeam']['id'], $opponentIds)) {
+            if ($match['score']['winner'] == $teamId) {
+                $performance['wins']++;
+            } elseif ($match['score']['winner'] == 'DRAW') {
+                $performance['draws']++;
+            } else {
+                $performance['losses']++;
+            }
+        }
+    }
+
+    return $performance;
+}
+
+// Function to predict match outcome based on shared opponents
+function predictMatch($homeTeamId, $awayTeamId) {
+    $commonOpponents = getCommonOpponents($homeTeamId, $awayTeamId);
+    $homePerformance = analyzePerformance($homeTeamId, $commonOpponents);
+    $awayPerformance = analyzePerformance($awayTeamId, $commonOpponents);
+
+    $homeScore = $homePerformance['wins'] * 3 + $homePerformance['draws'];
+    $awayScore = $awayPerformance['wins'] * 3 + $awayPerformance['draws'];
+
+    if ($homeScore > $awayScore) {
+        return "Home team is predicted to win based on shared opponents.";
+    } elseif ($awayScore > $homeScore) {
+        return "Away team is predicted to win based on shared opponents.";
+    } else {
+        return "The match is predicted to be a draw based on shared opponents.";
+    }
+}
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -137,7 +207,7 @@ $paginatedMatches = array_slice($matches, $offset, $itemsPerPage);
     <link rel="stylesheet" href="css/bulma.min.css"> <!-- Bulma CSS -->
     <link rel="stylesheet" href="css/styles.css"> <!-- Custom Styles -->
     <link rel="stylesheet" href="../css/network-status.css">
-   <script src="../network-status.js"></script>
+    <script src="../network-status.js"></script>
     <script>
         function reloadPage() {
             const competition = document.getElementById('competition').value;
@@ -196,8 +266,6 @@ $paginatedMatches = array_slice($matches, $offset, $itemsPerPage);
         }
     }
 </script>
-
-
 </head>
 <body>
  <!-- Navigation Bar -->
@@ -317,6 +385,7 @@ $paginatedMatches = array_slice($matches, $offset, $itemsPerPage);
                                 <th>Score</th>
                                 <th>Status</th>
                                 <th>Match Date</th>
+                                <th>Prediction</th>
                                 <th>H2H</th>
                             </tr>
                         </thead>
@@ -328,146 +397,64 @@ $paginatedMatches = array_slice($matches, $offset, $itemsPerPage);
         $awayTeam = $match['awayTeam'] ?? ['name' => 'Unknown', 'id' => ''];
         $homeTeamId = $homeTeam['id'] ?? '';
         $awayTeamId = $awayTeam['id'] ?? '';
-        
-        
-       
+        $prediction = predictMatch($homeTeamId, $awayTeamId);
     ?>
     <tr>
         <td><?= $rowId; ?></td>
-       <!-- Home Team Column -->
-<td>
-    <!-- Home Team Name -->
-   
-    <div>
-        <a href="team_matches.php?team_id=<?= $homeTeam['id']; ?>" class="team-link">
-            <?= htmlspecialchars($homeTeam['name']); ?>
-        </a>
-    </div>
-    
-    
-    <!-- View Squad Button (Small) -->
-    <div style="margin-top: 10px;">
-        <button class="button is-link is-small" 
-                onclick="openModal(<?= $homeTeamId; ?>)" 
-                aria-label="View <?= htmlspecialchars($homeTeam['name']); ?> Squad" 
-                title="Click to view squad details for <?= htmlspecialchars($homeTeam['name']); ?>">
-<?= strtoupper(htmlspecialchars(substr($homeTeam['name'], 0, 3))); ?> Squad
-
-        </button>
-    </div>
-</td>
-
-<!-- Away Team Column -->
-<td>
-    <!-- Away Team Name -->
-    <div>
-    
-        <a href="team_matches.php?team_id=<?= $awayTeam['id']; ?>" class="team-link">
-            <?= htmlspecialchars($awayTeam['name']); ?>
-        </a>
-    </div>
-   
-    <!-- View Squad Button (Small) -->
-    <div style="margin-top: 10px;">
-        <button class="button is-link is-small" 
-                onclick="openModal(<?= $awayTeamId; ?>)" 
-                aria-label="View <?= htmlspecialchars($awayTeam['name']); ?> Squad" 
-                title="Click to view squad details for <?= htmlspecialchars($awayTeam['name']); ?>">
-<?= strtoupper(htmlspecialchars(substr($awayTeam['name'], 0, 3))); ?> Squad
-
-        </button>
-    </div>
-</td>
-
-<!-- Modal Structure -->
-<div id="teamSquadModal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-content">
-        <div class="box">
-            <!-- Content will be loaded here -->
-        </div>
-    </div>
-    <button class="modal-close is-large" aria-label="close"></button>
-</div>
-
-<script>
-    // Function to open the modal and load team squad data dynamically
-    const openModal = (teamId) => {
-        fetch(`team_squad.php?team_id=${teamId}`)
-            .then(response => response.text())
-            .then(html => {
-                document.getElementById('teamSquadModal').querySelector('.modal-content .box').innerHTML = html;
-                document.getElementById('teamSquadModal').classList.add('is-active');
-            });
-    };
-
-    // Close the modal when the close button is clicked
-    document.querySelector('.modal-close').addEventListener('click', () => {
-        document.getElementById('teamSquadModal').classList.remove('is-active');
-    });
-
-    // Close the modal when the background is clicked
-    document.querySelector('.modal-background').addEventListener('click', () => {
-        document.getElementById('teamSquadModal').classList.remove('is-active');
-    });
-</script>
-
-<!-- Bulma CSS & Custom styles for responsiveness -->
-<style>
-    /* Ensure the modal takes full screen width on smaller screens */
-    @media (max-width: 768px) {
-        .modal-content {
-            width: 90%;
-            height: 90%;
-            max-height: 80%;
-        }
-    }
-
-    /* Adjust the modal content for larger screens */
-    @media (min-width: 769px) {
-        .modal-content {
-            width: 70%;
-            max-width: 900px;
-            height: auto;
-        }
-    }
-
-    /* Ensuring the modal has proper padding and scroll behavior for small screens */
-    .modal-content .box {
-        overflow-y: auto;
-        max-height: 80vh; /* Keep content scrollable if it's too tall */
-        padding: 1.5rem;
-    }
-</style>
-
-
+        <td>
+            <div>
+                <a href="team_matches.php?team_id=<?= $homeTeam['id']; ?>" class="team-link">
+                    <?= htmlspecialchars($homeTeam['name']); ?>
+                </a>
+            </div>
+            <div style="margin-top: 10px;">
+                <button class="button is-link is-small" 
+                        onclick="openModal(<?= $homeTeamId; ?>)" 
+                        aria-label="View <?= htmlspecialchars($homeTeam['name']); ?> Squad" 
+                        title="Click to view squad details for <?= htmlspecialchars($homeTeam['name']); ?>">
+                    <?= strtoupper(htmlspecialchars(substr($homeTeam['name'], 0, 3))); ?> Squad
+                </button>
+            </div>
+        </td>
+        <td>
+            <div>
+                <a href="team_matches.php?team_id=<?= $awayTeam['id']; ?>" class="team-link">
+                    <?= htmlspecialchars($awayTeam['name']); ?>
+                </a>
+            </div>
+            <div style="margin-top: 10px;">
+                <button class="button is-link is-small" 
+                        onclick="openModal(<?= $awayTeamId; ?>)" 
+                        aria-label="View <?= htmlspecialchars($awayTeam['name']); ?> Squad" 
+                        title="Click to view squad details for <?= htmlspecialchars($awayTeam['name']); ?>">
+                    <?= strtoupper(htmlspecialchars(substr($awayTeam['name'], 0, 3))); ?> Squad
+                </button>
+            </div>
+        </td>
         <td><?= $match['score']['fullTime']['home'] ?? '-'; ?> - <?= $match['score']['fullTime']['away'] ?? '-'; ?></td>
         <td><?= $match['status']; ?></td>
         <td><?= date('Y-m-d H:i', strtotime($match['utcDate'])); ?></td>
+        <td><?= $prediction; ?></td>
         <td>
-    <?php if (!empty($homeTeamId) && !empty($awayTeamId)): ?>
-        <button class="button is-small is-info" style="margin-right: 10px;" onclick="toggleH2H('<?= $rowId; ?>', '<?= $homeTeamId; ?>', '<?= $awayTeamId; ?>', 'home')">
-            Show Home H2H
-        </button>
-        <button class="button is-small is-info" onclick="toggleH2H('<?= $rowId; ?>', '<?= $homeTeamId; ?>', '<?= $awayTeamId; ?>', 'away')">
-            Show Away H2H
-        </button>
-    <?php else: ?>
-        <span>N/A</span>
-    <?php endif; ?>
-</td>
-
-
-</tr>
-<tr>
-    <td colspan="7">
-        <div id="h2h-<?= $rowId; ?>" style="padding: 10px; background-color: #f5f5f5;"></div>
-        <div id="h2hA-<?= $rowId; ?>" style="padding: 10px; background-color: #f5f5f5;"></div>
-    </td>
-</tr>
-
+            <?php if (!empty($homeTeamId) && !empty($awayTeamId)): ?>
+                <button class="button is-small is-info" style="margin-right: 10px;" onclick="toggleH2H('<?= $rowId; ?>', '<?= $homeTeamId; ?>', '<?= $awayTeamId; ?>', 'home')">
+                    Show Home H2H
+                </button>
+                <button class="button is-small is-info" onclick="toggleH2H('<?= $rowId; ?>', '<?= $homeTeamId; ?>', '<?= $awayTeamId; ?>', 'away')">
+                    Show Away H2H
+                </button>
+            <?php else: ?>
+                <span>N/A</span>
+            <?php endif; ?>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="8">
+            <div id="h2h-<?= $rowId; ?>" style="padding: 10px; background-color: #f5f5f5;"></div>
+            <div id="h2hA-<?= $rowId; ?>" style="padding: 10px; background-color: #f5f5f5;"></div>
+        </td>
+    </tr>
 <?php endforeach; ?>
-
                         </tbody>
                     </table>
                 </div>
