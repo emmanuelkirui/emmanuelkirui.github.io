@@ -772,71 +772,26 @@ if ($selected_competition && $fixtures_data) {
 
             echo "<tr>
                 <td>$date_eat</td>
-                 <td>
-            <div style='display: flex; align-items: center; gap: 8px;'>
-                <img src='$home_crest' alt='$home_team' style='height: 30px; width: 30px;' />
-                <a href='#' style='text-decoration: none; color: inherit;'>
-                    <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
-                    <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
-                    <div style='font-size: 10px; color: #555; margin-top: 2px;'>
-                        Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored
+                <td>
+                    <div style='display: flex; align-items: center; gap: 8px;'>
+                        <img src='$home_crest' alt='$home_team' style='height: 30px; width: 30px;' />
+                        <a href='#' style='text-decoration: none; color: inherit;'>
+                            <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
+                            <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
+                            <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
+                        </a>
                     </div>
-                </a>
-            </div>";
-
-        // Prediction logic
-        function calculate_form_score($form) {
-            $form_points = 0;
-            $matches = str_split($form);
-            foreach ($matches as $match) {
-                if ($match === 'W') $form_points += 3;
-                elseif ($match === 'D') $form_points += 1;
-            }
-            return $form_points;
-        }
-
-        $home_form_score = calculate_form_score($last6_home);
-        $away_form_score = calculate_form_score($last6_away);
-        $prediction_text = "";
-        $prediction_color = "";
-
-        if ($home_points > $away_points + 3 && $home_form_score >= $away_form_score) {
-            $prediction_text = "$home_team to win";
-            $prediction_color = "#27ae60"; // Green for home win
-        } elseif ($away_points > $home_points + 3 && $away_form_score >= $home_form_score) {
-            $prediction_text = "$away_team to win";
-            $prediction_color = "#e74c3c"; // Red for away win
-        } elseif ($home_goal_diff > $away_goal_diff && $home_form_score >= $away_form_score) {
-            $prediction_text = "Slight edge for $home_team";
-            $prediction_color = "#2ecc71"; // Light green for slight home advantage
-        } elseif ($away_goal_diff > $home_goal_diff && $away_form_score >= $home_form_score) {
-            $prediction_text = "Slight edge for $away_team";
-            $prediction_color = "#f39c12"; // Orange for slight away advantage
-        } else {
-            $prediction_text = "Draw";
-            $prediction_color = "#3498db"; // Blue for draw
-        }
-
-        // Include the prediction inside the same TD
-        echo "<div style='text-align: center; font-size: 12px; font-weight: bold; padding-top: 5px; color: $prediction_color;'>
-                $prediction_text
-              </div>
-        </td>
-        <td>
-            <div style='display: flex; align-items: center; gap: 8px;'>
-                <img src='$away_crest' alt='$away_team' style='height: 30px; width: 30px;' />
-                <a href='#' style='text-decoration: none; color: inherit;'>
-                    <span style='font-weight: bold; font-size: 14px; color: #2980b9;'>$away_team</span>
-                    <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
-                    <div style='font-size: 10px; color: #555; margin-top: 2px;'>
-                        Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored
+                </td>
+                <td>
+                    <div style='display: flex; align-items: center; gap: 8px;'>
+                        <img src='$away_crest' alt='$away_team' style='height: 30px; width: 30px;' />
+                        <a href='#' style='text-decoration: none; color: inherit;'>
+                            <span style='font-weight: bold; font-size: 14px; color: #2980b9;'>$away_team</span>
+                            <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
+                            <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</div>
+                        </a>
                     </div>
-                </a>
-            </div>
-            <div style='text-align: center; font-size: 12px; font-weight: bold; padding-top: 5px; color: $prediction_color;'>
-                $prediction_text
-            </div>
-        </td>
+                </td>
                 <td>$status</td>
                 <td>$score</td>
                 <td>$prediction
@@ -846,6 +801,7 @@ if ($selected_competition && $fixtures_data) {
                 <td>$venue</td>
             </tr>";
         }
+
         echo "</table>"; 
     }
 }
