@@ -4,11 +4,9 @@ $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
 // Start session to store competitions and their data
-// Check if session is not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 
 // Function to fetch data from the API
 function fetchAPI($url, $api_key) {
@@ -31,7 +29,6 @@ function fetchAPI($url, $api_key) {
 
     return json_decode($response, true);
 }
-
 
 // Fetch all competitions only once and store in session
 if (!isset($_SESSION['competitions'])) {
@@ -62,6 +59,21 @@ function getTeamMetrics($standings_data) {
         ];
     }
     return $metrics;
+}
+
+// Function to get standings position and goal difference
+function getStandingsPositionAndGoalDifference($standings_data) {
+    $standings = [];
+    foreach ($standings_data['standings'][0]['table'] as $team) {
+        $team_name = $team['team']['name'];
+        $position = $team['position'];
+        $goal_difference = $team['goalDifference'];
+        $standings[$team_name] = [
+            'position' => $position,
+            'goal_difference' => $goal_difference
+        ];
+    }
+    return $standings;
 }
 
 // Helper function to calculate a numeric weight for recent form
@@ -159,7 +171,7 @@ function predictMatch($home_metrics, $away_metrics, $advantages) {
     }
 }
 
-
+// Function to predict goals
 function predictGoals($home_metrics, $away_metrics, $advantages) {
     $home_advantage = $advantages['home_advantage'];
     $away_advantage = $advantages['away_advantage'];
@@ -191,6 +203,7 @@ function predictGoals($home_metrics, $away_metrics, $advantages) {
     ];
 }
 
+// Function to get last 6 matches for a team
 function getLast6Matches($team_name, $fixtures) {
     $results = []; // To store the results of the last 6 matches
     
@@ -251,8 +264,6 @@ function getLast6Matches($team_name, $fixtures) {
     return "N/A";
 }
 
-
-
 // Function to calculate date range filter (Yesterday, Today, Tomorrow)
 function filterMatchesByDate($matches, $filter, $start_date = null, $end_date = null) {
     $filtered_matches = [];
@@ -307,8 +318,6 @@ function filterMatchesByDate($matches, $filter, $start_date = null, $end_date = 
     return $filtered_matches;
 }
 
-
-
 // Function to search matches by team
 function searchMatchesByTeam($matches, $team) {
     $filtered_matches = [];
@@ -339,11 +348,12 @@ if ($selected_competition) {
     $standings_data = fetchAPI($standings_url, $api_key);
     $fixtures_data = fetchAPI($fixtures_url, $api_key);
     $team_metrics = getTeamMetrics($standings_data);
+    $standings = getStandingsPositionAndGoalDifference($standings_data); // Get standings data
 } else {
     $fixtures_data = null;
     $team_metrics = null;
+    $standings = null;
 }
-
 
 // Display the competition dropdown
 echo "<h1>Football Match Predictions</h1>";
@@ -353,7 +363,6 @@ echo '<link rel="stylesheet" type="text/css" href="css/liv.css">';
 echo '<link rel="stylesheet" type="text/css" href="css/network-status.css">';
 
 echo "<?php include('search-form.php'); ?>";
-
 
 // Retrieve selected values from the query string
 $selected_competition = isset($_GET['competition']) ? $_GET['competition'] : '';
@@ -534,7 +543,6 @@ window.onload = function () {
 };
 </script>';
 
-
 // Competition dropdown
 echo '<form id="searchForm" method="GET" action="">';
 // Default selected competition and date filter values
@@ -599,7 +607,6 @@ echo '<div id="custom_range" style="' . ($selected_date_filter == 'custom' ? 'di
 echo '<input type="submit" value="Search" />
       </form>';
 
-
 // JavaScript for toggling the custom date range
 echo "<script>
 function toggleCustomRange(value) {
@@ -607,7 +614,6 @@ function toggleCustomRange(value) {
     customRange.style.display = value === 'custom' ? 'block' : 'none';
 }
 </script>";
-
 
 if ($selected_competition && $fixtures_data) {
     // Filter matches by date
@@ -623,77 +629,73 @@ if ($selected_competition && $fixtures_data) {
         // Display message if no matches found
         echo "<p style='color: red; font-weight: bold;'>No matches found for the selected date range.</p>";
     } else {
-  echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">';
+        echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">';
 
-echo '<div style="text-align: right; margin-bottom: 10px;">
-        <button id="shareButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;">
-            <i class="fas fa-share-alt" style="font-size: 24px; color: #007bff;"></i>
-        </button>
-        <button id="downloadButton" style="background: none; border: none; cursor: pointer;">
-            <i class="fas fa-download" style="font-size: 24px; color: #28a745;"></i>
-        </button>
-      </div>';
+        echo '<div style="text-align: right; margin-bottom: 10px;">
+                <button id="shareButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;">
+                    <i class="fas fa-share-alt" style="font-size: 24px; color: #007bff;"></i>
+                </button>
+                <button id="downloadButton" style="background: none; border: none; cursor: pointer;">
+                    <i class="fas fa-download" style="font-size: 24px; color: #28a745;"></i>
+                </button>
+              </div>';
 
-echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-      <script>
-      function getFormattedTimestamp() {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, "0");
-          const day = String(now.getDate()).padStart(2, "0");
-          const hours = String(now.getHours()).padStart(2, "0");
-          const minutes = String(now.getMinutes()).padStart(2, "0");
-          const seconds = String(now.getSeconds()).padStart(2, "0");
-          return `cps_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
-      }
+        echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+              <script>
+              function getFormattedTimestamp() {
+                  const now = new Date();
+                  const year = now.getFullYear();
+                  const month = String(now.getMonth() + 1).padStart(2, "0");
+                  const day = String(now.getDate()).padStart(2, "0");
+                  const hours = String(now.getHours()).padStart(2, "0");
+                  const minutes = String(now.getMinutes()).padStart(2, "0");
+                  const seconds = String(now.getSeconds()).padStart(2, "0");
+                  return `cps_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
+              }
 
-      function captureTable(callback) {
-          const table = document.querySelector("table");
+              function captureTable(callback) {
+                  const table = document.querySelector("table");
 
-          // Make sure the table is fully loaded before capturing
-          setTimeout(() => {
-              html2canvas(table, {
-                  scale: 3, // Increase scale for better quality
-                  useCORS: true, // Fixes cross-origin issues if images are inside the table
-                  backgroundColor: "#ffffff", // Ensures a white background
-                  width: table.scrollWidth, // Capture full table width
-                  height: table.scrollHeight // Capture full table height
-              }).then(canvas => callback(canvas));
-          }, 200); // Small delay to ensure rendering is done
-      }
+                  // Make sure the table is fully loaded before capturing
+                  setTimeout(() => {
+                      html2canvas(table, {
+                          scale: 3, // Increase scale for better quality
+                          useCORS: true, // Fixes cross-origin issues if images are inside the table
+                          backgroundColor: "#ffffff", // Ensures a white background
+                          width: table.scrollWidth, // Capture full table width
+                          height: table.scrollHeight // Capture full table height
+                      }).then(canvas => callback(canvas));
+                  }, 200); // Small delay to ensure rendering is done
+              }
 
-      document.getElementById("shareButton").addEventListener("click", async function() {
-          captureTable(canvas => {
-              canvas.toBlob(blob => {
-                  const fileName = getFormattedTimestamp();
-                  const file = new File([blob], fileName, { type: "image/png" });
+              document.getElementById("shareButton").addEventListener("click", async function() {
+                  captureTable(canvas => {
+                      canvas.toBlob(blob => {
+                          const fileName = getFormattedTimestamp();
+                          const file = new File([blob], fileName, { type: "image/png" });
 
-                  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                      navigator.share({
-                          files: [file],
-                          title: "Captured Table",
-                          text: "Here is a table snapshot"
-                      }).catch(error => console.error("Error sharing:", error));
-                  } else {
-                      alert("Web Share API not supported or cannot share images.");
-                  }
-              }, "image/png");
-          });
-      });
+                          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                              navigator.share({
+                                  files: [file],
+                                  title: "Captured Table",
+                                  text: "Here is a table snapshot"
+                              }).catch(error => console.error("Error sharing:", error));
+                          } else {
+                              alert("Web Share API not supported or cannot share images.");
+                          }
+                      }, "image/png");
+                  });
+              });
 
-      document.getElementById("downloadButton").addEventListener("click", function() {
-          captureTable(canvas => {
-              const link = document.createElement("a");
-              link.href = canvas.toDataURL("image/png");
-              link.download = getFormattedTimestamp();
-              link.click();
-          });
-      });
-      </script>';
-
-
-
-
+              document.getElementById("downloadButton").addEventListener("click", function() {
+                  captureTable(canvas => {
+                      const link = document.createElement("a");
+                      link.href = canvas.toDataURL("image/png");
+                      link.download = getFormattedTimestamp();
+                      link.click();
+                  });
+              });
+              </script>';
 
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
         echo "<tr>
@@ -708,7 +710,7 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
               </tr>";
 
         foreach ($filtered_matches as $match) {
-             // Calculate home and away advantage dynamically
+            // Calculate home and away advantage dynamically
             $advantages = calculateHomeAwayAdvantage($fixtures_data);
             $date_utc = $match['utcDate'];
             $date_eat = convertToEAT($date_utc); // Convert UTC to EAT
@@ -726,22 +728,25 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
 
+            // Get standings position and goal difference
+            $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
+            $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
+            $away_position = isset($standings[$away_team]['position']) ? $standings[$away_team]['position'] : 'N/A';
+            $away_goal_diff = isset($standings[$away_team]['goal_difference']) ? $standings[$away_team]['goal_difference'] : 'N/A';
+
             // Check if score matches prediction
             $prediction = '';
             $match_result = '';
-             $predicted_goals = ''; // Initialize predicted goals variable
+            $predicted_goals = ''; // Initialize predicted goals variable
             if (isset($team_metrics[$home_team]) && isset($team_metrics[$away_team])) {
                 $home_metrics = $team_metrics[$home_team];
                 $away_metrics = $team_metrics[$away_team];
                 // Call predictMatch for outcome prediction
-                 // Pass both home and away advantages to predictMatch
                 $prediction = predictMatch($home_metrics, $away_metrics, $advantages);
 
                 // Call predictGoals for goal prediction
                 $predicted_goals_data = predictGoals($home_metrics, $away_metrics, $advantages);
                 $predicted_goals = "{$predicted_goals_data['home_goals']} - {$predicted_goals_data['away_goals']}";
-               
-              
 
                 if ($status == 'FINISHED' && $score != 'N/A') {
                     $score_home = explode(" - ", $score)[0];
@@ -765,6 +770,9 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                         <a href='#' style='text-decoration: none; color: inherit;'>
                             <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
+                            <div style='font-size: 10px; color: #555; margin-top: 2px;'>
+                                Pos: $home_position | GD: $home_goal_diff
+                            </div>
                         </a>
                     </div>
                 </td>
@@ -774,13 +782,16 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                         <a href='#' style='text-decoration: none; color: inherit;'>
                             <span style='font-weight: bold; font-size: 14px; color: #2980b9;'>$away_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
+                            <div style='font-size: 10px; color: #555; margin-top: 2px;'>
+                                Pos: $away_position | GD: $away_goal_diff
+                            </div>
                         </a>
                     </div>
                 </td>
                 <td>$status</td>
                 <td>$score</td>
                 <td>$prediction
-                 <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
+                    <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
                 </td>
                 <td>$match_result</td>
                 <td>$venue</td>
@@ -790,7 +801,6 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
         echo "</table>"; 
     }
 }
-
 
 ?>
 
