@@ -29,17 +29,28 @@ function fetchAPI($url, $api_key, $retries = 3) {
             // Calculate wait time using exponential backoff
             $wait_time = pow(2, 4 - $retries); // 2^3 = 8, 2^2 = 4, 2^1 = 2
 
-            // Display styled countdown to the user
-            echo "<div style='font-family: Arial, sans-serif; background: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin: 10px 0;'>
+            // Output the initial countdown message and JavaScript for dynamic countdown
+            echo "<div id='countdown' style='font-family: Arial, sans-serif; background: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin: 10px 0;'>
                   Rate limit hit. Retrying in <strong>$wait_time</strong> seconds...
                   </div>";
-            for ($i = $wait_time; $i > 0; $i--) {
-                echo "<div style='font-family: Arial, sans-serif; background: #fff3cd; color: #856404; padding: 10px; border: 1px solid #ffeeba; border-radius: 5px; margin: 5px 0;'>
-                      Retrying in <strong>$i</strong> seconds...
-                      </div>";
-                flush(); // Send output to the browser immediately
-                sleep(1); // Wait 1 second
-            }
+
+            echo "<script>
+                  let countdown = $wait_time;
+                  const countdownElement = document.getElementById('countdown');
+
+                  const interval = setInterval(() => {
+                      countdown--;
+                      countdownElement.innerHTML = `Rate limit hit. Retrying in <strong>${countdown}</strong> seconds...`;
+
+                      if (countdown <= 0) {
+                          clearInterval(interval);
+                          window.location.reload(); // Reload the page to retry
+                      }
+                  }, 1000); // Update every second
+                  </script>";
+
+            flush(); // Send output to the browser immediately
+            sleep($wait_time); // Wait for the countdown to finish on the server side
 
             return fetchAPI($url, $api_key, $retries - 1); // Retry with one less retry attempt
         } else {
