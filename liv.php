@@ -761,12 +761,16 @@ if ($selected_competition && $fixtures_data) {
       function captureTable(callback) {
           const table = document.querySelector("table");
 
+          // Ensure the table and its parent elements have a solid background color
+          table.style.backgroundColor = "#ffffff"; // Set table background to white
+          document.body.style.backgroundColor = "#ffffff"; // Set body background to white
+
           // Make sure the table is fully loaded before capturing
           setTimeout(() => {
               html2canvas(table, {
                   scale: 3, // Increase scale for better quality
                   useCORS: true, // Fixes cross-origin issues if images are inside the table
-                  backgroundColor: "#ffffff", // Ensures a white background
+                  backgroundColor: null, // Set to null to avoid transparent overlay
                   width: table.scrollWidth, // Capture full table width
                   height: table.scrollHeight // Capture full table height
               }).then(canvas => callback(canvas));
@@ -833,6 +837,8 @@ if ($selected_competition && $fixtures_data) {
           }, 5); // 5-second countdown
       });
       </script>';
+
+      
 
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
         echo "<tr>
