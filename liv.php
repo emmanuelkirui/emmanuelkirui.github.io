@@ -918,58 +918,6 @@ if ($selected_competition && $fixtures_data) {
         echo "</table>"; 
     }
 }
-    
-// Dynamic Footer Variables
-$site_name = "CPS Football Predictions"; // Change as needed
-$pages = [
-    "Home" => "#",
-    "About" => "#",
-    "Contact" => "#",
-    "Privacy Policy" => "#"
-];
-$current_year = date("Y");
-
-// Echo the footer
-echo '<!-- Footer -->
-<footer style="background-color: #333; color: #fff; padding: 20px 0; margin-top: 40px; text-align: center;">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
-        
-        <!-- Quick Links -->
-        <div style="margin-bottom: 20px;">';
-foreach ($pages as $page_name => $page_link) {
-    echo '<a href="' . $page_link . '" style="color: #fff; text-decoration: none; margin: 0 10px;">' . $page_name . '</a>';
-}
-echo '</div>
-
-        <!-- Social Media Links (Static) -->
-        <div style="margin-bottom: 20px;">
-            <a href="https://facebook.com" target="_blank" style="color: #fff; text-decoration: none; margin: 0 10px;">
-                <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="https://twitter.com" target="_blank" style="color: #fff; text-decoration: none; margin: 0 10px;">
-                <i class="fab fa-twitter"></i>
-            </a>
-            <a href="https://instagram.com" target="_blank" style="color: #fff; text-decoration: none; margin: 0 10px;">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://linkedin.com" target="_blank" style="color: #fff; text-decoration: none; margin: 0 10px;">
-                <i class="fab fa-linkedin-in"></i>
-            </a>
-        </div>
-
-        <!-- Copyright Notice -->
-        <div style="font-size: 14px;">
-            &copy; ' . $current_year . ' ' . $site_name . '. All rights reserved.
-        </div>
-    </div>
-</footer>
-
-<!-- Font Awesome for Icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">';
-
-
-    
-    
 ?>
 
 <script>
