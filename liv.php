@@ -745,7 +745,8 @@ if ($selected_competition && $fixtures_data) {
                 </button>
               </div>';
 
-            echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+            
+    echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 function getFormattedTimestamp() {
     const now = new Date();
@@ -764,7 +765,7 @@ function captureTable(callback) {
     // Make sure the table is fully loaded before capturing
     setTimeout(() => {
         html2canvas(table, {
-            scale: 5, // Increase scale for better quality
+            scale: 3, // Increase scale for better quality
             useCORS: true, // Fixes cross-origin issues if images are inside the table
             backgroundColor: "#ffffff", // Ensures a white background
             width: table.scrollWidth, // Capture full table width
@@ -804,16 +805,17 @@ function startCountdown(action, duration) {
 function showFeedbackMessage(message, isSuccess) {
     const feedbackElement = document.createElement("div");
     feedbackElement.style.position = "fixed";
-    feedbackElement.style.top = "20px";
+    feedbackElement.style.top = "50%";
     feedbackElement.style.left = "50%";
-    feedbackElement.style.transform = "translateX(-50%)";
+    feedbackElement.style.transform = "translate(-50%, -50%)";
     feedbackElement.style.backgroundColor = isSuccess ? "rgba(0, 128, 0, 0.8)" : "rgba(255, 0, 0, 0.8)";
     feedbackElement.style.color = "#fff";
-    feedbackElement.style.padding = "10px 20px";
-    feedbackElement.style.borderRadius = "5px";
+    feedbackElement.style.padding = "20px";
+    feedbackElement.style.borderRadius = "10px";
     feedbackElement.style.zIndex = "1000";
-    feedbackElement.style.fontSize = "16px";
+    feedbackElement.style.fontSize = "20px";
     feedbackElement.style.fontFamily = "Arial, sans-serif";
+    feedbackElement.style.textAlign = "center";
     feedbackElement.textContent = message;
     document.body.appendChild(feedbackElement);
 
