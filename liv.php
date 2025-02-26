@@ -433,7 +433,7 @@ echo '<style>
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.9);
     display: none;
     justify-content: center;
     align-items: center;
@@ -464,8 +464,8 @@ echo '<style>
     border-radius: 50%;
     position: absolute;
     background: linear-gradient(45deg, rgba(52, 152, 219, 0.3), rgba(142, 68, 173, 0.3));
-    animation: pulse 1.5s infinite, rotateRing 4s infinite linear;
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.4);
+    animation: pulse 1.5s infinite ease-in-out, rotateRing 4s infinite linear;
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
 }
 
 .status_light_led {
@@ -476,16 +476,25 @@ echo '<style>
     position: absolute;
     z-index: 1;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    animation: glow 1.5s infinite alternate ease-in-out;
 }
 
+/* Enhanced Pulse Animation */
 @keyframes pulse {
     0% {
         transform: scale(1);
         opacity: 1;
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+        box-shadow: 0 0 20px 10px rgba(52, 152, 219, 0.2);
     }
     100% {
-        transform: scale(1.5);
-        opacity: 0;
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
     }
 }
 
@@ -495,6 +504,17 @@ echo '<style>
     }
     100% {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes glow {
+    0% {
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    }
+    100% {
+        background-color: #3498db;
+        box-shadow: 0 0 15px rgba(52, 152, 219, 0.8);
     }
 }
 
@@ -548,12 +568,12 @@ echo '<style>
 
 /* Add a glowing effect on hover for the status light */
 .status:hover .status_light_ring {
-    box-shadow: 0 0 15px rgba(52, 152, 219, 0.5);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
 }
 
 .status:hover .status_light_led {
     background-color: #3498db;
-    box-shadow: 0 0 15px rgba(52, 152, 219, 0.6);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
 }
 </style>';
 
