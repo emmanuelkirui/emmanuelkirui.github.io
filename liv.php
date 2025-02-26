@@ -919,70 +919,103 @@ if ($selected_competition && $fixtures_data) {
     }
 }
     
+ 
 // Dynamic Footer Variables
 $site_name = "CPS Football Predictions"; // Change as needed
 $current_year = date("Y");
 
 // Echo the footer
-echo '<!-- Footer -->
-<footer style="background-color: #333; color: #fff; padding: 20px 0; margin-top: 40px; text-align: center;">
-    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+echo '
+<style>
+    /* Footer Styling */
+    footer {
+        background-color: #333;
+        color: #fff;
+        padding: 20px 0;
+        margin-top: 40px;
+        text-align: center;
+        position: relative; /* Keeps it in document flow */
+        z-index: -1; /* Pushes it behind everything */
+    }
+    .footer-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    .footer-section {
+        margin-bottom: 20px;
+    }
+    .footer-section h3 {
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+    .footer-section p {
+        max-width: 600px;
+        margin: auto;
+        font-size: 14px;
+    }
+    .footer-social a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        font-size: 18px;
+    }
+    .footer-copyright {
+        font-size: 14px;
+    }
+</style>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-container">
         
         <!-- About Us Section -->
-        <div style="margin-bottom: 20px;">
+        <div class="footer-section">
             <h3>About Us</h3>
-            <p style="max-width: 600px; margin: auto; font-size: 14px;">
+            <p>
                 Welcome to ' . $site_name . '! We provide expert football predictions to help you make informed decisions.
                 Our goal is to offer accurate and insightful predictions based on data analysis and trends.
             </p>
         </div>
 
         <!-- Contact Us Section -->
-        <div style="margin-bottom: 20px;">
+        <div class="footer-section">
             <h3>Contact Us</h3>
-            <p style="font-size: 14px;">
-                Email: emmanuelkirui042@gmail.com<br>
+            <p>
+                Email: emmanuelkirui042@gmail.com <br>
                 Phone: +254 742 994437 <br>
-                Address: 125 Litein, Nairobi, Kenya
+                Address: 125 Litein, Nairobi,Kenya
             </p>
         </div>
 
         <!-- Privacy Policy -->
-        <div style="margin-bottom: 20px;">
+        <div class="footer-section">
             <h3>Privacy Policy</h3>
-            <p style="max-width: 600px; margin: auto; font-size: 14px;">
+            <p>
                 Your privacy is important to us. We do not share personal data with third parties.
                 All predictions and services are provided with strict data protection measures.
             </p>
         </div>
 
         <!-- Terms & Conditions -->
-        <div style="margin-bottom: 20px;">
+        <div class="footer-section">
             <h3>Terms & Conditions</h3>
-            <p style="max-width: 600px; margin: auto; font-size: 14px;">
+            <p>
                 By using our services, you agree to our terms. All predictions are for informational purposes only.
                 We are not responsible for any losses incurred based on our predictions.
             </p>
         </div>
 
         <!-- Social Media Links (Static) -->
-        <div style="margin-bottom: 20px;">
-            <a href="https://facebook.com" target="_blank" style="color: #fff; text-decoration: none; margin: 0 10px;">
-                <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="https://twitter.com" target="_blank" style="color: #fff; text-decoration: none; margin: 0 10px;">
-                <i class="fab fa-twitter"></i>
-            </a>
-            <a href="https://instagram.com" target="_blank" style="color: #fff; text-decoration: none; margin: 0 10px;">
-                <i class="fab fa-instagram"></i>
-            </a>
-            <a href="https://linkedin.com" target="_blank" style="color: #fff; text-decoration: none; margin: 0 10px;">
-                <i class="fab fa-linkedin-in"></i>
-            </a>
+        <div class="footer-section footer-social">
+            <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin-in"></i></a>
         </div>
 
         <!-- Copyright Notice -->
-        <div style="font-size: 14px;">
+        <div class="footer-copyright">
             &copy; ' . $current_year . ' ' . $site_name . '. All rights reserved.
         </div>
     </div>
