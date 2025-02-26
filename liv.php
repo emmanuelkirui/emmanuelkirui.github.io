@@ -746,104 +746,120 @@ if ($selected_competition && $fixtures_data) {
               </div>';
 
             echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-      <script>
-      function getFormattedTimestamp() {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = String(now.getMonth() + 1).padStart(2, "0");
-          const day = String(now.getDate()).padStart(2, "0");
-          const hours = String(now.getHours()).padStart(2, "0");
-          const minutes = String(now.getMinutes()).padStart(2, "0");
-          const seconds = String(now.getSeconds()).padStart(2, "0");
-          return `cps_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
-      }
+<script>
+function getFormattedTimestamp() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+    return `cps_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
+}
 
-      function captureTable(callback) {
-          const table = document.querySelector("table");
+function captureTable(callback) {
+    const table = document.querySelector("table");
 
-          // Ensure the table is fully loaded before capturing
-          setTimeout(() => {
-              html2canvas(table, {
-                  scale: 5, // High resolution
-                  useCORS: true, // Fixes cross-origin issues
-                  logging: true, // Debugging
-                  allowTaint: false, // Prevent tainting
-                  width: table.scrollWidth,
-                  height: table.scrollHeight
-              }).then(canvas => {
-                  callback(canvas);
-              }).catch(error => {
-                  console.error("Error capturing table:", error);
-              });
-          }, 200); // Small delay to ensure rendering is done
-      }
+    // Make sure the table is fully loaded before capturing
+    setTimeout(() => {
+        html2canvas(table, {
+            scale: 5, // Increase scale for better quality
+            useCORS: true, // Fixes cross-origin issues if images are inside the table
+            backgroundColor: "#ffffff", // Ensures a white background
+            width: table.scrollWidth, // Capture full table width
+            height: table.scrollHeight // Capture full table height
+        }).then(canvas => callback(canvas));
+    }, 200); // Small delay to ensure rendering is done
+}
 
-      function startCountdown(action, duration) {
-          let countdown = duration;
-          const countdownElement = document.createElement("div");
-          countdownElement.style.position = "fixed";
-          countdownElement.style.top = "50%";
-          countdownElement.style.left = "50%";
-          countdownElement.style.transform = "translate(-50%, -50%)";
-          countdownElement.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-          countdownElement.style.color = "#fff";
-          countdownElement.style.padding = "20px";
-          countdownElement.style.borderRadius = "10px";
-          countdownElement.style.zIndex = "1000";
-          countdownElement.style.fontSize = "24px";
-          countdownElement.style.fontFamily = "Arial, sans-serif";
-          countdownElement.textContent = `Download/Share will start in ${countdown} seconds...`;
-          document.body.appendChild(countdownElement);
+function startCountdown(action, duration) {
+    let countdown = duration;
+    const countdownElement = document.createElement("div");
+    countdownElement.style.position = "fixed";
+    countdownElement.style.top = "50%";
+    countdownElement.style.left = "50%";
+    countdownElement.style.transform = "translate(-50%, -50%)";
+    countdownElement.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+    countdownElement.style.color = "#fff";
+    countdownElement.style.padding = "20px";
+    countdownElement.style.borderRadius = "10px";
+    countdownElement.style.zIndex = "1000";
+    countdownElement.style.fontSize = "24px";
+    countdownElement.style.fontFamily = "Arial, sans-serif";
+    countdownElement.textContent = `Download/Share will start in ${countdown} seconds...`;
+    document.body.appendChild(countdownElement);
 
-          const interval = setInterval(() => {
-              countdown--;
-              countdownElement.textContent = `Download/Share will start in ${countdown} seconds...`;
-              if (countdown <= 0) {
-                  clearInterval(interval);
-                  document.body.removeChild(countdownElement);
-                  action();
-              }
-          }, 1000);
-      }
+    const interval = setInterval(() => {
+        countdown--;
+        countdownElement.textContent = `Download/Share will start in ${countdown} seconds...`;
+        if (countdown <= 0) {
+            clearInterval(interval);
+            document.body.removeChild(countdownElement);
+            action();
+        }
+    }, 1000);
+}
 
-      document.getElementById("shareButton").addEventListener("click", async function() {
-          startCountdown(() => {
-              captureTable(canvas => {
-                  canvas.toBlob(blob => {
-                      const fileName = getFormattedTimestamp();
-                      const file = new File([blob], fileName, { type: "image/png" });
+function showFeedbackMessage(message, isSuccess) {
+    const feedbackElement = document.createElement("div");
+    feedbackElement.style.position = "fixed";
+    feedbackElement.style.top = "20px";
+    feedbackElement.style.left = "50%";
+    feedbackElement.style.transform = "translateX(-50%)";
+    feedbackElement.style.backgroundColor = isSuccess ? "rgba(0, 128, 0, 0.8)" : "rgba(255, 0, 0, 0.8)";
+    feedbackElement.style.color = "#fff";
+    feedbackElement.style.padding = "10px 20px";
+    feedbackElement.style.borderRadius = "5px";
+    feedbackElement.style.zIndex = "1000";
+    feedbackElement.style.fontSize = "16px";
+    feedbackElement.style.fontFamily = "Arial, sans-serif";
+    feedbackElement.textContent = message;
+    document.body.appendChild(feedbackElement);
 
-                      // Check if Web Share API is supported
-                      if (navigator.share && navigator.canShare({ files: [file] })) {
-                          navigator.share({
-                              files: [file],
-                              title: "Captured Table",
-                              text: "Here is a table snapshot"
-                          }).then(() => {
-                              console.log("Share successful");
-                          }).catch(error => {
-                              console.error("Error sharing:", error);
-                              alert("Sharing failed. Please try again.");
-                          });
-                      } else {
-                          alert("Web Share API not supported or cannot share files in this browser.");
-                      }
-                  }, "image/png", 1.0); // High-quality PNG
-              });
-          }, 5); // 5-second countdown
-      });
+    setTimeout(() => {
+        document.body.removeChild(feedbackElement);
+    }, 3000); // Remove feedback message after 3 seconds
+}
 
-      document.getElementById("downloadButton").addEventListener("click", function() {
-          startCountdown(() => {
-              captureTable(canvas => {
-                  const link = document.createElement("a");
-                  link.href = canvas.toDataURL("image/png", 1.0); // High-quality PNG
-                  link.download = getFormattedTimestamp();
-                  link.click();
-              });
-          }, 5); // 5-second countdown
-      });
-      </script>';
+document.getElementById("shareButton").addEventListener("click", async function() {
+    startCountdown(() => {
+        captureTable(canvas => {
+            canvas.toBlob(blob => {
+                const fileName = getFormattedTimestamp();
+                const file = new File([blob], fileName, { type: "image/png" });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    navigator.share({
+                        files: [file],
+                        title: "Captured Table",
+                        text: "Here is a table snapshot"
+                    }).then(() => {
+                        showFeedbackMessage("Table shared successfully!", true);
+                    }).catch(error => {
+                        console.error("Error sharing:", error);
+                        showFeedbackMessage("Failed to share table.", false);
+                    });
+                } else {
+                    showFeedbackMessage("Web Share API not supported or cannot share images.", false);
+                }
+            }, "image/png");
+        });
+    }, 5); // 5-second countdown
+});
+
+document.getElementById("downloadButton").addEventListener("click", function() {
+    startCountdown(() => {
+        captureTable(canvas => {
+            const link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png");
+            link.download = getFormattedTimestamp();
+            link.click();
+            showFeedbackMessage("Table downloaded successfully!", true);
+        });
+    }, 5); // 5-second countdown
+});
+</script>';
 
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
         echo "<tr>
