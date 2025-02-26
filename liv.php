@@ -764,7 +764,7 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
           // Make sure the table is fully loaded before capturing
           setTimeout(() => {
               html2canvas(table, {
-                  scale: 3, // Increase scale for better quality
+                  scale: 5, // Increase scale for better quality
                   useCORS: true, // Fixes cross-origin issues if images are inside the table
                   width: table.scrollWidth, // Capture full table width
                   height: table.scrollHeight // Capture full table height
