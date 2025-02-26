@@ -79,122 +79,43 @@ function getStandingsData($standings_data) {
     }
     return $standings;
 }
-function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6, $away_last6, $head_to_head = []) {
+function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6, $away_last6) {
     // Extract metrics for home team
     $home_position = $standings[$home_team]['position'] ?? 20; // Default to worst position if not found
     $home_gd = $standings[$home_team]['goal_difference'] ?? 0;
     $home_gs = $standings[$home_team]['goals_scored'] ?? 0;
     $home_points = $standings[$home_team]['points'] ?? 0;
-    $home_form_weight = calculateFormWeightForPrediction($home_last6);
-    $home_home_record = $standings[$home_team]['home_record'] ?? ['wins' => 0, 'draws' => 0, 'losses' => 0];
+    $home_form_weight = calculateRecentFormWeight($home_last6);
 
     // Extract metrics for away team
     $away_position = $standings[$away_team]['position'] ?? 20; // Default to worst position if not found
     $away_gd = $standings[$away_team]['goal_difference'] ?? 0;
     $away_gs = $standings[$away_team]['goals_scored'] ?? 0;
     $away_points = $standings[$away_team]['points'] ?? 0;
-    $away_form_weight = calculateFormWeightForPrediction($away_last6);
-    $away_away_record = $standings[$away_team]['away_record'] ?? ['wins' => 0, 'draws' => 0, 'losses' => 0];
-
-    // Head-to-head record
-    $head_to_head_weight = calculateHeadToHeadWeightForPrediction($head_to_head, $home_team);
-
-    // Calculate home and away strength
-    $home_strength = calculateHomeAwayStrengthForPrediction($home_home_record);
-    $away_strength = calculateHomeAwayStrengthForPrediction($away_away_record);
+    $away_form_weight = calculateRecentFormWeight($away_last6);
 
     // Decision logic
-    $home_advantage = 0;
-    $away_advantage = 0;
-    $reasons = [];
-
-    // Position
-    if ($home_position < $away_position) {
-        $home_advantage += 1;
-        $reasons[] = "Home team is higher in the table (Position: $home_position vs $away_position).";
-    } elseif ($home_position > $away_position) {
-        $away_advantage += 1;
-        $reasons[] = "Away team is higher in the table (Position: $away_position vs $home_position).";
-    } else {
-        $reasons[] = "Both teams are in the same position in the table (Position: $home_position).";
-    }
-
-    // Recent form
-    if ($home_form_weight > $away_form_weight) {
-        $home_advantage += 1;
-        $reasons[] = "Home team is in better recent form (Form: " . implode(", ", $home_last6) . ").";
-    } elseif ($home_form_weight < $away_form_weight) {
-        $away_advantage += 1;
-        $reasons[] = "Away team is in better recent form (Form: " . implode(", ", $away_last6) . ").";
-    } else {
-        $reasons[] = "Both teams have similar recent form (Home Form: " . implode(", ", $home_last6) . " | Away Form: " . implode(", ", $away_last6) . ").";
-    }
-
-    // Goal difference
-    if ($home_gd > $away_gd) {
-        $home_advantage += 1;
-        $reasons[] = "Home team has a stronger goal difference (GD: $home_gd vs $away_gd).";
-    } elseif ($home_gd < $away_gd) {
-        $away_advantage += 1;
-        $reasons[] = "Away team has a stronger goal difference (GD: $away_gd vs $home_gd).";
-    } else {
-        $reasons[] = "Both teams have the same goal difference (GD: $home_gd).";
-    }
-
-    // Goals scored
-    if ($home_gs > $away_gs) {
-        $home_advantage += 1;
-        $reasons[] = "Home team has scored more goals (GS: $home_gs vs $away_gs).";
-    } elseif ($home_gs < $away_gs) {
-        $away_advantage += 1;
-        $reasons[] = "Away team has scored more goals (GS: $away_gs vs $home_gs).";
-    } else {
-        $reasons[] = "Both teams have scored the same number of goals (GS: $home_gs).";
-    }
-
-    // Points
-    if ($home_points > $away_points) {
-        $home_advantage += 1;
-        $reasons[] = "Home team has more points in the standings (Points: $home_points vs $away_points).";
-    } elseif ($home_points < $away_points) {
-        $away_advantage += 1;
-        $reasons[] = "Away team has more points in the standings (Points: $away_points vs $home_points).";
-    } else {
-        $reasons[] = "Both teams have the same number of points (Points: $home_points).";
-    }
-
-    // Home/Away strength
-    if ($home_strength > $away_strength) {
-        $home_advantage += 1;
-        $reasons[] = "Home team has a stronger home record (Home Wins: {$home_home_record['wins']}, Draws: {$home_home_record['draws']}, Losses: {$home_home_record['losses']}).";
-    } elseif ($home_strength < $away_strength) {
-        $away_advantage += 1;
-        $reasons[] = "Away team has a stronger away record (Away Wins: {$away_away_record['wins']}, Draws: {$away_away_record['draws']}, Losses: {$away_away_record['losses']}).";
-    } else {
-        $reasons[] = "Both teams have similar home/away records.";
-    }
-
-    // Head-to-head
-    if ($head_to_head_weight > 0) {
-        $home_advantage += 1;
-        $reasons[] = "Home team has a better head-to-head record against the away team.";
-    } elseif ($head_to_head_weight < 0) {
-        $away_advantage += 1;
-        $reasons[] = "Away team has a better head-to-head record against the home team.";
-    } else {
-        $reasons[] = "Head-to-head record is balanced between the two teams.";
-    }
-
-    // Final decision
-    if ($home_advantage > $away_advantage) {
+    if ($home_position < $away_position && $home_form_weight > $away_form_weight) {
         $decision = "Home Win";
-        $reason = "Home team has a stronger overall advantage. " . implode(" ", $reasons);
-    } elseif ($home_advantage < $away_advantage) {
+        $reason = "Home team is higher in the table and in better form.";
+    } elseif ($home_position > $away_position && $home_form_weight < $away_form_weight) {
         $decision = "Away Win";
-        $reason = "Away team has a stronger overall advantage. " . implode(" ", $reasons);
+        $reason = "Away team is higher in the table and in better form.";
+    } elseif ($home_gd > $away_gd && $home_gs > $away_gs) {
+        $decision = "Home Win";
+        $reason = "Home team has a stronger goal difference and scoring record.";
+    } elseif ($home_gd < $away_gd && $home_gs < $away_gs) {
+        $decision = "Away Win";
+        $reason = "Away team has a stronger goal difference and scoring record.";
+    } elseif ($home_points > $away_points) {
+        $decision = "Home Win";
+        $reason = "Home team has more points in the standings.";
+    } elseif ($home_points < $away_points) {
+        $decision = "Away Win";
+        $reason = "Away team has more points in the standings.";
     } else {
         $decision = "Draw";
-        $reason = "Teams are evenly matched. " . implode(" ", $reasons);
+        $reason = "Teams are evenly matched based on current data.";
     }
 
     return [
@@ -202,36 +123,6 @@ function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6
         'reason' => $reason
     ];
 }
-
-function calculateFormWeightForPrediction($last6) {
-    $weight = 0;
-    foreach ($last6 as $result) {
-        switch ($result) {
-            case 'W': $weight += 3; break;
-            case 'D': $weight += 1; break;
-            case 'L': $weight -= 1; break;
-        }
-    }
-    return $weight;
-}
-
-function calculateHeadToHeadWeightForPrediction($head_to_head, $home_team) {
-    $weight = 0;
-    foreach ($head_to_head as $match) {
-        if ($match['home_team'] == $home_team && $match['result'] == 'W') $weight += 1;
-        elseif ($match['home_team'] == $home_team && $match['result'] == 'L') $weight -= 1;
-        elseif ($match['away_team'] == $home_team && $match['result'] == 'W') $weight -= 1;
-        elseif ($match['away_team'] == $home_team && $match['result'] == 'L') $weight += 1;
-    }
-    return $weight;
-}
-
-function calculateHomeAwayStrengthForPrediction($record) {
-    $total_matches = array_sum($record);
-    if ($total_matches == 0) return 0;
-    return ($record['wins'] * 3 + $record['draws']) / $total_matches;
-}
-
 // Helper function to calculate a numeric weight for recent form
 function calculateRecentFormWeight($recent_form) {
     $form_weights = [
