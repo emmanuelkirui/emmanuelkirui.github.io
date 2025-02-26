@@ -85,7 +85,7 @@ function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6
     $home_gd = $standings[$home_team]['goal_difference'] ?? 0;
     $home_gs = $standings[$home_team]['goals_scored'] ?? 0;
     $home_points = $standings[$home_team]['points'] ?? 0;
-    $home_form_weight = calculateRecentFormWeightsugg($home_last6);
+    $home_form_weight = calculateFormWeightForPrediction($home_last6);
     $home_home_record = $standings[$home_team]['home_record'] ?? ['wins' => 0, 'draws' => 0, 'losses' => 0];
 
     // Extract metrics for away team
@@ -93,15 +93,15 @@ function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6
     $away_gd = $standings[$away_team]['goal_difference'] ?? 0;
     $away_gs = $standings[$away_team]['goals_scored'] ?? 0;
     $away_points = $standings[$away_team]['points'] ?? 0;
-    $away_form_weight = calculateRecentFormWeightsugg($away_last6);
+    $away_form_weight = calculateFormWeightForPrediction($away_last6);
     $away_away_record = $standings[$away_team]['away_record'] ?? ['wins' => 0, 'draws' => 0, 'losses' => 0];
 
     // Head-to-head record
-    $head_to_head_weight = calculateHeadToHeadWeight($head_to_head, $home_team);
+    $head_to_head_weight = calculateHeadToHeadWeightForPrediction($head_to_head, $home_team);
 
     // Calculate home and away strength
-    $home_strength = ($home_home_record['wins'] * 3 + $home_home_record['draws']) / (array_sum($home_home_record) ?: 1);
-    $away_strength = ($away_away_record['wins'] * 3 + $away_away_record['draws']) / (array_sum($away_away_record) ?: 1);
+    $home_strength = calculateHomeAwayStrengthForPrediction($home_home_record);
+    $away_strength = calculateHomeAwayStrengthForPrediction($away_away_record);
 
     // Decision logic
     $home_advantage = 0;
@@ -112,54 +112,66 @@ function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6
     if ($home_position < $away_position) {
         $home_advantage += 1;
         $reasons[] = "Home team is higher in the table (Position: $home_position vs $away_position).";
-    } else {
+    } elseif ($home_position > $away_position) {
         $away_advantage += 1;
         $reasons[] = "Away team is higher in the table (Position: $away_position vs $home_position).";
+    } else {
+        $reasons[] = "Both teams are in the same position in the table (Position: $home_position).";
     }
 
     // Recent form
     if ($home_form_weight > $away_form_weight) {
         $home_advantage += 1;
-        $reasons[] = "Home team is in better recent form (Form Weight: $home_form_weight vs $away_form_weight).";
-    } else {
+        $reasons[] = "Home team is in better recent form (Form: " . implode(", ", $home_last6) . ").";
+    } elseif ($home_form_weight < $away_form_weight) {
         $away_advantage += 1;
-        $reasons[] = "Away team is in better recent form (Form Weight: $away_form_weight vs $home_form_weight).";
+        $reasons[] = "Away team is in better recent form (Form: " . implode(", ", $away_last6) . ").";
+    } else {
+        $reasons[] = "Both teams have similar recent form (Home Form: " . implode(", ", $home_last6) . " | Away Form: " . implode(", ", $away_last6) . ").";
     }
 
     // Goal difference
     if ($home_gd > $away_gd) {
         $home_advantage += 1;
         $reasons[] = "Home team has a stronger goal difference (GD: $home_gd vs $away_gd).";
-    } else {
+    } elseif ($home_gd < $away_gd) {
         $away_advantage += 1;
         $reasons[] = "Away team has a stronger goal difference (GD: $away_gd vs $home_gd).";
+    } else {
+        $reasons[] = "Both teams have the same goal difference (GD: $home_gd).";
     }
 
     // Goals scored
     if ($home_gs > $away_gs) {
         $home_advantage += 1;
         $reasons[] = "Home team has scored more goals (GS: $home_gs vs $away_gs).";
-    } else {
+    } elseif ($home_gs < $away_gs) {
         $away_advantage += 1;
         $reasons[] = "Away team has scored more goals (GS: $away_gs vs $home_gs).";
+    } else {
+        $reasons[] = "Both teams have scored the same number of goals (GS: $home_gs).";
     }
 
     // Points
     if ($home_points > $away_points) {
         $home_advantage += 1;
         $reasons[] = "Home team has more points in the standings (Points: $home_points vs $away_points).";
-    } else {
+    } elseif ($home_points < $away_points) {
         $away_advantage += 1;
         $reasons[] = "Away team has more points in the standings (Points: $away_points vs $home_points).";
+    } else {
+        $reasons[] = "Both teams have the same number of points (Points: $home_points).";
     }
 
     // Home/Away strength
     if ($home_strength > $away_strength) {
         $home_advantage += 1;
-        $reasons[] = "Home team has a stronger home record (Home Strength: " . round($home_strength, 2) . " vs Away Strength: " . round($away_strength, 2) . ").";
-    } else {
+        $reasons[] = "Home team has a stronger home record (Home Wins: {$home_home_record['wins']}, Draws: {$home_home_record['draws']}, Losses: {$home_home_record['losses']}).";
+    } elseif ($home_strength < $away_strength) {
         $away_advantage += 1;
-        $reasons[] = "Away team has a stronger away record (Away Strength: " . round($away_strength, 2) . " vs Home Strength: " . round($home_strength, 2) . ").";
+        $reasons[] = "Away team has a stronger away record (Away Wins: {$away_away_record['wins']}, Draws: {$away_away_record['draws']}, Losses: {$away_away_record['losses']}).";
+    } else {
+        $reasons[] = "Both teams have similar home/away records.";
     }
 
     // Head-to-head
@@ -169,6 +181,8 @@ function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6
     } elseif ($head_to_head_weight < 0) {
         $away_advantage += 1;
         $reasons[] = "Away team has a better head-to-head record against the home team.";
+    } else {
+        $reasons[] = "Head-to-head record is balanced between the two teams.";
     }
 
     // Final decision
@@ -189,7 +203,7 @@ function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6
     ];
 }
 
-function calculateRecentFormWeightsugg($last6) {
+function calculateFormWeightForPrediction($last6) {
     $weight = 0;
     foreach ($last6 as $result) {
         switch ($result) {
@@ -201,7 +215,7 @@ function calculateRecentFormWeightsugg($last6) {
     return $weight;
 }
 
-function calculateHeadToHeadWeight($head_to_head, $home_team) {
+function calculateHeadToHeadWeightForPrediction($head_to_head, $home_team) {
     $weight = 0;
     foreach ($head_to_head as $match) {
         if ($match['home_team'] == $home_team && $match['result'] == 'W') $weight += 1;
@@ -211,6 +225,13 @@ function calculateHeadToHeadWeight($head_to_head, $home_team) {
     }
     return $weight;
 }
+
+function calculateHomeAwayStrengthForPrediction($record) {
+    $total_matches = array_sum($record);
+    if ($total_matches == 0) return 0;
+    return ($record['wins'] * 3 + $record['draws']) / $total_matches;
+}
+
 // Helper function to calculate a numeric weight for recent form
 function calculateRecentFormWeight($recent_form) {
     $form_weights = [
