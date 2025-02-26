@@ -1,7 +1,7 @@
 <?php
 // Function to fetch home win percentages for a competition
 function get_home_wins_for_competition($competition_code) {
-    $base_uri = 'https://api.football-data.org/v2/competitions/' . $competition_code . '/matches';
+    $base_uri = 'https://api.football-data.org/v4/competitions/' . $competition_code . '/matches';
     $headers = array(
         'X-Auth-Token: d2ef1a157a0d4c83ba4023d1fbd28b5c', // Replace with your API token
         'Accept-Encoding: '
