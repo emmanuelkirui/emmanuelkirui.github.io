@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Function to fetch data from the API
-function fetchAPI($url, $api_key) {
+function fetchAPI($url, $api_key, $retries = 3) {
     $curl = curl_init();
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
@@ -18,18 +18,41 @@ function fetchAPI($url, $api_key) {
             "X-Auth-Token: $api_key"
         ],
     ]);
+
     $response = curl_exec($curl);
-    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE); // Get the HTTP response code
+    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
 
-    if ($http_code != 200) { // Check if the HTTP code is not OK (200)
-        header('Location: error');
+    // Handle rate limits (HTTP 429)
+    if ($http_code == 429) {
+        if ($retries > 0) {
+            // Calculate wait time using exponential backoff
+            $wait_time = pow(2, 4 - $retries); // 2^3 = 8, 2^2 = 4, 2^1 = 2
+
+            // Display countdown to the user
+            echo "Rate limit hit. Retrying in $wait_time seconds...<br>";
+            for ($i = $wait_time; $i > 0; $i--) {
+                echo "Retrying in $i seconds...<br>";
+                flush(); // Send output to the browser immediately
+                sleep(1); // Wait 1 second
+            }
+
+            return fetchAPI($url, $api_key, $retries - 1); // Retry with one less retry attempt
+        } else {
+            // All retries exhausted for 429 error
+            header('Location: error'); // Redirect to an error page
+            exit;
+        }
+    }
+
+    // Handle other errors
+    if ($http_code != 200) {
+        header('Location: error'); // Redirect to an error page
         exit;
     }
 
     return json_decode($response, true);
 }
-
 // Fetch all competitions only once and store in session
 if (!isset($_SESSION['competitions'])) {
     $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
