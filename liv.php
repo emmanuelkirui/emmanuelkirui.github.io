@@ -745,8 +745,7 @@ if ($selected_competition && $fixtures_data) {
                 </button>
               </div>';
 
-            
-    echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+            echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 function getFormattedTimestamp() {
     const now = new Date();
@@ -765,13 +764,17 @@ function captureTable(callback) {
     // Make sure the table is fully loaded before capturing
     setTimeout(() => {
         html2canvas(table, {
-            scale: 3, // Increase scale for better quality
-            useCORS: true, // Fixes cross-origin issues if images are inside the table
-            backgroundColor: "#ffffff", // Ensures a white background
-            width: table.scrollWidth, // Capture full table width
-            height: table.scrollHeight // Capture full table height
-        }).then(canvas => callback(canvas));
-    }, 200); // Small delay to ensure rendering is done
+            scale: 3,
+            useCORS: true, // Fixes cross-origin issues
+            backgroundColor: "#ffffff",
+            width: table.scrollWidth,
+            height: table.scrollHeight
+        }).then(canvas => callback(canvas))
+          .catch(error => {
+              console.error("Error capturing table:", error);
+              showFeedbackMessage("Failed to capture table.", false);
+          });
+    }, 200);
 }
 
 function startCountdown(action, duration) {
@@ -821,33 +824,40 @@ function showFeedbackMessage(message, isSuccess) {
 
     setTimeout(() => {
         document.body.removeChild(feedbackElement);
-    }, 3000); // Remove feedback message after 3 seconds
+    }, 3000);
 }
 
 document.getElementById("shareButton").addEventListener("click", async function() {
     startCountdown(() => {
         captureTable(canvas => {
             canvas.toBlob(blob => {
+                if (!blob) {
+                    console.error("Failed to create blob from canvas.");
+                    showFeedbackMessage("Failed to create image.", false);
+                    return;
+                }
+
                 const fileName = getFormattedTimestamp();
                 const file = new File([blob], fileName, { type: "image/png" });
 
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    navigator.share({
-                        files: [file],
-                        title: "Captured Table",
-                        text: "Here is a table snapshot"
-                    }).then(() => {
-                        showFeedbackMessage("Table shared successfully!", true);
-                    }).catch(error => {
-                        console.error("Error sharing:", error);
-                        showFeedbackMessage("Failed to share table.", false);
-                    });
-                } else {
+                if (!navigator.share || !navigator.canShare({ files: [file] })) {
                     showFeedbackMessage("Web Share API not supported or cannot share images.", false);
+                    return;
                 }
+
+                navigator.share({
+                    files: [file],
+                    title: "Captured Table",
+                    text: "Here is a table snapshot"
+                }).then(() => {
+                    showFeedbackMessage("Table shared successfully!", true);
+                }).catch(error => {
+                    console.error("Error sharing:", error);
+                    showFeedbackMessage("Failed to share table.", false);
+                });
             }, "image/png");
         });
-    }, 5); // 5-second countdown
+    }, 5);
 });
 
 document.getElementById("downloadButton").addEventListener("click", function() {
@@ -859,10 +869,9 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             link.click();
             showFeedbackMessage("Table downloaded successfully!", true);
         });
-    }, 5); // 5-second countdown
+    }, 5);
 });
 </script>';
-
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
         echo "<tr>
                 <th>Date (EAT)</th>
