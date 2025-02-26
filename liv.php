@@ -826,23 +826,10 @@ if ($selected_competition && $fixtures_data) {
                             <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
-                          <div onclick="let content = this.nextElementSibling; 
-                            let icon = this.querySelector('span'); 
-                            if (content.style.display === 'none') { 
-                               content.style.display = 'block'; 
-                               icon.innerHTML = '▼ Click to collapse'; 
-                            } else { 
-                               content.style.display = 'none'; 
-                               icon.innerHTML = '▶ Click to expand'; 
-                             }"
-                              style="font-size: 12px; color: #007bff; font-weight: bold; cursor: pointer; margin-top: 5px;">
-                             <span>▶ Click to expand</span>
-                           </div>
-
-                           <div style="display: none; font-size: 10px; color: #777; font-style: italic; margin-top: 2px;">
-                              <strong>Decision:</strong> $decision<br>
-                              <strong>Reason:</strong> $reason
-                           </div>
+                              <div style='font-size: 10px; color: #777; font-style: italic; margin-top: 2px;'>
+                        <strong>Decision:</strong> $decision<br>
+                        <strong>Reason:</strong> $reason
+                    </div>
                         </a>
                     </div>
                 </td>
@@ -853,23 +840,10 @@ if ($selected_competition && $fixtures_data) {
                             <span style='font-weight: bold; font-size: 14px; color: #2980b9;'>$away_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</div>
-                            <div onclick="let content = this.nextElementSibling; 
-                            let icon = this.querySelector('span'); 
-                            if (content.style.display === 'none') { 
-                               content.style.display = 'block'; 
-                               icon.innerHTML = '▼ Click to collapse'; 
-                            } else { 
-                               content.style.display = 'none'; 
-                               icon.innerHTML = '▶ Click to expand'; 
-                             }"
-                              style="font-size: 12px; color: #007bff; font-weight: bold; cursor: pointer; margin-top: 5px;">
-                             <span>▶ Click to expand</span>
-                           </div>
-
-                           <div style="display: none; font-size: 10px; color: #777; font-style: italic; margin-top: 2px;">
-                              <strong>Decision:</strong> $decision<br>
-                              <strong>Reason:</strong> $reason
-                           </div>
+                            <div style='font-size: 10px; color: #777; font-style: italic; margin-top: 2px;'>
+                        <strong>Decision:</strong> $decision<br>
+                        <strong>Reason:</strong> $reason
+                    </div>
                         </a>
                     </div>
                 </td>
