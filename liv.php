@@ -826,7 +826,7 @@ if ($selected_competition && $fixtures_data) {
                             <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
-                              <div style='font-size: 10px; color: #777; font-style: italic; margin-top: 2px;'>
+                              <div style='font-size: 8px; color: #777; font-style: italic; margin-top: 2px;'>
                                 <strong>$decision</strong><br>
                                 <strong>$reason</strong>
                                </div>
@@ -840,7 +840,7 @@ if ($selected_competition && $fixtures_data) {
                             <span style='font-weight: bold; font-size: 14px; color: #2980b9;'>$away_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</div>
-                            <div style='font-size: 10px; color: #777; font-style: italic; margin-top: 2px;'>
+                            <div style='font-size: 8px; color: #777; font-style: italic; margin-top: 2px;'>
                                 <strong>$decision</strong><br>
                                 <strong>$reason</strong>
                            </div>
