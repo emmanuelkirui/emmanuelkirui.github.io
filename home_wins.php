@@ -1,13 +1,80 @@
 <?php
+// Function to fetch available competitions
+function get_available_competitions() {
+    $uri = 'https://api.football-data.org/v4/competitions';
+    $headers = array(
+        'X-Auth-Token: d2ef1a157a0d4c83ba4023d1fbd28b5c', // Replace with your API token
+        'Accept-Encoding: '
+    );
+
+    $options = array(
+        'http' => array(
+            'header'  => $headers,
+            'method'  => 'GET'
+        )
+    );
+    $context  = stream_context_create($options);
+    $response = file_get_contents($uri, false, $context);
+
+    if ($response === FALSE) {
+        die("Error fetching available competitions.");
+    }
+
+    $competitions = json_decode($response, true);
+    $available_competitions = array();
+
+    // Filter active competitions with match data
+    foreach ($competitions as $comp) {
+        if (isset($comp['code']) && $comp['plan'] === 'TIER_ONE') { // Only include top-tier leagues
+            array_push($available_competitions, $comp['code']);
+        }
+    }
+
+    return $available_competitions;
+}
+
+// Function to fetch available seasons for a competition
+function get_available_seasons($competition_code) {
+    $uri = 'https://api.football-data.org/v4/competitions/' . $competition_code;
+    $headers = array(
+        'X-Auth-Token: d2ef1a157a0d4c83ba4023d1fbd28b5c', // Replace with your API token
+        'Accept-Encoding: '
+    );
+
+    $options = array(
+        'http' => array(
+            'header'  => $headers,
+            'method'  => 'GET'
+        )
+    );
+    $context  = stream_context_create($options);
+    $response = file_get_contents($uri, false, $context);
+
+    if ($response === FALSE) {
+        die("Error fetching available seasons for $competition_code.");
+    }
+
+    $data = json_decode($response, true);
+    $seasons = array();
+
+    // Extract available seasons
+    foreach ($data['seasons'] as $season) {
+        if ($season['current'] === false) { // Exclude the current season
+            array_push($seasons, $season['year']);
+        }
+    }
+
+    return $seasons;
+}
+
 // Function to fetch home win percentages for a competition
-function get_home_wins_for_competition($competition_code) {
+function get_home_wins_for_competition($competition_code, $seasons) {
     $base_uri = 'https://api.football-data.org/v4/competitions/' . $competition_code . '/matches';
     $headers = array(
         'X-Auth-Token: d2ef1a157a0d4c83ba4023d1fbd28b5c', // Replace with your API token
         'Accept-Encoding: '
     );
     $retVal = array();
-    $seasons = range(2010, 2019);
 
     foreach ($seasons as $year) {
         $uri = $base_uri . "?season=" . $year;
@@ -47,14 +114,14 @@ function get_home_wins_for_competition($competition_code) {
     return $retVal;
 }
 
-// Competitions to analyze
-$competitions = array('BL1', 'PL', 'PD', 'SA', 'FL1', 'DED');
-$seasons = range(2010, 2019);
+// Get available competitions
+$competitions = get_available_competitions();
 $values = array();
 
 // Fetch data for each competition
 foreach ($competitions as $key) {
-    $values[$key] = get_home_wins_for_competition($key);
+    $seasons = get_available_seasons($key); // Get available seasons for the competition
+    $values[$key] = get_home_wins_for_competition($key, $seasons);
 }
 
 // Output HTML and JavaScript
@@ -73,7 +140,6 @@ foreach ($competitions as $key) {
 
     <script>
         // Pass PHP data to JavaScript
-        const seasons = <?php echo json_encode($seasons); ?>;
         const values = <?php echo json_encode($values); ?>;
 
         // Create the chart
@@ -81,7 +147,7 @@ foreach ($competitions as $key) {
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: seasons,
+                labels: Object.keys(values).length > 0 ? Object.keys(values[Object.keys(values)[0]]) : [], // Use seasons as labels
                 datasets: Object.keys(values).map(competition => ({
                     label: competition,
                     data: values[competition],
