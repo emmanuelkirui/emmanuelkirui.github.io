@@ -745,7 +745,7 @@ if ($selected_competition && $fixtures_data) {
                 </button>
               </div>';
 
-echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+      echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
       <script>
       function getFormattedTimestamp() {
           const now = new Date();
@@ -761,14 +761,27 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
       function captureTable(callback) {
           const table = document.querySelector("table");
 
-          // Make sure the table is fully loaded before capturing
+          // Ensure the table is fully loaded before capturing
           setTimeout(() => {
               html2canvas(table, {
-                  scale: 5, // Increase scale for better quality
-                  useCORS: true, // Fixes cross-origin issues if images are inside the table
+                  scale: 5, // Increase scale for higher resolution (e.g., 5x)
+                  useCORS: true, // Fixes cross-origin issues for external images
+                  logging: true, // Enable logging for debugging
+                  allowTaint: false, // Prevent tainting the canvas
                   width: table.scrollWidth, // Capture full table width
-                  height: table.scrollHeight // Capture full table height
-              }).then(canvas => callback(canvas));
+                  height: table.scrollHeight, // Capture full table height
+                  onclone: (clonedDoc) => {
+                      // Ensure fonts and styles are rendered correctly
+                      clonedDoc.body.style.fontSmoothing = "antialiased";
+                      clonedDoc.body.style.webkitFontSmoothing = "antialiased";
+                  }
+              }).then(canvas => {
+                  // Ensure the canvas is high quality
+                  canvas.style.imageRendering = "auto"; // Ensures smooth rendering
+                  callback(canvas);
+              }).catch(error => {
+                  console.error("Error capturing table:", error);
+              });
           }, 200); // Small delay to ensure rendering is done
       }
 
@@ -816,7 +829,7 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
                       } else {
                           alert("Web Share API not supported or cannot share images.");
                       }
-                  }, "image/png");
+                  }, "image/png", 1.0); // Set image quality to 1.0 (no compression)
               });
           }, 5); // 5-second countdown
       });
@@ -825,7 +838,7 @@ echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html
           startCountdown(() => {
               captureTable(canvas => {
                   const link = document.createElement("a");
-                  link.href = canvas.toDataURL("image/png");
+                  link.href = canvas.toDataURL("image/png", 1.0); // Set image quality to 1.0 (no compression)
                   link.download = getFormattedTimestamp();
                   link.click();
               });
