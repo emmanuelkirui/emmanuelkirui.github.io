@@ -29,10 +29,14 @@ function fetchAPI($url, $api_key, $retries = 3) {
             // Calculate wait time using exponential backoff
             $wait_time = pow(2, 4 - $retries); // 2^3 = 8, 2^2 = 4, 2^1 = 2
 
-            // Display countdown to the user
-            echo "Rate limit hit. Retrying in $wait_time seconds...<br>";
+            // Display styled countdown to the user
+            echo "<div style='font-family: Arial, sans-serif; background: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin: 10px 0;'>
+                  Rate limit hit. Retrying in <strong>$wait_time</strong> seconds...
+                  </div>";
             for ($i = $wait_time; $i > 0; $i--) {
-                echo "Retrying in $i seconds...<br>";
+                echo "<div style='font-family: Arial, sans-serif; background: #fff3cd; color: #856404; padding: 10px; border: 1px solid #ffeeba; border-radius: 5px; margin: 5px 0;'>
+                      Retrying in <strong>$i</strong> seconds...
+                      </div>";
                 flush(); // Send output to the browser immediately
                 sleep(1); // Wait 1 second
             }
