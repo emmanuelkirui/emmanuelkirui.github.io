@@ -745,7 +745,7 @@ if ($selected_competition && $fixtures_data) {
                 </button>
               </div>';
 
-      echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+            echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
       <script>
       function getFormattedTimestamp() {
           const now = new Date();
@@ -764,20 +764,13 @@ if ($selected_competition && $fixtures_data) {
           // Ensure the table is fully loaded before capturing
           setTimeout(() => {
               html2canvas(table, {
-                  scale: 5, // Increase scale for higher resolution (e.g., 5x)
-                  useCORS: true, // Fixes cross-origin issues for external images
-                  logging: true, // Enable logging for debugging
-                  allowTaint: false, // Prevent tainting the canvas
-                  width: table.scrollWidth, // Capture full table width
-                  height: table.scrollHeight, // Capture full table height
-                  onclone: (clonedDoc) => {
-                      // Ensure fonts and styles are rendered correctly
-                      clonedDoc.body.style.fontSmoothing = "antialiased";
-                      clonedDoc.body.style.webkitFontSmoothing = "antialiased";
-                  }
+                  scale: 5, // High resolution
+                  useCORS: true, // Fixes cross-origin issues
+                  logging: true, // Debugging
+                  allowTaint: false, // Prevent tainting
+                  width: table.scrollWidth,
+                  height: table.scrollHeight
               }).then(canvas => {
-                  // Ensure the canvas is high quality
-                  canvas.style.imageRendering = "auto"; // Ensures smooth rendering
                   callback(canvas);
               }).catch(error => {
                   console.error("Error capturing table:", error);
@@ -820,16 +813,22 @@ if ($selected_competition && $fixtures_data) {
                       const fileName = getFormattedTimestamp();
                       const file = new File([blob], fileName, { type: "image/png" });
 
-                      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                      // Check if Web Share API is supported
+                      if (navigator.share && navigator.canShare({ files: [file] })) {
                           navigator.share({
                               files: [file],
                               title: "Captured Table",
                               text: "Here is a table snapshot"
-                          }).catch(error => console.error("Error sharing:", error));
+                          }).then(() => {
+                              console.log("Share successful");
+                          }).catch(error => {
+                              console.error("Error sharing:", error);
+                              alert("Sharing failed. Please try again.");
+                          });
                       } else {
-                          alert("Web Share API not supported or cannot share images.");
+                          alert("Web Share API not supported or cannot share files in this browser.");
                       }
-                  }, "image/png", 1.0); // Set image quality to 1.0 (no compression)
+                  }, "image/png", 1.0); // High-quality PNG
               });
           }, 5); // 5-second countdown
       });
@@ -838,14 +837,13 @@ if ($selected_competition && $fixtures_data) {
           startCountdown(() => {
               captureTable(canvas => {
                   const link = document.createElement("a");
-                  link.href = canvas.toDataURL("image/png", 1.0); // Set image quality to 1.0 (no compression)
+                  link.href = canvas.toDataURL("image/png", 1.0); // High-quality PNG
                   link.download = getFormattedTimestamp();
                   link.click();
               });
           }, 5); // 5-second countdown
       });
       </script>';
-      
 
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
         echo "<tr>
