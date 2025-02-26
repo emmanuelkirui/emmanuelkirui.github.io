@@ -746,61 +746,93 @@ if ($selected_competition && $fixtures_data) {
               </div>';
 
         echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-              <script>
-              function getFormattedTimestamp() {
-                  const now = new Date();
-                  const year = now.getFullYear();
-                  const month = String(now.getMonth() + 1).padStart(2, "0");
-                  const day = String(now.getDate()).padStart(2, "0");
-                  const hours = String(now.getHours()).padStart(2, "0");
-                  const minutes = String(now.getMinutes()).padStart(2, "0");
-                  const seconds = String(now.getSeconds()).padStart(2, "0");
-                  return `cps_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
+      <script>
+      function getFormattedTimestamp() {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, "0");
+          const day = String(now.getDate()).padStart(2, "0");
+          const hours = String(now.getHours()).padStart(2, "0");
+          const minutes = String(now.getMinutes()).padStart(2, "0");
+          const seconds = String(now.getSeconds()).padStart(2, "0");
+          return `cps_${year}${month}${day}_${hours}${minutes}${seconds}.png`;
+      }
+
+      function captureTable(callback) {
+          const table = document.querySelector("table");
+
+          // Make sure the table is fully loaded before capturing
+          setTimeout(() => {
+              html2canvas(table, {
+                  scale: 3, // Increase scale for better quality
+                  useCORS: true, // Fixes cross-origin issues if images are inside the table
+                  backgroundColor: "#ffffff", // Ensures a white background
+                  width: table.scrollWidth, // Capture full table width
+                  height: table.scrollHeight // Capture full table height
+              }).then(canvas => callback(canvas));
+          }, 200); // Small delay to ensure rendering is done
+      }
+
+      function startCountdown(action, duration) {
+          let countdown = duration;
+          const countdownElement = document.createElement("div");
+          countdownElement.style.position = "fixed";
+          countdownElement.style.top = "50%";
+          countdownElement.style.left = "50%";
+          countdownElement.style.transform = "translate(-50%, -50%)";
+          countdownElement.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+          countdownElement.style.color = "#fff";
+          countdownElement.style.padding = "20px";
+          countdownElement.style.borderRadius = "10px";
+          countdownElement.style.zIndex = "1000";
+          countdownElement.style.fontSize = "24px";
+          countdownElement.style.fontFamily = "Arial, sans-serif";
+          countdownElement.textContent = `Download/Share will start in ${countdown} seconds...`;
+          document.body.appendChild(countdownElement);
+
+          const interval = setInterval(() => {
+              countdown--;
+              countdownElement.textContent = `Download/Share will start in ${countdown} seconds...`;
+              if (countdown <= 0) {
+                  clearInterval(interval);
+                  document.body.removeChild(countdownElement);
+                  action();
               }
+          }, 1000);
+      }
 
-              function captureTable(callback) {
-                  const table = document.querySelector("table");
+      document.getElementById("shareButton").addEventListener("click", async function() {
+          startCountdown(() => {
+              captureTable(canvas => {
+                  canvas.toBlob(blob => {
+                      const fileName = getFormattedTimestamp();
+                      const file = new File([blob], fileName, { type: "image/png" });
 
-                  // Make sure the table is fully loaded before capturing
-                  setTimeout(() => {
-                      html2canvas(table, {
-                          scale: 3, // Increase scale for better quality
-                          useCORS: true, // Fixes cross-origin issues if images are inside the table
-                          backgroundColor: "#ffffff", // Ensures a white background
-                          width: table.scrollWidth, // Capture full table width
-                          height: table.scrollHeight // Capture full table height
-                      }).then(canvas => callback(canvas));
-                  }, 200); // Small delay to ensure rendering is done
-              }
-
-              document.getElementById("shareButton").addEventListener("click", async function() {
-                  captureTable(canvas => {
-                      canvas.toBlob(blob => {
-                          const fileName = getFormattedTimestamp();
-                          const file = new File([blob], fileName, { type: "image/png" });
-
-                          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                              navigator.share({
-                                  files: [file],
-                                  title: "Captured Table",
-                                  text: "Here is a table snapshot"
-                              }).catch(error => console.error("Error sharing:", error));
-                          } else {
-                              alert("Web Share API not supported or cannot share images.");
-                          }
-                      }, "image/png");
-                  });
+                      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                          navigator.share({
+                              files: [file],
+                              title: "Captured Table",
+                              text: "Here is a table snapshot"
+                          }).catch(error => console.error("Error sharing:", error));
+                      } else {
+                          alert("Web Share API not supported or cannot share images.");
+                      }
+                  }, "image/png");
               });
+          }, 5); // 5-second countdown
+      });
 
-              document.getElementById("downloadButton").addEventListener("click", function() {
-                  captureTable(canvas => {
-                      const link = document.createElement("a");
-                      link.href = canvas.toDataURL("image/png");
-                      link.download = getFormattedTimestamp();
-                      link.click();
-                  });
+      document.getElementById("downloadButton").addEventListener("click", function() {
+          startCountdown(() => {
+              captureTable(canvas => {
+                  const link = document.createElement("a");
+                  link.href = canvas.toDataURL("image/png");
+                  link.download = getFormattedTimestamp();
+                  link.click();
               });
-              </script>';
+          }, 5); // 5-second countdown
+      });
+      </script>';
 
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
         echo "<tr>
