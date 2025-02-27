@@ -53,6 +53,17 @@
             position: relative;
             animation: move 4s infinite ease-in-out;
         }
+        /* Character body */
+        .character-body {
+            fill: #3498db;
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+
+        .character-arm {
+            fill: #3498db;
+            animation: wave 1.5s infinite ease-in-out;
+            transform-origin: 80% 20%;
+        }
 
         .spinner-container {
             display: flex;
@@ -119,42 +130,79 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
 
-        @keyframes slideDown {
-            from {
-                transform: translateY(-20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
+@keyframes slideDown {
+    0% {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(10px);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
 
-        @keyframes move {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-25px);
+    }
+    60% {
+        transform: translateY(-10px);
+    }
+}
 
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
+@keyframes wave {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(10deg);
+    }
+    50% {
+        transform: rotate(-10deg);
+    }
+    75% {
+        transform: rotate(5deg);
+    }
+}
+
+@keyframes move {
+    0% {
+        transform: translateY(0);
+    }
+    20% {
+        transform: translateY(-12px);
+    }
+    40% {
+        transform: translateY(6px);
+    }
+    60% {
+        transform: translateY(-6px);
+    }
+    80% {
+        transform: translateY(12px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
 
         @media (max-width: 768px) {
             .error-container h1 {
