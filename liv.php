@@ -7,7 +7,6 @@ $competitions_url = "https://api.football-data.org/v4/competitions"; // List all
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 // Function to fetch data from the API
 function fetchAPI($url, $api_key, $retries = 3) {
     $curl = curl_init();
@@ -30,88 +29,24 @@ function fetchAPI($url, $api_key, $retries = 3) {
             $wait_time = pow(2, 4 - $retries); // 2^3 = 8, 2^2 = 4, 2^1 = 2
 
             // Output the initial countdown message and JavaScript for dynamic countdown
-            echo "
-            <div id='countdown' style='
-                font-family: "Segoe UI", Arial, sans-serif;
-                background: linear-gradient(135deg, #ff6b6b, #ff4757);
-                color: #fff;
-                padding: 20px;
-                border-radius: 12px;
-                margin: 20px auto;
-                max-width: 400px;
-                text-align: center;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-                animation: fadeIn 0.5s ease-in-out;
-            '>
-                <h3 style='
-                    margin: 0;
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: #fff;
-                '>
-                    ⏳ Rate Limit Exceeded
-                </h3>
-                <p style='
-                    margin: 10px 0;
-                    font-size: 14px;
-                    color: rgba(255, 255, 255, 0.9);
-                '>
-                    Please wait while we retry...
-                </p>
-                <div style='
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #fff;
-                    margin: 10px 0;
-                    padding: 10px;
-                    background: rgba(255, 255, 255, 0.1);
-                    border-radius: 8px;
-                    display: inline-block;
-                '>
-                    <span id='countdown-timer'>$wait_time</span> seconds
-                </div>
-                <p style='
-                    margin: 0;
-                    font-size: 12px;
-                    color: rgba(255, 255, 255, 0.8);
-                '>
-                    Retry attempt: " . (4 - $retries) . " of 3
-                </p>
-            </div>";
+            echo "<div id='countdown' style='font-family: Arial, sans-serif; background: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin: 10px 0;'>
+                  Rate limit hit. Retrying in <strong>$wait_time</strong> seconds...
+                  </div>";
 
-            echo "
-            <script>
-                let countdown = $wait_time;
-                const countdownElement = document.getElementById('countdown-timer');
+            echo "<script>
+                  let countdown = $wait_time;
+                  const countdownElement = document.getElementById('countdown');
 
-                const interval = setInterval(() => {
-                    countdown--;
-                    countdownElement.textContent = countdown;
+                  const interval = setInterval(() => {
+                      countdown--;
+                      countdownElement.innerHTML = `Rate limit hit. Retrying in <strong>${countdown}</strong> seconds...`;
 
-                    if (countdown <= 0) {
-                        clearInterval(interval);
-                        window.location.reload(); // Reload the page to retry
-                    }
-                }, 1000); // Update every second
-            </script>";
-
-            echo "
-            <style>
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(-20px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-
-                @keyframes pulse {
-                    0% { transform: scale(1); }
-                    50% { transform: scale(1.05); }
-                    100% { transform: scale(1); }
-                }
-
-                #countdown {
-                    animation: pulse 1.5s infinite ease-in-out;
-                }
-            </style>";
+                      if (countdown <= 0) {
+                          clearInterval(interval);
+                          window.location.reload(); // Reload the page to retry
+                      }
+                  }, 1000); // Update every second
+                  </script>";
 
             flush(); // Send output to the browser immediately
             sleep($wait_time); // Wait for the countdown to finish on the server side
@@ -131,9 +66,7 @@ function fetchAPI($url, $api_key, $retries = 3) {
     }
 
     return json_decode($response, true);
-}
-            
-            
+}                       
 // Fetch all competitions only once and store in session
 if (!isset($_SESSION['competitions'])) {
     $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
