@@ -287,7 +287,7 @@
         </div>
 
         <div class="spinner-container">
-            <i class="fa fa-spinner"></i> Reloading...
+            <i class="fa fa-spinner"></i> Reloading in <span id="countdown">5</span> seconds...
         </div>
 
         <div class="button-group">
@@ -301,6 +301,20 @@
         function goBack() {
             window.history.back();
         }
+
+        // Countdown timer
+        let timeLeft = 5;
+        const countdownElement = document.getElementById('countdown');
+
+        const countdownInterval = setInterval(() => {
+            timeLeft--;
+            countdownElement.textContent = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(countdownInterval);
+                window.history.back();
+            }
+        }, 1000);
 
         // Auto-reload the page after 5 seconds
         setTimeout(() => {
