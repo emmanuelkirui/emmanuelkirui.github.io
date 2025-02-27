@@ -27,26 +27,31 @@ function fetchAPI($url, $api_key, $retries = 3) {
         if ($retries > 0) {
             // Calculate wait time using exponential backoff
             $wait_time = pow(2, 4 - $retries); // 2^3 = 8, 2^2 = 4, 2^1 = 2
+            
+            // Output the initial countdown message and embed JavaScript for dynamic countdown
+echo "
+<div id='countdown' style='font-family: Arial, sans-serif; background: #f8f9fa; color: #0c5460; padding: 15px; border: 1px solid #bee5eb; border-radius: 8px; margin: 20px 0; text-align: center; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);'>
+    Rate limit exceeded. Please wait <strong>$wait_time</strong> seconds before retrying...
+</div>";
 
-            // Output the initial countdown message and JavaScript for dynamic countdown
-            echo "<div id='countdown' style='font-family: Arial, sans-serif; background: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin: 10px 0;'>
-                  Rate limit hit. Retrying in <strong>$wait_time</strong> seconds...
-                  </div>";
+echo "
+<script>
+    // Initialize countdown variables
+    let countdown = $wait_time;
+    const countdownElement = document.getElementById('countdown');
 
-            echo "<script>
-                  let countdown = $wait_time;
-                  const countdownElement = document.getElementById('countdown');
+    // Update the countdown every second
+    const interval = setInterval(() => {
+        countdown--;
+        countdownElement.innerHTML = `Rate limit exceeded. Please wait <strong>${countdown}</strong> seconds before retrying...`;
 
-                  const interval = setInterval(() => {
-                      countdown--;
-                      countdownElement.innerHTML = `Rate limit hit. Retrying in <strong>${countdown}</strong> seconds...`;
-
-                      if (countdown <= 0) {
-                          clearInterval(interval);
-                          window.location.reload(); // Reload the page to retry
-                      }
-                  }, 1000); // Update every second
-                  </script>";
+        // Reload the page when the countdown reaches 0
+        if (countdown <= 0) {
+            clearInterval(interval);
+            window.location.reload(); // Reload the page to retry
+        }
+    }, 1000); // Update every second
+</script>";
 
             flush(); // Send output to the browser immediately
             sleep($wait_time); // Wait for the countdown to finish on the server side
