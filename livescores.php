@@ -27,6 +27,25 @@ if ($response === false) {
 $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
+if ($httpStatusCode == 429) {
+    echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
+            <h2 style='color: red;'>Too Many Requests (429)</h2>
+            <p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>5</span> seconds...</p>
+          </div>
+          <script>
+            let timeLeft = 5;
+            let countdownTimer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('countdown').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    location.reload();
+                }
+            }, 1000);
+          </script>";
+    exit;
+}
+
 if ($httpStatusCode >= 400) {
     // Redirect to error.php with the status code as a parameter
     header("Location: ../error.php?code=$httpStatusCode");
