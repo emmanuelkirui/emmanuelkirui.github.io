@@ -6,21 +6,34 @@ $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
-echo "<nav class='navbar'>";
-echo "<div class='hamburger' onclick='toggleMenu()'>☰</div>";
-echo "<div class='nav-menu' id='navMenu'>";
-echo "<a href='#' class='nav-link'>Home</a>";
-echo "<a href='valmanu' class='nav-link'>More Predictions</a>";
-echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+echo "<nav class='navbar' style='width: 100%; position: relative;'>";
+echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
+echo "<div class='nav-menu' id='navMenu' style='display: inline-block;'>";
+echo "<a href='#' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
+echo "<a href='valmanu.php' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
+echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
 echo "</div>";
 echo "</nav>";
 
-// Add the required JavaScript
+// JavaScript with inline style toggling
 echo "<script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
-        menu.classList.toggle('active');
+        const currentDisplay = menu.style.display;
+        if (currentDisplay === 'none') {
+            menu.style.display = 'inline-block';
+        } else {
+            menu.style.display = 'none';
+        }
     }
+    
+    // Ensure menu is visible initially on larger screens
+    window.addEventListener('resize', function() {
+        const menu = document.getElementById('navMenu');
+        if (window.innerWidth > 768) {
+            menu.style.display = 'inline-block';
+        }
+    });
 </script>";
 
 // Handle different actions based on query parameters
