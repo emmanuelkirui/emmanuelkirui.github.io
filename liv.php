@@ -694,77 +694,22 @@ if ($selected_competition && $fixtures_data) {
                 }
             }
             </style>';
-        } else { // Table View
+        } else {
+            // No additional CSS for Table View; original inline styles will apply
             echo '<style>
             .match-display { 
                 width: 100%; 
                 margin: 0; 
-                padding: 20px; 
-                box-sizing: border-box; 
-            }
-            .match-table {
-                width: 100%;
-                border-collapse: collapse;
-                font-family: "Arial", sans-serif;
-            }
-            .match-table th, .match-table td {
-                border: 1px solid #ddd;
-                padding: 5px;
-                text-align: left;
-                font-size: 14px;
-            }
-            .match-table th {
-                background: #f5f5f5;
-                font-weight: bold;
-            }
-            .match-table td img {
-                width: 30px;
-                height: 30px;
-                vertical-align: middle;
-                margin-right: 5px;
-            }
-            .match-table .team-info {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            @media (max-width: 768px) {
-                .match-display {
-                    padding: 10px;
-                }
-                .match-table {
-                    display: block;
-                    overflow-x: auto; /* Enable horizontal scrolling on mobile */
-                    white-space: nowrap;
-                }
-                .match-table th, .match-table td {
-                    font-size: 12px;
-                    padding: 4px;
-                }
-                .match-table td img {
-                    width: 20px;
-                    height: 20px;
-                }
+                padding: 0; 
             }
             </style>';
         }
 
         echo '<div class="match-display">';
         if ($view_preference == 'table') {
-            // Table View
-            echo '<table class="match-table">';
-            echo "<tr>
-                    <th>Date (EAT)</th>
-                    <th>Home Team</th>
-                    <th>Away Team</th>
-                    <th>Status</th>
-                    <th>Score</th>
-                    <th>Prediction</th>
-                    <th>Match Result</th>
-                    <th>Matchday</th>
-                  </tr>";
-
+            // Original Table View
+            echo "<table border='1' cellpadding='5' cellspacing='0'>";
+            echo "<tr><th>Date (EAT)</th><th>Home Team</th><th>Away Team</th><th>Status</th><th>Score</th><th>Prediction</th><th>Match Result</th><th>Matchday</th></tr>";
             foreach ($filtered_matches as $match) {
                 $advantages = calculateHomeAwayAdvantage($fixtures_data);
                 $date_eat = convertToEAT($match['utcDate']);
@@ -772,83 +717,24 @@ if ($selected_competition && $fixtures_data) {
                 $away_team = $match['awayTeam']['name'];
                 $status = $match['status'];
                 $score = isset($match['score']['fullTime']) ? "{$match['score']['fullTime']['home']} - {$match['score']['fullTime']['away']}" : "N/A";
-                $venue = isset($match['matchday']) ? $match['matchday'] : "Unknown";
-                $last6_home = getLast6Matches($match['homeTeam']['name'], $fixtures_data['matches']);
-                $last6_away = getLast6Matches($match['awayTeam']['name'], $fixtures_data['matches']);
-                $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
-                $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
-                $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
-                $decision = $prediction['decision'];
-                $reason = $prediction['reason'];
-
-                $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
-                $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
-                $home_points = isset($standings[$home_team]['points']) ? $standings[$home_team]['points'] : 'N/A';
-                $home_goals_scored = isset($standings[$home_team]['goals_scored']) ? $standings[$home_team]['goals_scored'] : 'N/A';
-                $away_position = isset($standings[$away_team]['position']) ? $standings[$away_team]['position'] : 'N/A';
-                $away_goal_diff = isset($standings[$away_team]['goal_difference']) ? $standings[$away_team]['goal_difference'] : 'N/A';
-                $away_points = isset($standings[$away_team]['points']) ? $standings[$away_team]['points'] : 'N/A';
-                $away_goals_scored = isset($standings[$away_team]['goals_scored']) ? $standings[$away_team]['goals_scored'] : 'N/A';
-
-                $prediction = '';
-                $match_result = '';
-                $predicted_goals = '';
-                if (isset($team_metrics[$home_team]) && isset($team_metrics[$away_team])) {
-                    $home_metrics = $team_metrics[$home_team];
-                    $away_metrics = $team_metrics[$away_team];
-                    $prediction = predictMatch($home_metrics, $away_metrics, $advantages);
-                    $predicted_goals_data = predictGoals($home_metrics, $away_metrics, $advantages);
-                    $predicted_goals = "{$predicted_goals_data['home_goals']} - {$predicted_goals_data['away_goals']}";
-
-                    if ($status == 'FINISHED' && $score != 'N/A') {
-                        $score_home = explode(" - ", $score)[0];
-                        $score_away = explode(" - ", $score)[1];
-
-                        if (($prediction == "Win for Home" && $score_home > $score_away) || 
-                            ($prediction == "Win for Away" && $score_away > $score_home) || 
-                            ($prediction == "Draw" && $score_home == $score_away)) {
-                            $match_result = "<span style='color: green;'>✓</span>";
-                        } else {
-                            $match_result = "<span style='color: red;'>✕</span>";
-                        }
-                    }
-                }
+                $matchday = $match['matchday'] ?? "Unknown";
+                $last6_home = getLast6Matches($home_team, $fixtures_data['matches']);
+                $last6_away = getLast6Matches($away_team, $fixtures_data['matches']);
+                $home_crest = $team_metrics[$home_team]['crest'] ?? '';
+                $away_crest = $team_metrics[$away_team]['crest'] ?? '';
+                $prediction = $team_metrics[$home_team] && $team_metrics[$away_team] ? predictMatch($team_metrics[$home_team], $team_metrics[$away_team], $advantages) : "N/A";
+                $predicted_goals = $team_metrics[$home_team] && $team_metrics[$away_team] ? predictGoals($team_metrics[$home_team], $team_metrics[$away_team], $advantages) : ['home_goals' => 'N/A', 'away_goals' => 'N/A'];
+                $match_result = ($status == 'FINISHED' && $score != 'N/A') ? (predictMatchResult($prediction, $score) ? "<span style='color: green;'>✓</span>" : "<span style='color: red;'>✕</span>") : "";
 
                 echo "<tr>
                     <td>$date_eat</td>
-                    <td>
-                        <div class='team-info'>
-                            <img src='$home_crest' alt='$home_team'/>
-                            <div>
-                                <span style='font-weight: bold; color: #2c3e50;'>$home_team</span>
-                                <span style='font-size: 12px; color: #7f8c8d; font-style: italic;'>($last6_home)</span>
-                                <div style='font-size: 10px; color: #555;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
-                                <div style='font-size: 10px; color: #777; font-style: italic;'>
-                                    <strong>$decision</strong> - $reason
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class='team-info'>
-                            <img src='$away_crest' alt='$away_team'/>
-                            <div>
-                                <span style='font-weight: bold; color: #2980b9;'>$away_team</span>
-                                <span style='font-size: 12px; color: #7f8c8d; font-style: italic;'>($last6_away)</span>
-                                <div style='font-size: 10px; color: #555;'>Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</div>
-                                <div style='font-size: 10px; color: #777; font-style: italic;'>
-                                    <strong>$decision</strong> - $reason
-                                </div>
-                            </div>
-                        </div>
-                    </td>
+                    <td><img src='$home_crest' style='height: 30px; width: 30px;' /> $home_team ($last6_home)</td>
+                    <td><img src='$away_crest' style='height: 30px; width: 30px;' /> $away_team ($last6_away)</td>
                     <td>$status</td>
                     <td>$score</td>
-                    <td>$prediction
-                        <div style='font-size: 12px; color: gray; font-style: italic;'>Predicted Goals: $predicted_goals</div>
-                    </td>
+                    <td>$prediction<br><span style='font-size: 12px; color: gray;'>Predicted Goals: {$predicted_goals['home_goals']} - {$predicted_goals['away_goals']}</span></td>
                     <td>$match_result</td>
-                    <td>$venue</td>
+                    <td>$matchday</td>
                 </tr>";
             }
             echo "</table>";
@@ -861,23 +747,23 @@ if ($selected_competition && $fixtures_data) {
                 $away_team = $match['awayTeam']['name'];
                 $status = $match['status'];
                 $score = isset($match['score']['fullTime']) ? "{$match['score']['fullTime']['home']} - {$match['score']['fullTime']['away']}" : "N/A";
-                $venue = isset($match['matchday']) ? $match['matchday'] : "Unknown";
+                $venue = $match['matchday'] ?? "Unknown";
                 $last6_home = getLast6Matches($match['homeTeam']['name'], $fixtures_data['matches']);
                 $last6_away = getLast6Matches($match['awayTeam']['name'], $fixtures_data['matches']);
-                $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
-                $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
+                $home_crest = $team_metrics[$home_team]['crest'] ?? '';
+                $away_crest = $team_metrics[$away_team]['crest'] ?? '';
                 $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
                 $decision = $prediction['decision'];
                 $reason = $prediction['reason'];
 
-                $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
-                $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
-                $home_points = isset($standings[$home_team]['points']) ? $standings[$home_team]['points'] : 'N/A';
-                $home_goals_scored = isset($standings[$home_team]['goals_scored']) ? $standings[$home_team]['goals_scored'] : 'N/A';
-                $away_position = isset($standings[$away_team]['position']) ? $standings[$away_team]['position'] : 'N/A';
-                $away_goal_diff = isset($standings[$away_team]['goal_difference']) ? $standings[$away_team]['goal_difference'] : 'N/A';
-                $away_points = isset($standings[$away_team]['points']) ? $standings[$away_team]['points'] : 'N/A';
-                $away_goals_scored = isset($standings[$away_team]['goals_scored']) ? $standings[$away_team]['goals_scored'] : 'N/A';
+                $home_position = $standings[$home_team]['position'] ?? 'N/A';
+                $home_goal_diff = $standings[$home_team]['goal_difference'] ?? 'N/A';
+                $home_points = $standings[$home_team]['points'] ?? 'N/A';
+                $home_goals_scored = $standings[$home_team]['goals_scored'] ?? 'N/A';
+                $away_position = $standings[$away_team]['position'] ?? 'N/A';
+                $away_goal_diff = $standings[$away_team]['goal_difference'] ?? 'N/A';
+                $away_points = $standings[$away_team]['points'] ?? 'N/A';
+                $away_goals_scored = $standings[$away_team]['goals_scored'] ?? 'N/A';
 
                 $prediction = '';
                 $match_result = '';
@@ -1027,7 +913,6 @@ function showFeedbackMessage(message, isSuccess) {
     feedbackElement.style.zIndex = "1000";
     feedbackElement.style.fontSize = "20px";
     feedbackElement.style.fontFamily = "Arial, sans-serif";
-    feedbackElement.style.textAlign = "center";
     feedbackElement.textContent = message;
     document.body.appendChild(feedbackElement);
 
@@ -1082,6 +967,16 @@ document.getElementById("downloadButton").addEventListener("click", function() {
 });
 </script>';
     }
+}
+}
+
+// Helper function to check prediction accuracy (used in original table view)
+function predictMatchResult($prediction, $score) {
+    list($home_score, $away_score) = explode(" - ", $score);
+    if ($prediction == "Win for Home" && $home_score > $away_score) return true;
+    if ($prediction == "Win for Away" && $away_score > $home_score) return true;
+    if ($prediction == "Draw" && $home_score == $away_score) return true;
+    return false;
 }
 ?>
 
