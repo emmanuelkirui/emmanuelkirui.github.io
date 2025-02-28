@@ -43,14 +43,13 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
 }
 
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
-    $pastDate = date('Y-m-d', strtotime('-60 days')); // Approx January 1, 2025
-    $currentDate = date('Y-m-d'); // February 28, 2025
+    $pastDate = date('Y-m-d', strtotime('-60 days'));
+    $currentDate = date('Y-m-d');
     $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=$currentDate&limit=10&status=FINISHED";
     $data = fetchWithRetry($url, $apiKey);
     return isset($data['matches']) ? $data['matches'] : [];
 }
 
-// New function to get last 6 matches
 function getLast6Matches($team_name, $fixtures) {
     $results = [];
     
@@ -105,6 +104,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
         $results = fetchTeamResults($teamId, $apiKey, $baseUrl);
         if ($results === false) {
             $teamStats[$teamId] = ['results' => [], 'needsRetry' => true];
+            echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); incompleteTeams.push($teamId);</script>";
             return $teamStats[$teamId];
         }
         
@@ -159,13 +159,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
 
     $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats);
     $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats);
-
-    if (isset($homeStats['needsRetry']) && $homeStats['needsRetry']) {
-        echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); incompleteTeams.push($homeTeamId);</script>";
-    }
-    if (isset($awayStats['needsRetry']) && $awayStats['needsRetry']) {
-        echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); incompleteTeams.push($awayTeamId);</script>";
-    }
 
     if (empty($homeStats['results']) || empty($awayStats['results'])) {
         return ["Loading...", "N/A", "", "N/A"];
@@ -236,10 +229,13 @@ if ($action === 'fetch_team_data') {
         }
     }
 
+    $form = getLast6Matches($teamName, $results);
+
     echo json_encode([
         'success' => true,
         'teamName' => $teamName,
-        'results' => $stats['results']
+        'results' => $stats['results'],
+        'form' => $form
     ]);
     exit;
 }
@@ -689,6 +685,14 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                         $homeForm = getLast6Matches($homeTeam, $homeFixtures);
                         $awayForm = getLast6Matches($awayTeam, $awayFixtures);
 
+                        // Check for incomplete form data and add to incompleteTeams
+                        if ($homeForm === "N/A" || empty($homeFixtures)) {
+                            echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); if (!incompleteTeams.includes($homeTeamId)) incompleteTeams.push($homeTeamId);</script>";
+                        }
+                        if ($awayForm === "N/A" || empty($awayFixtures)) {
+                            echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); if (!incompleteTeams.includes($awayTeamId)) incompleteTeams.push($awayTeamId);</script>";
+                        }
+
                         echo "
                         <div class='match-card' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-index='$index'>
                             <div class='teams'>
@@ -816,9 +820,7 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     const historyElement = document.getElementById(`history-${index}`);
                     const predictionElement = document.getElementById(`prediction-${index}`);
 
-                    // Fetch form data dynamically (assuming API call or recalculation needed)
-                    // For simplicity, we'll assume the form is recalculated on the server side
-                    formElement.innerHTML = '<?php echo getLast6Matches("' + data.teamName + '", fetchTeamResults(teamId, "' . $apiKey . '", "' . $baseUrl . '")); ?>';
+                    formElement.innerHTML = data.form;
 
                     let historyHtml = '';
                     if (isHome) {
@@ -932,7 +934,7 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     matchCards.forEach(card => {
                         const index = card.dataset.index;
                         const isHome = card.dataset.homeId == teamId;
-                        fetchTeamData(teamId, index, isHome);
+                        setTimeout(() => fetchTeamData(teamId, index, isHome), 5000); // Delay to avoid rate limit
                     });
                 });
             }
