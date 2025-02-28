@@ -5,15 +5,59 @@ if (!isset($_SESSION['teamStats'])) $_SESSION['teamStats'] = [];
 $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
 
+function fetchWithRetry($url, $apiKey, $maxRetries = 3, $retryDelay = 5) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
+    curl_setopt($ch, CURLOPT_HEADER, true); // Include headers in output
+    
+    $attempt = 0;
+    while ($attempt < $maxRetries) {
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+        // Split headers and body
+        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $headers = substr($response, 0, $headerSize);
+        $body = substr($response, $headerSize);
+
+        if ($httpCode == 429) {
+            $attempt++;
+            if ($attempt < $maxRetries) {
+                // Extract retry-after header if available
+                preg_match('/Retry-After: (\d+)/i', $headers, $matches);
+                $retrySeconds = isset($matches[1]) ? (int)$matches[1] : $retryDelay;
+                
+                echo "<p>Rate limit exceeded. Retry attempt $attempt/$maxRetries in $retrySeconds seconds...</p>";
+                for ($i = $retrySeconds; $i > 0; $i--) {
+                    echo "<p>Retrying in $i seconds...</p>";
+                    flush(); // Force output to browser
+                    sleep(1);
+                }
+                continue;
+            } else {
+                echo "<p>Max retry attempts reached. Please try again later.</p>";
+                curl_close($ch);
+                return false;
+            }
+        } elseif ($httpCode == 200) {
+            curl_close($ch);
+            return json_decode($body, true);
+        } else {
+            echo "<p>API Error: HTTP $httpCode</p>";
+            curl_close($ch);
+            return false;
+        }
+    }
+    curl_close($ch);
+    return false;
+}
+
 // Fetch available competitions
 $competitionsUrl = $baseUrl . 'competitions';
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $competitionsUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
-$compResponse = curl_exec($ch);
-curl_close($ch);
-$competitions = isset(json_decode($compResponse, true)['competitions']) ? json_decode($compResponse, true)['competitions'] : [];
+$compData = fetchWithRetry($competitionsUrl, $apiKey);
+$competitions = isset($compData['competitions']) ? $compData['competitions'] : [];
 
 // Handle user selections with isset
 $selectedComp = isset($_GET['competition']) ? $_GET['competition'] : (isset($competitions[0]['code']) ? $competitions[0]['code'] : 'PL');
@@ -51,27 +95,17 @@ if (isset($dateOptions[$filter])) {
 
 // Fetch matches
 $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $matchesUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
-$matchResponse = curl_exec($ch);
-curl_close($ch);
-$allMatches = isset(json_decode($matchResponse, true)['matches']) ? json_decode($matchResponse, true)['matches'] : [];
+$matchData = fetchWithRetry($matchesUrl, $apiKey);
+$allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
 
 // Team stats functions
 $teamStats = &$_SESSION['teamStats'];
 
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
-    $pastDate = date('Y-m-d', strtotime('-30 days'));
-    $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=" . date('Y-m-d') . "&limit=6&status=FINISHED";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
-    $response = curl_exec($ch);
-    curl_close($ch);
-    return isset(json_decode($response, true)['matches']) ? json_decode($response, true)['matches'] : [];
+    $pastDate = date('Y-m-d', strtotime('-60 days')); // Extended to 60 days to get more finished matches
+    $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=" . date('Y-m-d') . "&limit=10&status=FINISHED"; // Increased limit to 10
+    $data = fetchWithRetry($url, $apiKey);
+    return isset($data['matches']) ? $data['matches'] : [];
 }
 
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
@@ -110,9 +144,9 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
             }
             $stats['games']++;
         }
-        // Calculate form from results
+        // Calculate form from results (latest first)
         $formArray = [];
-        foreach (array_reverse($results) as $match) { // Reverse to get latest first
+        foreach (array_reverse($results) as $match) {
             $homeId = isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0;
             $awayId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
             $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : 0;
@@ -161,7 +195,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
     $diff = $homeStrength - $awayStrength;
     $confidence = min(90, abs($diff) / ($homeStrength + $awayStrength + 1) * 100);
 
-    // Predict goals based on team averages
     $predictedHomeGoals = round($homeGoalAvg * (1 + $diff/100));
     $predictedAwayGoals = round($awayGoalAvg * (1 - $diff/100));
     $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
@@ -481,11 +514,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
         .form-display .latest {
             border: 2px solid #000; /* Black border for latest result */
         }
-
-        .predicted-score {
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
     </style>
 </head>
 <body>
@@ -503,7 +531,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                 <?php
                 foreach ($competitions as $comp) {
                     $code = isset($comp['code']) ? $comp['code'] : '';
-                    $name = isset($comp['name']) ? $comp['name'] : 'Unknown'; // Fixed typo: $comm to $comp
+                    $name = isset($comp['name']) ? $comp['name'] : 'Unknown';
                     $selected = $code === $selectedComp ? 'selected' : '';
                     echo "<option value='$code' $selected>$name</option>";
                 }
