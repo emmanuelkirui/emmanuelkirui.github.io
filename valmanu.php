@@ -60,14 +60,6 @@ $matchResponse = curl_exec($ch);
 curl_close($ch);
 $allMatches = isset(json_decode($matchResponse, true)['matches']) ? json_decode($matchResponse, true)['matches'] : [];
 
-// Debug: Show number of matches fetched and their details
-echo "Total matches fetched: " . count($allMatches) . "<br>";
-foreach ($allMatches as $idx => $match) {
-    echo "Match " . ($idx + 1) . ": " . (isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'TBD') . " vs " . 
-         (isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'TBD') . " - Status: " . 
-         (isset($match['status']) ? $match['status'] : 'Unknown') . "<br>";
-}
-
 // Team stats functions
 $teamStats = &$_SESSION['teamStats'];
 
@@ -404,6 +396,22 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             padding: 0;
             margin: 0;
         }
+
+        .view-history-btn {
+            margin-top: 10px;
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-history-btn:hover {
+            background-color: var(--secondary-color);
+        }
     </style>
 </head>
 <body>
@@ -489,10 +497,12 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                             <div class='prediction'>
                                 <p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
                                 <p class='confidence'>Confidence: $confidence</p>
-                            </div>";
-
-                        if ($showPast && !empty($homeStats['results']) && !empty($awayStats['results'])) {
-                            echo "<div class='past-results'>
+                            </div>
+                            <button class='view-history-btn' onclick='toggleHistory(this)'>👁️ View History</button>
+                            <div class='past-results' style='display: none;'>";
+                        
+                        if (!empty($homeStats['results']) && !empty($awayStats['results'])) {
+                            echo "
                                 <p><strong>$homeTeam Recent Results:</strong></p>
                                 <ul>";
                             foreach ($homeStats['results'] as $result) {
@@ -504,10 +514,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                             foreach ($awayStats['results'] as $result) {
                                 echo "<li>$result</li>";
                             }
-                            echo "</ul></div>";
+                            echo "</ul>";
                         }
-
-                        echo "</div>";
+                        
+                        echo "</div></div>";
                     }
                 }
             } else {
@@ -527,6 +537,13 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             document.querySelectorAll('.match-info').forEach(el => {
                 el.classList.toggle('dark', newTheme === 'dark');
             });
+        }
+
+        function toggleHistory(button) {
+            const historyDiv = button.nextElementSibling;
+            const isHidden = historyDiv.style.display === 'none';
+            historyDiv.style.display = isHidden ? 'block' : 'none';
+            button.textContent = isHidden ? '👁️ Hide History' : '👁️ View History';
         }
 
         function updateUrl(comp, filter, showPast) {
