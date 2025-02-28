@@ -33,11 +33,12 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
     curl_close($ch);
 
     if ($httpCode == 429 && $attempt < $maxRetries) {
-        echo "<script>var retryAttempt = " . ($attempt + 1) . "; var maxRetries = $maxRetries;</script>";
+        echo "<script>var retryAttempt = " . ($attempt + 1) . "; var maxRetries = $maxRetries; displayError('Rate limit exceeded. Retrying in 5 seconds...', true);</script>";
         return false;
     } elseif ($httpCode == 200) {
         return json_decode($body, true);
     } else {
+        echo "<script>displayError('Failed to fetch data from API (HTTP $httpCode). Reloading in 5 seconds...', true);</script>";
         return false;
     }
 }
@@ -704,11 +705,12 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             font-weight: bold;
         }
 
-        .retry-message {
+        .error-message {
             text-align: center;
             margin: 20px 0;
             font-size: 1.2em;
             color: #dc3545;
+            display: none;
         }
     </style>
 </head>
@@ -722,14 +724,12 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             <p>Select Competition and Date Range</p>
         </div>
 
-        <?php if ($compData === false || $matchData === false): ?>
-            <div id="retry-message" class="retry-message">
-                Rate limit exceeded. Retry attempt <span id="attempt-count"></span>/<span id="max-retries"></span>. Retrying in <span id="countdown">5</span> seconds...
-            </div>
-        <?php endif; ?>
+        <div id="error-message" class="error-message">
+            <span id="error-text"></span> <span id="countdown"></span>
+        </div>
 
         <div class="controls">
-            <select id="competition-select" onchange="updateMatches(this.value, '<?php echo $filter; ?>')">
+            <select id="competition-select" onchange="updateMatches()">
                 <?php
                 foreach ($competitions as $comp) {
                     $code = isset($comp['code']) ? $comp['code'] : '';
@@ -846,6 +846,8 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
     </div>
 
     <script>
+        let currentFilter = '<?php echo $filter; ?>';
+
         function toggleTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
@@ -866,34 +868,70 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             button.textContent = isHidden ? '👁️ Hide History' : '👁️ View History';
         }
 
-        function updateMatches(competition, filter) {
+        function displayError(message, autoReload = false) {
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const countdown = document.getElementById('countdown');
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+
+            if (autoReload) {
+                let timeLeft = 5;
+                countdown.textContent = `Reloading in ${timeLeft} seconds...`;
+                const timer = setInterval(() => {
+                    timeLeft--;
+                    countdown.textContent = `Reloading in ${timeLeft} seconds...`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        window.location.reload();
+                    }
+                }, 1000);
+            } else {
+                countdown.textContent = '';
+            }
+        }
+
+        function hideError() {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.style.display = 'none';
+        }
+
+        function updateMatches() {
+            const competition = document.getElementById('competition-select').value;
             let fromDate, toDate;
             const dateOptions = <?php echo json_encode($dateOptions); ?>;
-            
-            if (filter === 'custom') {
+
+            if (currentFilter === 'custom') {
                 fromDate = document.getElementById('custom-start').value;
                 toDate = document.getElementById('custom-end').value;
-                if (!fromDate || !toDate) return; // Wait for custom dates
-            } else if (dateOptions[filter]) {
-                if (dateOptions[filter].date) {
-                    fromDate = toDate = dateOptions[filter].date;
+                if (!fromDate || !toDate) return; // Wait for valid custom dates
+            } else if (dateOptions[currentFilter]) {
+                if (dateOptions[currentFilter].date) {
+                    fromDate = toDate = dateOptions[currentFilter].date;
                 } else {
-                    fromDate = dateOptions[filter].from;
-                    toDate = dateOptions[filter].to;
+                    fromDate = dateOptions[currentFilter].from;
+                    toDate = dateOptions[currentFilter].to;
                 }
+            } else {
+                console.error('Invalid filter:', currentFilter);
+                return;
             }
 
             fetchMatches(competition, fromDate, toDate);
         }
 
         function fetchMatches(competition, fromDate, toDate) {
-            window.incompleteTeams = []; // Reset incomplete teams
+            window.incompleteTeams = [];
+            hideError();
             fetch(`?action=fetch_matches&competition=${competition}&fromDate=${fromDate}&toDate=${toDate}`, {
                 headers: {
                     'X-Auth-Token': '<?php echo $apiKey; ?>'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     document.getElementById('match-grid').innerHTML = data.html;
@@ -908,10 +946,13 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                         });
                     }
                 } else {
-                    console.error('Error fetching matches:', data.error);
+                    throw new Error(data.error || 'Unknown error fetching matches');
                 }
             })
-            .catch(error => console.error('Error fetching matches:', error));
+            .catch(error => {
+                console.error('Fetch matches error:', error);
+                displayError(`Error loading matches: ${error.message}`, true);
+            });
         }
 
         function selectFilter(filter) {
@@ -930,23 +971,29 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                 }
             });
 
+            currentFilter = filter;
+
             if (filter === 'custom') {
-                customRange.style.display = 'block';
+                customRange.classList.add('active');
                 dropdown.classList.add('active');
             } else {
-                customRange.style.display = 'none';
+                customRange.classList.remove('active');
                 dropdown.classList.remove('active');
-                updateMatches(document.getElementById('competition-select').value, filter);
+                updateMatches();
             }
         }
 
         function applyCustomDate() {
-            const competition = document.getElementById('competition-select').value;
             const fromDate = document.getElementById('custom-start').value;
             const toDate = document.getElementById('custom-end').value;
-            document.getElementById('filter-btn').textContent = `Custom: ${fromDate} to ${toDate}`;
-            document.getElementById('filter-dropdown').classList.remove('active');
-            fetchMatches(competition, fromDate, toDate);
+            if (fromDate && toDate) {
+                document.getElementById('filter-btn').textContent = `Custom: ${fromDate} to ${toDate}`;
+                document.getElementById('filter-dropdown').classList.remove('active');
+                currentFilter = 'custom';
+                updateMatches();
+            } else {
+                displayError('Please select both start and end dates.');
+            }
         }
 
         document.getElementById('filter-btn').addEventListener('click', function(e) {
@@ -954,13 +1001,14 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             const dropdown = document.getElementById('filter-dropdown');
             dropdown.classList.toggle('active');
             const customRange = document.getElementById('custom-date-range');
-            customRange.style.display = '<?php echo $filter === 'custom' ? 'block' : 'none'; ?>';
+            customRange.classList.toggle('active', currentFilter === 'custom');
         });
 
         document.addEventListener('click', function(e) {
             const container = document.querySelector('.filter-container');
             if (!container.contains(e.target)) {
                 document.getElementById('filter-dropdown').classList.remove('active');
+                document.getElementById('custom-date-range').classList.remove('active');
             }
         });
 
@@ -970,7 +1018,10 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     'X-Auth-Token': '<?php echo $apiKey; ?>'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
@@ -1004,10 +1055,12 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     if (otherTeamLoaded) {
                         fetchPrediction(index, matchCard.dataset.homeId, matchCard.dataset.awayId);
                     }
+                } else {
+                    throw new Error(data.error || 'Unknown error fetching team data');
                 }
             })
             .catch(error => {
-                console.error('Error fetching team data:', error);
+                console.error('Fetch team data error:', error);
                 setTimeout(() => fetchTeamData(teamId, index, isHome), 5000);
             });
         }
@@ -1018,7 +1071,10 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     'X-Auth-Token': '<?php echo $apiKey; ?>'
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     const predictionElement = document.getElementById(`prediction-${index}`);
@@ -1027,9 +1083,11 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                         <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
                         <p class="confidence">Confidence: ${data.confidence}</p>
                     `;
+                } else {
+                    throw new Error(data.error || 'Unknown error fetching prediction');
                 }
             })
-            .catch(error => console.error('Error fetching prediction:', error));
+            .catch(error => console.error('Fetch prediction error:', error));
         }
 
         window.onload = function() {
@@ -1057,27 +1115,25 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             });
 
             if (currentFilter === 'custom') {
-                document.getElementById('custom-date-range').style.display = 'block';
+                document.getElementById('custom-date-range').classList.add('active');
             }
 
             if (typeof retryAttempt !== 'undefined' && retryAttempt <= maxRetries) {
-                document.getElementById('attempt-count').textContent = retryAttempt;
-                document.getElementById('max-retries').textContent = maxRetries;
-                
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-text').textContent = 'Rate limit exceeded. Retrying...';
                 let timeLeft = 5;
-                const countdownElement = document.getElementById('countdown');
-                countdownElement.textContent = timeLeft;
-
+                document.getElementById('countdown').textContent = `Reloading in ${timeLeft} seconds...`;
                 const timer = setInterval(() => {
                     timeLeft--;
-                    countdownElement.textContent = timeLeft;
+                    document.getElementById('countdown').textContent = `Reloading in ${timeLeft} seconds...`;
                     if (timeLeft <= 0) {
                         clearInterval(timer);
-                        fetchMatches('<?php echo $selectedComp; ?>', '<?php echo $fromDate; ?>', '<?php echo $toDate; ?>');
+                        window.location.reload();
                     }
                 }, 1000);
             } else if (typeof retryAttempt !== 'undefined' && retryAttempt > maxRetries) {
-                document.getElementById('retry-message').textContent = 'Max retry attempts reached. Please try again later.';
+                document.getElementById('error-message').style.display = 'block';
+                document.getElementById('error-text').textContent = 'Max retry attempts reached. Please try again later.';
             }
 
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
