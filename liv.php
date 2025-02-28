@@ -23,7 +23,6 @@ function fetchAPI($url, $api_key, $retries = 3) {
     $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
 
-    // Handle rate limits (HTTP 429)
     if ($http_code == 429) {
         if ($retries > 0) {
             $wait_time = pow(2, 4 - $retries);
@@ -72,7 +71,6 @@ function ensureDataComplete($competition_id, $api_key) {
     $standings_url = "https://api.football-data.org/v4/competitions/$competition_id/standings";
     $fixtures_url = "https://api.football-data.org/v4/competitions/$competition_id/matches";
 
-    // Check if data exists in session; if not, fetch it
     if (!isset($_SESSION["standings_$competition_id"]) || !isset($_SESSION["fixtures_$competition_id"])) {
         $standings_data = fetchAPI($standings_url, $api_key);
         $fixtures_data = fetchAPI($fixtures_url, $api_key);
@@ -83,7 +81,6 @@ function ensureDataComplete($competition_id, $api_key) {
         $fixtures_data = $_SESSION["fixtures_$competition_id"];
     }
 
-    // If data is still incomplete after fetching, retry once
     if (!$standings_data || !$fixtures_data) {
         $standings_data = fetchAPI($standings_url, $api_key);
         $fixtures_data = fetchAPI($fixtures_url, $api_key);
@@ -423,7 +420,7 @@ function convertToEAT($utcDate) {
 
 // Get selected competition and fetch its data
 $selected_competition = isset($_GET['competition']) ? $_GET['competition'] : 'PL';
-$view_preference = isset($_GET['view']) ? $_GET['view'] : 'table'; // User Preference: Table or Card
+$view_preference = isset($_GET['view']) ? $_GET['view'] : 'table';
 
 // Fetch data for the selected competition with automatic loading
 list($standings_data, $fixtures_data) = ensureDataComplete($selected_competition, $api_key);
@@ -554,6 +551,19 @@ function toggleCustomRange(value) {
     const customRange = document.getElementById('custom_range');
     customRange.style.display = value === 'custom' ? 'block' : 'none';
 }
+
+// Automatic update on view preference change
+document.addEventListener('DOMContentLoaded', function() {
+    const viewDropdown = document.getElementById('view');
+    viewDropdown.addEventListener('change', function() {
+        const form = document.getElementById('searchForm');
+        showStatusLight(); // Show loading indicator
+        form.submit(); // Submit form to reflect view change
+    });
+
+    const dateFilter = document.getElementById('date_filter').value;
+    toggleCustomRange(dateFilter);
+});
 </script>";
 
 if ($selected_competition && $fixtures_data) {
@@ -704,7 +714,6 @@ document.getElementById("downloadButton").addEventListener("click", function() {
 });
 </script>';
 
-        // Display based on user preference (Table or Card)
         if ($view_preference == 'table') {
             // Table View
             echo "<div class='match-display'><table border='1' cellpadding='5' cellspacing='0'>";
@@ -809,13 +818,64 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             }
             echo "</table></div>";
         } else {
-            // Card View
+            // Professional Card View
             echo '<style>
-            .match-display { display: flex; flex-wrap: wrap; gap: 20px; }
-            .card { border: 1px solid #ddd; padding: 15px; width: 300px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 5px; background: #fff; }
-            .card h3 { margin: 0 0 10px; font-size: 18px; color: #2c3e50; }
-            .card p { margin: 5px 0; font-size: 14px; }
-            .card img { height: 30px; width: 30px; vertical-align: middle; margin-right: 5px; }
+            .match-display { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px; }
+            .card {
+                width: 320px;
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                font-family: "Arial", sans-serif;
+                border: 1px solid #e0e0e0;
+            }
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+            }
+            .card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
+                margin-bottom: 15px;
+            }
+            .card-header h3 {
+                font-size: 18px;
+                color: #333;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .card-header img {
+                width: 30px;
+                height: 30px;
+                object-fit: contain;
+            }
+            .card-content p {
+                margin: 8px 0;
+                font-size: 14px;
+                color: #555;
+                line-height: 1.5;
+            }
+            .card-content strong {
+                color: #222;
+                font-weight: 600;
+            }
+            .card-content .prediction {
+                background: #f5f5f5;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-size: 13px;
+                color: #2c3e50;
+            }
+            .card-content .status-finished { color: #28a745; }
+            .card-content .status-scheduled { color: #e67e22; }
+            .card-content .match-result span { font-size: 18px; }
             </style>';
             echo "<div class='match-display'>";
             foreach ($filtered_matches as $match) {
@@ -864,16 +924,21 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                 }
 
                 echo "<div class='card'>
-                    <h3><img src='$home_crest' /> $home_team vs <img src='$away_crest' /> $away_team</h3>
-                    <p><strong>Date:</strong> $date_eat</p>
-                    <p><strong>Home Form:</strong> $last6_home | Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</p>
-                    <p><strong>Away Form:</strong> $last6_away | Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</p>
-                    <p><strong>Status:</strong> $status</p>
-                    <p><strong>Score:</strong> $score</p>
-                    <p><strong>Prediction:</strong> $prediction (Goals: $predicted_goals)</p>
-                    <p><strong>Match Result:</strong> $match_result</p>
-                    <p><strong>Matchday:</strong> $venue</p>
-                    <p><strong>Decision:</strong> $decision - $reason</p>
+                    <div class='card-header'>
+                        <h3><img src='$home_crest' alt='$home_team' /> $home_team</h3>
+                        <h3><img src='$away_crest' alt='$away_team' /> $away_team</h3>
+                    </div>
+                    <div class='card-content'>
+                        <p><strong>Date:</strong> $date_eat</p>
+                        <p><strong>Home Stats:</strong> Form: $last6_home | Pos: $home_position | GD: $home_goal_diff | Pts: $home_points | GS: $home_goals_scored</p>
+                        <p><strong>Away Stats:</strong> Form: $last6_away | Pos: $away_position | GD: $away_goal_diff | Pts: $away_points | GS: $away_goals_scored</p>
+                        <p><strong>Status:</strong> <span class='status-" . strtolower($status) . "'>$status</span></p>
+                        <p><strong>Score:</strong> $score</p>
+                        <p><strong>Prediction:</strong> <span class='prediction'>$prediction (Goals: $predicted_goals)</span></p>
+                        <p><strong>Match Result:</strong> <span class='match-result'>$match_result</span></p>
+                        <p><strong>Matchday:</strong> $venue</p>
+                        <p><strong>Decision:</strong> $decision - <em>$reason</em></p>
+                    </div>
                 </div>";
             }
             echo "</div>";
