@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+// Set timezone to East Africa Time (Nairobi)
+date_default_timezone_set('Africa/Nairobi');
+
 // Initialize session data with error handling
 if (!isset($_SESSION['teamStats'])) {
     $_SESSION['teamStats'] = [];
@@ -39,8 +42,8 @@ function handleError($message) {
     exit;
 }
 
-// Enhanced fetch function with retry mechanism
-function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
+// Enhanced fetch function with exponential backoff retry mechanism for 429 errors
+function fetchWithRetry($url, $apiKey, $maxRetries = 5) {
     $attempt = isset($_GET['attempt']) ? (int)$_GET['attempt'] : 0;
     
     $ch = curl_init();
@@ -48,7 +51,7 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
     curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Prevent hanging
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     
     $response = curl_exec($ch);
     if (curl_errno($ch)) {
@@ -64,9 +67,16 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
     curl_close($ch);
 
     if ($httpCode == 429 && $attempt < $maxRetries) {
-        $retrySeconds = 5;
+        $retrySeconds = min(pow(2, $attempt), 32);
+        $nextAttempt = $attempt + 1;
+        
+        preg_match('/Retry-After: (\d+)/i', $headers, $matches);
+        if (!empty($matches[1])) {
+            $retrySeconds = max($retrySeconds, (int)$matches[1]);
+        }
+        
         echo "<script>
-            var retryAttempt = $attempt + 1;
+            var retryAttempt = $nextAttempt;
             var maxRetries = $maxRetries;
             document.addEventListener('DOMContentLoaded', function() {
                 let timeLeft = $retrySeconds;
@@ -81,7 +91,9 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
                     document.getElementById('countdown').textContent = timeLeft;
                     if (timeLeft <= 0) {
                         clearInterval(timer);
-                        window.location.href = window.location.pathname + window.location.search + (window.location.search ? '&' : '?') + 'attempt=' + retryAttempt;
+                        let url = window.location.pathname + window.location.search;
+                        url += (window.location.search ? '&' : '?') + 'attempt=' + retryAttempt;
+                        window.location.href = url;
                     }
                 }, 1000);
             });
@@ -129,7 +141,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
                 $awayId = $match['awayTeam']['id'] ?? 0;
                 $homeGoals = $match['score']['fullTime']['home'] ?? 0;
                 $awayGoals = $match['score']['fullTime']['away'] ?? 0;
-                $date = date('M d', strtotime($match['utcDate'] ?? 'now'));
+                $date = date('M d', strtotime($match['utcDate'] . ' UTC') + 3*3600); // Convert to EAT
                 $resultStr = ($match['homeTeam']['name'] ?? 'Unknown') . " $homeGoals - $awayGoals " . ($match['awayTeam']['name'] ?? 'Unknown');
 
                 if ($teamId == $homeId) {
@@ -671,7 +683,7 @@ try {
     <div class="container">
         <div class="header">
             <h1>Advanced Football Predictions</h1>
-            <p>Select Competition and Date Range</p>
+            <p>Select Competition and Date Range (Times in EAT)</p>
         </div>
 
         <div class="controls">
@@ -717,7 +729,7 @@ try {
                         $awayTeamId = $match['awayTeam']['id'] ?? 0;
                         $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
                         $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
-                        $date = $match['utcDate'] ?? 'TBD' ? date('M d, Y H:i', strtotime($match['utcDate'])) : 'TBD';
+                        $date = $match['utcDate'] ?? 'TBD' ? date('M d, Y H:i', strtotime($match['utcDate'] . ' UTC') + 3*3600) : 'TBD'; // Convert to EAT
                         $homeCrest = $match['homeTeam']['crest'] ?? '';
                         $awayCrest = $match['awayTeam']['crest'] ?? '';
                         $status = $match['status'];
@@ -761,7 +773,7 @@ try {
                                 </div>
                             </div>
                             <div class='match-info " . (isset($_COOKIE['theme']) && $_COOKIE['theme'] === 'dark' ? 'dark' : '') . "'>
-                                <p>$date (" . $status . ")" . ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null ? " - $homeGoals : $awayGoals" : "") . "</p>
+                                <p>$date ($status)" . ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null ? " - $homeGoals : $awayGoals" : "") . "</p>
                             </div>
                             <div class='prediction' id='prediction-$index'>
                                 <p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
