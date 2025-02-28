@@ -42,8 +42,8 @@ function handleError($message) {
     exit;
 }
 
-// Enhanced fetch function with exponential backoff retry mechanism for 429 errors
-function fetchWithRetry($url, $apiKey, $maxRetries = 5) {
+// Enhanced fetch function with infinite retry mechanism for 429 errors
+function fetchWithRetry($url, $apiKey) {
     $attempt = isset($_GET['attempt']) ? (int)$_GET['attempt'] : 0;
     
     $ch = curl_init();
@@ -66,24 +66,26 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 5) {
     
     curl_close($ch);
 
-    if ($httpCode == 429 && $attempt < $maxRetries) {
+    if ($httpCode == 429) {
+        // Exponential backoff, capped at 32 seconds
         $retrySeconds = min(pow(2, $attempt), 32);
         $nextAttempt = $attempt + 1;
         
+        // Check for Retry-After header and use it if available
         preg_match('/Retry-After: (\d+)/i', $headers, $matches);
         if (!empty($matches[1])) {
             $retrySeconds = max($retrySeconds, (int)$matches[1]);
         }
         
+        // Display retry message and auto-reload indefinitely
         echo "<script>
             var retryAttempt = $nextAttempt;
-            var maxRetries = $maxRetries;
             document.addEventListener('DOMContentLoaded', function() {
                 let timeLeft = $retrySeconds;
                 const retryDiv = document.createElement('div');
                 retryDiv.id = 'retry-message';
                 retryDiv.className = 'retry-message';
-                retryDiv.innerHTML = 'Rate limit exceeded. Retry attempt <span id=\"attempt-count\">' + retryAttempt + '</span>/<span id=\"max-retries\">' + maxRetries + '</span>. Retrying in <span id=\"countdown\">' + timeLeft + '</span> seconds...';
+                retryDiv.innerHTML = 'Rate limit exceeded. Retry attempt ' + retryAttempt + '. Retrying in <span id=\"countdown\">' + timeLeft + '</span> seconds...';
                 document.body.insertBefore(retryDiv, document.body.firstChild.nextSibling);
                 
                 const timer = setInterval(() => {
