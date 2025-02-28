@@ -818,7 +818,7 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             }
             echo "</table></div>";
         } else {
-            // Professional Card View with Flexbox, Optimized for Mobile
+            // Professional Card View with Flexbox, Optimized to Fit Screen Width on Mobile
             echo '<style>
             .match-display { 
                 display: flex; 
@@ -826,9 +826,11 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                 gap: 20px; 
                 justify-content: center; 
                 padding: 20px; 
+                margin: 0; /* Remove any default margins */
             }
             .card {
-                width: 320px;
+                width: 320px; /* Default width for larger screens */
+                max-width: 100%; /* Ensure it doesn’t exceed container */
                 background: #fff;
                 border-radius: 10px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -839,6 +841,7 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
+                box-sizing: border-box; /* Include padding in width */
             }
             .card:hover {
                 transform: translateY(-5px);
@@ -900,10 +903,13 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             /* Mobile Adjustments */
             @media (max-width: 768px) {
                 .match-display {
-                    padding: 10px;
+                    padding: 10px; /* Reduced padding */
+                    gap: 15px;
                 }
                 .card {
-                    width: 100%; /* Full width on mobile */
+                    width: 100vw; /* Fit full viewport width */
+                    margin: 0 -10px; /* Offset parent padding */
+                    border-radius: 0; /* Optional: remove rounded corners on mobile */
                     padding: 15px;
                 }
                 .card-header h3 {
@@ -914,7 +920,7 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                     height: 25px;
                 }
                 .card-content .row {
-                    flex-direction: column; /* Stack label and value vertically on small screens */
+                    flex-direction: column; /* Stack vertically on mobile */
                     align-items: flex-start;
                     gap: 5px;
                 }
