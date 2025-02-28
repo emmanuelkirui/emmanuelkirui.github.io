@@ -17,7 +17,7 @@ $competitions = isset(json_decode($compResponse, true)['competitions']) ? json_d
 
 // Handle user selections with isset
 $selectedComp = isset($_GET['competition']) ? $_GET['competition'] : (isset($competitions[0]['code']) ? $competitions[0]['code'] : 'PL');
-$filter = isset($_GET['filter']) ? $_GET['filter'] : 'today';
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'week'; // Default to week
 $customStart = isset($_GET['start']) ? $_GET['start'] : '';
 $customEnd = isset($_GET['end']) ? $_GET['end'] : '';
 $showPast = isset($_GET['showPast']) ? true : false;
@@ -44,7 +44,7 @@ if (isset($dateOptions[$filter])) {
     }
 }
 
-// Fetch upcoming matches
+// Fetch matches
 $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $matchesUrl);
@@ -53,6 +53,9 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
 $matchResponse = curl_exec($ch);
 curl_close($ch);
 $upcomingMatches = isset(json_decode($matchResponse, true)['matches']) ? json_decode($matchResponse, true)['matches'] : [];
+
+// Debug: Show number of matches fetched
+echo "Total matches fetched: " . count($upcomingMatches) . "<br>";
 
 // Team stats functions
 $teamStats = &$_SESSION['teamStats'];
@@ -107,8 +110,11 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
     $awayTeamId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
     $homeTeam = isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'TBD';
     $awayTeam = isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'TBD';
+    $status = isset($match['status']) ? $match['status'] : 'SCHEDULED';
+    $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : null;
+    $awayGoals = isset($match['score']['fullTime']['away']) ? $match['score']['fullTime']['away'] : null;
 
-    if (!$homeTeamId || !$awayTeamId) return ["N/A", "0%"];
+    if (!$homeTeamId || !$awayTeamId) return ["N/A", "0%", ""];
 
     $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats);
     $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats);
@@ -126,13 +132,27 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
     $diff = $homeStrength - $awayStrength;
     $confidence = min(90, abs($diff) / ($homeStrength + $awayStrength + 1) * 100);
 
+    $prediction = "";
+    $resultIndicator = "";
+
     if ($diff > 15) {
-        return ["$homeTeam to win", sprintf("%.1f%%", $confidence)];
+        $prediction = "$homeTeam to win";
+        $confidence = sprintf("%.1f%%", $confidence);
     } elseif ($diff < -15) {
-        return ["$awayTeam to win", sprintf("%.1f%%", $confidence)];
+        $prediction = "$awayTeam to win";
+        $confidence = sprintf("%.1f%%", $confidence);
     } else {
-        return ["Draw", sprintf("%.1f%%", min(70, $confidence))];
+        $prediction = "Draw";
+        $confidence = sprintf("%.1f%%", min(70, $confidence));
     }
+
+    // Check prediction accuracy for finished matches
+    if ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null) {
+        $actualResult = ($homeGoals > $awayGoals) ? "$homeTeam to win" : (($homeGoals < $awayGoals) ? "$awayTeam to win" : "Draw");
+        $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
+    }
+
+    return [$prediction, $confidence, $resultIndicator];
 }
 ?>
 
@@ -356,6 +376,11 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             color: var(--secondary-color);
         }
 
+        .result-indicator {
+            font-size: 1.2em;
+            margin-left: 5px;
+        }
+
         .past-results {
             margin-top: 15px;
             padding: 10px;
@@ -424,13 +449,16 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             <?php
             if (!empty($upcomingMatches)) {
                 foreach ($upcomingMatches as $match) {
-                    if (isset($match['status']) && $match['status'] !== 'FINISHED') {
+                    if (isset($match['status'])) {
                         $homeTeam = isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'TBD';
                         $awayTeam = isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'TBD';
                         $date = isset($match['utcDate']) ? date('M d, Y H:i', strtotime($match['utcDate'])) : 'TBD';
                         $homeCrest = isset($match['homeTeam']['crest']) ? $match['homeTeam']['crest'] : '';
                         $awayCrest = isset($match['awayTeam']['crest']) ? $match['awayTeam']['crest'] : '';
-                        [$prediction, $confidence] = predictMatch($match, $apiKey, $baseUrl, $teamStats);
+                        $status = $match['status'];
+                        $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : null;
+                        $awayGoals = isset($match['score']['fullTime']['away']) ? $match['score']['fullTime']['away'] : null;
+                        [$prediction, $confidence, $resultIndicator] = predictMatch($match, $apiKey, $baseUrl, $teamStats);
                         $homeStats = calculateTeamStrength(isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0, $apiKey, $baseUrl, $teamStats);
                         $awayStats = calculateTeamStrength(isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0, $apiKey, $baseUrl, $teamStats);
 
@@ -448,10 +476,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                                 </div>
                             </div>
                             <div class='match-info " . (isset($_COOKIE['theme']) && $_COOKIE['theme'] === 'dark' ? 'dark' : '') . "'>
-                                <p>$date</p>
+                                <p>$date (" . $status . ")" . ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null ? " - $homeGoals : $awayGoals" : "") . "</p>
                             </div>
                             <div class='prediction'>
-                                <p>Prediction: $prediction</p>
+                                <p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
                                 <p class='confidence'>Confidence: $confidence</p>
                             </div>";
 
@@ -475,7 +503,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                     }
                 }
             } else {
-                echo "<p>No upcoming matches available for the selected competition and date range.</p>";
+                echo "<p>No matches available for the selected competition and date range.</p>";
             }
             ?>
         </div>
