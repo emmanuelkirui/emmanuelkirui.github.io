@@ -83,11 +83,10 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
             'goalsScored' => 0, 
             'goalsConceded' => 0, 
             'games' => 0, 
-            'results' => [], 
+            'results' => [],
             'form' => ''
         ];
         
-        $formArray = [];
         foreach ($results as $match) {
             $homeId = isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0;
             $awayId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
@@ -99,35 +98,37 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
             if ($teamId == $homeId) {
                 $stats['goalsScored'] += $homeGoals;
                 $stats['goalsConceded'] += $awayGoals;
-                if ($homeGoals > $awayGoals) {
-                    $stats['wins']++;
-                    $formArray[] = 'W';
-                } elseif ($homeGoals == $awayGoals) {
-                    $stats['draws']++;
-                    $formArray[] = 'D';
-                } else {
-                    $formArray[] = 'L';
-                }
+                if ($homeGoals > $awayGoals) $stats['wins']++;
+                elseif ($homeGoals == $awayGoals) $stats['draws']++;
                 $stats['results'][] = "$date: $resultStr";
             } elseif ($teamId == $awayId) {
                 $stats['goalsScored'] += $awayGoals;
                 $stats['goalsConceded'] += $homeGoals;
-                if ($awayGoals > $homeGoals) {
-                    $stats['wins']++;
-                    $formArray[] = 'W';
-                } elseif ($homeGoals == $awayGoals) {
-                    $stats['draws']++;
-                    $formArray[] = 'D';
-                } else {
-                    $formArray[] = 'L';
-                }
+                if ($awayGoals > $homeGoals) $stats['wins']++;
+                elseif ($homeGoals == $awayGoals) $stats['draws']++;
                 $stats['results'][] = "$date: $resultStr";
             }
             $stats['games']++;
         }
-        // Reverse form array to show latest result last and limit to 6
-        $formArray = array_slice(array_reverse($formArray), 0, 6);
-        $stats['form'] = implode('', $formArray);
+        // Calculate form from results
+        $formArray = [];
+        foreach (array_reverse($results) as $match) { // Reverse to get latest first
+            $homeId = isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0;
+            $awayId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
+            $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : 0;
+            $awayGoals = isset($match['score']['fullTime']['away']) ? $match['score']['fullTime']['away'] : 0;
+            
+            if ($teamId == $homeId) {
+                if ($homeGoals > $awayGoals) $formArray[] = 'W';
+                elseif ($homeGoals == $awayGoals) $formArray[] = 'D';
+                else $formArray[] = 'L';
+            } elseif ($teamId == $awayId) {
+                if ($awayGoals > $homeGoals) $formArray[] = 'W';
+                elseif ($homeGoals == $awayGoals) $formArray[] = 'D';
+                else $formArray[] = 'L';
+            }
+        }
+        $stats['form'] = implode('', array_slice($formArray, 0, 6));
         $teamStats[$teamId] = $stats;
     }
     return $teamStats[$teamId];
@@ -453,12 +454,32 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             display: inline-block;
             width: 20px;
             text-align: center;
+            border-radius: 3px;
+            margin: 0 1px;
+        }
+
+        .form-display .win {
+            background-color: #28a745; /* Green */
+            color: white;
+        }
+
+        .form-display .draw {
+            background-color: #fd7e14; /* Orange */
+            color: white;
+        }
+
+        .form-display .loss {
+            background-color: #dc3545; /* Red */
+            color: white;
+        }
+
+        .form-display .empty {
+            background-color: #6c757d; /* Gray for '-' */
+            color: white;
         }
 
         .form-display .latest {
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 3px;
+            border: 2px solid #000; /* Black border for latest result */
         }
 
         .predicted-score {
@@ -482,7 +503,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                 <?php
                 foreach ($competitions as $comp) {
                     $code = isset($comp['code']) ? $comp['code'] : '';
-                    $name = isset($comm['name']) ? $comp['name'] : 'Unknown';
+                    $name = isset($comp['name']) ? $comp['name'] : 'Unknown'; // Fixed typo: $comm to $comp
                     $selected = $code === $selectedComp ? 'selected' : '';
                     echo "<option value='$code' $selected>$name</option>";
                 }
@@ -535,10 +556,15 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
                                     <div class='form-display'>";
-                        // Display home team form
+                        // Display home team form with colors
                         $homeForm = str_pad($homeStats['form'], 6, '-', STR_PAD_LEFT);
                         for ($i = 0; $i < strlen($homeForm); $i++) {
-                            $class = ($i == strlen($homeForm) - 1 && $homeForm[$i] !== '-') ? 'latest' : '';
+                            $class = '';
+                            if ($homeForm[$i] === 'W') $class = 'win';
+                            elseif ($homeForm[$i] === 'D') $class = 'draw';
+                            elseif ($homeForm[$i] === 'L') $class = 'loss';
+                            elseif ($homeForm[$i] === '-') $class = 'empty';
+                            if ($i === strlen($homeForm) - 1 && $homeForm[$i] !== '-') $class .= ' latest';
                             echo "<span class='$class'>" . $homeForm[$i] . "</span>";
                         }
                         echo "</div>
@@ -548,10 +574,15 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
                                     <div class='form-display'>";
-                        // Display away team form
+                        // Display away team form with colors
                         $awayForm = str_pad($awayStats['form'], 6, '-', STR_PAD_LEFT);
                         for ($i = 0; $i < strlen($awayForm); $i++) {
-                            $class = ($i == strlen($awayForm) - 1 && $awayForm[$i] !== '-') ? 'latest' : '';
+                            $class = '';
+                            if ($awayForm[$i] === 'W') $class = 'win';
+                            elseif ($awayForm[$i] === 'D') $class = 'draw';
+                            elseif ($awayForm[$i] === 'L') $class = 'loss';
+                            elseif ($awayForm[$i] === '-') $class = 'empty';
+                            if ($i === strlen($awayForm) - 1 && $awayForm[$i] !== '-') $class .= ' latest';
                             echo "<span class='$class'>" . $awayForm[$i] . "</span>";
                         }
                         echo "</div>
