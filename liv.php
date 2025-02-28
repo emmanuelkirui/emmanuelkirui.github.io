@@ -818,19 +818,22 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             }
             echo "</table></div>";
         } else {
-            // Professional Card View with Flexbox, Optimized to Fit Screen Width on Mobile
+            // Professional Card View with Flexbox, Full Width on Mobile
             echo '<style>
             .match-display { 
                 display: flex; 
-                flex-wrap: wrap; 
-                gap: 20px; 
-                justify-content: center; 
-                padding: 20px; 
-                margin: 0; /* Remove any default margins */
+                flex-direction: column; /* Stack cards vertically */
+                width: 100%; /* Full width of parent */
+                margin: 0; 
+                padding: 0; /* Remove padding to ensure cards touch edges */
+                gap: 20px; /* Space between cards */
             }
             .card {
-                width: 320px; /* Default width for larger screens */
-                max-width: 100%; /* Ensure it doesn’t exceed container */
+                display: flex;
+                flex-direction: column;
+                width: 100%; /* Default to full width for all screens */
+                max-width: 320px; /* Cap width for larger screens */
+                margin: 0 auto; /* Center on larger screens */
                 background: #fff;
                 border-radius: 10px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -838,10 +841,8 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                 transition: transform 0.3s ease, box-shadow 0.3s ease;
                 font-family: "Arial", sans-serif;
                 border: 1px solid #e0e0e0;
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
                 box-sizing: border-box; /* Include padding in width */
+                gap: 15px;
             }
             .card:hover {
                 transform: translateY(-5px);
@@ -903,13 +904,13 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             /* Mobile Adjustments */
             @media (max-width: 768px) {
                 .match-display {
-                    padding: 10px; /* Reduced padding */
-                    gap: 15px;
+                    padding: 0; /* Ensure no padding affects card width */
                 }
                 .card {
-                    width: 100vw; /* Fit full viewport width */
-                    margin: 0 -10px; /* Offset parent padding */
-                    border-radius: 0; /* Optional: remove rounded corners on mobile */
+                    width: 100%; /* Full width on mobile */
+                    max-width: none; /* Remove max-width cap */
+                    margin: 0; /* No margins to ensure edge-to-edge */
+                    border-radius: 0; /* Optional: flat edges on mobile */
                     padding: 15px;
                 }
                 .card-header h3 {
@@ -1029,6 +1030,9 @@ document.getElementById("downloadButton").addEventListener("click", function() {
     }
 }
 ?>
+
+<!-- Add viewport meta tag for mobile compatibility -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script>
 function toggleCustomRange(value) {
