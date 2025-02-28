@@ -67,25 +67,23 @@ function fetchWithRetry($url, $apiKey) {
     curl_close($ch);
 
     if ($httpCode == 429) {
-        // Exponential backoff, capped at 32 seconds
         $retrySeconds = min(pow(2, $attempt), 32);
         $nextAttempt = $attempt + 1;
         
-        // Check for Retry-After header and use it if available
         preg_match('/Retry-After: (\d+)/i', $headers, $matches);
         if (!empty($matches[1])) {
             $retrySeconds = max($retrySeconds, (int)$matches[1]);
         }
         
-        // Display retry message and auto-reload indefinitely
+        // Display styled retry message with countdown
         echo "<script>
             var retryAttempt = $nextAttempt;
             document.addEventListener('DOMContentLoaded', function() {
                 let timeLeft = $retrySeconds;
                 const retryDiv = document.createElement('div');
                 retryDiv.id = 'retry-message';
-                retryDiv.className = 'retry-message';
-                retryDiv.innerHTML = 'Rate limit exceeded. Retry attempt ' + retryAttempt + '. Retrying in <span id=\"countdown\">' + timeLeft + '</span> seconds...';
+                retryDiv.className = 'retry-message countdown-box'; // Added countdown-box class
+                retryDiv.innerHTML = '<span class=\"retry-text\">Rate limit exceeded. Retry attempt ' + retryAttempt + '. Retrying in </span><span id=\"countdown\" class=\"countdown-timer\">' + timeLeft + '</span><span class=\"retry-text\"> seconds...</span>';
                 document.body.insertBefore(retryDiv, document.body.firstChild.nextSibling);
                 
                 const timer = setInterval(() => {
@@ -675,6 +673,53 @@ try {
             margin: 20px 0;
             font-size: 1.2em;
             color: #dc3545;
+        }
+
+        /* New styles for countdown output */
+        .countdown-box {
+            background-color: rgba(220, 53, 69, 0.1); /* Light red background */
+            border: 2px solid #dc3545; /* Red border */
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .retry-text {
+            color: #dc3545; /* Red text */
+            font-weight: bold;
+        }
+
+        .countdown-timer {
+            display: inline-block;
+            background-color: #dc3545; /* Red background for timer */
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin: 0 5px;
+            font-size: 1.4em;
+            min-width: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Dark theme adjustments */
+        [data-theme="dark"] .countdown-box {
+            background-color: rgba(220, 53, 69, 0.2);
+            border-color: #e74c3c;
+        }
+
+        [data-theme="dark"] .retry-text {
+            color: #e74c3c;
+        }
+
+        [data-theme="dark"] .countdown-timer {
+            background-color: #e74c3c;
         }
     </style>
 </head>
