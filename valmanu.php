@@ -25,15 +25,15 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 3, $retryDelay = 5) {
         if ($httpCode == 429) {
             $attempt++;
             if ($attempt < $maxRetries) {
-                // Extract retry-after header if available
+                // Extract retry-after header if available, otherwise use default delay
                 preg_match('/Retry-After: (\d+)/i', $headers, $matches);
                 $retrySeconds = isset($matches[1]) ? (int)$matches[1] : $retryDelay;
                 
-                echo "<p>Rate limit exceeded. Retry attempt $attempt/$maxRetries in $retrySeconds seconds...</p>";
-                for ($i = $retrySeconds; $i > 0; $i--) {
+                echo "<p>Rate limit exceeded. Retry attempt $attempt/$maxRetries. Countdown:</p>";
+                for ($i = 5; $i >= 0; $i--) { // Countdown from 5 to 0
                     echo "<p>Retrying in $i seconds...</p>";
                     flush(); // Force output to browser
-                    sleep(1);
+                    if ($i > 0) sleep(1); // Sleep only between counts, not after 0
                 }
                 continue;
             } else {
