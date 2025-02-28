@@ -43,8 +43,10 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
 }
 
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
-    $pastDate = date('Y-m-d', strtotime('-60 days'));
-    $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=" . date('Y-m-d') . "&limit=10&status=FINISHED";
+    // Use current date (February 28, 2025) for latest data
+    $pastDate = date('Y-m-d', strtotime('-60 days')); // Approx January 1, 2025
+    $currentDate = date('Y-m-d'); // February 28, 2025
+    $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=$currentDate&limit=10&status=FINISHED";
     $data = fetchWithRetry($url, $apiKey);
     return isset($data['matches']) ? $data['matches'] : [];
 }
@@ -692,14 +694,18 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
                                     <div class='form-display' id='form-home-$index'>";
-                        $homeForm = str_pad($homeStats['form'], 6, '-', STR_PAD_LEFT);
-                        for ($i = 0; $i < strlen($homeForm); $i++) {
+                        $homeForm = substr($homeStats['form'], -6); // Take last 6 results (most recent)
+                        $homeForm = str_pad($homeForm, 6, '-', STR_PAD_LEFT); // Pad left with '-' if less than 6
+                        for ($i = 0; $i < 6; $i++) {
                             $class = '';
                             if ($homeForm[$i] === 'W') $class = 'win';
                             elseif ($homeForm[$i] === 'D') $class = 'draw';
                             elseif ($homeForm[$i] === 'L') $class = 'loss';
-                            elseif ($homeForm[$i] === '-') $class = 'empty';
-                            if ($i === strlen($homeForm) - 1 && $homeForm[$i] !== '-') $class .= ' latest';
+                            else $class = 'empty';
+                            // Highlight the rightmost non-'empty' result (latest match)
+                            if ($i === (strlen(trim($homeStats['form'], '-')) + (6 - strlen($homeForm))) - 1 && $homeForm[$i] !== '-') {
+                                $class .= ' latest';
+                            }
                             echo "<span class='$class'>" . $homeForm[$i] . "</span>";
                         }
                         echo "</div>
@@ -709,14 +715,18 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
                                     <div class='form-display' id='form-away-$index'>";
-                        $awayForm = str_pad($awayStats['form'], 6, '-', STR_PAD_LEFT);
-                        for ($i = 0; $i < strlen($awayForm); $i++) {
+                        $awayForm = substr($awayStats['form'], -6); // Take last 6 results (most recent)
+                        $awayForm = str_pad($awayForm, 6, '-', STR_PAD_LEFT); // Pad left with '-' if less than 6
+                        for ($i = 0; $i < 6; $i++) {
                             $class = '';
                             if ($awayForm[$i] === 'W') $class = 'win';
                             elseif ($awayForm[$i] === 'D') $class = 'draw';
                             elseif ($awayForm[$i] === 'L') $class = 'loss';
-                            elseif ($awayForm[$i] === '-') $class = 'empty';
-                            if ($i === strlen($awayForm) - 1 && $awayForm[$i] !== '-') $class .= ' latest';
+                            else $class = 'empty';
+                            // Highlight the rightmost non-'empty' result (latest match)
+                            if ($i === (strlen(trim($awayStats['form'], '-')) + (6 - strlen($awayForm))) - 1 && $awayForm[$i] !== '-') {
+                                $class .= ' latest';
+                            }
                             echo "<span class='$class'>" . $awayForm[$i] . "</span>";
                         }
                         echo "</div>
@@ -835,21 +845,17 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     const predictionElement = document.getElementById(`prediction-${index}`);
 
                     let formHtml = '';
-                    const form = data.form.padStart(6, '-');
-                    for (let i = 0; i < form.length; i++) {
+                    const form = data.form.slice(-6).padStart(6, '-'); // Last 6, pad left with '-'
+                    for (let i = 0; i < 6; i++) {
                         let className = '';
                         if (form[i] === 'W') className = 'win';
                         else if (form[i] === 'D') className = 'draw';
                         else if (form[i] === 'L') className = 'loss';
-                        else if (form[i] === '-') className = 'empty';
-                        if (i === form.length - 1 && form[i] !== '-') className += ' latest';
+                        else className = 'empty';
+                        if (i === (form.trim('-').length + (6 - form.length)) - 1 && form[i] !== '-') className += ' latest';
                         formHtml += `<span class="${className}">${form[i]}</span>`;
                     }
-                    if (isHome) {
-                        formElement.innerHTML = formHtml;
-                    } else {
-                        formElement.innerHTML = formHtml;
-                    }
+                    formElement.innerHTML = formHtml;
 
                     let historyHtml = '';
                     if (isHome) {
