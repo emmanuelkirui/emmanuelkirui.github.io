@@ -20,7 +20,7 @@ $selectedComp = isset($_GET['competition']) ? $_GET['competition'] : (isset($com
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'upcoming';
 $customStart = isset($_GET['start']) ? $_GET['start'] : '';
 $customEnd = isset($_GET['end']) ? $_GET['end'] : '';
-$showPast = isset($_GET['showPast']) && $_GET['showPast'] == 1 ? true : false; // Explicitly check for 1
+$showPast = isset($_GET['showPast']) && $_GET['showPast'] == 1 ? true : false;
 
 // Advanced date options
 $dateOptions = [
@@ -31,6 +31,11 @@ $dateOptions = [
     'upcoming' => ['label' => 'Next 7 Days', 'from' => date('Y-m-d'), 'to' => date('Y-m-d', strtotime('+7 days'))],
     'custom' => ['label' => 'Custom Range']
 ];
+
+// Determine display label for the filter button
+$filterLabel = ($filter === 'custom' && $customStart && $customEnd) 
+    ? "Custom: $customStart to $customEnd" 
+    : (isset($dateOptions[$filter]['label']) ? $dateOptions[$filter]['label'] : 'Select Date');
 
 $fromDate = $toDate = date('Y-m-d');
 if (isset($dateOptions[$filter])) {
@@ -422,11 +427,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             </select>
 
             <div class="filter-container">
-                <button class="filter-dropdown-btn">
-                    <?php 
-                    echo isset($dateOptions[$filter]['label']) ? $dateOptions[$filter]['label'] : 'Select Date'; 
-                    ?>
-                </button>
+                <button class="filter-dropdown-btn"><?php echo $filterLabel; ?></button>
                 <div class="filter-dropdown">
                     <?php
                     foreach ($dateOptions as $key => $option) {
@@ -521,10 +522,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
             body.setAttribute('data-theme', newTheme);
             document.cookie = `theme=${newTheme};path=/;max-age=31536000`;
-            
             document.querySelectorAll('.match-info').forEach(el => {
                 el.classList.toggle('dark', newTheme === 'dark');
             });
@@ -554,11 +553,11 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             e.stopPropagation();
             const dropdown = document.querySelector('.filter-dropdown');
             dropdown.classList.toggle('active');
-            
+            const customRange = document.querySelector('.custom-date-range');
             if ('<?php echo $filter; ?>' === 'custom') {
-                document.querySelector('.custom-date-range').classList.add('active');
+                customRange.classList.add('active');
             } else {
-                document.querySelector('.custom-date-range').classList.remove('active');
+                customRange.classList.remove('active');
             }
         });
 
@@ -573,7 +572,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             const theme = document.cookie.split('; ')
                 .find(row => row.startsWith('theme='))
                 ?.split('=')[1];
-            
             if (theme) {
                 document.body.setAttribute('data-theme', theme);
                 document.querySelectorAll('.match-info').forEach(el => {
