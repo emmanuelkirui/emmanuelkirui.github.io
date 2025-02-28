@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Set timezone to East Africa Time (Nairobi)
+// Set timezone to East Africa Time (Nairobi, Kenya, UTC+3)
 date_default_timezone_set('Africa/Nairobi');
 
 // Initialize session data with error handling
@@ -106,10 +106,10 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 5) {
     }
 }
 
-// Team results fetch function with error handling
+// Team results fetch function with error handling (dates in EAT, Nairobi, Kenya)
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
-    $pastDate = date('Y-m-d', strtotime('-60 days'));
-    $currentDate = date('Y-m-d');
+    $pastDate = date('Y-m-d', strtotime('-60 days')); // Nairobi time (UTC+3)
+    $currentDate = date('Y-m-d'); // Nairobi time (UTC+3)
     $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=$currentDate&limit=10&status=FINISHED";
     
     $response = fetchWithRetry($url, $apiKey);
@@ -120,7 +120,7 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     return isset($response['data']['matches']) ? $response['data']['matches'] : [];
 }
 
-// Team strength calculation with error handling
+// Team strength calculation with error handling (dates in EAT, Nairobi, Kenya)
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
     try {
         if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form'])) {
@@ -141,7 +141,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
                 $awayId = $match['awayTeam']['id'] ?? 0;
                 $homeGoals = $match['score']['fullTime']['home'] ?? 0;
                 $awayGoals = $match['score']['fullTime']['away'] ?? 0;
-                $date = date('M d', strtotime($match['utcDate'] . ' UTC') + 3*3600); // Convert to EAT
+                $date = date('M d', strtotime($match['utcDate'])); // API provides UTC, converted to EAT (Nairobi, Kenya) via timezone setting
                 $resultStr = ($match['homeTeam']['name'] ?? 'Unknown') . " $homeGoals - $awayGoals " . ($match['awayTeam']['name'] ?? 'Unknown');
 
                 if ($teamId == $homeId) {
@@ -319,7 +319,7 @@ switch ($action) {
         exit;
 }
 
-// Main page logic
+// Main page logic (dates in EAT, Nairobi, Kenya)
 try {
     $competitionsUrl = $baseUrl . 'competitions';
     $compResponse = fetchWithRetry($competitionsUrl, $apiKey);
@@ -338,11 +338,11 @@ try {
     $customEnd = $_GET['end'] ?? '';
 
     $dateOptions = [
-        'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))],
-        'today' => ['label' => 'Today', 'date' => date('Y-m-d')],
-        'tomorrow' => ['label' => 'Tomorrow', 'date' => date('Y-m-d', strtotime('+1 day'))],
-        'week' => ['label' => 'This Week', 'from' => date('Y-m-d', strtotime('monday this week')), 'to' => date('Y-m-d', strtotime('sunday this week'))],
-        'upcoming' => ['label' => 'Next 7 Days', 'from' => date('Y-m-d'), 'to' => date('Y-m-d', strtotime('+7 days'))],
+        'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))], // Nairobi time (UTC+3)
+        'today' => ['label' => 'Today', 'date' => date('Y-m-d')], // Nairobi time (UTC+3)
+        'tomorrow' => ['label' => 'Tomorrow', 'date' => date('Y-m-d', strtotime('+1 day'))], // Nairobi time (UTC+3)
+        'week' => ['label' => 'This Week', 'from' => date('Y-m-d', strtotime('monday this week')), 'to' => date('Y-m-d', strtotime('sunday this week'))], // Nairobi time
+        'upcoming' => ['label' => 'Next 7 Days', 'from' => date('Y-m-d'), 'to' => date('Y-m-d', strtotime('+7 days'))], // Nairobi time
         'custom' => ['label' => 'Custom Range']
     ];
 
@@ -350,7 +350,7 @@ try {
         ? "Custom: $customStart to $customEnd" 
         : ($dateOptions[$filter]['label'] ?? 'Select Date');
 
-    $fromDate = $toDate = date('Y-m-d');
+    $fromDate = $toDate = date('Y-m-d'); // Nairobi time (UTC+3)
     if (isset($dateOptions[$filter])) {
         if (isset($dateOptions[$filter]['date'])) {
             $fromDate = $toDate = $dateOptions[$filter]['date'];
@@ -683,7 +683,7 @@ try {
     <div class="container">
         <div class="header">
             <h1>Advanced Football Predictions</h1>
-            <p>Select Competition and Date Range (Times in EAT)</p>
+            <p>Select Competition and Date Range (Times in EAT - Nairobi, Kenya)</p>
         </div>
 
         <div class="controls">
@@ -729,7 +729,7 @@ try {
                         $awayTeamId = $match['awayTeam']['id'] ?? 0;
                         $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
                         $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
-                        $date = $match['utcDate'] ?? 'TBD' ? date('M d, Y H:i', strtotime($match['utcDate'] . ' UTC') + 3*3600) : 'TBD'; // Convert to EAT
+                        $date = $match['utcDate'] ?? 'TBD' ? date('M d, Y H:i', strtotime($match['utcDate'])) : 'TBD'; // API UTC converted to EAT (Nairobi, Kenya)
                         $homeCrest = $match['homeTeam']['crest'] ?? '';
                         $awayCrest = $match['awayTeam']['crest'] ?? '';
                         $status = $match['status'];
