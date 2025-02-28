@@ -490,7 +490,6 @@ window.onload = function () {
 };
 </script>';
 
-// Competition dropdown with view preference
 echo '<form id="searchForm" method="GET" action="">';
 $default_competition = 'PL';
 $default_date_filter = 'all';
@@ -552,7 +551,6 @@ function toggleCustomRange(value) {
     customRange.style.display = value === 'custom' ? 'block' : 'none';
 }
 
-// Automatic update on view preference change
 document.addEventListener('DOMContentLoaded', function() {
     const viewDropdown = document.getElementById('view');
     viewDropdown.addEventListener('change', function() {
@@ -579,6 +577,376 @@ if ($selected_competition && $fixtures_data) {
         echo "<p style='color: red; font-weight: bold;'>No matches found for the selected date range.</p>";
     } else {
         echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">';
+
+        // Define styles based on view preference
+        if ($view_preference == 'card') {
+            echo '<style>
+            .match-display { 
+                display: flex; 
+                flex-direction: column; 
+                width: 100%; 
+                margin: 0; 
+                padding: 0; 
+                gap: 20px; 
+            }
+            .card {
+                display: flex;
+                flex-direction: column;
+                width: 100%; 
+                max-width: 320px; 
+                margin: 0 auto; 
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                font-family: "Arial", sans-serif;
+                border: 1px solid #e0e0e0;
+                box-sizing: border-box;
+                gap: 15px;
+            }
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+            }
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 10px;
+            }
+            .card-header h3 {
+                font-size: 18px;
+                color: #333;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+            .card-header img {
+                width: 30px;
+                height: 30px;
+                object-fit: contain;
+            }
+            .card-content {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .card-content .row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .card-content .label {
+                font-weight: 600;
+                color: #222;
+                flex: 1;
+                min-width: 100px;
+            }
+            .card-content .value {
+                color: #555;
+                flex: 2;
+                text-align: right;
+            }
+            .card-content .prediction {
+                background: #f5f5f5;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-size: 13px;
+                color: #2c3e50;
+                text-align: center;
+            }
+            .card-content .status-finished { color: #28a745; }
+            .card-content .status-scheduled { color: #e67e22; }
+            .card-content .match-result span { font-size: 18px; }
+
+            @media (max-width: 768px) {
+                .match-display {
+                    padding: 0;
+                }
+                .card {
+                    width: 100%; 
+                    max-width: none; 
+                    margin: 0; 
+                    border-radius: 0; 
+                    padding: 15px;
+                }
+                .card-header h3 {
+                    font-size: 16px;
+                }
+                .card-header img {
+                    width: 25px;
+                    height: 25px;
+                }
+                .card-content .row {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 5px;
+                }
+                .card-content .label, .card-content .value {
+                    text-align: left;
+                    font-size: 13px;
+                }
+                .card-content .prediction {
+                    font-size: 12px;
+                }
+            }
+            </style>';
+        } else { // Table View
+            echo '<style>
+            .match-display { 
+                width: 100%; 
+                margin: 0; 
+                padding: 20px; 
+                box-sizing: border-box; 
+            }
+            .match-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-family: "Arial", sans-serif;
+            }
+            .match-table th, .match-table td {
+                border: 1px solid #ddd;
+                padding: 5px;
+                text-align: left;
+                font-size: 14px;
+            }
+            .match-table th {
+                background: #f5f5f5;
+                font-weight: bold;
+            }
+            .match-table td img {
+                width: 30px;
+                height: 30px;
+                vertical-align: middle;
+                margin-right: 5px;
+            }
+            .match-table .team-info {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            @media (max-width: 768px) {
+                .match-display {
+                    padding: 10px;
+                }
+                .match-table {
+                    display: block;
+                    overflow-x: auto; /* Enable horizontal scrolling on mobile */
+                    white-space: nowrap;
+                }
+                .match-table th, .match-table td {
+                    font-size: 12px;
+                    padding: 4px;
+                }
+                .match-table td img {
+                    width: 20px;
+                    height: 20px;
+                }
+            }
+            </style>';
+        }
+
+        echo '<div class="match-display">';
+        if ($view_preference == 'table') {
+            // Table View
+            echo '<table class="match-table">';
+            echo "<tr>
+                    <th>Date (EAT)</th>
+                    <th>Home Team</th>
+                    <th>Away Team</th>
+                    <th>Status</th>
+                    <th>Score</th>
+                    <th>Prediction</th>
+                    <th>Match Result</th>
+                    <th>Matchday</th>
+                  </tr>";
+
+            foreach ($filtered_matches as $match) {
+                $advantages = calculateHomeAwayAdvantage($fixtures_data);
+                $date_eat = convertToEAT($match['utcDate']);
+                $home_team = $match['homeTeam']['name'];
+                $away_team = $match['awayTeam']['name'];
+                $status = $match['status'];
+                $score = isset($match['score']['fullTime']) ? "{$match['score']['fullTime']['home']} - {$match['score']['fullTime']['away']}" : "N/A";
+                $venue = isset($match['matchday']) ? $match['matchday'] : "Unknown";
+                $last6_home = getLast6Matches($match['homeTeam']['name'], $fixtures_data['matches']);
+                $last6_away = getLast6Matches($match['awayTeam']['name'], $fixtures_data['matches']);
+                $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
+                $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
+                $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
+                $decision = $prediction['decision'];
+                $reason = $prediction['reason'];
+
+                $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
+                $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
+                $home_points = isset($standings[$home_team]['points']) ? $standings[$home_team]['points'] : 'N/A';
+                $home_goals_scored = isset($standings[$home_team]['goals_scored']) ? $standings[$home_team]['goals_scored'] : 'N/A';
+                $away_position = isset($standings[$away_team]['position']) ? $standings[$away_team]['position'] : 'N/A';
+                $away_goal_diff = isset($standings[$away_team]['goal_difference']) ? $standings[$away_team]['goal_difference'] : 'N/A';
+                $away_points = isset($standings[$away_team]['points']) ? $standings[$away_team]['points'] : 'N/A';
+                $away_goals_scored = isset($standings[$away_team]['goals_scored']) ? $standings[$away_team]['goals_scored'] : 'N/A';
+
+                $prediction = '';
+                $match_result = '';
+                $predicted_goals = '';
+                if (isset($team_metrics[$home_team]) && isset($team_metrics[$away_team])) {
+                    $home_metrics = $team_metrics[$home_team];
+                    $away_metrics = $team_metrics[$away_team];
+                    $prediction = predictMatch($home_metrics, $away_metrics, $advantages);
+                    $predicted_goals_data = predictGoals($home_metrics, $away_metrics, $advantages);
+                    $predicted_goals = "{$predicted_goals_data['home_goals']} - {$predicted_goals_data['away_goals']}";
+
+                    if ($status == 'FINISHED' && $score != 'N/A') {
+                        $score_home = explode(" - ", $score)[0];
+                        $score_away = explode(" - ", $score)[1];
+
+                        if (($prediction == "Win for Home" && $score_home > $score_away) || 
+                            ($prediction == "Win for Away" && $score_away > $score_home) || 
+                            ($prediction == "Draw" && $score_home == $score_away)) {
+                            $match_result = "<span style='color: green;'>✓</span>";
+                        } else {
+                            $match_result = "<span style='color: red;'>✕</span>";
+                        }
+                    }
+                }
+
+                echo "<tr>
+                    <td>$date_eat</td>
+                    <td>
+                        <div class='team-info'>
+                            <img src='$home_crest' alt='$home_team'/>
+                            <div>
+                                <span style='font-weight: bold; color: #2c3e50;'>$home_team</span>
+                                <span style='font-size: 12px; color: #7f8c8d; font-style: italic;'>($last6_home)</span>
+                                <div style='font-size: 10px; color: #555;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
+                                <div style='font-size: 10px; color: #777; font-style: italic;'>
+                                    <strong>$decision</strong> - $reason
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class='team-info'>
+                            <img src='$away_crest' alt='$away_team'/>
+                            <div>
+                                <span style='font-weight: bold; color: #2980b9;'>$away_team</span>
+                                <span style='font-size: 12px; color: #7f8c8d; font-style: italic;'>($last6_away)</span>
+                                <div style='font-size: 10px; color: #555;'>Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</div>
+                                <div style='font-size: 10px; color: #777; font-style: italic;'>
+                                    <strong>$decision</strong> - $reason
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>$status</td>
+                    <td>$score</td>
+                    <td>$prediction
+                        <div style='font-size: 12px; color: gray; font-style: italic;'>Predicted Goals: $predicted_goals</div>
+                    </td>
+                    <td>$match_result</td>
+                    <td>$venue</td>
+                </tr>";
+            }
+            echo "</table>";
+        } else {
+            // Card View
+            foreach ($filtered_matches as $match) {
+                $advantages = calculateHomeAwayAdvantage($fixtures_data);
+                $date_eat = convertToEAT($match['utcDate']);
+                $home_team = $match['homeTeam']['name'];
+                $away_team = $match['awayTeam']['name'];
+                $status = $match['status'];
+                $score = isset($match['score']['fullTime']) ? "{$match['score']['fullTime']['home']} - {$match['score']['fullTime']['away']}" : "N/A";
+                $venue = isset($match['matchday']) ? $match['matchday'] : "Unknown";
+                $last6_home = getLast6Matches($match['homeTeam']['name'], $fixtures_data['matches']);
+                $last6_away = getLast6Matches($match['awayTeam']['name'], $fixtures_data['matches']);
+                $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
+                $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
+                $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
+                $decision = $prediction['decision'];
+                $reason = $prediction['reason'];
+
+                $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
+                $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
+                $home_points = isset($standings[$home_team]['points']) ? $standings[$home_team]['points'] : 'N/A';
+                $home_goals_scored = isset($standings[$home_team]['goals_scored']) ? $standings[$home_team]['goals_scored'] : 'N/A';
+                $away_position = isset($standings[$away_team]['position']) ? $standings[$away_team]['position'] : 'N/A';
+                $away_goal_diff = isset($standings[$away_team]['goal_difference']) ? $standings[$away_team]['goal_difference'] : 'N/A';
+                $away_points = isset($standings[$away_team]['points']) ? $standings[$away_team]['points'] : 'N/A';
+                $away_goals_scored = isset($standings[$away_team]['goals_scored']) ? $standings[$away_team]['goals_scored'] : 'N/A';
+
+                $prediction = '';
+                $match_result = '';
+                $predicted_goals = '';
+                if (isset($team_metrics[$home_team]) && isset($team_metrics[$away_team])) {
+                    $home_metrics = $team_metrics[$home_team];
+                    $away_metrics = $team_metrics[$away_team];
+                    $prediction = predictMatch($home_metrics, $away_metrics, $advantages);
+                    $predicted_goals_data = predictGoals($home_metrics, $away_metrics, $advantages);
+                    $predicted_goals = "{$predicted_goals_data['home_goals']} - {$predicted_goals_data['away_goals']}";
+
+                    if ($status == 'FINISHED' && $score != 'N/A') {
+                        $score_home = explode(" - ", $score)[0];
+                        $score_away = explode(" - ", $score)[1];
+                        $match_result = ($prediction == "Win for Home" && $score_home > $score_away) || 
+                                        ($prediction == "Win for Away" && $score_away > $score_home) || 
+                                        ($prediction == "Draw" && $score_home == $score_away) ? 
+                                        "<span style='color: green;'>✓</span>" : "<span style='color: red;'>✕</span>";
+                    }
+                }
+
+                echo "<div class='card'>
+                    <div class='card-header'>
+                        <h3><img src='$home_crest' alt='$home_team' /> $home_team</h3>
+                        <h3><img src='$away_crest' alt='$away_team' /> $away_team</h3>
+                    </div>
+                    <div class='card-content'>
+                        <div class='row'>
+                            <span class='label'>Date:</span>
+                            <span class='value'>$date_eat</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Home Stats:</span>
+                            <span class='value'>Form: $last6_home | Pos: $home_position | GD: $home_goal_diff | Pts: $home_points | GS: $home_goals_scored</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Away Stats:</span>
+                            <span class='value'>Form: $last6_away | Pos: $away_position | GD: $away_goal_diff | Pts: $away_points | GS: $away_goals_scored</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Status:</span>
+                            <span class='value status-" . strtolower($status) . "'>$status</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Score:</span>
+                            <span class='value'>$score</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Prediction:</span>
+                            <span class='value prediction'>$prediction (Goals: $predicted_goals)</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Match Result:</span>
+                            <span class='value match-result'>$match_result</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Matchday:</span>
+                            <span class='value'>$venue</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Decision:</span>
+                            <span class='value'>$decision - <em>$reason</em></span>
+                        </div>
+                    </div>
+                </div>";
+            }
+        }
+        echo "</div>";
+
         echo '<div style="text-align: right; margin-bottom: 10px;">
                 <button id="shareButton" style="background: none; border: none; cursor: pointer; margin-right: 10px;">
                     <i class="fas fa-share-alt" style="font-size: 24px; color: #007bff;"></i>
@@ -713,325 +1081,10 @@ document.getElementById("downloadButton").addEventListener("click", function() {
     }, 5);
 });
 </script>';
-
-        if ($view_preference == 'table') {
-            // Table View
-            echo "<div class='match-display'><table border='1' cellpadding='5' cellspacing='0'>";
-            echo "<tr>
-                    <th>Date (EAT)</th>
-                    <th>Home Team</th>
-                    <th>Away Team</th>
-                    <th>Status</th>
-                    <th>Score</th>
-                    <th>Prediction</th>
-                    <th>Match Result</th>
-                    <th>Matchday</th>
-                  </tr>";
-
-            foreach ($filtered_matches as $match) {
-                $advantages = calculateHomeAwayAdvantage($fixtures_data);
-                $date_eat = convertToEAT($match['utcDate']);
-                $home_team = $match['homeTeam']['name'];
-                $away_team = $match['awayTeam']['name'];
-                $status = $match['status'];
-                $score = isset($match['score']['fullTime']) ? "{$match['score']['fullTime']['home']} - {$match['score']['fullTime']['away']}" : "N/A";
-                $venue = isset($match['matchday']) ? $match['matchday'] : "Unknown";
-                $last6_home = getLast6Matches($match['homeTeam']['name'], $fixtures_data['matches']);
-                $last6_away = getLast6Matches($match['awayTeam']['name'], $fixtures_data['matches']);
-                $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
-                $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
-                $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
-                $decision = $prediction['decision'];
-                $reason = $prediction['reason'];
-
-                $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
-                $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
-                $home_points = isset($standings[$home_team]['points']) ? $standings[$home_team]['points'] : 'N/A';
-                $home_goals_scored = isset($standings[$home_team]['goals_scored']) ? $standings[$home_team]['goals_scored'] : 'N/A';
-                $away_position = isset($standings[$away_team]['position']) ? $standings[$away_team]['position'] : 'N/A';
-                $away_goal_diff = isset($standings[$away_team]['goal_difference']) ? $standings[$away_team]['goal_difference'] : 'N/A';
-                $away_points = isset($standings[$away_team]['points']) ? $standings[$away_team]['points'] : 'N/A';
-                $away_goals_scored = isset($standings[$away_team]['goals_scored']) ? $standings[$away_team]['goals_scored'] : 'N/A';
-
-                $prediction = '';
-                $match_result = '';
-                $predicted_goals = '';
-                if (isset($team_metrics[$home_team]) && isset($team_metrics[$away_team])) {
-                    $home_metrics = $team_metrics[$home_team];
-                    $away_metrics = $team_metrics[$away_team];
-                    $prediction = predictMatch($home_metrics, $away_metrics, $advantages);
-                    $predicted_goals_data = predictGoals($home_metrics, $away_metrics, $advantages);
-                    $predicted_goals = "{$predicted_goals_data['home_goals']} - {$predicted_goals_data['away_goals']}";
-
-                    if ($status == 'FINISHED' && $score != 'N/A') {
-                        $score_home = explode(" - ", $score)[0];
-                        $score_away = explode(" - ", $score)[1];
-
-                        if (($prediction == "Win for Home" && $score_home > $score_away) || 
-                            ($prediction == "Win for Away" && $score_away > $score_home) || 
-                            ($prediction == "Draw" && $score_home == $score_away)) {
-                            $match_result = "<span style='color: green;'>✓</span>";
-                        } else {
-                            $match_result = "<span style='color: red;'>✕</span>";
-                        }
-                    }
-                }
-
-                echo "<tr>
-                    <td>$date_eat</td>
-                    <td>
-                        <div style='display: flex; align-items: center; gap: 8px;'>
-                            <img src='$home_crest' alt='$home_team' style='height: 30px; width: 30px;' />
-                            <a href='#' style='text-decoration: none; color: inherit;'>
-                                <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
-                                <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
-                                <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
-                                <div style='font-size: 5px; color: #777; font-style: italic; margin-top: 2px;'>
-                                    <strong>$decision</strong><br>
-                                    <strong>$reason</strong>
-                                </div>
-                            </a>
-                        </div>
-                    </td>
-                    <td>
-                        <div style='display: flex; align-items: center; gap: 8px;'>
-                            <img src='$away_crest' alt='$away_team' style='height: 30px; width: 30px;' />
-                            <a href='#' style='text-decoration: none; color: inherit;'>
-                                <span style='font-weight: bold; font-size: 14px; color: #2980b9;'>$away_team</span>
-                                <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_away)</span>
-                                <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $away_position | GD: $away_goal_diff | PTS: $away_points | GS: $away_goals_scored</div>
-                                <div style='font-size: 5px; color: #777; font-style: italic; margin-top: 2px;'>
-                                    <strong>$decision</strong><br>
-                                    <strong>$reason</strong>
-                                </div>
-                            </a>
-                        </div>
-                    </td>
-                    <td>$status</td>
-                    <td>$score</td>
-                    <td>$prediction
-                        <div style='font-size: 12px; color: gray; font-style: italic; margin-top: 5px;'>Predicted Goals: $predicted_goals</div>
-                    </td>
-                    <td>$match_result</td>
-                    <td>$venue</td>
-                </tr>";
-            }
-            echo "</table></div>";
-        } else {
-            // Professional Card View with Flexbox, Full Width on Mobile
-            echo '<style>
-            .match-display { 
-                display: flex; 
-                flex-direction: column; /* Stack cards vertically */
-                width: 100%; /* Full width of parent */
-                margin: 0; 
-                padding: 0; /* Remove padding to ensure cards touch edges */
-                gap: 20px; /* Space between cards */
-            }
-            .card {
-                display: flex;
-                flex-direction: column;
-                width: 100%; /* Default to full width for all screens */
-                max-width: 320px; /* Cap width for larger screens */
-                margin: 0 auto; /* Center on larger screens */
-                background: #fff;
-                border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                padding: 20px;
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                font-family: "Arial", sans-serif;
-                border: 1px solid #e0e0e0;
-                box-sizing: border-box; /* Include padding in width */
-                gap: 15px;
-            }
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
-            }
-            .card-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                border-bottom: 1px solid #eee;
-                padding-bottom: 10px;
-            }
-            .card-header h3 {
-                font-size: 18px;
-                color: #333;
-                margin: 0;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            .card-header img {
-                width: 30px;
-                height: 30px;
-                object-fit: contain;
-            }
-            .card-content {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
-            .card-content .row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .card-content .label {
-                font-weight: 600;
-                color: #222;
-                flex: 1;
-                min-width: 100px;
-            }
-            .card-content .value {
-                color: #555;
-                flex: 2;
-                text-align: right;
-            }
-            .card-content .prediction {
-                background: #f5f5f5;
-                padding: 5px 10px;
-                border-radius: 5px;
-                font-size: 13px;
-                color: #2c3e50;
-                text-align: center;
-            }
-            .card-content .status-finished { color: #28a745; }
-            .card-content .status-scheduled { color: #e67e22; }
-            .card-content .match-result span { font-size: 18px; }
-
-            /* Mobile Adjustments */
-            @media (max-width: 768px) {
-                .match-display {
-                    padding: 0; /* Ensure no padding affects card width */
-                }
-                .card {
-                    width: 100%; /* Full width on mobile */
-                    max-width: none; /* Remove max-width cap */
-                    margin: 0; /* No margins to ensure edge-to-edge */
-                    border-radius: 0; /* Optional: flat edges on mobile */
-                    padding: 15px;
-                }
-                .card-header h3 {
-                    font-size: 16px;
-                }
-                .card-header img {
-                    width: 25px;
-                    height: 25px;
-                }
-                .card-content .row {
-                    flex-direction: column; /* Stack vertically on mobile */
-                    align-items: flex-start;
-                    gap: 5px;
-                }
-                .card-content .label, .card-content .value {
-                    text-align: left;
-                    font-size: 13px;
-                }
-                .card-content .prediction {
-                    font-size: 12px;
-                }
-            }
-            </style>';
-            echo "<div class='match-display'>";
-            foreach ($filtered_matches as $match) {
-                $advantages = calculateHomeAwayAdvantage($fixtures_data);
-                $date_eat = convertToEAT($match['utcDate']);
-                $home_team = $match['homeTeam']['name'];
-                $away_team = $match['awayTeam']['name'];
-                $status = $match['status'];
-                $score = isset($match['score']['fullTime']) ? "{$match['score']['fullTime']['home']} - {$match['score']['fullTime']['away']}" : "N/A";
-                $venue = isset($match['matchday']) ? $match['matchday'] : "Unknown";
-                $last6_home = getLast6Matches($match['homeTeam']['name'], $fixtures_data['matches']);
-                $last6_away = getLast6Matches($match['awayTeam']['name'], $fixtures_data['matches']);
-                $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
-                $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
-                $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
-                $decision = $prediction['decision'];
-                $reason = $prediction['reason'];
-
-                $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
-                $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
-                $home_points = isset($standings[$home_team]['points']) ? $standings[$home_team]['points'] : 'N/A';
-                $home_goals_scored = isset($standings[$home_team]['goals_scored']) ? $standings[$home_team]['goals_scored'] : 'N/A';
-                $away_position = isset($standings[$away_team]['position']) ? $standings[$away_team]['position'] : 'N/A';
-                $away_goal_diff = isset($standings[$away_team]['goal_difference']) ? $standings[$away_team]['goal_difference'] : 'N/A';
-                $away_points = isset($standings[$away_team]['points']) ? $standings[$away_team]['points'] : 'N/A';
-                $away_goals_scored = isset($standings[$away_team]['goals_scored']) ? $standings[$away_team]['goals_scored'] : 'N/A';
-
-                $prediction = '';
-                $match_result = '';
-                $predicted_goals = '';
-                if (isset($team_metrics[$home_team]) && isset($team_metrics[$away_team])) {
-                    $home_metrics = $team_metrics[$home_team];
-                    $away_metrics = $team_metrics[$away_team];
-                    $prediction = predictMatch($home_metrics, $away_metrics, $advantages);
-                    $predicted_goals_data = predictGoals($home_metrics, $away_metrics, $advantages);
-                    $predicted_goals = "{$predicted_goals_data['home_goals']} - {$predicted_goals_data['away_goals']}";
-
-                    if ($status == 'FINISHED' && $score != 'N/A') {
-                        $score_home = explode(" - ", $score)[0];
-                        $score_away = explode(" - ", $score)[1];
-                        $match_result = ($prediction == "Win for Home" && $score_home > $score_away) || 
-                                        ($prediction == "Win for Away" && $score_away > $score_home) || 
-                                        ($prediction == "Draw" && $score_home == $score_away) ? 
-                                        "<span style='color: green;'>✓</span>" : "<span style='color: red;'>✕</span>";
-                    }
-                }
-
-                echo "<div class='card'>
-                    <div class='card-header'>
-                        <h3><img src='$home_crest' alt='$home_team' /> $home_team</h3>
-                        <h3><img src='$away_crest' alt='$away_team' /> $away_team</h3>
-                    </div>
-                    <div class='card-content'>
-                        <div class='row'>
-                            <span class='label'>Date:</span>
-                            <span class='value'>$date_eat</span>
-                        </div>
-                        <div class='row'>
-                            <span class='label'>Home Stats:</span>
-                            <span class='value'>Form: $last6_home | Pos: $home_position | GD: $home_goal_diff | Pts: $home_points | GS: $home_goals_scored</span>
-                        </div>
-                        <div class='row'>
-                            <span class='label'>Away Stats:</span>
-                            <span class='value'>Form: $last6_away | Pos: $away_position | GD: $away_goal_diff | Pts: $away_points | GS: $away_goals_scored</span>
-                        </div>
-                        <div class='row'>
-                            <span class='label'>Status:</span>
-                            <span class='value status-" . strtolower($status) . "'>$status</span>
-                        </div>
-                        <div class='row'>
-                            <span class='label'>Score:</span>
-                            <span class='value'>$score</span>
-                        </div>
-                        <div class='row'>
-                            <span class='label'>Prediction:</span>
-                            <span class='value prediction'>$prediction (Goals: $predicted_goals)</span>
-                        </div>
-                        <div class='row'>
-                            <span class='label'>Match Result:</span>
-                            <span class='value match-result'>$match_result</span>
-                        </div>
-                        <div class='row'>
-                            <span class='label'>Matchday:</span>
-                            <span class='value'>$venue</span>
-                        </div>
-                        <div class='row'>
-                            <span class='label'>Decision:</span>
-                            <span class='value'>$decision - <em>$reason</em></span>
-                        </div>
-                    </div>
-                </div>";
-            }
-            echo "</div>";
-        }
     }
 }
 ?>
 
-<!-- Add viewport meta tag for mobile compatibility -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script>
