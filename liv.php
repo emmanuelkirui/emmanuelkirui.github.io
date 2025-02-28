@@ -3,6 +3,13 @@
 $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
+// Add Navigation Bar
+echo "<nav style='background-color: #f8f9fa; padding: 10px; text-align: center;'>";
+echo "<a href='liv' style='margin: 0 15px; text-decoration: none; color: #007bff;'>Home</a>";
+echo "<a href='valmanu' style='margin: 0 15px; text-decoration: none; color: #007bff;'>More Predictions</a>";
+echo "</nav>";
+
+
 // Start session to store competitions and their data
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
