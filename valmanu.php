@@ -21,9 +21,9 @@ echo "<script>
         const menu = document.getElementById('navMenu');
         const currentDisplay = menu.style.display;
         if (currentDisplay === 'none') {
-            menu.style.display = 'inline-block';
-        } else {
             menu.style.display = 'none';
+        } else {
+            menu.style.display = 'inline-block';
         }
     }
     
