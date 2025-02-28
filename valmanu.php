@@ -17,7 +17,7 @@ $competitions = isset(json_decode($compResponse, true)['competitions']) ? json_d
 
 // Handle user selections with isset
 $selectedComp = isset($_GET['competition']) ? $_GET['competition'] : (isset($competitions[0]['code']) ? $competitions[0]['code'] : 'PL');
-$filter = isset($_GET['filter']) ? $_GET['filter'] : 'week'; // Default to week
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'upcoming'; // Default to upcoming matches
 $customStart = isset($_GET['start']) ? $_GET['start'] : '';
 $customEnd = isset($_GET['end']) ? $_GET['end'] : '';
 $showPast = isset($_GET['showPast']) ? true : false;
@@ -28,6 +28,7 @@ $dateOptions = [
     'today' => ['label' => 'Today', 'date' => date('Y-m-d')],
     'tomorrow' => ['label' => 'Tomorrow', 'date' => date('Y-m-d', strtotime('+1 day'))],
     'week' => ['label' => 'This Week', 'from' => date('Y-m-d', strtotime('monday this week')), 'to' => date('Y-m-d', strtotime('sunday this week'))],
+    'upcoming' => ['label' => 'Next 7 Days', 'from' => date('Y-m-d'), 'to' => date('Y-m-d', strtotime('+7 days'))],
     'custom' => ['label' => 'Custom Range']
 ];
 
@@ -52,10 +53,10 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
 $matchResponse = curl_exec($ch);
 curl_close($ch);
-$upcomingMatches = isset(json_decode($matchResponse, true)['matches']) ? json_decode($matchResponse, true)['matches'] : [];
+$allMatches = isset(json_decode($matchResponse, true)['matches']) ? json_decode($matchResponse, true)['matches'] : [];
 
 // Debug: Show number of matches fetched
-echo "Total matches fetched: " . count($upcomingMatches) . "<br>";
+echo "Total matches fetched: " . count($allMatches) . "<br>";
 
 // Team stats functions
 $teamStats = &$_SESSION['teamStats'];
@@ -146,7 +147,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
         $confidence = sprintf("%.1f%%", min(70, $confidence));
     }
 
-    // Check prediction accuracy for finished matches
     if ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null) {
         $actualResult = ($homeGoals > $awayGoals) ? "$homeTeam to win" : (($homeGoals < $awayGoals) ? "$awayTeam to win" : "Draw");
         $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
@@ -418,7 +418,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
 
             <div class="filter-container">
                 <button class="filter-dropdown-btn">
-                    <?php echo isset($dateOptions[$filter]['label']) ? $dateOptions[$filter]['label'] : 'Select Date'; ?>
+                    <?php 
+                    // Display the label of the currently selected filter
+                    echo isset($dateOptions[$filter]['label']) ? $dateOptions[$filter]['label'] : 'Select Date'; 
+                    ?>
                 </button>
                 <div class="filter-dropdown">
                     <?php
@@ -447,8 +450,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
 
         <div class="match-grid">
             <?php
-            if (!empty($upcomingMatches)) {
-                foreach ($upcomingMatches as $match) {
+            if (!empty($allMatches)) {
+                foreach ($allMatches as $match) {
                     if (isset($match['status'])) {
                         $homeTeam = isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'TBD';
                         $awayTeam = isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'TBD';
@@ -524,7 +527,15 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
         }
 
         function updateUrl(comp, filter, showPast) {
-            window.location.href = `?competition=${comp}&filter=${filter}&showPast=${showPast}`;
+            let url = `?competition=${comp}&filter=${filter}&showPast=${showPast}`;
+            if (filter === 'custom') {
+                const start = document.querySelector('input[name="start"]').value;
+                const end = document.querySelector('input[name="end"]').value;
+                if (start && end) {
+                    url += `&start=${start}&end=${end}`;
+                }
+            }
+            window.location.href = url;
         }
 
         function selectFilter(filter) {
@@ -540,7 +551,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             const dropdown = document.querySelector('.filter-dropdown');
             dropdown.classList.toggle('active');
             
-            if ('<?php echo $filter; ?>' !== 'custom') {
+            // Show custom range form if 'custom' is selected
+            if ('<?php echo $filter; ?>' === 'custom') {
+                document.querySelector('.custom-date-range').classList.add('active');
+            } else {
                 document.querySelector('.custom-date-range').classList.remove('active');
             }
         });
@@ -563,9 +577,20 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                     el.classList.toggle('dark', theme === 'dark');
                 });
             }
-            <?php if ($filter === 'custom'): ?>
+
+            // Ensure the correct filter is highlighted and custom range is shown if applicable
+            const currentFilter = '<?php echo $filter; ?>';
+            document.querySelectorAll('.filter-option').forEach(option => {
+                if (option.getAttribute('data-filter') === currentFilter) {
+                    option.classList.add('selected');
+                } else {
+                    option.classList.remove('selected');
+                }
+            });
+
+            if (currentFilter === 'custom') {
                 document.querySelector('.custom-date-range').classList.add('active');
-            <?php endif; ?>
+            }
         }
     </script>
 </body>
