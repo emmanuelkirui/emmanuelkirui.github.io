@@ -1,9 +1,8 @@
 <?php
-session_start(); // Start session for caching
+session_start();
 if (!isset($_SESSION['teamStats'])) $_SESSION['teamStats'] = [];
 
-// API configuration
-$apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Replace with your football-data.org API key
+$apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
 
 // Fetch available competitions
@@ -14,35 +13,38 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
 $compResponse = curl_exec($ch);
 curl_close($ch);
-$competitions = json_decode($compResponse, true)['competitions'] ?? [];
+$competitions = isset(json_decode($compResponse, true)['competitions']) ? json_decode($compResponse, true)['competitions'] : [];
 
-// Handle user selections
-$selectedComp = $_GET['competition'] ?? ($competitions[0]['code'] ?? 'PL');
-$filter = $_GET['filter'] ?? 'today';
-$customStart = $_GET['start'] ?? '';
-$customEnd = $_GET['end'] ?? '';
+// Handle user selections with isset
+$selectedComp = isset($_GET['competition']) ? $_GET['competition'] : (isset($competitions[0]['code']) ? $competitions[0]['code'] : 'PL');
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'today';
+$customStart = isset($_GET['start']) ? $_GET['start'] : '';
+$customEnd = isset($_GET['end']) ? $_GET['end'] : '';
 $showPast = isset($_GET['showPast']) ? true : false;
 
-// Date handling for upcoming matches
-$today = date('Y-m-d');
-$yesterday = date('Y-m-d', strtotime('-1 day'));
-$tomorrow = date('Y-m-d', strtotime('+1 day'));
-$fromDate = $toDate = $today;
+// Advanced date options
+$dateOptions = [
+    'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))],
+    'today' => ['label' => 'Today', 'date' => date('Y-m-d')],
+    'tomorrow' => ['label' => 'Tomorrow', 'date' => date('Y-m-d', strtotime('+1 day'))],
+    'week' => ['label' => 'This Week', 'from' => date('Y-m-d', strtotime('monday this week')), 'to' => date('Y-m-d', strtotime('sunday this week'))],
+    'custom' => ['label' => 'Custom Range']
+];
 
-switch ($filter) {
-    case 'yesterday':
-        $fromDate = $toDate = $yesterday;
-        break;
-    case 'tomorrow':
-        $fromDate = $toDate = $tomorrow;
-        break;
-    case 'custom':
-        $fromDate = $customStart ?: $today;
-        $toDate = $customEnd ?: $today;
-        break;
+$fromDate = $toDate = date('Y-m-d');
+if (isset($dateOptions[$filter])) {
+    if (isset($dateOptions[$filter]['date'])) {
+        $fromDate = $toDate = $dateOptions[$filter]['date'];
+    } elseif (isset($dateOptions[$filter]['from']) && isset($dateOptions[$filter]['to'])) {
+        $fromDate = $dateOptions[$filter]['from'];
+        $toDate = $dateOptions[$filter]['to'];
+    } elseif ($filter === 'custom' && $customStart && $customEnd) {
+        $fromDate = $customStart;
+        $toDate = $customEnd;
+    }
 }
 
-// Fetch upcoming matches for selected competition
+// Fetch upcoming matches
 $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $matchesUrl);
@@ -50,10 +52,11 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
 $matchResponse = curl_exec($ch);
 curl_close($ch);
-$upcomingMatches = json_decode($matchResponse, true)['matches'] ?? [];
+$upcomingMatches = isset(json_decode($matchResponse, true)['matches']) ? json_decode($matchResponse, true)['matches'] : [];
 
-// Team stats caching and fetching
+// Team stats functions
 $teamStats = &$_SESSION['teamStats'];
+
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     $pastDate = date('Y-m-d', strtotime('-30 days'));
     $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=" . date('Y-m-d') . "&limit=5&status=FINISHED";
@@ -63,7 +66,7 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
     $response = curl_exec($ch);
     curl_close($ch);
-    return json_decode($response, true)['matches'] ?? [];
+    return isset(json_decode($response, true)['matches']) ? json_decode($response, true)['matches'] : [];
 }
 
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
@@ -72,12 +75,12 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
         $stats = ['wins' => 0, 'draws' => 0, 'goalsScored' => 0, 'goalsConceded' => 0, 'games' => 0, 'results' => []];
         
         foreach ($results as $match) {
-            $homeId = $match['homeTeam']['id'];
-            $awayId = $match['awayTeam']['id'];
-            $homeGoals = $match['score']['fullTime']['home'] ?? 0;
-            $awayGoals = $match['score']['fullTime']['away'] ?? 0;
+            $homeId = isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0;
+            $awayId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
+            $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : 0;
+            $awayGoals = isset($match['score']['fullTime']['away']) ? $match['score']['fullTime']['away'] : 0;
             $date = date('M d', strtotime($match['utcDate']));
-            $resultStr = "{$match['homeTeam']['name']} $homeGoals - $awayGoals {$match['awayTeam']['name']}";
+            $resultStr = (isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'Unknown') . " $homeGoals - $awayGoals " . (isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'Unknown');
 
             if ($teamId == $homeId) {
                 $stats['goalsScored'] += $homeGoals;
@@ -99,12 +102,11 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
     return $teamStats[$teamId];
 }
 
-// Advanced prediction logic with draws
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
-    $homeTeamId = $match['homeTeam']['id'] ?? 0;
-    $awayTeamId = $match['awayTeam']['id'] ?? 0;
-    $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
-    $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
+    $homeTeamId = isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0;
+    $awayTeamId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
+    $homeTeam = isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'TBD';
+    $awayTeam = isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'TBD';
 
     if (!$homeTeamId || !$awayTeamId) return ["N/A", "0%"];
 
@@ -118,7 +120,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
     $homeGoalAvg = $homeStats['games'] ? $homeStats['goalsScored'] / $homeStats['games'] : 0;
     $awayGoalAvg = $awayStats['games'] ? $awayStats['goalsScored'] / $awayStats['games'] : 0;
 
-    $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1; // Home advantage
+    $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1;
     $awayStrength = $awayWinRate * 50 + $awayDrawRate * 20 + $awayGoalAvg * 20;
 
     $diff = $homeStrength - $awayStrength;
@@ -139,7 +141,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Football Predictions</title>
+    <title>Advanced Football Predictions</title>
     <style>
         :root {
             --primary-color: #2ecc71;
@@ -186,7 +188,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             flex-wrap: wrap;
         }
 
-        .theme-toggle, .filter-btn, select, .toggle-btn {
+        .theme-toggle, select, .toggle-btn {
             padding: 10px 20px;
             margin: 5px;
             background-color: var(--primary-color);
@@ -197,19 +199,95 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             transition: background-color 0.3s ease;
         }
 
-        .theme-toggle:hover, .filter-btn:hover, select:hover, .toggle-btn:hover {
+        .theme-toggle:hover, select:hover, .toggle-btn:hover {
             background-color: var(--secondary-color);
         }
 
-        .custom-date {
-            margin: 10px 0;
+        .filter-container {
+            position: relative;
+            display: inline-block;
+            margin: 5px;
         }
 
-        .custom-date input {
+        .filter-dropdown-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            min-width: 120px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-dropdown-btn::after {
+            content: '▼';
+            margin-left: 10px;
+            font-size: 0.8em;
+        }
+
+        .filter-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            min-width: 200px;
+            z-index: 10;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .filter-dropdown.active {
+            display: block;
+        }
+
+        .filter-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .filter-option:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .filter-option.selected {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .custom-date-range {
+            padding: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .custom-date-range.active {
+            display: block;
+        }
+
+        .custom-date-range input[type="date"] {
+            width: 100%;
+            margin: 5px 0;
             padding: 5px;
-            margin: 0 5px;
             border-radius: 5px;
             border: 1px solid var(--text-color);
+        }
+
+        .custom-date-range button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         .match-grid {
@@ -297,38 +375,47 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
     <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
     <div class="container">
         <div class="header">
-            <h1>Dynamic Football Predictions</h1>
+            <h1>Advanced Football Predictions</h1>
             <p>Select Competition and Date Range</p>
         </div>
 
         <div class="controls">
-            <select onchange="window.location.href='?competition='+this.value+'&filter=<?php echo $filter; ?>&showPast=<?php echo $showPast ? 1 : 0; ?>'">
+            <select onchange="updateUrl(this.value, '<?php echo $filter; ?>', <?php echo $showPast ? 1 : 0; ?>)">
                 <?php
                 foreach ($competitions as $comp) {
-                    $code = $comp['code'];
-                    $name = $comp['name'];
+                    $code = isset($comp['code']) ? $comp['code'] : '';
+                    $name = isset($comp['name']) ? $comp['name'] : 'Unknown';
                     $selected = $code === $selectedComp ? 'selected' : '';
                     echo "<option value='$code' $selected>$name</option>";
                 }
                 ?>
             </select>
 
-            <div>
-                <button class="filter-btn" onclick="window.location.href='?competition=<?php echo $selectedComp; ?>&filter=yesterday&showPast=<?php echo $showPast ? 1 : 0; ?>'">Yesterday</button>
-                <button class="filter-btn" onclick="window.location.href='?competition=<?php echo $selectedComp; ?>&filter=today&showPast=<?php echo $showPast ? 1 : 0; ?>'">Today</button>
-                <button class="filter-btn" onclick="window.location.href='?competition=<?php echo $selectedComp; ?>&filter=tomorrow&showPast=<?php echo $showPast ? 1 : 0; ?>'">Tomorrow</button>
+            <div class="filter-container">
+                <button class="filter-dropdown-btn">
+                    <?php echo isset($dateOptions[$filter]['label']) ? $dateOptions[$filter]['label'] : 'Select Date'; ?>
+                </button>
+                <div class="filter-dropdown">
+                    <?php
+                    foreach ($dateOptions as $key => $option) {
+                        $selectedClass = $filter === $key ? 'selected' : '';
+                        echo "<div class='filter-option $selectedClass' data-filter='$key' onclick='selectFilter(\"$key\")'>";
+                        echo isset($option['label']) ? $option['label'] : '';
+                        echo "</div>";
+                    }
+                    ?>
+                    <form class="custom-date-range" method="GET">
+                        <input type="date" name="start" value="<?php echo $customStart; ?>">
+                        <input type="date" name="end" value="<?php echo $customEnd; ?>">
+                        <input type="hidden" name="filter" value="custom">
+                        <input type="hidden" name="competition" value="<?php echo $selectedComp; ?>">
+                        <input type="hidden" name="showPast" value="<?php echo $showPast ? 1 : 0; ?>">
+                        <button type="submit">Apply</button>
+                    </form>
+                </div>
             </div>
 
-            <form class="custom-date" method="GET">
-                <input type="date" name="start" value="<?php echo $customStart; ?>">
-                <input type="date" name="end" value="<?php echo $customEnd; ?>">
-                <input type="hidden" name="filter" value="custom">
-                <input type="hidden" name="competition" value="<?php echo $selectedComp; ?>">
-                <input type="hidden" name="showPast" value="<?php echo $showPast ? 1 : 0; ?>">
-                <button type="submit" class="filter-btn">Custom</button>
-            </form>
-
-            <button class="toggle-btn" onclick="window.location.href='?competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>&showPast=<?php echo $showPast ? 0 : 1; ?>'">
+            <button class="toggle-btn" onclick="updateUrl('<?php echo $selectedComp; ?>', '<?php echo $filter; ?>', <?php echo $showPast ? 0 : 1; ?>)">
                 <?php echo $showPast ? 'Hide' : 'Show'; ?> Past Results
             </button>
         </div>
@@ -337,15 +424,15 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             <?php
             if (!empty($upcomingMatches)) {
                 foreach ($upcomingMatches as $match) {
-                    if ($match['status'] !== 'FINISHED') {
-                        $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
-                        $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
-                        $date = date('M d, Y H:i', strtotime($match['utcDate']));
-                        $homeCrest = $match['homeTeam']['crest'] ?? '';
-                        $awayCrest = $match['awayTeam']['crest'] ?? '';
+                    if (isset($match['status']) && $match['status'] !== 'FINISHED') {
+                        $homeTeam = isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'TBD';
+                        $awayTeam = isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'TBD';
+                        $date = isset($match['utcDate']) ? date('M d, Y H:i', strtotime($match['utcDate'])) : 'TBD';
+                        $homeCrest = isset($match['homeTeam']['crest']) ? $match['homeTeam']['crest'] : '';
+                        $awayCrest = isset($match['awayTeam']['crest']) ? $match['awayTeam']['crest'] : '';
                         [$prediction, $confidence] = predictMatch($match, $apiKey, $baseUrl, $teamStats);
-                        $homeStats = calculateTeamStrength($match['homeTeam']['id'] ?? 0, $apiKey, $baseUrl, $teamStats);
-                        $awayStats = calculateTeamStrength($match['awayTeam']['id'] ?? 0, $apiKey, $baseUrl, $teamStats);
+                        $homeStats = calculateTeamStrength(isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0, $apiKey, $baseUrl, $teamStats);
+                        $awayStats = calculateTeamStrength(isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0, $apiKey, $baseUrl, $teamStats);
 
                         echo "
                         <div class='match-card'>
@@ -408,6 +495,35 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             });
         }
 
+        function updateUrl(comp, filter, showPast) {
+            window.location.href = `?competition=${comp}&filter=${filter}&showPast=${showPast}`;
+        }
+
+        function selectFilter(filter) {
+            if (filter !== 'custom') {
+                updateUrl('<?php echo $selectedComp; ?>', filter, <?php echo $showPast ? 1 : 0; ?>);
+            } else {
+                document.querySelector('.custom-date-range').classList.add('active');
+            }
+        }
+
+        document.querySelector('.filter-dropdown-btn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.querySelector('.filter-dropdown');
+            dropdown.classList.toggle('active');
+            
+            if ('<?php echo $filter; ?>' !== 'custom') {
+                document.querySelector('.custom-date-range').classList.remove('active');
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const container = document.querySelector('.filter-container');
+            if (!container.contains(e.target)) {
+                document.querySelector('.filter-dropdown').classList.remove('active');
+            }
+        });
+
         window.onload = function() {
             const theme = document.cookie.split('; ')
                 .find(row => row.startsWith('theme='))
@@ -419,6 +535,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                     el.classList.toggle('dark', theme === 'dark');
                 });
             }
+            <?php if ($filter === 'custom'): ?>
+                document.querySelector('.custom-date-range').classList.add('active');
+            <?php endif; ?>
         }
     </script>
 </body>
