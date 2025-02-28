@@ -694,16 +694,17 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
                                     <div class='form-display' id='form-home-$index'>";
-                        $homeForm = substr($homeStats['form'], -6); // Take last 6 results (most recent)
-                        $homeForm = str_pad($homeForm, 6, '-', STR_PAD_LEFT); // Pad left with '-' if less than 6
+                        $homeForm = substr($homeStats['form'], -6); // Take last 6 results
+                        $homeForm = str_pad($homeForm, 6, '-', STR_PAD_LEFT); // Pad left with '-'
+                        $homeForm = strrev($homeForm); // Reverse the form string (e.g., WWWLLD -> DLLLWW)
                         for ($i = 0; $i < 6; $i++) {
                             $class = '';
                             if ($homeForm[$i] === 'W') $class = 'win';
                             elseif ($homeForm[$i] === 'D') $class = 'draw';
                             elseif ($homeForm[$i] === 'L') $class = 'loss';
                             else $class = 'empty';
-                            // Highlight the rightmost non-'empty' result (latest match)
-                            if ($i === (strlen(trim($homeStats['form'], '-')) + (6 - strlen($homeForm))) - 1 && $homeForm[$i] !== '-') {
+                            // Highlight the rightmost non-'empty' result (latest match) in reversed order
+                            if ($i === 5 && $homeForm[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) {
                                 $class .= ' latest';
                             }
                             echo "<span class='$class'>" . $homeForm[$i] . "</span>";
@@ -715,16 +716,17 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
                                     <div class='form-display' id='form-away-$index'>";
-                        $awayForm = substr($awayStats['form'], -6); // Take last 6 results (most recent)
-                        $awayForm = str_pad($awayForm, 6, '-', STR_PAD_LEFT); // Pad left with '-' if less than 6
+                        $awayForm = substr($awayStats['form'], -6); // Take last 6 results
+                        $awayForm = str_pad($awayForm, 6, '-', STR_PAD_LEFT); // Pad left with '-'
+                        $awayForm = strrev($awayForm); // Reverse the form string (e.g., WWWLLD -> DLLLWW)
                         for ($i = 0; $i < 6; $i++) {
                             $class = '';
                             if ($awayForm[$i] === 'W') $class = 'win';
                             elseif ($awayForm[$i] === 'D') $class = 'draw';
                             elseif ($awayForm[$i] === 'L') $class = 'loss';
                             else $class = 'empty';
-                            // Highlight the rightmost non-'empty' result (latest match)
-                            if ($i === (strlen(trim($awayStats['form'], '-')) + (6 - strlen($awayForm))) - 1 && $awayForm[$i] !== '-') {
+                            // Highlight the rightmost non-'empty' result (latest match) in reversed order
+                            if ($i === 5 && $awayForm[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) {
                                 $class .= ' latest';
                             }
                             echo "<span class='$class'>" . $awayForm[$i] . "</span>";
@@ -846,14 +848,15 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
 
                     let formHtml = '';
                     const form = data.form.slice(-6).padStart(6, '-'); // Last 6, pad left with '-'
+                    const reversedForm = form.split('').reverse().join(''); // Reverse for display
                     for (let i = 0; i < 6; i++) {
                         let className = '';
-                        if (form[i] === 'W') className = 'win';
-                        else if (form[i] === 'D') className = 'draw';
-                        else if (form[i] === 'L') className = 'loss';
+                        if (reversedForm[i] === 'W') className = 'win';
+                        else if (reversedForm[i] === 'D') className = 'draw';
+                        else if (reversedForm[i] === 'L') className = 'loss';
                         else className = 'empty';
-                        if (i === (form.trim('-').length + (6 - form.length)) - 1 && form[i] !== '-') className += ' latest';
-                        formHtml += `<span class="${className}">${form[i]}</span>`;
+                        if (i === 5 && reversedForm[i] !== '-' && form.trim('-').length > 0) className += ' latest';
+                        formHtml += `<span class="${className}">${reversedForm[i]}</span>`;
                     }
                     formElement.innerHTML = formHtml;
 
