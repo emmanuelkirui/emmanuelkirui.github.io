@@ -8,26 +8,26 @@ $teamStats = &$_SESSION['teamStats'];
 
 echo "<nav class='navbar' style='width: 100%; position: relative;'>";
 echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
-echo "<div class='nav-menu' id='navMenu' style='display: inline-block;'>";
+echo "<div class='nav-menu' id='navMenu' style='display: none;'>"; // Changed from inline-block to none
 echo "<a href='#' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
-echo "<a href='valmanu.php' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
+echo "<a href='valmanu' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
 echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
 echo "</div>";
 echo "</nav>";
 
-// JavaScript with inline style toggling
+// JavaScript remains mostly the same
 echo "<script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
         const currentDisplay = menu.style.display;
         if (currentDisplay === 'none') {
-            menu.style.display = 'none';
-        } else {
             menu.style.display = 'inline-block';
+        } else {
+            menu.style.display = 'none';
         }
     }
     
-    // Ensure menu is visible initially on larger screens
+    // Optional: Show menu on larger screens
     window.addEventListener('resize', function() {
         const menu = document.getElementById('navMenu');
         if (window.innerWidth > 768) {
