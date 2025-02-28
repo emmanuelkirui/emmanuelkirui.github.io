@@ -557,8 +557,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const viewDropdown = document.getElementById('view');
     viewDropdown.addEventListener('change', function() {
         const form = document.getElementById('searchForm');
-        showStatusLight(); // Show loading indicator
-        form.submit(); // Submit form to reflect view change
+        showStatusLight();
+        form.submit();
     });
 
     const dateFilter = document.getElementById('date_filter').value;
@@ -818,9 +818,15 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             }
             echo "</table></div>";
         } else {
-            // Professional Card View
+            // Professional Card View with Flexbox
             echo '<style>
-            .match-display { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; padding: 20px; }
+            .match-display { 
+                display: flex; 
+                flex-wrap: wrap; 
+                gap: 20px; 
+                justify-content: center; 
+                padding: 20px; 
+            }
             .card {
                 width: 320px;
                 background: #fff;
@@ -830,6 +836,9 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                 transition: transform 0.3s ease, box-shadow 0.3s ease;
                 font-family: "Arial", sans-serif;
                 border: 1px solid #e0e0e0;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
             }
             .card:hover {
                 transform: translateY(-5px);
@@ -837,11 +846,10 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             }
             .card-header {
                 display: flex;
-                align-items: center;
                 justify-content: space-between;
+                align-items: center;
                 border-bottom: 1px solid #eee;
                 padding-bottom: 10px;
-                margin-bottom: 15px;
             }
             .card-header h3 {
                 font-size: 18px;
@@ -856,15 +864,26 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                 height: 30px;
                 object-fit: contain;
             }
-            .card-content p {
-                margin: 8px 0;
-                font-size: 14px;
-                color: #555;
-                line-height: 1.5;
+            .card-content {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
             }
-            .card-content strong {
-                color: #222;
+            .card-content .row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .card-content .label {
                 font-weight: 600;
+                color: #222;
+                flex: 1;
+                min-width: 100px;
+            }
+            .card-content .value {
+                color: #555;
+                flex: 2;
+                text-align: right;
             }
             .card-content .prediction {
                 background: #f5f5f5;
@@ -872,6 +891,7 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                 border-radius: 5px;
                 font-size: 13px;
                 color: #2c3e50;
+                text-align: center;
             }
             .card-content .status-finished { color: #28a745; }
             .card-content .status-scheduled { color: #e67e22; }
@@ -929,15 +949,42 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                         <h3><img src='$away_crest' alt='$away_team' /> $away_team</h3>
                     </div>
                     <div class='card-content'>
-                        <p><strong>Date:</strong> $date_eat</p>
-                        <p><strong>Home Stats:</strong> Form: $last6_home | Pos: $home_position | GD: $home_goal_diff | Pts: $home_points | GS: $home_goals_scored</p>
-                        <p><strong>Away Stats:</strong> Form: $last6_away | Pos: $away_position | GD: $away_goal_diff | Pts: $away_points | GS: $away_goals_scored</p>
-                        <p><strong>Status:</strong> <span class='status-" . strtolower($status) . "'>$status</span></p>
-                        <p><strong>Score:</strong> $score</p>
-                        <p><strong>Prediction:</strong> <span class='prediction'>$prediction (Goals: $predicted_goals)</span></p>
-                        <p><strong>Match Result:</strong> <span class='match-result'>$match_result</span></p>
-                        <p><strong>Matchday:</strong> $venue</p>
-                        <p><strong>Decision:</strong> $decision - <em>$reason</em></p>
+                        <div class='row'>
+                            <span class='label'>Date:</span>
+                            <span class='value'>$date_eat</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Home Stats:</span>
+                            <span class='value'>Form: $last6_home | Pos: $home_position | GD: $home_goal_diff | Pts: $home_points | GS: $home_goals_scored</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Away Stats:</span>
+                            <span class='value'>Form: $last6_away | Pos: $away_position | GD: $away_goal_diff | Pts: $away_points | GS: $away_goals_scored</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Status:</span>
+                            <span class='value status-" . strtolower($status) . "'>$status</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Score:</span>
+                            <span class='value'>$score</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Prediction:</span>
+                            <span class='value prediction'>$prediction (Goals: $predicted_goals)</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Match Result:</span>
+                            <span class='value match-result'>$match_result</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Matchday:</span>
+                            <span class='value'>$venue</span>
+                        </div>
+                        <div class='row'>
+                            <span class='label'>Decision:</span>
+                            <span class='value'>$decision - <em>$reason</em></span>
+                        </div>
                     </div>
                 </div>";
             }
