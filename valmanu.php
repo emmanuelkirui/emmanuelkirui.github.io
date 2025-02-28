@@ -18,8 +18,8 @@ echo "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Football Predictio
 echo "<nav class='navbar' style='width: 100%; position: relative;'>";
 echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
 echo "<div class='nav-menu' id='navMenu' style='display: none;'>";
-echo "<a href='#' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
-echo "<a href='valmanu' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
+echo "<a href='valmanu' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
+echo "<a href='liv' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
 echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
 echo "</div></nav>";
 
