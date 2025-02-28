@@ -4,11 +4,35 @@ $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
 // Add Navigation Bar
-echo "<nav style='background-color: #f8f9fa; padding: 10px; text-align: center;'>";
-echo "<a href='liv' style='margin: 0 15px; text-decoration: none; color: #007bff;'>Home</a>";
-echo "<a href='valmanu' style='margin: 0 15px; text-decoration: none; color: #007bff;'>More Predictions</a>";
+echo "<nav class='navbar' style='width: 100%; position: relative;'>";
+echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
+echo "<div class='nav-menu' id='navMenu' style='display: inline-block;'>";
+echo "<a href='#' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
+echo "<a href='liv' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
+echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
+echo "</div>";
 echo "</nav>";
 
+// JavaScript with inline style toggling
+echo "<script>
+    function toggleMenu() {
+        const menu = document.getElementById('navMenu');
+        const currentDisplay = menu.style.display;
+        if (currentDisplay === 'none') {
+            menu.style.display = 'none';
+        } else {
+            menu.style.display = 'inline-block';
+        }
+    }
+    
+    // Ensure menu is visible initially on larger screens
+    window.addEventListener('resize', function() {
+        const menu = document.getElementById('navMenu');
+        if (window.innerWidth > 768) {
+            menu.style.display = 'inline-block';
+        }
+    });
+</script>";
 
 // Start session to store competitions and their data
 if (session_status() === PHP_SESSION_NONE) {
