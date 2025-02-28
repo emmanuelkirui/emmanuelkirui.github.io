@@ -818,7 +818,7 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             }
             echo "</table></div>";
         } else {
-            // Professional Card View with Flexbox
+            // Professional Card View with Flexbox, Optimized for Mobile
             echo '<style>
             .match-display { 
                 display: flex; 
@@ -896,6 +896,36 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             .card-content .status-finished { color: #28a745; }
             .card-content .status-scheduled { color: #e67e22; }
             .card-content .match-result span { font-size: 18px; }
+
+            /* Mobile Adjustments */
+            @media (max-width: 768px) {
+                .match-display {
+                    padding: 10px;
+                }
+                .card {
+                    width: 100%; /* Full width on mobile */
+                    padding: 15px;
+                }
+                .card-header h3 {
+                    font-size: 16px;
+                }
+                .card-header img {
+                    width: 25px;
+                    height: 25px;
+                }
+                .card-content .row {
+                    flex-direction: column; /* Stack label and value vertically on small screens */
+                    align-items: flex-start;
+                    gap: 5px;
+                }
+                .card-content .label, .card-content .value {
+                    text-align: left;
+                    font-size: 13px;
+                }
+                .card-content .prediction {
+                    font-size: 12px;
+                }
+            }
             </style>';
             echo "<div class='match-display'>";
             foreach ($filtered_matches as $match) {
