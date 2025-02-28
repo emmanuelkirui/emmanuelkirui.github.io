@@ -20,7 +20,6 @@ $selectedComp = isset($_GET['competition']) ? $_GET['competition'] : (isset($com
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'upcoming';
 $customStart = isset($_GET['start']) ? $_GET['start'] : '';
 $customEnd = isset($_GET['end']) ? $_GET['end'] : '';
-$showPast = isset($_GET['showPast']) && $_GET['showPast'] == 1 ? true : false;
 
 // Advanced date options
 $dateOptions = [
@@ -210,7 +209,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             flex-wrap: wrap;
         }
 
-        .theme-toggle, select, .toggle-btn {
+        .theme-toggle, select {
             padding: 10px 20px;
             margin: 5px;
             background-color: var(--primary-color);
@@ -221,7 +220,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             transition: background-color 0.3s ease;
         }
 
-        .theme-toggle:hover, select:hover, .toggle-btn:hover {
+        .theme-toggle:hover, select:hover {
             background-color: var(--secondary-color);
         }
 
@@ -415,7 +414,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
     </style>
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <span class="theme-icon">☀️</span>
+    </button>
     <div class="container">
         <div class="header">
             <h1>Advanced Football Predictions</h1>
@@ -423,7 +424,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
         </div>
 
         <div class="controls">
-            <select onchange="updateUrl(this.value, '<?php echo $filter; ?>', <?php echo $showPast ? 1 : 0; ?>)">
+            <select onchange="updateUrl(this.value, '<?php echo $filter; ?>')">
                 <?php
                 foreach ($competitions as $comp) {
                     $code = isset($comp['code']) ? $comp['code'] : '';
@@ -450,15 +451,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                         <input type="date" name="end" value="<?php echo $customEnd; ?>">
                         <input type="hidden" name="filter" value="custom">
                         <input type="hidden" name="competition" value="<?php echo $selectedComp; ?>">
-                        <input type="hidden" name="showPast" value="<?php echo $showPast ? 1 : 0; ?>">
                         <button type="submit">Apply</button>
                     </form>
                 </div>
             </div>
-
-            <button class="toggle-btn" onclick="updateUrl('<?php echo $selectedComp; ?>', '<?php echo $filter; ?>', <?php echo $showPast ? 0 : 1; ?>)">
-                <?php echo $showPast ? 'Hide' : 'Show'; ?> Past Results
-            </button>
         </div>
 
         <div class="match-grid">
@@ -537,6 +533,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             document.querySelectorAll('.match-info').forEach(el => {
                 el.classList.toggle('dark', newTheme === 'dark');
             });
+            const themeIcon = document.querySelector('.theme-icon');
+            themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
 
         function toggleHistory(button) {
@@ -546,8 +544,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             button.textContent = isHidden ? '👁️ Hide History' : '👁️ View History';
         }
 
-        function updateUrl(comp, filter, showPast) {
-            let url = `?competition=${comp}&filter=${filter}&showPast=${showPast}`;
+        function updateUrl(comp, filter) {
+            let url = `?competition=${comp}&filter=${filter}`;
             if (filter === 'custom') {
                 const start = document.querySelector('input[name="start"]').value;
                 const end = document.querySelector('input[name="end"]').value;
@@ -560,7 +558,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
 
         function selectFilter(filter) {
             if (filter !== 'custom') {
-                updateUrl('<?php echo $selectedComp; ?>', filter, <?php echo $showPast ? 1 : 0; ?>);
+                updateUrl('<?php echo $selectedComp; ?>', filter);
             } else {
                 document.querySelector('.custom-date-range').classList.add('active');
             }
@@ -589,11 +587,15 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             const theme = document.cookie.split('; ')
                 .find(row => row.startsWith('theme='))
                 ?.split('=')[1];
+            const themeIcon = document.querySelector('.theme-icon');
             if (theme) {
                 document.body.setAttribute('data-theme', theme);
                 document.querySelectorAll('.match-info').forEach(el => {
                     el.classList.toggle('dark', theme === 'dark');
                 });
+                themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            } else {
+                themeIcon.textContent = '🌙'; // Default to light mode icon
             }
 
             const currentFilter = '<?php echo $filter; ?>';
