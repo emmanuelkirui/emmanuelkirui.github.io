@@ -6,11 +6,22 @@ $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
-// Add Navigation Bar
-echo "<nav style='background-color: #f8f9fa; padding: 10px; text-align: center;'>";
-echo "<a href='liv' style='margin: 0 15px; text-decoration: none; color: #007bff;'>Home</a>";
-echo "<a href='valmanu' style='margin: 0 15px; text-decoration: none; color: #007bff;'>More Predictions</a>";
+echo "<nav class='navbar'>";
+echo "<div class='hamburger' onclick='toggleMenu()'>☰</div>";
+echo "<div class='nav-menu' id='navMenu'>";
+echo "<a href='#' class='nav-link'>Home</a>";
+echo "<a href='valmanu' class='nav-link'>More Predictions</a>";
+echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+echo "</div>";
 echo "</nav>";
+
+// Add the required JavaScript
+echo "<script>
+    function toggleMenu() {
+        const menu = document.getElementById('navMenu');
+        menu.classList.toggle('active');
+    }
+</script>";
 
 // Handle different actions based on query parameters
 $action = isset($_GET['action']) ? $_GET['action'] : 'main';
