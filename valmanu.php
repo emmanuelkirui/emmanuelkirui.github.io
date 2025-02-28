@@ -17,10 +17,10 @@ $competitions = isset(json_decode($compResponse, true)['competitions']) ? json_d
 
 // Handle user selections with isset
 $selectedComp = isset($_GET['competition']) ? $_GET['competition'] : (isset($competitions[0]['code']) ? $competitions[0]['code'] : 'PL');
-$filter = isset($_GET['filter']) ? $_GET['filter'] : 'upcoming'; // Default to upcoming matches
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'upcoming';
 $customStart = isset($_GET['start']) ? $_GET['start'] : '';
 $customEnd = isset($_GET['end']) ? $_GET['end'] : '';
-$showPast = isset($_GET['showPast']) ? true : false;
+$showPast = isset($_GET['showPast']) && $_GET['showPast'] == 1 ? true : false; // Explicitly check for 1
 
 // Advanced date options
 $dateOptions = [
@@ -55,8 +55,13 @@ $matchResponse = curl_exec($ch);
 curl_close($ch);
 $allMatches = isset(json_decode($matchResponse, true)['matches']) ? json_decode($matchResponse, true)['matches'] : [];
 
-// Debug: Show number of matches fetched
+// Debug: Show number of matches fetched and their details
 echo "Total matches fetched: " . count($allMatches) . "<br>";
+foreach ($allMatches as $idx => $match) {
+    echo "Match " . ($idx + 1) . ": " . (isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'TBD') . " vs " . 
+         (isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'TBD') . " - Status: " . 
+         (isset($match['status']) ? $match['status'] : 'Unknown') . "<br>";
+}
 
 // Team stats functions
 $teamStats = &$_SESSION['teamStats'];
@@ -419,7 +424,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             <div class="filter-container">
                 <button class="filter-dropdown-btn">
                     <?php 
-                    // Display the label of the currently selected filter
                     echo isset($dateOptions[$filter]['label']) ? $dateOptions[$filter]['label'] : 'Select Date'; 
                     ?>
                 </button>
@@ -551,7 +555,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             const dropdown = document.querySelector('.filter-dropdown');
             dropdown.classList.toggle('active');
             
-            // Show custom range form if 'custom' is selected
             if ('<?php echo $filter; ?>' === 'custom') {
                 document.querySelector('.custom-date-range').classList.add('active');
             } else {
@@ -578,7 +581,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                 });
             }
 
-            // Ensure the correct filter is highlighted and custom range is shown if applicable
             const currentFilter = '<?php echo $filter; ?>';
             document.querySelectorAll('.filter-option').forEach(option => {
                 if (option.getAttribute('data-filter') === currentFilter) {
