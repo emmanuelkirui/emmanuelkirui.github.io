@@ -33,79 +33,29 @@ function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
     curl_close($ch);
 
     if ($httpCode == 429 && $attempt < $maxRetries) {
-        echo "<script>var retryAttempt = " . ($attempt + 1) . "; var maxRetries = $maxRetries; displayError('Rate limit exceeded. Retrying in 5 seconds...', true);</script>";
+        echo "<script>var retryAttempt = " . ($attempt + 1) . "; var maxRetries = $maxRetries;</script>";
         return false;
     } elseif ($httpCode == 200) {
         return json_decode($body, true);
     } else {
-        echo "<script>displayError('Failed to fetch data from API (HTTP $httpCode). Reloading in 5 seconds...', true);</script>";
         return false;
     }
 }
 
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
-    $pastDate = date('Y-m-d', strtotime('-60 days'));
-    $currentDate = date('Y-m-d');
+    // Use current date (February 28, 2025) for latest data
+    $pastDate = date('Y-m-d', strtotime('-60 days')); // Approx January 1, 2025
+    $currentDate = date('Y-m-d'); // February 28, 2025
     $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=$currentDate&limit=10&status=FINISHED";
     $data = fetchWithRetry($url, $apiKey);
     return isset($data['matches']) ? $data['matches'] : [];
 }
 
-function getLast6Matches($team_name, $fixtures) {
-    $results = [];
-    
-    $fixtures = array_reverse($fixtures);
-    
-    foreach ($fixtures as $match) {
-        if (strcasecmp($match['homeTeam']['name'], $team_name) === 0 || strcasecmp($match['awayTeam']['name'], $team_name) === 0) {
-            if ($match['status'] === 'FINISHED' && isset($match['score']['fullTime']['home'], $match['score']['fullTime']['away'])) {
-                $home_score = $match['score']['fullTime']['home'];
-                $away_score = $match['score']['fullTime']['away'];
-
-                if (strcasecmp($match['homeTeam']['name'], $team_name) === 0) {
-                    if ($home_score > $away_score) {
-                        $results[] = ['result' => 'W', 'color' => 'green'];
-                    } elseif ($home_score < $away_score) {
-                        $results[] = ['result' => 'L', 'color' => 'red'];
-                    } else {
-                        $results[] = ['result' => 'D', 'color' => 'blue'];
-                    }
-                } else {
-                    if ($away_score > $home_score) {
-                        $results[] = ['result' => 'W', 'color' => 'green'];
-                    } elseif ($away_score < $home_score) {
-                        $results[] = ['result' => 'L', 'color' => 'red'];
-                    } else {
-                        $results[] = ['result' => 'D', 'color' => 'blue'];
-                    }
-                }
-            }
-        }
-        if (count($results) >= 6) {
-            break;
-        }
-    }
-
-    $results = array_reverse($results);
-    
-    if (!empty($results)) {
-        $formatted_results = '';
-        foreach ($results as $index => $result) {
-            $style = $index === count($results) - 1 ? 'font-weight: bold; text-decoration: underline;' : '';
-            $formatted_results .= "<span style='color: {$result['color']}; $style; display: inline-block; line-height: 1; padding: 0; margin: 0;'>{$result['result']}</span>";
-        }
-        return $formatted_results;
-    }
-    
-    return "N/A";
-}
-
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
-    if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results'])) {
+    if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form'])) {
         $results = fetchTeamResults($teamId, $apiKey, $baseUrl);
         if ($results === false) {
-            $teamStats[$teamId] = ['results' => [], 'needsRetry' => true];
-            echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); incompleteTeams.push($teamId);</script>";
+            $teamStats[$teamId] = ['results' => [], 'form' => '', 'needsRetry' => true];
             return $teamStats[$teamId];
         }
         
@@ -116,6 +66,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
             'goalsConceded' => 0, 
             'games' => 0, 
             'results' => [],
+            'form' => '',
             'needsRetry' => false
         ];
         
@@ -142,6 +93,24 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
             }
             $stats['games']++;
         }
+        $formArray = [];
+        foreach (array_reverse($results) as $match) {
+            $homeId = isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0;
+            $awayId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
+            $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : 0;
+            $awayGoals = isset($match['score']['fullTime']['away']) ? $match['score']['fullTime']['away'] : 0;
+            
+            if ($teamId == $homeId) {
+                if ($homeGoals > $awayGoals) $formArray[] = 'W';
+                elseif ($homeGoals == $awayGoals) $formArray[] = 'D';
+                else $formArray[] = 'L';
+            } elseif ($teamId == $awayId) {
+                if ($awayGoals > $homeGoals) $formArray[] = 'W';
+                elseif ($homeGoals == $awayGoals) $formArray[] = 'D';
+                else $formArray[] = 'L';
+            }
+        }
+        $stats['form'] = implode('', array_slice($formArray, 0, 6));
         $teamStats[$teamId] = $stats;
     }
     return $teamStats[$teamId];
@@ -161,7 +130,14 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
     $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats);
     $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats);
 
-    if (empty($homeStats['results']) || empty($awayStats['results'])) {
+    if (isset($homeStats['needsRetry']) && $homeStats['needsRetry']) {
+        echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); incompleteTeams.push($homeTeamId);</script>";
+    }
+    if (isset($awayStats['needsRetry']) && $awayStats['needsRetry']) {
+        echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); incompleteTeams.push($awayTeamId);</script>";
+    }
+
+    if (empty($homeStats['results']) || empty($homeStats['form']) || empty($awayStats['results']) || empty($awayStats['form'])) {
         return ["Loading...", "N/A", "", "N/A"];
     }
 
@@ -230,13 +206,11 @@ if ($action === 'fetch_team_data') {
         }
     }
 
-    $form = getLast6Matches($teamName, $results);
-
     echo json_encode([
         'success' => true,
         'teamName' => $teamName,
         'results' => $stats['results'],
-        'form' => $form
+        'form' => $stats['form']
     ]);
     exit;
 }
@@ -297,107 +271,6 @@ if ($action === 'predict_match') {
         'resultIndicator' => '',
         'predictedScore' => $predictedScore
     ]);
-    exit;
-}
-
-if ($action === 'fetch_matches') {
-    header('Content-Type: application/json');
-    $competition = isset($_GET['competition']) ? $_GET['competition'] : 'PL';
-    $fromDate = isset($_GET['fromDate']) ? $_GET['fromDate'] : date('Y-m-d');
-    $toDate = isset($_GET['toDate']) ? $_GET['toDate'] : date('Y-m-d', strtotime('+7 days'));
-
-    $matchesUrl = $baseUrl . "competitions/$competition/matches?dateFrom=$fromDate&dateTo=$toDate";
-    $matchData = fetchWithRetry($matchesUrl, $apiKey);
-    
-    if ($matchData === false) {
-        echo json_encode(['success' => false, 'error' => 'Failed to fetch matches']);
-        exit;
-    }
-    
-    $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
-    $html = '';
-    
-    if (!empty($allMatches)) {
-        foreach ($allMatches as $index => $match) {
-            if (isset($match['status'])) {
-                $homeTeamId = isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0;
-                $awayTeamId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
-                $homeTeam = isset($match['homeTeam']['name']) ? $match['homeTeam']['name'] : 'TBD';
-                $awayTeam = isset($match['awayTeam']['name']) ? $match['awayTeam']['name'] : 'TBD';
-                $date = isset($match['utcDate']) ? date('M d, Y H:i', strtotime($match['utcDate'])) : 'TBD';
-                $homeCrest = isset($match['homeTeam']['crest']) ? $match['homeTeam']['crest'] : '';
-                $awayCrest = isset($match['awayTeam']['crest']) ? $match['awayTeam']['crest'] : '';
-                $status = $match['status'];
-                $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : null;
-                $awayGoals = isset($match['score']['fullTime']['away']) ? $match['score']['fullTime']['away'] : null;
-                [$prediction, $confidence, $resultIndicator, $predictedScore] = predictMatch($match, $apiKey, $baseUrl, $teamStats);
-                $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats);
-                $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats);
-
-                $homeFixtures = fetchTeamResults($homeTeamId, $apiKey, $baseUrl);
-                $awayFixtures = fetchTeamResults($awayTeamId, $apiKey, $baseUrl);
-                $homeForm = getLast6Matches($homeTeam, $homeFixtures);
-                $awayForm = getLast6Matches($awayTeam, $awayFixtures);
-
-                if ($homeForm === "N/A" || empty($homeFixtures)) {
-                    echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); if (!incompleteTeams.includes($homeTeamId)) incompleteTeams.push($homeTeamId);</script>";
-                }
-                if ($awayForm === "N/A" || empty($awayFixtures)) {
-                    echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); if (!incompleteTeams.includes($awayTeamId)) incompleteTeams.push($awayTeamId);</script>";
-                }
-
-                $html .= "
-                <div class='match-card' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-index='$index'>
-                    <div class='teams'>
-                        <div class='team'>
-                            " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
-                            <p>$homeTeam</p>
-                            <div class='form-display' id='form-home-$index'>$homeForm</div>
-                        </div>
-                        <span class='vs'>VS</span>
-                        <div class='team'>
-                            " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
-                            <p>$awayTeam</p>
-                            <div class='form-display' id='form-away-$index'>$awayForm</div>
-                        </div>
-                    </div>
-                    <div class='match-info " . (isset($_COOKIE['theme']) && $_COOKIE['theme'] === 'dark' ? 'dark' : '') . "'>
-                        <p>$date (" . $status . ")" . ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null ? " - $homeGoals : $awayGoals" : "") . "</p>
-                    </div>
-                    <div class='prediction' id='prediction-$index'>
-                        <p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
-                        <p class='predicted-score'>Predicted Score: $predictedScore</p>
-                        <p class='confidence'>Confidence: $confidence</p>
-                    </div>
-                    <button class='view-history-btn' onclick='toggleHistory(this)'>👁️ View History</button>
-                    <div class='past-results' id='history-$index' style='display: none;'>";
-                
-                if (!empty($homeStats['results']) && !empty($awayStats['results'])) {
-                    $html .= "
-                        <p><strong>$homeTeam Recent Results:</strong></p>
-                        <ul>";
-                    foreach ($homeStats['results'] as $result) {
-                        $html .= "<li>$result</li>";
-                    }
-                    $html .= "</ul>
-                        <p><strong>$awayTeam Recent Results:</strong></p>
-                        <ul>";
-                    foreach ($awayStats['results'] as $result) {
-                        $html .= "<li>$result</li>";
-                    }
-                    $html .= "</ul>";
-                } else {
-                    $html .= "<p>Loading history...</p>";
-                }
-                
-                $html .= "</div></div>";
-            }
-        }
-    } else {
-        $html .= "<p>No matches available for the selected competition and date range.</p>";
-    }
-    
-    echo json_encode(['success' => true, 'html' => $html]);
     exit;
 }
 
@@ -705,12 +578,43 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             font-weight: bold;
         }
 
-        .error-message {
+        .form-display span {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+            border-radius: 3px;
+            margin: 0 1px;
+        }
+
+        .form-display .win {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .form-display .draw {
+            background-color: #fd7e14;
+            color: white;
+        }
+
+        .form-display .loss {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .form-display .empty {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .form-display .latest {
+            border: 2px solid #000;
+        }
+
+        .retry-message {
             text-align: center;
             margin: 20px 0;
             font-size: 1.2em;
             color: #dc3545;
-            display: none;
         }
     </style>
 </head>
@@ -724,12 +628,14 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             <p>Select Competition and Date Range</p>
         </div>
 
-        <div id="error-message" class="error-message">
-            <span id="error-text"></span> <span id="countdown"></span>
-        </div>
+        <?php if ($compData === false || $matchData === false): ?>
+            <div id="retry-message" class="retry-message">
+                Rate limit exceeded. Retry attempt <span id="attempt-count"></span>/<span id="max-retries"></span>. Retrying in <span id="countdown">5</span> seconds...
+            </div>
+        <?php endif; ?>
 
         <div class="controls">
-            <select id="competition-select" onchange="updateMatches()">
+            <select onchange="updateUrl(this.value, '<?php echo $filter; ?>')">
                 <?php
                 foreach ($competitions as $comp) {
                     $code = isset($comp['code']) ? $comp['code'] : '';
@@ -741,8 +647,8 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             </select>
 
             <div class="filter-container">
-                <button class="filter-dropdown-btn" id="filter-btn"><?php echo $filterLabel; ?></button>
-                <div class="filter-dropdown" id="filter-dropdown">
+                <button class="filter-dropdown-btn"><?php echo $filterLabel; ?></button>
+                <div class="filter-dropdown">
                     <?php
                     foreach ($dateOptions as $key => $option) {
                         $selectedClass = $filter === $key ? 'selected' : '';
@@ -751,16 +657,18 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                         echo "</div>";
                     }
                     ?>
-                    <div class="custom-date-range" id="custom-date-range">
-                        <input type="date" id="custom-start" value="<?php echo $customStart; ?>">
-                        <input type="date" id="custom-end" value="<?php echo $customEnd; ?>">
-                        <button onclick="applyCustomDate()">Apply</button>
-                    </div>
+                    <form class="custom-date-range" method="GET">
+                        <input type="date" name="start" value="<?php echo $customStart; ?>">
+                        <input type="date" name="end" value="<?php echo $customEnd; ?>">
+                        <input type="hidden" name="filter" value="custom">
+                        <input type="hidden" name="competition" value="<?php echo $selectedComp; ?>">
+                        <button type="submit">Apply</button>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <div class="match-grid" id="match-grid">
+        <div class="match-grid">
             <?php
             if (!empty($allMatches)) {
                 foreach ($allMatches as $index => $match) {
@@ -779,31 +687,49 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats);
                         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats);
 
-                        $homeFixtures = fetchTeamResults($homeTeamId, $apiKey, $baseUrl);
-                        $awayFixtures = fetchTeamResults($awayTeamId, $apiKey, $baseUrl);
-                        $homeForm = getLast6Matches($homeTeam, $homeFixtures);
-                        $awayForm = getLast6Matches($awayTeam, $awayFixtures);
-
-                        if ($homeForm === "N/A" || empty($homeFixtures)) {
-                            echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); if (!incompleteTeams.includes($homeTeamId)) incompleteTeams.push($homeTeamId);</script>";
-                        }
-                        if ($awayForm === "N/A" || empty($awayFixtures)) {
-                            echo "<script>var incompleteTeams = (typeof incompleteTeams === 'undefined' ? [] : incompleteTeams); if (!incompleteTeams.includes($awayTeamId)) incompleteTeams.push($awayTeamId);</script>";
-                        }
-
                         echo "
                         <div class='match-card' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-index='$index'>
                             <div class='teams'>
                                 <div class='team'>
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
-                                    <div class='form-display' id='form-home-$index'>$homeForm</div>
+                                    <div class='form-display' id='form-home-$index'>";
+                        $homeForm = substr($homeStats['form'], -6); // Take last 6 results (most recent)
+                        $homeForm = str_pad($homeForm, 6, '-', STR_PAD_LEFT); // Pad left with '-' if less than 6
+                        for ($i = 0; $i < 6; $i++) {
+                            $class = '';
+                            if ($homeForm[$i] === 'W') $class = 'win';
+                            elseif ($homeForm[$i] === 'D') $class = 'draw';
+                            elseif ($homeForm[$i] === 'L') $class = 'loss';
+                            else $class = 'empty';
+                            // Highlight the rightmost non-'empty' result (latest match)
+                            if ($i === (strlen(trim($homeStats['form'], '-')) + (6 - strlen($homeForm))) - 1 && $homeForm[$i] !== '-') {
+                                $class .= ' latest';
+                            }
+                            echo "<span class='$class'>" . $homeForm[$i] . "</span>";
+                        }
+                        echo "</div>
                                 </div>
                                 <span class='vs'>VS</span>
                                 <div class='team'>
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
-                                    <div class='form-display' id='form-away-$index'>$awayForm</div>
+                                    <div class='form-display' id='form-away-$index'>";
+                        $awayForm = substr($awayStats['form'], -6); // Take last 6 results (most recent)
+                        $awayForm = str_pad($awayForm, 6, '-', STR_PAD_LEFT); // Pad left with '-' if less than 6
+                        for ($i = 0; $i < 6; $i++) {
+                            $class = '';
+                            if ($awayForm[$i] === 'W') $class = 'win';
+                            elseif ($awayForm[$i] === 'D') $class = 'draw';
+                            elseif ($awayForm[$i] === 'L') $class = 'loss';
+                            else $class = 'empty';
+                            // Highlight the rightmost non-'empty' result (latest match)
+                            if ($i === (strlen(trim($awayStats['form'], '-')) + (6 - strlen($awayForm))) - 1 && $awayForm[$i] !== '-') {
+                                $class .= ' latest';
+                            }
+                            echo "<span class='$class'>" . $awayForm[$i] . "</span>";
+                        }
+                        echo "</div>
                                 </div>
                             </div>
                             <div class='match-info " . (isset($_COOKIE['theme']) && $_COOKIE['theme'] === 'dark' ? 'dark' : '') . "'>
@@ -846,8 +772,6 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
     </div>
 
     <script>
-        let currentFilter = '<?php echo $filter; ?>';
-
         function toggleTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
@@ -868,147 +792,42 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             button.textContent = isHidden ? '👁️ Hide History' : '👁️ View History';
         }
 
-        function displayError(message, autoReload = false) {
-            const errorDiv = document.getElementById('error-message');
-            const errorText = document.getElementById('error-text');
-            const countdown = document.getElementById('countdown');
-            errorText.textContent = message;
-            errorDiv.style.display = 'block';
-
-            if (autoReload) {
-                let timeLeft = 5;
-                countdown.textContent = `Reloading in ${timeLeft} seconds...`;
-                const timer = setInterval(() => {
-                    timeLeft--;
-                    countdown.textContent = `Reloading in ${timeLeft} seconds...`;
-                    if (timeLeft <= 0) {
-                        clearInterval(timer);
-                        window.location.reload();
-                    }
-                }, 1000);
-            } else {
-                countdown.textContent = '';
+        function updateUrl(comp, filter) {
+            let url = `?competition=${comp}&filter=${filter}`;
+            if (filter === 'custom') {
+                const start = document.querySelector('input[name="start"]').value;
+                const end = document.querySelector('input[name="end"]').value;
+                if (start && end) {
+                    url += `&start=${start}&end=${end}`;
+                }
             }
-        }
-
-        function hideError() {
-            const errorDiv = document.getElementById('error-message');
-            errorDiv.style.display = 'none';
-        }
-
-        function updateMatches() {
-            const competition = document.getElementById('competition-select').value;
-            let fromDate, toDate;
-            const dateOptions = <?php echo json_encode($dateOptions); ?>;
-
-            if (currentFilter === 'custom') {
-                fromDate = document.getElementById('custom-start').value;
-                toDate = document.getElementById('custom-end').value;
-                if (!fromDate || !toDate) return; // Wait for valid custom dates
-            } else if (dateOptions[currentFilter]) {
-                if (dateOptions[currentFilter].date) {
-                    fromDate = toDate = dateOptions[currentFilter].date;
-                } else {
-                    fromDate = dateOptions[currentFilter].from;
-                    toDate = dateOptions[currentFilter].to;
-                }
-            } else {
-                console.error('Invalid filter:', currentFilter);
-                return;
-            }
-
-            fetchMatches(competition, fromDate, toDate);
-        }
-
-        function fetchMatches(competition, fromDate, toDate) {
-            window.incompleteTeams = [];
-            hideError();
-            fetch(`?action=fetch_matches&competition=${competition}&fromDate=${fromDate}&toDate=${toDate}`, {
-                headers: {
-                    'X-Auth-Token': '<?php echo $apiKey; ?>'
-                }
-            })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('match-grid').innerHTML = data.html;
-                    if (window.incompleteTeams && window.incompleteTeams.length > 0) {
-                        window.incompleteTeams.forEach(teamId => {
-                            const matchCards = document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`);
-                            matchCards.forEach(card => {
-                                const index = card.dataset.index;
-                                const isHome = card.dataset.homeId == teamId;
-                                setTimeout(() => fetchTeamData(teamId, index, isHome), 5000);
-                            });
-                        });
-                    }
-                } else {
-                    throw new Error(data.error || 'Unknown error fetching matches');
-                }
-            })
-            .catch(error => {
-                console.error('Fetch matches error:', error);
-                displayError(`Error loading matches: ${error.message}`, true);
-            });
+            window.location.href = url;
         }
 
         function selectFilter(filter) {
-            const filterBtn = document.getElementById('filter-btn');
-            const dropdown = document.getElementById('filter-dropdown');
-            const customRange = document.getElementById('custom-date-range');
-            const options = document.querySelectorAll('.filter-option');
-            const dateOptions = <?php echo json_encode($dateOptions); ?>;
+            if (filter !== 'custom') {
+                updateUrl('<?php echo $selectedComp; ?>', filter);
+            } else {
+                document.querySelector('.custom-date-range').classList.add('active');
+            }
+        }
 
-            options.forEach(opt => {
-                if (opt.getAttribute('data-filter') === filter) {
-                    opt.classList.add('selected');
-                    filterBtn.textContent = dateOptions[filter].label || 'Select Date';
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-
-            currentFilter = filter;
-
-            if (filter === 'custom') {
+        document.querySelector('.filter-dropdown-btn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const dropdown = document.querySelector('.filter-dropdown');
+            dropdown.classList.toggle('active');
+            const customRange = document.querySelector('.custom-date-range');
+            if ('<?php echo $filter; ?>' === 'custom') {
                 customRange.classList.add('active');
-                dropdown.classList.add('active');
             } else {
                 customRange.classList.remove('active');
-                dropdown.classList.remove('active');
-                updateMatches();
             }
-        }
-
-        function applyCustomDate() {
-            const fromDate = document.getElementById('custom-start').value;
-            const toDate = document.getElementById('custom-end').value;
-            if (fromDate && toDate) {
-                document.getElementById('filter-btn').textContent = `Custom: ${fromDate} to ${toDate}`;
-                document.getElementById('filter-dropdown').classList.remove('active');
-                currentFilter = 'custom';
-                updateMatches();
-            } else {
-                displayError('Please select both start and end dates.');
-            }
-        }
-
-        document.getElementById('filter-btn').addEventListener('click', function(e) {
-            e.stopPropagation();
-            const dropdown = document.getElementById('filter-dropdown');
-            dropdown.classList.toggle('active');
-            const customRange = document.getElementById('custom-date-range');
-            customRange.classList.toggle('active', currentFilter === 'custom');
         });
 
         document.addEventListener('click', function(e) {
             const container = document.querySelector('.filter-container');
             if (!container.contains(e.target)) {
-                document.getElementById('filter-dropdown').classList.remove('active');
-                document.getElementById('custom-date-range').classList.remove('active');
+                document.querySelector('.filter-dropdown').classList.remove('active');
             }
         });
 
@@ -1018,17 +837,25 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     'X-Auth-Token': '<?php echo $apiKey; ?>'
                 }
             })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
                     const historyElement = document.getElementById(`history-${index}`);
                     const predictionElement = document.getElementById(`prediction-${index}`);
 
-                    formElement.innerHTML = data.form;
+                    let formHtml = '';
+                    const form = data.form.slice(-6).padStart(6, '-'); // Last 6, pad left with '-'
+                    for (let i = 0; i < 6; i++) {
+                        let className = '';
+                        if (form[i] === 'W') className = 'win';
+                        else if (form[i] === 'D') className = 'draw';
+                        else if (form[i] === 'L') className = 'loss';
+                        else className = 'empty';
+                        if (i === (form.trim('-').length + (6 - form.length)) - 1 && form[i] !== '-') className += ' latest';
+                        formHtml += `<span class="${className}">${form[i]}</span>`;
+                    }
+                    formElement.innerHTML = formHtml;
 
                     let historyHtml = '';
                     if (isHome) {
@@ -1050,17 +877,15 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
 
                     const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
                     const otherTeamLoaded = isHome ? 
-                        document.getElementById(`form-away-${index}`).innerHTML !== 'N/A' : 
-                        document.getElementById(`form-home-${index}`).innerHTML !== 'N/A';
+                        !document.getElementById(`form-away-${index}`).innerHTML.includes('-') : 
+                        !document.getElementById(`form-home-${index}`).innerHTML.includes('-');
                     if (otherTeamLoaded) {
                         fetchPrediction(index, matchCard.dataset.homeId, matchCard.dataset.awayId);
                     }
-                } else {
-                    throw new Error(data.error || 'Unknown error fetching team data');
                 }
             })
             .catch(error => {
-                console.error('Fetch team data error:', error);
+                console.error('Error fetching team data:', error);
                 setTimeout(() => fetchTeamData(teamId, index, isHome), 5000);
             });
         }
@@ -1071,10 +896,7 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     'X-Auth-Token': '<?php echo $apiKey; ?>'
                 }
             })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const predictionElement = document.getElementById(`prediction-${index}`);
@@ -1083,11 +905,9 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                         <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
                         <p class="confidence">Confidence: ${data.confidence}</p>
                     `;
-                } else {
-                    throw new Error(data.error || 'Unknown error fetching prediction');
                 }
             })
-            .catch(error => console.error('Fetch prediction error:', error));
+            .catch(error => console.error('Error fetching prediction:', error));
         }
 
         window.onload = function() {
@@ -1115,25 +935,32 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
             });
 
             if (currentFilter === 'custom') {
-                document.getElementById('custom-date-range').classList.add('active');
+                document.querySelector('.custom-date-range').classList.add('active');
             }
 
             if (typeof retryAttempt !== 'undefined' && retryAttempt <= maxRetries) {
-                document.getElementById('error-message').style.display = 'block';
-                document.getElementById('error-text').textContent = 'Rate limit exceeded. Retrying...';
+                document.getElementById('attempt-count').textContent = retryAttempt;
+                document.getElementById('max-retries').textContent = maxRetries;
+                
                 let timeLeft = 5;
-                document.getElementById('countdown').textContent = `Reloading in ${timeLeft} seconds...`;
+                const countdownElement = document.getElementById('countdown');
+                countdownElement.textContent = timeLeft;
+
                 const timer = setInterval(() => {
                     timeLeft--;
-                    document.getElementById('countdown').textContent = `Reloading in ${timeLeft} seconds...`;
+                    countdownElement.textContent = timeLeft;
                     if (timeLeft <= 0) {
                         clearInterval(timer);
-                        window.location.reload();
+                        let url = window.location.pathname + '?competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>';
+                        url += '&attempt=' + retryAttempt;
+                        if ('<?php echo $filter; ?>' === 'custom' && '<?php echo $customStart; ?>' && '<?php echo $customEnd; ?>') {
+                            url += '&start=<?php echo $customStart; ?>&end=<?php echo $customEnd; ?>';
+                        }
+                        window.location.href = url;
                     }
                 }, 1000);
             } else if (typeof retryAttempt !== 'undefined' && retryAttempt > maxRetries) {
-                document.getElementById('error-message').style.display = 'block';
-                document.getElementById('error-text').textContent = 'Max retry attempts reached. Please try again later.';
+                document.getElementById('retry-message').textContent = 'Max retry attempts reached. Please try again later.';
             }
 
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
@@ -1142,7 +969,7 @@ $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
                     matchCards.forEach(card => {
                         const index = card.dataset.index;
                         const isHome = card.dataset.homeId == teamId;
-                        setTimeout(() => fetchTeamData(teamId, index, isHome), 5000);
+                        fetchTeamData(teamId, index, isHome);
                     });
                 });
             }
