@@ -34,44 +34,13 @@ echo "<script>
     });
 </script>";
 
-// Error handling function
+    // Error handling function
 function handleError($message) {
-    echo "<div style='
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 200px;
-        padding: 20px;
-        margin: 20px auto;
-        max-width: 600px;
-        background: linear-gradient(135deg, #ffebee 0%, #fff5f5 100%);
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border: 1px solid #dc3545;
-        font-family: Arial, sans-serif;
-        transition: all 0.3s ease;
-    '>";
-    echo "<h2 style='
-        color: #dc3545;
-        margin: 0 0 15px 0;
-        font-size: 28px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    '>Error</h2>";
-    echo "<p style='
-        color: #721c24;
-        margin: 0;
-        font-size: 16px;
-        line-height: 1.5;
-        text-align: center;
-        padding: 0 15px;
-    '>" . htmlspecialchars($message) . "</p>";
+    echo "<div style='text-align: center; padding: 20px; color: #dc3545;'>";
+    echo "<h2>Error</h2><p>" . htmlspecialchars($message) . "</p>";
     echo "</div></body></html>";
     exit;
 }
-
 // Enhanced fetch function with infinite retry mechanism for 429 errors
 function fetchWithRetry($url, $apiKey) {
     $attempt = isset($_GET['attempt']) ? (int)$_GET['attempt'] : 0;
