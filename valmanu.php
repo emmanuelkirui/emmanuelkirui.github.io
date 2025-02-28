@@ -5,58 +5,42 @@ if (!isset($_SESSION['teamStats'])) $_SESSION['teamStats'] = [];
 $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
 
-function fetchWithRetry($url, $apiKey, $maxRetries = 3, $retryDelay = 5) {
+function fetchWithRetry($url, $apiKey, $maxRetries = 3) {
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
-    curl_setopt($ch, CURLOPT_HEADER, true); // Include headers in output
+    curl_setopt($ch, CURLOPT_HEADER, true);
     
-    $attempt = 0;
-    while ($attempt < $maxRetries) {
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
-        // Split headers and body
-        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $headers = substr($response, 0, $headerSize);
-        $body = substr($response, $headerSize);
+    $attempt = isset($_GET['attempt']) ? (int)$_GET['attempt'] : 0;
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+    $headers = substr($response, 0, $headerSize);
+    $body = substr($response, $headerSize);
 
-        if ($httpCode == 429) {
-            $attempt++;
-            if ($attempt < $maxRetries) {
-                // Extract retry-after header if available, otherwise use default delay
-                preg_match('/Retry-After: (\d+)/i', $headers, $matches);
-                $retrySeconds = isset($matches[1]) ? (int)$matches[1] : $retryDelay;
-                
-                echo "<p>Rate limit exceeded. Retry attempt $attempt/$maxRetries. Countdown:</p>";
-                for ($i = 5; $i >= 0; $i--) { // Countdown from 5 to 0
-                    echo "<p>Retrying in $i seconds...</p>";
-                    flush(); // Force output to browser
-                    if ($i > 0) sleep(1); // Sleep only between counts, not after 0
-                }
-                continue;
-            } else {
-                echo "<p>Max retry attempts reached. Please try again later.</p>";
-                curl_close($ch);
-                return false;
-            }
-        } elseif ($httpCode == 200) {
-            curl_close($ch);
-            return json_decode($body, true);
-        } else {
-            echo "<p>API Error: HTTP $httpCode</p>";
-            curl_close($ch);
-            return false;
-        }
+    if ($httpCode == 429 && $attempt < $maxRetries) {
+        curl_close($ch);
+        // Pass attempt count to JavaScript for countdown
+        echo "<script>var retryAttempt = " . ($attempt + 1) . "; var maxRetries = $maxRetries;</script>";
+        return false; // Trigger client-side retry
+    } elseif ($httpCode == 200) {
+        curl_close($ch);
+        return json_decode($body, true);
+    } else {
+        echo "<p>API Error: HTTP $httpCode</p>";
+        curl_close($ch);
+        return false;
     }
-    curl_close($ch);
-    return false;
 }
 
 // Fetch available competitions
 $competitionsUrl = $baseUrl . 'competitions';
 $compData = fetchWithRetry($competitionsUrl, $apiKey);
+if ($compData === false && isset($_GET['attempt']) && $_GET['attempt'] < 3) {
+    exit; // Let JavaScript handle retry
+}
 $competitions = isset($compData['competitions']) ? $compData['competitions'] : [];
 
 // Handle user selections with isset
@@ -96,15 +80,21 @@ if (isset($dateOptions[$filter])) {
 // Fetch matches
 $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
 $matchData = fetchWithRetry($matchesUrl, $apiKey);
+if ($matchData === false && isset($_GET['attempt']) && $_GET['attempt'] < 3) {
+    exit; // Let JavaScript handle retry
+}
 $allMatches = isset($matchData['matches']) ? $matchData['matches'] : [];
 
 // Team stats functions
 $teamStats = &$_SESSION['teamStats'];
 
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
-    $pastDate = date('Y-m-d', strtotime('-60 days')); // Extended to 60 days to get more finished matches
-    $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=" . date('Y-m-d') . "&limit=10&status=FINISHED"; // Increased limit to 10
+    $pastDate = date('Y-m-d', strtotime('-60 days'));
+    $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=" . date('Y-m-d') . "&limit=10&status=FINISHED";
     $data = fetchWithRetry($url, $apiKey);
+    if ($data === false && isset($_GET['attempt']) && $_GET['attempt'] < 3) {
+        exit; // Let JavaScript handle retry
+    }
     return isset($data['matches']) ? $data['matches'] : [];
 }
 
@@ -514,6 +504,13 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
         .form-display .latest {
             border: 2px solid #000; /* Black border for latest result */
         }
+
+        .retry-message {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2em;
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -525,6 +522,12 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
             <h1>Advanced Football Predictions</h1>
             <p>Select Competition and Date Range</p>
         </div>
+
+        <?php if ($compData === false || $matchData === false): ?>
+            <div id="retry-message" class="retry-message">
+                Rate limit exceeded. Retry attempt <span id="attempt-count"></span>/<span id="max-retries"></span>. Retrying in <span id="countdown">5</span> seconds...
+            </div>
+        <?php endif; ?>
 
         <div class="controls">
             <select onchange="updateUrl(this.value, '<?php echo $filter; ?>')">
@@ -584,7 +587,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
                                     <div class='form-display'>";
-                        // Display home team form with colors
                         $homeForm = str_pad($homeStats['form'], 6, '-', STR_PAD_LEFT);
                         for ($i = 0; $i < strlen($homeForm); $i++) {
                             $class = '';
@@ -602,7 +604,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
                                     <div class='form-display'>";
-                        // Display away team form with colors
                         $awayForm = str_pad($awayStats['form'], 6, '-', STR_PAD_LEFT);
                         for ($i = 0; $i < strlen($awayForm); $i++) {
                             $class = '';
@@ -646,7 +647,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                         echo "</div></div>";
                     }
                 }
-            } else {
+            } else if ($compData !== false && $matchData !== false) {
                 echo "<p>No matches available for the selected competition and date range.</p>";
             }
             ?>
@@ -739,6 +740,33 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
 
             if (currentFilter === 'custom') {
                 document.querySelector('.custom-date-range').classList.add('active');
+            }
+
+            // Retry logic with countdown
+            if (typeof retryAttempt !== 'undefined' && retryAttempt <= maxRetries) {
+                document.getElementById('attempt-count').textContent = retryAttempt;
+                document.getElementById('max-retries').textContent = maxRetries;
+                
+                let timeLeft = 5;
+                const countdownElement = document.getElementById('countdown');
+                countdownElement.textContent = timeLeft;
+
+                const timer = setInterval(() => {
+                    timeLeft--;
+                    countdownElement.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        // Construct URL with incremented attempt
+                        let url = window.location.pathname + '?competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>';
+                        url += '&attempt=' + retryAttempt;
+                        if ('<?php echo $filter; ?>' === 'custom' && '<?php echo $customStart; ?>' && '<?php echo $customEnd; ?>') {
+                            url += '&start=<?php echo $customStart; ?>&end=<?php echo $customEnd; ?>';
+                        }
+                        window.location.href = url; // Retry by refreshing page
+                    }
+                }, 1000);
+            } else if (retryAttempt >= maxRetries) {
+                document.getElementById('retry-message').textContent = 'Max retry attempts reached. Please try again later.';
             }
         }
     </script>
