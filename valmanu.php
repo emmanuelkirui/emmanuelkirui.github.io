@@ -64,7 +64,7 @@ $teamStats = &$_SESSION['teamStats'];
 
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     $pastDate = date('Y-m-d', strtotime('-30 days'));
-    $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=" . date('Y-m-d') . "&limit=5&status=FINISHED";
+    $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=" . date('Y-m-d') . "&limit=6&status=FINISHED";
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -77,8 +77,17 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
     if (!isset($teamStats[$teamId])) {
         $results = fetchTeamResults($teamId, $apiKey, $baseUrl);
-        $stats = ['wins' => 0, 'draws' => 0, 'goalsScored' => 0, 'goalsConceded' => 0, 'games' => 0, 'results' => []];
+        $stats = [
+            'wins' => 0, 
+            'draws' => 0, 
+            'goalsScored' => 0, 
+            'goalsConceded' => 0, 
+            'games' => 0, 
+            'results' => [], 
+            'form' => ''
+        ];
         
+        $formArray = [];
         foreach ($results as $match) {
             $homeId = isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0;
             $awayId = isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0;
@@ -90,18 +99,35 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
             if ($teamId == $homeId) {
                 $stats['goalsScored'] += $homeGoals;
                 $stats['goalsConceded'] += $awayGoals;
-                if ($homeGoals > $awayGoals) $stats['wins']++;
-                elseif ($homeGoals == $awayGoals) $stats['draws']++;
+                if ($homeGoals > $awayGoals) {
+                    $stats['wins']++;
+                    $formArray[] = 'W';
+                } elseif ($homeGoals == $awayGoals) {
+                    $stats['draws']++;
+                    $formArray[] = 'D';
+                } else {
+                    $formArray[] = 'L';
+                }
                 $stats['results'][] = "$date: $resultStr";
             } elseif ($teamId == $awayId) {
                 $stats['goalsScored'] += $awayGoals;
                 $stats['goalsConceded'] += $homeGoals;
-                if ($awayGoals > $homeGoals) $stats['wins']++;
-                elseif ($homeGoals == $awayGoals) $stats['draws']++;
+                if ($awayGoals > $homeGoals) {
+                    $stats['wins']++;
+                    $formArray[] = 'W';
+                } elseif ($homeGoals == $awayGoals) {
+                    $stats['draws']++;
+                    $formArray[] = 'D';
+                } else {
+                    $formArray[] = 'L';
+                }
                 $stats['results'][] = "$date: $resultStr";
             }
             $stats['games']++;
         }
+        // Reverse form array to show latest result last and limit to 6
+        $formArray = array_slice(array_reverse($formArray), 0, 6);
+        $stats['form'] = implode('', $formArray);
         $teamStats[$teamId] = $stats;
     }
     return $teamStats[$teamId];
@@ -116,7 +142,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
     $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : null;
     $awayGoals = isset($match['score']['fullTime']['away']) ? $match['score']['fullTime']['away'] : null;
 
-    if (!$homeTeamId || !$awayTeamId) return ["N/A", "0%", ""];
+    if (!$homeTeamId || !$awayTeamId) return ["N/A", "0%", "", "0-0"];
 
     $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats);
     $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats);
@@ -133,6 +159,11 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
 
     $diff = $homeStrength - $awayStrength;
     $confidence = min(90, abs($diff) / ($homeStrength + $awayStrength + 1) * 100);
+
+    // Predict goals based on team averages
+    $predictedHomeGoals = round($homeGoalAvg * (1 + $diff/100));
+    $predictedAwayGoals = round($awayGoalAvg * (1 - $diff/100));
+    $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
 
     $prediction = "";
     $resultIndicator = "";
@@ -153,7 +184,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
         $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
     }
 
-    return [$prediction, $confidence, $resultIndicator];
+    return [$prediction, $confidence, $resultIndicator, $predictedScore];
 }
 ?>
 
@@ -411,6 +442,29 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
         .view-history-btn:hover {
             background-color: var(--secondary-color);
         }
+
+        .form-display {
+            margin-top: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .form-display span {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+        }
+
+        .form-display .latest {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 3px;
+        }
+
+        .predicted-score {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -428,7 +482,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                 <?php
                 foreach ($competitions as $comp) {
                     $code = isset($comp['code']) ? $comp['code'] : '';
-                    $name = isset($comp['name']) ? $comp['name'] : 'Unknown';
+                    $name = isset($comm['name']) ? $comp['name'] : 'Unknown';
                     $selected = $code === $selectedComp ? 'selected' : '';
                     echo "<option value='$code' $selected>$name</option>";
                 }
@@ -470,7 +524,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                         $status = $match['status'];
                         $homeGoals = isset($match['score']['fullTime']['home']) ? $match['score']['fullTime']['home'] : null;
                         $awayGoals = isset($match['score']['fullTime']['away']) ? $match['score']['fullTime']['away'] : null;
-                        [$prediction, $confidence, $resultIndicator] = predictMatch($match, $apiKey, $baseUrl, $teamStats);
+                        [$prediction, $confidence, $resultIndicator, $predictedScore] = predictMatch($match, $apiKey, $baseUrl, $teamStats);
                         $homeStats = calculateTeamStrength(isset($match['homeTeam']['id']) ? $match['homeTeam']['id'] : 0, $apiKey, $baseUrl, $teamStats);
                         $awayStats = calculateTeamStrength(isset($match['awayTeam']['id']) ? $match['awayTeam']['id'] : 0, $apiKey, $baseUrl, $teamStats);
 
@@ -480,11 +534,27 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                                 <div class='team'>
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
+                                    <div class='form-display'>";
+                        // Display home team form
+                        $homeForm = str_pad($homeStats['form'], 6, '-', STR_PAD_LEFT);
+                        for ($i = 0; $i < strlen($homeForm); $i++) {
+                            $class = ($i == strlen($homeForm) - 1 && $homeForm[$i] !== '-') ? 'latest' : '';
+                            echo "<span class='$class'>" . $homeForm[$i] . "</span>";
+                        }
+                        echo "</div>
                                 </div>
                                 <span class='vs'>VS</span>
                                 <div class='team'>
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
+                                    <div class='form-display'>";
+                        // Display away team form
+                        $awayForm = str_pad($awayStats['form'], 6, '-', STR_PAD_LEFT);
+                        for ($i = 0; $i < strlen($awayForm); $i++) {
+                            $class = ($i == strlen($awayForm) - 1 && $awayForm[$i] !== '-') ? 'latest' : '';
+                            echo "<span class='$class'>" . $awayForm[$i] . "</span>";
+                        }
+                        echo "</div>
                                 </div>
                             </div>
                             <div class='match-info " . (isset($_COOKIE['theme']) && $_COOKIE['theme'] === 'dark' ? 'dark' : '') . "'>
@@ -492,6 +562,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
                             </div>
                             <div class='prediction'>
                                 <p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
+                                <p class='predicted-score'>Predicted Score: $predictedScore</p>
                                 <p class='confidence'>Confidence: $confidence</p>
                             </div>
                             <button class='view-history-btn' onclick='toggleHistory(this)'>👁️ View History</button>
