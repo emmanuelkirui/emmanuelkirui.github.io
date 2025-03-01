@@ -1017,3 +1017,6 @@ try {
     handleError("Unexpected error: " . $e->getMessage());
 }
 ?>
+    <?php include 'back-to-top.php'; ?>
+<?php include 'connpulse.php'; ?>
+    
