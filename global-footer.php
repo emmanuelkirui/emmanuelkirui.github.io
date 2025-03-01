@@ -1,177 +1,189 @@
 <?php
-$year = date("Y");
+$year = date("Y"); // Auto-updating year
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Footer Section</title>
-    
-    <!-- Font Awesome (Online) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    
+    <title>Footer</title>
+
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/YOUR-KIT-ID.js" crossorigin="anonymous"></script>
+
     <style>
         /* Footer Styles */
         .footer {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
+            background: #333;
+            color: white;
             text-align: center;
-            margin: 20px;
-            border-radius: 10px;
+            padding: 20px;
+            margin: 20px; /* Adds space around */
+            border-top: 3px solid #f39c12;
         }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* Footer Links */
         .footer-links {
             list-style: none;
             padding: 0;
-            margin: 0;
+            margin: 15px 0;
             display: flex;
             justify-content: center;
-            gap: 20px;
             flex-wrap: wrap;
+            gap: 15px;
         }
+
+        .footer-links li {
+            margin: 0;
+        }
+
         .footer-links a {
             color: #f39c12;
             text-decoration: none;
             font-size: 16px;
-            font-weight: 600;
-            transition: color 0.3s ease;
+            font-weight: bold;
+            transition: color 0.3s ease-in-out;
         }
+
         .footer-links a:hover {
             color: #e67e22;
             text-decoration: underline;
         }
+
+        /* Social Media Icons */
         .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
             margin-top: 10px;
         }
+
         .social-icons a {
             color: #f39c12;
             font-size: 24px;
-            margin: 0 15px;
             transition: color 0.3s ease;
         }
+
         .social-icons a:hover {
             color: #e67e22;
         }
-        .disclaimer {
+
+        /* Gambling Disclaimer */
+        .gambling-disclaimer {
             font-size: 14px;
-            color: #ddd;
+            background: #222;
+            color: #ffcc00;
+            padding: 10px;
+            border-radius: 5px;
             margin-top: 15px;
-            line-height: 1.6;
         }
-        /* Cookie Consent Banner */
-        .cookie-banner {
+
+        /* Cookie Consent */
+        #cookieConsent {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
             color: white;
-            padding: 15px;
+            padding: 10px;
             text-align: center;
             display: none;
-            z-index: 1000;
-        }
-        .cookie-banner button {
-            background: #f39c12;
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            margin-left: 10px;
-            cursor: pointer;
-            font-weight: bold;
             border-radius: 5px;
         }
-        .cookie-banner button:hover {
-            background: #e67e22;
+
+        #cookieConsent button {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .footer-links {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .footer-links a {
+                font-size: 14px;
+            }
+            
+            .disclaimer, .gambling-disclaimer {
+                font-size: 12px;
+            }
+            
+            .social-icons {
+                gap: 10px;
+            }
+
+            .social-icons a {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-<!-- Footer Section -->
+<!-- Footer -->
 <footer class="footer">
-    <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
-    <ul class="footer-links">
-        <li><a href="#" onclick="openModal('termsModal')">Terms & Conditions</a></li>
-        <li><a href="#" onclick="openModal('privacyModal')">Privacy Policy</a></li>
-        <li><a href="#" onclick="openModal('thirdPartyModal')">Third-Party Services</a></li>
-    </ul>
-    
-    <!-- Social Media Icons -->
-    <div class="social-icons">
-        <a href="https://www.youtube.com/@emmanuelkirui9043" target="_blank"><i class="fab fa-youtube"></i></a>
-        <a href="https://www.tiktok.com/@emmanuelkirui3" target="_blank"><i class="fab fa-tiktok"></i></a>
+    <div class="footer-container">
+        <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
+        
+        <ul class="footer-links">
+            <li><a href="#"><i class="fa-solid fa-file-contract"></i> Terms</a></li>
+            <li><a href="#"><i class="fa-solid fa-user-shield"></i> Privacy</a></li>
+            <li><a href="#"><i class="fa-solid fa-handshake"></i> Third-Party</a></li>
+        </ul>
+
+        <!-- Social Media Icons -->
+        <div class="social-icons">
+            <a href="https://facebook.com/emmanuelkirui042" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://youtube.com/@emmanuelkirui9043" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://tiktok.com/@emmanuelkirui3" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+
+        <p class="gambling-disclaimer">
+            <i class="fa-solid fa-triangle-exclamation"></i> Responsible Gambling: This site is for **18+ users** only. 
+            If you or someone you know has a gambling problem, seek help. Play responsibly.
+        </p>
+
+        <p class="disclaimer">
+            This site uses third-party services, cookies, and advertisements. These third parties have their own policies, and we are not responsible for their actions. Please review their terms.
+        </p>
     </div>
-    
-    <p class="disclaimer">
-        This site is for users **18+** and may involve **gambling content**. Gamble responsibly.  
-        We use third-party services that have their own terms & privacy policies. Review them before using.
-    </p>
 </footer>
 
-<!-- Cookie Consent Banner -->
-<div class="cookie-banner" id="cookieBanner">
-    <p>This website uses cookies to ensure you get the best experience. By continuing, you agree to our 
-        <a href="#" onclick="openModal('privacyModal')" style="color: #f39c12;">Privacy Policy</a>.
+<!-- Cookie Consent -->
+<div id="cookieConsent">
+    <p><i class="fa-solid fa-cookie-bite"></i> This site uses cookies to improve user experience. 
+        <a href="privacy-policy.html">Learn more</a>.
     </p>
-    <button onclick="acceptCookies()">Accept</button>
-    <button onclick="declineCookies()">Decline</button>
+    <button id="acceptCookies">Accept</button>
 </div>
 
-<!-- Modals -->
-<div id="termsModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('termsModal')">&times;</span>
-        <h2>Terms & Conditions</h2>
-        <p>Welcome to our website. These terms and conditions outline the rules and regulations for the use of our services.</p>
-    </div>
-</div>
-
-<div id="privacyModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('privacyModal')">&times;</span>
-        <h2>Privacy Policy</h2>
-        <p>Your privacy is important to us. This policy explains how we collect, use, and protect your information.</p>
-    </div>
-</div>
-
-<div id="thirdPartyModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal('thirdPartyModal')">&times;</span>
-        <h2>Third-Party Services</h2>
-        <p>We use third-party services. They have their own terms and privacy policies. Please review them before using.</p>
-    </div>
-</div>
-
-<!-- JavaScript -->
+<!-- Cookie Consent Script -->
 <script>
-    // Show Cookie Banner if not accepted before
-    window.onload = function() {
-        if (!localStorage.getItem("cookiesAccepted")) {
-            document.getElementById("cookieBanner").style.display = "block";
-        }
-    };
-
-    function acceptCookies() {
+document.addEventListener("DOMContentLoaded", function () {
+    if (!localStorage.getItem("cookiesAccepted")) {
+        document.getElementById("cookieConsent").style.display = "block";
+    }
+    document.getElementById("acceptCookies").addEventListener("click", function () {
         localStorage.setItem("cookiesAccepted", "true");
-        document.getElementById("cookieBanner").style.display = "none";
-    }
-
-    function declineCookies() {
-        alert("You have declined cookies. Some features may not work properly.");
-        document.getElementById("cookieBanner").style.display = "none";
-    }
-
-    // Open Modal
-    function openModal(id) {
-        document.getElementById(id).style.display = "block";
-    }
-
-    // Close Modal
-    function closeModal(id) {
-        document.getElementById(id).style.display = "none";
-    }
+        document.getElementById("cookieConsent").style.display = "none";
+    });
+});
 </script>
 
 </body>
