@@ -23,12 +23,10 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='liv' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
     echo "</div>";
-    echo "</nav>";
-}
-
-
-// JavaScript remains mostly the same
-echo "<script>
+    echo "</nav>"
+        
+    // JavaScript remains mostly the same
+    echo "<script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
         const currentDisplay = menu.style.display;
@@ -47,7 +45,7 @@ echo "<script>
         }
     });
 </script>";
-
+}
     // Error handling function
 function handleError($message) {
     echo "<div style='text-align: center; padding: 20px; color: #dc3545;'>";
