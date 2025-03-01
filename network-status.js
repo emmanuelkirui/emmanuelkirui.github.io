@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const startTime = performance.now();
         try {
             // Use a small test file or endpoint - replace with your own URL
-            await fetch('https://example.com/ping', { 
+            await fetch('https://speed.cloudflare.com/__down?bytes=1000', { 
                 cache: 'no-store',
                 mode: 'no-cors'
             });
@@ -112,29 +112,40 @@ document.addEventListener("DOMContentLoaded", function () {
     checkNetworkStatus();
 });
 
-// Suggested CSS to add
+// Updated CSS with responsiveness
 const styles = `
     #reconnect-notice {
         position: fixed;
-        top: 20px;
+        top: 1rem;
         left: 50%;
         transform: translateX(-50%);
-        padding: 10px 20px;
-        border-radius: 5px;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
         background: rgba(0, 0, 0, 0.8);
         color: white;
         align-items: center;
-        gap: 10px;
+        gap: 0.75rem;
         z-index: 1000;
+        max-width: 90vw;
+        font-size: clamp(0.875rem, 2.5vw, 1rem);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+        display: flex;
     }
 
     .spinner {
-        width: 20px;
-        height: 20px;
-        border: 3px solid #fff;
-        border-top: 3px solid transparent;
+        width: clamp(1rem, 3vw, 1.5rem);
+        height: clamp(1rem, 3vw, 1.5rem);
+        border: 0.2rem solid #fff;
+        border-top: 0.2rem solid transparent;
         border-radius: 50%;
         animation: spin 1s linear infinite;
+    }
+
+    .status-message {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70vw;
     }
 
     .fade-in {
@@ -150,4 +161,55 @@ const styles = `
     @keyframes spin {
         to { transform: rotate(360deg); }
     }
+
+    /* Tablet and below */
+    @media (max-width: 768px) {
+        #reconnect-notice {
+            top: 0.5rem;
+            padding: 0.5rem 1rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+        
+        .spinner {
+            margin-bottom: 0.25rem;
+        }
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+        #reconnect-notice {
+            top: 0;
+            left: 0;
+            transform: none;
+            width: 100%;
+            max-width: 100vw;
+            border-radius: 0;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .status-message {
+            max-width: 90vw;
+        }
+    }
+
+    /* Large screens */
+    @media (min-width: 1200px) {
+        #reconnect-notice {
+            padding: 1rem 2rem;
+            gap: 1rem;
+        }
+        
+        .spinner {
+            width: 1.75rem;
+            height: 1.75rem;
+        }
+    }
 `;
+
+// Inject the styles into the document
+const styleSheet = document.createElement("style");
+styleSheet.textContent = styles;
+document.head.appendChild(styleSheet);
