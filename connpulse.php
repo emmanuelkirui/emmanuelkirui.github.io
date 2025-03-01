@@ -9,109 +9,85 @@ function checkConnection() {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
     header('Content-Type: application/json');
 
-    $startTime = time();
-    $maxExecutionTime = 10;
-
-    while (true) {
-        if (!checkConnection()) {
-            echo json_encode(['status' => 'error', 'message' => 'Connection lost during processing']);
-            exit;
-        }
-
-        if ((time() - $startTime) > $maxExecutionTime) {
-            header('HTTP/1.1 504 Gateway Timeout');
-            echo json_encode(['status' => 'error', 'message' => 'Server timeout after 10s']);
-            exit;
-        }
-
-        sleep(1);
-        break;
+    if (!checkConnection()) {
+        echo json_encode(['status' => 'error', 'message' => 'Connection lost']);
+        exit;
     }
 
-    echo json_encode(['status' => 'success', 'message' => 'Processed successfully']);
+    echo json_encode(['status' => 'success', 'message' => 'Connection stable']);
     exit;
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connection Monitor</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
         .status-container {
-            margin: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+            font-size: 16px;
+            font-weight: bold;
         }
         .success { color: green; }
-        .error { color: maroon; background-color: #ffe6e6; padding: 5px; }
+        .error { color: maroon; background-color: #ffe6e6; padding: 5px; border-radius: 5px; }
     </style>
 </head>
 <body>
+
     <div class="status-container">
         <div id="status-output">Checking connection...</div>
     </div>
 
     <script>
-    class ConnectionMonitor {
-        constructor() {
-            this.timeout = 8000;
-            this.checkConnection();
-            this.monitorNetwork();
-        }
+    async function checkConnection() {
+        const output = document.getElementById('status-output');
+        output.textContent = 'Checking connection...';
+        output.className = '';
 
-        async checkConnection() {
-            while (true) {
-                const outputElement = document.getElementById('status-output');
-                outputElement.textContent = 'Checking connection...';
-                outputElement.className = '';
+        try {
+            const response = await fetch('?ajax=1', { method: 'POST', headers: { 'Content-Type': 'application/json' } });
 
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+            if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
-                try {
-                    const response = await fetch('?ajax=1', {
-                        method: 'POST',
-                        signal: controller.signal,
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        throw new Error(`Server error: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    outputElement.className = data.status === 'success' ? 'success' : 'error';
-                    outputElement.textContent = `${data.status.toUpperCase()}: ${data.message}`;
-                } catch (error) {
-                    outputElement.className = 'error';
-                    outputElement.textContent = 'ERROR: ' + (
-                        error.message === 'Failed to fetch' ? 'Connection lost or server not responding' :
-                        error.message === 'AbortError' ? 'Client timeout after 8s' :
-                        error.message
-                    );
-                }
-
-                await new Promise(resolve => setTimeout(resolve, 5000)); // Check every 5 seconds
-            }
-        }
-
-        monitorNetwork() {
-            const outputElement = document.getElementById('status-output');
-            window.addEventListener('offline', () => {
-                outputElement.className = 'error';
-                outputElement.textContent = 'ERROR: Network connection lost';
-            });
-            window.addEventListener('online', () => {
-                outputElement.className = '';
-                outputElement.textContent = 'Network connection restored';
-            });
+            const data = await response.json();
+            output.className = data.status === 'success' ? 'success' : 'error';
+            output.textContent = data.message;
+        } catch (error) {
+            output.className = 'error';
+            output.textContent = 'ERROR: ' + (error.message.includes('Failed to fetch') ? 'Connection lost or server not responding' : error.message);
         }
     }
 
-    new ConnectionMonitor();
+    window.addEventListener('load', checkConnection);
+    setInterval(checkConnection, 5000); // Auto-refresh every 5 seconds
+
+    window.addEventListener('offline', () => {
+        const output = document.getElementById('status-output');
+        output.className = 'error';
+        output.textContent = 'ERROR: Network connection lost';
+    });
+
+    window.addEventListener('online', () => {
+        checkConnection();
+    });
     </script>
+
 </body>
 </html>
