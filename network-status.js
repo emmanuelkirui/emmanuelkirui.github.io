@@ -124,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
     checkNetworkStatus();
 });
 
-// Updated CSS with minimum width and mobile-friendly adjustments
+// Updated CSS to handle long text and stabilize spinner
 const styles = `
     #reconnect-notice {
         position: fixed;
@@ -138,24 +138,26 @@ const styles = `
         align-items: center;
         gap: 0.75rem;
         z-index: 1000;
-        min-width: 220px; /* Minimum width for mobile readability */
+        min-width: 220px;
         max-width: 90vw;
         font-size: clamp(0.875rem, 2.5vw, 1rem);
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
         display: flex;
         pointer-events: none;
+        overflow: hidden; /* Prevents content from spilling out */
     }
 
     .spinner {
         width: clamp(1rem, 2.5vw, 1.5rem);
         height: clamp(1rem, 2.5vw, 1.5rem);
-        min-width: 16px; /* Minimum size for visibility on mobile */
+        min-width: 16px;
         min-height: 16px;
         border: 0.2rem solid #fff;
         border-top: 0.2rem solid transparent;
         border-radius: 50%;
         display: none;
         flex-shrink: 0;
+        order: 1; /* Ensures spinner stays on the left */
     }
 
     .spinner.active {
@@ -167,8 +169,10 @@ const styles = `
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: calc(90vw - 40px); /* Adjusted for spinner and padding */
+        max-width: calc(90vw - 40px); /* Space for spinner and padding */
+        min-width: 0; /* Allows proper flex shrinking */
         flex-grow: 1;
+        order: 2; /* Ensures message follows spinner */
     }
 
     .fade-in {
@@ -195,10 +199,11 @@ const styles = `
         right: 0;
         margin: 0 auto;
         width: fit-content;
-        min-width: 220px; /* Consistent minimum width in cards */
+        min-width: 220px;
         max-width: 90%;
         transform: none;
         padding: 0.5rem 1rem;
+        overflow: hidden;
     }
 
     /* Tablet and below */
@@ -206,14 +211,14 @@ const styles = `
         #reconnect-notice {
             top: 0.5rem;
             padding: 0.5rem 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
+            flex-wrap: nowrap; /* Prevents wrapping to keep spinner stable */
+            justify-content: flex-start;
             gap: 0.5rem;
-            min-width: 200px; /* Slightly smaller but still readable */
+            min-width: 200px;
         }
         
         .spinner {
-            margin: 0 auto;
+            margin-right: 0.5rem; /* Consistent spacing */
         }
     }
 
@@ -225,7 +230,7 @@ const styles = `
             transform: none;
             width: 100%;
             max-width: 100vw;
-            min-width: 180px; /* Minimum width for smallest mobile screens */
+            min-width: 180px;
             border-radius: 0;
             padding: 0.5rem;
             font-size: 0.875rem;
@@ -240,11 +245,11 @@ const styles = `
         }
         
         .status-message {
-            max-width: calc(85vw - 30px); /* Adjusted for mobile */
+            max-width: calc(85vw - 30px);
         }
         
         .spinner {
-            min-width: 14px; /* Slightly smaller but visible */
+            min-width: 14px;
             min-height: 14px;
         }
     }
@@ -254,7 +259,7 @@ const styles = `
         #reconnect-notice {
             padding: 1rem 2rem;
             gap: 1rem;
-            min-width: 250px; /* Larger minimum for desktop */
+            min-width: 250px;
         }
         
         .spinner {
