@@ -1,4 +1,15 @@
-<!-- Footer -->
+<?php
+// Dynamic variables
+$year = date("Y"); // Auto-updates the year
+$site_name = "Emmanuel Kirui#CPS"; // Change your site name here
+$footer_links = [
+    "#" => "Terms and Conditions",
+    "#" => "Privacy Policy",
+    "#" => "Third-Party Service Providers",
+    "#" => "Responsible Gambling"
+];
+?>
+
 <footer>
     <style>
         footer {
@@ -8,11 +19,18 @@
             text-align: center;
             border-top: 2px solid #f39c12;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .footer-content {
             max-width: 1200px;
-            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
 
         /* Footer Links */
@@ -43,6 +61,26 @@
             text-decoration: underline;
         }
 
+        /* Gambling Disclaimer */
+        .gambling-disclaimer {
+            background-color: #222;
+            color: #ffcc00;
+            font-size: 0.9rem;
+            padding: 10px;
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gambling-disclaimer img {
+            width: 50px;
+            margin-bottom: 5px;
+        }
+
         /* Footer Disclaimer */
         .disclaimer {
             font-size: 0.9rem;
@@ -62,19 +100,31 @@
                 font-size: 0.9rem;
             }
 
-            .disclaimer {
+            .disclaimer, .gambling-disclaimer {
                 font-size: 0.85rem;
+            }
+
+            .gambling-disclaimer img {
+                width: 40px;
             }
         }
     </style>
 
     <div class="footer-content">
-        <p>&copy; 2025 Emmanuel Kirui. All rights reserved.</p>
+        <p>&copy; <?php echo $year . " " . $site_name; ?>. All rights reserved.</p>
         <ul class="footer-links">
-            <li><a href="#">Terms and Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Third-Party Service Providers</a></li>
+            <?php foreach ($footer_links as $link => $text): ?>
+                <li><a href="<?php echo $link; ?>"><?php echo $text; ?></a></li>
+            <?php endforeach; ?>
         </ul>
+
+        <!-- Gambling Disclaimer -->
+        <div class="gambling-disclaimer">
+            <img src="18plus.png" alt="18+ Only">
+            <p>Strictly 18+ | Gamble Responsibly</p>
+            <p>If you have a gambling problem, seek help from a professional service.</p>
+        </div>
+
         <p class="disclaimer">
             This site uses third-party services, cookies, and advertisements. These third parties have their own terms and conditions, and we are not responsible for their actions or policies. You are encouraged to review the terms and conditions of any third-party service providers.
         </p>
