@@ -1030,4 +1030,4 @@ try {
 ?>
     <?php include 'back-to-top.php'; ?>
 <?php echo '<script src="network-status.js"></script>'; ?>
-<?php include 'connpulse.php'; ?>
+
