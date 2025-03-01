@@ -1164,3 +1164,4 @@ try {
 ?>
 <?php include 'back-to-top.php'; ?>
 <script src="network-status.js"></script>
+<?php include 'global-footer.php'; ?>
