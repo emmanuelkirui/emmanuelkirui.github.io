@@ -14,23 +14,34 @@ $baseUrl = 'http://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
 // Basic HTML structure to prevent white screen
-echo "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Football Predictions</title></head><body>";
+// Add Navigation Bar
 echo "<nav class='navbar' style='width: 100%; position: relative;'>";
 echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
-echo "<div class='nav-menu' id='navMenu' style='display: none;'>";
+echo "<div class='nav-menu' id='navMenu' style='display: none;'>"; // Changed from inline-block to none
 echo "<a href='valmanu' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
 echo "<a href='liv' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
 echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
-echo "</div></nav>";
+echo "</div>";
+echo "</nav>";
 
+// JavaScript remains mostly the same
 echo "<script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
-        menu.style.display = menu.style.display === 'none' ? 'inline-block' : 'none';
+        const currentDisplay = menu.style.display;
+        if (currentDisplay === 'none') {
+            menu.style.display = 'inline-block';
+        } else {
+            menu.style.display = 'none';
+        }
     }
+    
+    // Optional: Show menu on larger screens
     window.addEventListener('resize', function() {
         const menu = document.getElementById('navMenu');
-        if (window.innerWidth > 768) menu.style.display = 'inline-block';
+        if (window.innerWidth > 768) {
+            menu.style.display = 'inline-block';
+        }
     });
 </script>";
 
