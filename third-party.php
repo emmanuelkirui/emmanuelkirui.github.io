@@ -6,113 +6,172 @@ $year = date("Y");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Learn about the third-party services used by Emmanuel Kirui's website and their respective terms and policies.">
+    <meta name="description" content="Explore the third-party services integrated into Emmanuel Kirui's website, detailing their purposes, data practices, and links to their terms and privacy policies for transparency.">
     <meta name="author" content="Emmanuel Kirui">
+    <meta name="keywords" content="third-party services, Emmanuel Kirui, privacy, website functionality, terms of service">
+    <meta name="robots" content="index, follow">
     <title>Third-Party Services | Emmanuel Kirui</title>
 
-    <!-- Google Font & Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1vW6TfH6PfnEX7uL9r6Qz1D8rW9V8eB5eJ5eJ7eK9rL6rW8eL5fJ6eJ7rW9V8eB5eJ5eJ7eK9rL6r==" crossorigin="anonymous" referrerpolicy="no-referrer">
 
     <style>
+        /* Reset and Base Styles */
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
         body {
             font-family: 'Roboto', Arial, sans-serif;
-            margin: 0;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #f4f4f4, #e0e0e0);
-            color: #333;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            color: #2d3436;
             line-height: 1.8;
+            padding: 50px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .container {
-            max-width: 900px;
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            max-width: 960px;
             margin: 0 auto;
-            text-align: left;
+            background: #ffffff;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
         }
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Typography */
         h1 {
             color: #f39c12;
-            font-size: 32px;
+            font-size: 36px;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            font-weight: 700;
+            letter-spacing: 1px;
         }
         h2 {
             color: #e67e22;
-            font-size: 24px;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #f39c12;
-            padding-bottom: 5px;
+            font-size: 26px;
+            margin: 40px 0 20px;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 8px;
+            font-weight: 700;
         }
         p {
-            font-size: 16px;
-            margin: 10px 0;
+            font-size: 17px;
+            margin: 15px 0;
             text-align: justify;
         }
         ul {
-            margin: 10px 0 20px 20px;
+            margin: 15px 0 25px 25px;
             padding-left: 20px;
         }
         li {
-            margin-bottom: 10px;
-            font-size: 16px;
+            font-size: 17px;
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 15px;
         }
+        li::before {
+            content: "•";
+            color: #f39c12;
+            position: absolute;
+            left: 0;
+            font-size: 20px;
+        }
+
+        /* Links and Buttons */
         a {
             color: #f39c12;
             text-decoration: none;
+            transition: color 0.3s ease;
         }
         a:hover {
+            color: #e67e22;
             text-decoration: underline;
         }
         .back-button {
             display: inline-flex;
             align-items: center;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #fff;
+            justify-content: center;
+            padding: 14px 25px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
             background: #f39c12;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             text-decoration: none;
-            transition: all 0.3s ease-in-out;
-            margin-top: 30px;
+            transition: all 0.3s ease;
+            margin-top: 40px;
         }
         .back-button i {
-            margin-right: 8px;
+            margin-right: 10px;
         }
         .back-button:hover {
             background: #e67e22;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
+
+        /* Footer */
         .footer {
-            margin-top: 40px;
-            font-size: 14px;
-            color: #777;
+            margin-top: 50px;
+            font-size: 15px;
+            color: #6c757d;
             text-align: center;
-            border-top: 1px solid #ddd;
-            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            padding-top: 25px;
         }
         .contact-link {
             color: #f39c12;
-            text-decoration: none;
+            font-weight: 700;
         }
         .contact-link:hover {
+            color: #e67e22;
             text-decoration: underline;
         }
-        @media (max-width: 600px) {
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+                max-width: 100%;
+            }
+            h1 {
+                font-size: 30px;
+            }
+            h2 {
+                font-size: 22px;
+            }
+            p, li {
+                font-size: 15px;
+            }
+            .back-button {
+                padding: 12px 20px;
+                font-size: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 30px 15px;
+            }
             .container {
                 padding: 20px;
             }
             h1 {
-                font-size: 28px;
+                font-size: 26px;
             }
             h2 {
                 font-size: 20px;
@@ -124,63 +183,83 @@ $year = date("Y");
     </style>
 </head>
 <body>
+    <main class="container" role="main">
+        <header>
+            <h1><i class="fas fa-handshake"></i> Third-Party Services</h1>
+            <p><strong>Last Updated:</strong> March 01, 2025</p>
+        </header>
 
-<div class="container">
-    <h1><i class="fas fa-handshake"></i> Third-Party Services</h1>
-    <p>Last Updated: March 01, 2025</p>
-    <p>At Emmanuel Kirui's website, we utilize various third-party services to enhance functionality, improve user experience, and maintain operational efficiency. This page provides information about these services, their roles, and how their terms and privacy policies apply to your use of our website.</p>
+        <section>
+            <p>Welcome to Emmanuel Kirui's website. To provide you with a robust, secure, and user-friendly experience, we leverage a variety of third-party services. This page outlines these services, their purposes, and how they integrate with our site. It also provides transparency into their respective terms of service and privacy policies, ensuring you understand how your data may be handled when interacting with our platform.</p>
+        </section>
 
-    <h2>1. Overview of Third-Party Services</h2>
-    <p>We integrate third-party tools and services to deliver a seamless experience. These services may process data on our behalf and have their own terms of service and privacy policies, which you should review. By using our website, you acknowledge and agree to the practices outlined by these third parties.</p>
+        <section>
+            <h2>1. Introduction to Third-Party Services</h2>
+            <p>Our website employs third-party tools to enhance functionality, optimize performance, and ensure security. These services are carefully selected to align with our commitment to quality and user satisfaction. Each third-party provider operates under its own legal agreements, which may include data processing terms that apply to your use of our website. We encourage you to familiarize yourself with these policies to make informed decisions about your engagement with our platform.</p>
+        </section>
 
-    <h2>2. List of Third-Party Services</h2>
-    <p>Below are examples of third-party services we may use and their purposes:</p>
-    <ul>
-        <li><strong>Google Analytics:</strong> Used to analyze website traffic and user behavior. See their <a href="https://policies.google.com/privacy" target="_blank">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank">Terms of Service</a>.</li>
-        <li><strong>Cloudflare:</strong> Provides security and performance optimization. Review their <a href="https://www.cloudflare.com/privacypolicy/" target="_blank">Privacy Policy</a> and <a href="https://www.cloudflare.com/terms/" target="_blank">Terms</a>.</li>
-        <li><strong>Font Awesome:</strong> Supplies icons for visual enhancement. Check their <a href="https://fontawesome.com/privacy" target="_blank">Privacy Policy</a> and <a href="https://fontawesome.com/terms" target="_blank">Terms</a>.</li>
-        <li><strong>Hosting Providers:</strong> Services like [Insert Provider, e.g., AWS or SiteGround] host our website and store data. Policies vary by provider.</li>
-    </ul>
-    <p>Note: This list is not exhaustive and may change as we update our tools. We will strive to keep this page current.</p>
+        <section>
+            <h2>2. Third-Party Services We Utilize</h2>
+            <p>The following is a detailed list of key third-party services we may integrate, along with their intended purposes:</p>
+            <ul>
+                <li><strong>Google Analytics:</strong> A web analytics tool that tracks and reports website traffic, user interactions, and behavioral patterns to help us improve our content and services. Learn more in their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                <li><strong>Cloudflare:</strong> A service that enhances website security, accelerates load times, and protects against cyber threats. Refer to their <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.cloudflare.com/terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                <li><strong>Font Awesome:</strong> A library providing scalable vector icons to enhance the visual appeal and usability of our website. See their <a href="https://fontawesome.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://fontawesome.com/terms" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</li>
+                <li><strong>Hosting Providers (e.g., AWS, SiteGround):</strong> Infrastructure services that host our website, store data, and ensure uptime and reliability. Policies depend on the specific provider; please contact us for details on our current hosting partner.</li>
+            </ul>
+            <p><em>Note:</em> This list is representative and subject to change as we adopt new tools or discontinue others. We aim to keep this page updated to reflect our current third-party ecosystem.</p>
+        </section>
 
-    <h2>3. Data Sharing with Third Parties</h2>
-    <p>We may share certain data (e.g., usage statistics or IP addresses) with these services to enable their functionality. However:</p>
-    <ul>
-        <li>We do not sell your personal information to third parties.</li>
-        <li>Data sharing is limited to what is necessary for the service to operate.</li>
-        <li>Third parties are contractually obligated to protect your data and comply with applicable laws.</li>
-    </ul>
-    <p>For more details, refer to our <a href="/privacy-policy" class="contact-link">Privacy Policy</a>.</p>
+        <section>
+            <h2>3. Data Handling and Third-Party Integration</h2>
+            <p>To enable these services, we may share specific data, such as anonymized usage statistics, IP addresses, or cookies, with third-party providers. Our data-sharing practices are guided by the following principles:</p>
+            <ul>
+                <li>We do not sell, trade, or otherwise monetize your personal information.</li>
+                <li>Data shared is strictly limited to what is necessary for each service to function effectively.</li>
+                <li>Third-party providers are bound by contractual agreements to safeguard your data and comply with relevant data protection regulations, such as GDPR or CCPA, where applicable.</li>
+            </ul>
+            <p>For a comprehensive overview of our data practices, please review our <a href="/privacy-policy" class="contact-link">Privacy Policy</a>.</p>
+        </section>
 
-    <h2>4. Your Responsibilities</h2>
-    <p>Before interacting with our website, we encourage you to:</p>
-    <ul>
-        <li>Review the terms and privacy policies of the third-party services listed above.</li>
-        <li>Understand how these services may collect and use your data.</li>
-        <li>Contact us if you have concerns about any third-party service we use.</li>
-    </ul>
+        <section>
+            <h2>4. Your Role and Responsibilities</h2>
+            <p>As a user of our website, we recommend the following actions to ensure a transparent and informed experience:</p>
+            <ul>
+                <li>Examine the terms of service and privacy policies of the third-party providers listed above.</li>
+                <li>Understand how these services may collect, process, or store your data during your visit.</li>
+                <li>Reach out to us with any questions or concerns regarding our third-party integrations.</li>
+            </ul>
+        </section>
 
-    <h2>5. Limitation of Liability</h2>
-    <p>While we carefully select reputable third-party providers, we are not responsible for:</p>
-    <ul>
-        <li>The content, accuracy, or practices of third-party websites or services.</li>
-        <li>Any issues arising from your use of these external services beyond our control.</li>
-    </ul>
-    <p>Your use of third-party services is at your own risk, subject to their respective terms.</p>
+        <section>
+            <h2>5. Limitation of Liability</h2>
+            <p>While we partner with trusted third-party providers, we cannot assume responsibility for:</p>
+            <ul>
+                <li>The accuracy, content, or operational practices of external services or websites linked herein.</li>
+                <li>Any disruptions, data breaches, or issues stemming from third-party services outside our direct control.</li>
+            </ul>
+            <p>Your interaction with these third-party services is governed by their terms and undertaken at your discretion.</p>
+        </section>
 
-    <h2>6. Updates to This Page</h2>
-    <p>We may update this page to reflect changes in the third-party services we use. Updates will be posted here with a revised "Last Updated" date. Please check back periodically.</p>
+        <section>
+            <h2>6. Updates to This Information</h2>
+            <p>We reserve the right to modify this page as our use of third-party services evolves. Any updates will be reflected here, accompanied by a revised "Last Updated" date. We recommend revisiting this page periodically to stay informed of changes.</p>
+        </section>
 
-    <h2>7. Contact Us</h2>
-    <p>If you have questions about our use of third-party services, please reach out to us at <a href="mailto:support@emmanuelkirui.com" class="contact-link">support@emmanuelkirui.com</a>.</p>
+        <section>
+            <h2>7. Contact Information</h2>
+            <p>For inquiries regarding our use of third-party services or any other concerns, please contact us at <a href="mailto:support@emmanuelkirui.com" class="contact-link">support@emmanuelkirui.com</a>. We are committed to addressing your questions promptly and thoroughly.</p>
+        </section>
 
-    <!-- Back Button -->
-    <button class="back-button" onclick="history.back()">
-        <i class="fas fa-arrow-left"></i> Return to Previous Page
-    </button>
+        <!-- Back Button -->
+        <button class="back-button" onclick="history.back()" aria-label="Return to Previous Page">
+            <i class="fas fa-arrow-left"></i> Return to Previous Page
+        </button>
 
-    <p class="footer">© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>Contact us at <a href="mailto:info@emmanuelkirui.com" class="contact-link">info@emmanuelkirui.com</a> for any inquiries.</p>
-</div>
-
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>For further inquiries, reach us at <a href="mailto:info@emmanuelkirui.com" class="contact-link">info@emmanuelkirui.com</a>.</p>
+        </footer>
+    </main>
 </body>
 </html>
