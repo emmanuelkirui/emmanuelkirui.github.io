@@ -12,23 +12,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
     $startTime = time();
     $maxExecutionTime = 10;
     
-    while (true) {
-        if (!checkConnection()) {
-            echo json_encode(['status' => 'error', 'message' => 'Connection lost during processing']);
-            exit;
+    try {
+        while (true) {
+            if (!checkConnection()) {
+                throw new Exception('Connection lost during processing');
+            }
+            
+            if ((time() - $startTime) > $maxExecutionTime) {
+                header('HTTP/1.1 504 Gateway Timeout');
+                throw new Exception('Server timeout after 10s');
+            }
+            
+            sleep(1);
+            break;
         }
         
-        if ((time() - $startTime) > $maxExecutionTime) {
-            header('HTTP/1.1 504 Gateway Timeout');
-            echo json_encode(['status' => 'error', 'message' => 'Server timeout after 10s']);
-            exit;
-        }
-        
-        sleep(1);
-        break;
+        echo json_encode(['status' => 'success', 'message' => 'Processed successfully']);
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
-    
-    echo json_encode(['status' => 'success', 'message' => 'Processed successfully']);
     exit;
 }
 ?>
@@ -60,30 +62,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
             color: maroon; 
             border: 1px solid maroon;
         }
-        button { 
-            margin: 20px; 
-            padding: 8px 15px; 
-            cursor: pointer;
-        }
         body { text-align: center; }
     </style>
 </head>
 <body>
-    <button id="fetchBtn">Test Connection</button>
     <div id="status-output" class="status-container"></div>
 
     <script>
     class ConnectionHandler {
         constructor() {
             this.timeout = 8000;
+            this.interval = 5000; // Check every 5 seconds
+            this.init();
+        }
+
+        init() {
+            this.monitorConnection();
+            this.processRequest(); // Automatically start the first check
+            setInterval(() => this.processRequest(), this.interval); // Periodic checks
         }
 
         async processRequest() {
             const outputElement = document.getElementById('status-output');
-            outputElement.textContent = 'Processing...';
-            outputElement.className = 'status-container'; // Reset to neutral
-            outputElement.style.display = 'block';
-            outputElement.style.opacity = '1';
+            this.showStatus(outputElement, 'Checking connection...', 'neutral');
 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -102,54 +103,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
                 }
 
                 const data = await response.json();
-                outputElement.className = `status-container ${data.status === 'success' ? 'success' : 'error'}`;
-                outputElement.textContent = `${data.status.toUpperCase()}: ${data.message}`;
-                
-                // Auto-hide after 3 seconds
-                setTimeout(() => {
-                    outputElement.style.opacity = '0';
-                    setTimeout(() => outputElement.style.display = 'none', 300);
-                }, 3000);
+                this.showStatus(outputElement, `${data.status.toUpperCase()}: ${data.message}`, data.status);
             } catch (error) {
-                outputElement.className = 'status-container error';
-                outputElement.textContent = 'ERROR: ' + (
-                    error.message === 'Failed to fetch' ? 'Connection lost or server not responding' :
-                    error.message === 'AbortError' ? 'Client timeout after 8s' :
-                    error.message
-                );
-                setTimeout(() => {
-                    outputElement.style.opacity = '0';
-                    setTimeout(() => outputElement.style.display = 'none', 300);
-                }, 3000);
+                const errorMessage = error.message === 'Failed to fetch' ? 'Connection lost or server not responding' :
+                                    error.message === 'AbortError' ? 'Client timeout after 8s' : error.message;
+                this.showStatus(outputElement, `ERROR: ${errorMessage}`, 'error');
             }
+        }
+
+        showStatus(element, message, status) {
+            element.textContent = message;
+            element.className = `status-container ${status}`;
+            element.style.display = 'block';
+            element.style.opacity = '1';
+
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                element.style.opacity = '0';
+                setTimeout(() => element.style.display = 'none', 300);
+            }, 3000);
         }
 
         monitorConnection() {
             const outputElement = document.getElementById('status-output');
             window.addEventListener('offline', () => {
-                outputElement.className = 'status-container error';
-                outputElement.textContent = 'ERROR: Network connection lost';
-                outputElement.style.display = 'block';
-                outputElement.style.opacity = '1';
+                this.showStatus(outputElement, 'ERROR: Network connection lost', 'error');
             });
             window.addEventListener('online', () => {
-                outputElement.className = 'status-container success';
-                outputElement.textContent = 'SUCCESS: Network connection restored';
-                outputElement.style.display = 'block';
-                outputElement.style.opacity = '1';
-                setTimeout(() => {
-                    outputElement.style.opacity = '0';
-                    setTimeout(() => outputElement.style.display = 'none', 300);
-                }, 3000);
+                this.showStatus(outputElement, 'SUCCESS: Network connection restored', 'success');
             });
         }
     }
 
-    const handler = new ConnectionHandler();
-    handler.monitorConnection();
-    document.getElementById('fetchBtn').addEventListener('click', () => {
-        handler.processRequest();
-    });
+    new ConnectionHandler();
     </script>
 </body>
 </html>
