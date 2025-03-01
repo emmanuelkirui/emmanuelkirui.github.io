@@ -15,21 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
     while (true) {
         if (!checkConnection()) {
             echo json_encode(['status' => 'error', 'message' => 'Connection lost']);
-            die();
+            exit;
         }
 
         if ((time() - $startTime) > $maxExecutionTime) {
             http_response_code(504);
             echo json_encode(['status' => 'error', 'message' => 'Server timeout']);
-            die();
+            exit;
         }
 
         sleep(1);
         break;
     }
 
-    echo json_encode(['status' => 'ok']); // Prevents "Unexpected token '<'"
-    die();
+    echo json_encode(['status' => 'ok']);
+    exit;
+}
+
+// Prevent further execution if it's an AJAX request
+if (isset($_GET['ajax'])) {
+    exit;
 }
 ?>
 
