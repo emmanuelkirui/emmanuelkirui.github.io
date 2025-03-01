@@ -13,8 +13,7 @@ $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
-
-// Only output the navigation bar if it's not an AJAX request
+// Only output the navigation bar and script if it's not an AJAX request
 if (!isset($_GET['ajax'])) {
     echo "<nav class='navbar' style='width: 100%; position: relative;'>";
     echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
@@ -23,9 +22,9 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='liv' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
     echo "</div>";
-    echo "</nav>"
-        
-    // JavaScript remains mostly the same
+    echo "</nav>";
+
+    // JavaScript for toggling the menu
     echo "<script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
@@ -44,8 +43,9 @@ if (!isset($_GET['ajax'])) {
             menu.style.display = 'inline-block';
         }
     });
-</script>";
+    </script>";
 }
+
     // Error handling function
 function handleError($message) {
     echo "<div style='text-align: center; padding: 20px; color: #dc3545;'>";
