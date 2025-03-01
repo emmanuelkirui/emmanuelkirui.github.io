@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Append elements
     reconnectNotice.appendChild(spinner);
     reconnectNotice.appendChild(message);
-    document.body.appendChild(reconnectNotice);
+    document.body.insertBefore(reconnectNotice, document.body.firstChild); // Place at top of body
 
     // Connection states
     const states = {
@@ -28,23 +28,23 @@ document.addEventListener("DOMContentLoaded", function () {
     const statusConfig = {
         [states.ONLINE]: { 
             display: "none", 
-            message: "",
-            spinner: false
+            message: "", 
+            spinner: false 
         },
         [states.OFFLINE]: { 
             display: "flex", 
-            message: "Offline - No Internet Connection",
-            spinner: true
+            message: "Offline - No Internet Connection", 
+            spinner: true 
         },
         [states.SLOW]: { 
             display: "flex", 
-            message: "Slow Connection Detected",
-            spinner: true
+            message: "Slow Connection Detected", 
+            spinner: true 
         },
         [states.ERROR]: { 
             display: "flex", 
-            message: "Connection Error",
-            spinner: true
+            message: "Connection Error", 
+            spinner: true 
         }
     };
 
@@ -56,10 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 cache: 'no-store',
                 mode: 'no-cors'
             });
-            const endTime = performance.now();
-            return endTime - startTime;
+            return performance.now() - startTime;
         } catch (error) {
-            return Infinity;
+            return Infinity; // Indicates error
         }
     }
 
@@ -94,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         if (latency === Infinity) {
             updateUI(states.ERROR);
-        } else if (latency > 1000) {
+        } else if (latency > 1000) { // Threshold of 1 second for slow connection
             updateUI(states.SLOW);
         } else {
             updateUI(states.ONLINE);
@@ -103,7 +102,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Periodic checking
     let lastCheck = 0;
-    const CHECK_INTERVAL = 5000;
+    const CHECK_INTERVAL = 5000; // Check every 5 seconds
 
     function throttleCheck() {
         const now = Date.now();
@@ -118,159 +117,144 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("offline", checkNetworkStatus);
     window.addEventListener("load", checkNetworkStatus);
     
+    // Check periodically for slow connections
     setInterval(throttleCheck, 1000);
 
     // Initial check
     checkNetworkStatus();
-});
 
-// Updated CSS to handle long text and stabilize spinner
-const styles = `
-    #reconnect-notice {
-        position: fixed;
-        top: 1rem;
-        left: 50%;
-        transform: translateX(-50%);
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        background: rgba(0, 0, 0, 0.8);
-        color: white;
-        align-items: center;
-        gap: 0.75rem;
-        z-index: 1000;
-        min-width: 220px;
-        max-width: 90vw;
-        font-size: clamp(0.875rem, 2.5vw, 1rem);
-        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
-        display: flex;
-        pointer-events: none;
-        overflow: hidden; /* Prevents content from spilling out */
-    }
-
-    .spinner {
-        width: clamp(1rem, 2.5vw, 1.5rem);
-        height: clamp(1rem, 2.5vw, 1.5rem);
-        min-width: 16px;
-        min-height: 16px;
-        border: 0.2rem solid #fff;
-        border-top: 0.2rem solid transparent;
-        border-radius: 50%;
-        display: none;
-        flex-shrink: 0;
-        order: 1; /* Ensures spinner stays on the left */
-    }
-
-    .spinner.active {
-        display: block;
-        animation: spin 1s linear infinite;
-    }
-
-    .status-message {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: calc(90vw - 40px); /* Space for spinner and padding */
-        min-width: 0; /* Allows proper flex shrinking */
-        flex-grow: 1;
-        order: 2; /* Ensures message follows spinner */
-    }
-
-    .fade-in {
-        transition: opacity 0.3s ease;
-        opacity: 0;
-    }
-
-    .fade-in.online { opacity: 0; }
-    .fade-in.offline { opacity: 1; background: #dc3545; }
-    .fade-in.slow { opacity: 1; background: #ffc107; }
-    .fade-in.error { opacity: 1; background: #dc3545; }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    /* Card layout adjustments */
-    .card #reconnect-notice,
-    .card-container #reconnect-notice,
-    [class*="card"] #reconnect-notice {
-        position: absolute;
-        top: 0.5rem;
-        left: 0;
-        right: 0;
-        margin: 0 auto;
-        width: fit-content;
-        min-width: 220px;
-        max-width: 90%;
-        transform: none;
-        padding: 0.5rem 1rem;
-        overflow: hidden;
-    }
-
-    /* Tablet and below */
-    @media (max-width: 768px) {
+    // Inject CSS into the document
+    const styles = `
         #reconnect-notice {
+            position: fixed;
             top: 0.5rem;
-            padding: 0.5rem 1rem;
-            flex-wrap: nowrap; /* Prevents wrapping to keep spinner stable */
-            justify-content: flex-start;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1rem;
+            border-radius: 0.25rem;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            display: flex;
+            align-items: center;
             gap: 0.5rem;
-            min-width: 200px;
+            z-index: 2000;
+            min-width: 240px;
+            max-width: 90vw;
+            font-size: clamp(0.875rem, 2vw, 1rem);
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            overflow: hidden;
         }
-        
-        .spinner {
-            margin-right: 0.5rem; /* Consistent spacing */
-        }
-    }
 
-    /* Mobile and card-specific mobile */
-    @media (max-width: 480px) {
-        #reconnect-notice {
-            top: 0;
-            left: 0;
-            transform: none;
-            width: 100%;
-            max-width: 100vw;
-            min-width: 180px;
-            border-radius: 0;
-            padding: 0.5rem;
-            font-size: 0.875rem;
+        .spinner {
+            width: clamp(1rem, 2vw, 1.25rem);
+            height: clamp(1rem, 2vw, 1.25rem);
+            min-width: 16px;
+            min-height: 16px;
+            border: 0.2rem solid #fff;
+            border-top: 0.2rem solid transparent;
+            border-radius: 50%;
+            display: none;
+            flex-shrink: 0;
+            order: 1;
         }
-        
-        .card #reconnect-notice,
-        .card-container #reconnect-notice,
-        [class*="card"] #reconnect-notice {
-            width: 100%;
-            min-width: 180px;
-            padding: 0.5rem;
+
+        .spinner.active {
+            display: block;
+            animation: spin 1s linear infinite;
         }
-        
+
         .status-message {
-            max-width: calc(85vw - 30px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: calc(90vw - 48px);
+            min-width: 0;
+            flex-grow: 1;
+            order: 2;
         }
-        
-        .spinner {
-            min-width: 14px;
-            min-height: 14px;
-        }
-    }
 
-    /* Large screens */
-    @media (min-width: 1200px) {
-        #reconnect-notice {
-            padding: 1rem 2rem;
-            gap: 1rem;
-            min-width: 250px;
+        .fade-in {
+            transition: opacity 0.3s ease;
+            opacity: 0;
         }
-        
-        .spinner {
-            width: clamp(1.5rem, 2vw, 1.75rem);
-            height: clamp(1.5rem, 2vw, 1.75rem);
-            min-width: 20px;
-            min-height: 20px;
-        }
-    }
-`;
 
-const styleSheet = document.createElement("style");
-styleSheet.textContent = styles;
-document.head.appendChild(styleSheet);
+        .fade-in.online { opacity: 0; }
+        .fade-in.offline { opacity: 1; background: #ff3860; }
+        .fade-in.slow { opacity: 1; background: #ffdd57; color: #000; }
+        .fade-in.error { opacity: 1; background: #ff3860; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        section.section #reconnect-notice {
+            top: 4rem;
+        }
+
+        .table-container #reconnect-notice {
+            position: fixed;
+            top: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: fit-content;
+            min-width: 240px;
+            max-width: 90%;
+        }
+
+        @media (max-width: 768px) {
+            #reconnect-notice {
+                top: 0;
+                padding: 0.5rem 0.75rem;
+                min-width: 200px;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+            }
+            
+            .spinner {
+                margin-right: 0.5rem;
+            }
+            
+            .status-message {
+                max-width: calc(85vw - 40px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            #reconnect-notice {
+                width: 100%;
+                max-width: 100vw;
+                min-width: 180px;
+                left: 0;
+                transform: none;
+                border-radius: 0;
+            }
+            
+            .status-message {
+                max-width: calc(85vw - 36px);
+            }
+            
+            .spinner {
+                min-width: 14px;
+                min-height: 14px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            #reconnect-notice {
+                min-width: 260px;
+                padding: 1rem 1.5rem;
+            }
+            
+            .spinner {
+                min-width: 18px;
+                min-height: 18px;
+            }
+        }
+    `;
+
+    // Create and append the style element
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+});
