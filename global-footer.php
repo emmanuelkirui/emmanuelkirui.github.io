@@ -8,8 +8,8 @@ $year = date("Y"); // Auto-updating year
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Footer</title>
 
-    <!-- Font Awesome -->
-    <script src="https://kit.fontawesome.com/YOUR-KIT-ID.js" crossorigin="anonymous"></script>
+    <!-- Free Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style>
         /* Footer Styles */
@@ -140,22 +140,22 @@ $year = date("Y"); // Auto-updating year
         <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
         
         <ul class="footer-links">
-            <li><a href="#"><i class="fa-solid fa-file-contract"></i> Terms</a></li>
-            <li><a href="#"><i class="fa-solid fa-user-shield"></i> Privacy</a></li>
-            <li><a href="#"><i class="fa-solid fa-handshake"></i> Third-Party</a></li>
+            <li><a href="#"><i class="fa fa-file-contract"></i> Terms</a></li>
+            <li><a href="#"><i class="fa fa-user-shield"></i> Privacy</a></li>
+            <li><a href="#"><i class="fa fa-handshake"></i> Third-Party</a></li>
         </ul>
 
         <!-- Social Media Icons -->
         <div class="social-icons">
-            <a href="https://facebook.com/emmanuelkirui042" target="_blank"><i class="fa-brands fa-facebook"></i></a>
-            <a href="#" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
-            <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-            <a href="https://youtube.com/@emmanuelkirui9043" target="_blank"><i class="fa-brands fa-youtube"></i></a>
-            <a href="https://tiktok.com/@emmanuelkirui3" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+            <a href="https://facebook.com/emmanuelkirui042" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://youtube.com/@emmanuelkirui9043" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="https://tiktok.com/@emmanuelkirui3" target="_blank"><i class="fab fa-tiktok"></i></a>
         </div>
 
         <p class="gambling-disclaimer">
-            <i class="fa-solid fa-triangle-exclamation"></i> Responsible Gambling: This site is for **18+ users** only. 
+            <i class="fa fa-exclamation-triangle"></i> Responsible Gambling: This site is for **18+ users** only. 
             If you or someone you know has a gambling problem, seek help. Play responsibly.
         </p>
 
@@ -167,7 +167,7 @@ $year = date("Y"); // Auto-updating year
 
 <!-- Cookie Consent -->
 <div id="cookieConsent">
-    <p><i class="fa-solid fa-cookie-bite"></i> This site uses cookies to improve user experience. 
+    <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience. 
         <a href="privacy-policy.html">Learn more</a>.
     </p>
     <button id="acceptCookies">Accept</button>
