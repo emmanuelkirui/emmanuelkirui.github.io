@@ -25,6 +25,9 @@ $year = date("Y"); // Auto-updating year
         .footer-container {
             max-width: 1200px;
             margin: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         /* Footer Links */
@@ -60,7 +63,9 @@ $year = date("Y"); // Auto-updating year
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 10px;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #f39c12; /* Separator */
         }
 
         .social-icons a {
@@ -145,15 +150,6 @@ $year = date("Y"); // Auto-updating year
             <li><a href="#"><i class="fa fa-handshake"></i> Third-Party</a></li>
         </ul>
 
-        <!-- Social Media Icons -->
-        <div class="social-icons">
-            <a href="https://facebook.com/emmanuelkirui042" target="_blank"><i class="fab fa-facebook"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
-            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
-            <a href="https://youtube.com/@emmanuelkirui9043" target="_blank"><i class="fab fa-youtube"></i></a>
-            <a href="https://tiktok.com/@emmanuelkirui3" target="_blank"><i class="fab fa-tiktok"></i></a>
-        </div>
-
         <p class="gambling-disclaimer">
             <i class="fa fa-exclamation-triangle"></i> Responsible Gambling: This site is for **18+ users** only. 
             If you or someone you know has a gambling problem, seek help. Play responsibly.
@@ -162,6 +158,15 @@ $year = date("Y"); // Auto-updating year
         <p class="disclaimer">
             This site uses third-party services, cookies, and advertisements. These third parties have their own policies, and we are not responsible for their actions. Please review their terms.
         </p>
+
+        <!-- Social Media Icons (Moved to Bottom) -->
+        <div class="social-icons">
+            <a href="https://facebook.com/emmanuelkirui042" target="_blank"><i class="fab fa-facebook"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="https://youtube.com/@emmanuelkirui9043" target="_blank"><i class="fab fa-youtube"></i></a>
+            <a href="https://tiktok.com/@emmanuelkirui3" target="_blank"><i class="fab fa-tiktok"></i></a>
+        </div>
     </div>
 </footer>
 
