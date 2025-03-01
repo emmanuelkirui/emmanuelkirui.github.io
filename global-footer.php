@@ -11,9 +11,6 @@ $year = date("Y"); // Auto-updating year
     <!-- Font Awesome -->
     <script src="https://kit.fontawesome.com/YOUR-KIT-ID.js" crossorigin="anonymous"></script>
 
-    <!-- Bootstrap CSS (for modals) -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
         /* Footer Styles */
         .footer {
@@ -21,7 +18,7 @@ $year = date("Y"); // Auto-updating year
             color: white;
             text-align: center;
             padding: 20px;
-            margin: 20px;
+            margin: 20px; /* Adds space around */
             border-top: 3px solid #f39c12;
         }
 
@@ -50,7 +47,6 @@ $year = date("Y"); // Auto-updating year
             text-decoration: none;
             font-size: 16px;
             font-weight: bold;
-            cursor: pointer;
             transition: color 0.3s ease-in-out;
         }
 
@@ -144,9 +140,9 @@ $year = date("Y"); // Auto-updating year
         <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
         
         <ul class="footer-links">
-            <li><a href="terms-conditions.php" data-bs-toggle="modal" data-bs-target="#termsModal"><i class="fa-solid fa-file-contract"></i> Terms</a></li>
-            <li><a href="privacy-policy.php" data-bs-toggle="modal" data-bs-target="#privacyModal"><i class="fa-solid fa-user-shield"></i> Privacy</a></li>
-            <li><a href="third-party.php" data-bs-toggle="modal" data-bs-target="#thirdPartyModal"><i class="fa-solid fa-handshake"></i> Third-Party</a></li>
+            <li><a href="#"><i class="fa-solid fa-file-contract"></i> Terms</a></li>
+            <li><a href="#"><i class="fa-solid fa-user-shield"></i> Privacy</a></li>
+            <li><a href="#"><i class="fa-solid fa-handshake"></i> Third-Party</a></li>
         </ul>
 
         <!-- Social Media Icons -->
@@ -172,52 +168,9 @@ $year = date("Y"); // Auto-updating year
 <!-- Cookie Consent -->
 <div id="cookieConsent">
     <p><i class="fa-solid fa-cookie-bite"></i> This site uses cookies to improve user experience. 
-        <a href="privacy-policy.php">Learn more</a>.
+        <a href="privacy-policy.html">Learn more</a>.
     </p>
     <button id="acceptCookies">Accept</button>
-</div>
-
-<!-- Modals -->
-<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="termsLabel">Terms & Conditions</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Here are the terms and conditions...</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="privacyLabel">Privacy Policy</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Here is the privacy policy...</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="thirdPartyModal" tabindex="-1" aria-labelledby="thirdPartyLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="thirdPartyLabel">Third-Party Agreements</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Details about third-party agreements...</p>
-            </div>
-        </div>
-    </div>
 </div>
 
 <!-- Cookie Consent Script -->
@@ -232,9 +185,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
