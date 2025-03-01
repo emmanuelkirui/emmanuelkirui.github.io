@@ -55,6 +55,24 @@ $year = date("Y"); // Auto-updating year
             text-decoration: underline;
         }
 
+        /* Social Media Icons */
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .social-icons a {
+            color: #f39c12;
+            font-size: 24px;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: #e67e22;
+        }
+
         /* Gambling Disclaimer */
         .gambling-disclaimer {
             font-size: 14px;
@@ -103,6 +121,14 @@ $year = date("Y"); // Auto-updating year
             .disclaimer, .gambling-disclaimer {
                 font-size: 12px;
             }
+            
+            .social-icons {
+                gap: 10px;
+            }
+
+            .social-icons a {
+                font-size: 20px;
+            }
         }
     </style>
 </head>
@@ -119,11 +145,14 @@ $year = date("Y"); // Auto-updating year
             <li><a href="#"><i class="fa-solid fa-handshake"></i> Third-Party</a></li>
         </ul>
 
-        <ul class="footer-links">
-            <li><a href="#" target="_blank"><i class="fa-brands fa-facebook"></i> Facebook</a></li>
-            <li><a href="#" target="_blank"><i class="fa-brands fa-x-twitter"></i> Twitter</a></li>
-            <li><a href="#" target="_blank"><i class="fa-brands fa-instagram"></i> Instagram</a></li>
-        </ul>
+        <!-- Social Media Icons -->
+        <div class="social-icons">
+            <a href="https://facebook.com/emmanuelkirui042" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://youtube.com/@emmanuelkirui9043" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+            <a href="https://tiktok.com/@emmanuelkirui3" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
 
         <p class="gambling-disclaimer">
             <i class="fa-solid fa-triangle-exclamation"></i> Responsible Gambling: This site is for **18+ users** only. 
