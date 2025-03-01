@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
         [states.ONLINE]: { 
             display: "none", 
             message: "",
-            spinner: false // Added spinner control
+            spinner: false
         },
         [states.OFFLINE]: { 
             display: "flex", 
@@ -83,7 +83,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Main network status check
     async function checkNetworkStatus() {
-        // Show spinner during check
         spinner.classList.add('active');
         
         if (!navigator.onLine) {
@@ -125,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
     checkNetworkStatus();
 });
 
-// Updated CSS with responsive spinner
+// Updated CSS with better card layout support
 const styles = `
     #reconnect-notice {
         position: fixed;
@@ -143,15 +142,17 @@ const styles = `
         font-size: clamp(0.875rem, 2.5vw, 1rem);
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
         display: flex;
+        pointer-events: none; /* Prevents interference with card interactions */
     }
 
     .spinner {
-        width: clamp(1rem, 3vw, 1.5rem);
-        height: clamp(1rem, 3vw, 1.5rem);
+        width: clamp(1rem, 2.5vw, 1.5rem);
+        height: clamp(1rem, 2.5vw, 1.5rem);
         border: 0.2rem solid #fff;
         border-top: 0.2rem solid transparent;
         border-radius: 50%;
-        display: none; /* Hidden by default */
+        display: none;
+        flex-shrink: 0; /* Prevents spinner from squashing in tight layouts */
     }
 
     .spinner.active {
@@ -164,6 +165,7 @@ const styles = `
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 70vw;
+        flex-grow: 1;
     }
 
     .fade-in {
@@ -180,22 +182,37 @@ const styles = `
         to { transform: rotate(360deg); }
     }
 
+    /* Card layout adjustments */
+    .card #reconnect-notice,
+    .card-container #reconnect-notice,
+    [class*="card"] #reconnect-notice {
+        position: absolute;
+        top: 0.5rem;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        width: fit-content;
+        max-width: 90%;
+        transform: none;
+        padding: 0.5rem 1rem;
+    }
+
     /* Tablet and below */
     @media (max-width: 768px) {
         #reconnect-notice {
             top: 0.5rem;
             padding: 0.5rem 1rem;
-            flex-direction: column;
-            text-align: center;
+            flex-wrap: wrap; /* Better handling in constrained spaces */
+            justify-content: center;
             gap: 0.5rem;
         }
         
         .spinner {
-            margin-bottom: 0.25rem;
+            margin: 0 auto;
         }
     }
 
-    /* Mobile */
+    /* Mobile and card-specific mobile */
     @media (max-width: 480px) {
         #reconnect-notice {
             top: 0;
@@ -208,8 +225,15 @@ const styles = `
             font-size: 0.875rem;
         }
         
+        .card #reconnect-notice,
+        .card-container #reconnect-notice,
+        [class*="card"] #reconnect-notice {
+            width: 100%;
+            padding: 0.5rem;
+        }
+        
         .status-message {
-            max-width: 90vw;
+            max-width: 85vw;
         }
     }
 
@@ -221,8 +245,8 @@ const styles = `
         }
         
         .spinner {
-            width: 1.75rem;
-            height: 1.75rem;
+            width: clamp(1.5rem, 2vw, 1.75rem);
+            height: clamp(1.5rem, 2vw, 1.75rem);
         }
     }
 `;
