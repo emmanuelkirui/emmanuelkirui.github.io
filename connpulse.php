@@ -1,5 +1,7 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
+    header('Content-Type: application/json');
+    
     set_time_limit(15);
     ini_set('default_socket_timeout', 5);
 
@@ -13,20 +15,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
     while (true) {
         if (!checkConnection()) {
             echo json_encode(['status' => 'error', 'message' => 'Connection lost']);
-            exit;
+            die();
         }
 
         if ((time() - $startTime) > $maxExecutionTime) {
-            header('HTTP/1.1 504 Gateway Timeout');
+            http_response_code(504);
             echo json_encode(['status' => 'error', 'message' => 'Server timeout']);
-            exit;
+            die();
         }
 
         sleep(1);
         break;
     }
 
-    exit;
+    echo json_encode(['status' => 'ok']); // Prevents "Unexpected token '<'"
+    die();
 }
 ?>
 
@@ -76,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
                 } catch (error) {
                     outputElement.className = 'error';
                     outputElement.textContent = 'ERROR: ' + (
-                        error.message === 'Failed to fetch' ? 'Connection lost' :
-                        error.message === 'AbortError' ? 'Client timeout' :
+                        error.message.includes('Failed to fetch') ? 'Connection lost' :
+                        error.message.includes('AbortError') ? 'Client timeout' :
                         error.message
                     );
                 }
