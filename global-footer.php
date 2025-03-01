@@ -145,9 +145,12 @@ $year = date("Y"); // Auto-updating year
         <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
         
         <ul class="footer-links">
-            <li><a href="terms-conditions.php"><i class="fa fa-file-contract"></i> Terms</a></li>
-            <li><a href="privacy-policy.php"><i class="fa fa-user-shield"></i> Privacy</a></li>
-            <li><a href="third-party.php"><i class="fa fa-handshake"></i> Third-Party</a></li>
+          <li><a href="terms-and-conditions.php"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
+          <li><a href="privacy-policy.php"><i class="fas fa-user-shield"></i> Privacy Policy</a></li>
+          <li><a href="third-party.php"><i class="fas fa-handshake"></i> Third-Party Services</a></li>
+          <li><a href="docs.php"><i class="fas fa-folder-open"></i> Documentation</a></li>
+          <li><a href="aboutus.php"><i class="fas fa-info-circle"></i> About Us</a></li>
+          <li><a href="contactus.php"><i class="fas fa-envelope"></i> Contact Us</a></li><ul class="footer-links" aria-label="Footer Navigation">
         </ul>
 
         <p class="gambling-disclaimer">
@@ -173,7 +176,7 @@ $year = date("Y"); // Auto-updating year
 <!-- Cookie Consent -->
 <div id="cookieConsent">
     <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience. 
-        <a href="privacy-policy.php">Learn more</a>.
+        <a href="privacy-policy.php">No-Manage</a>.
     </p>
     <button id="acceptCookies">Accept</button>
 </div>
