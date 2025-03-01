@@ -117,23 +117,37 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     return ['error' => false, 'data' => $response['data']['matches'] ?? []];
 }
 
-// Team strength calculation
-function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
+// New function to fetch standings data
+function fetchStandings($competition, $apiKey, $baseUrl) {
+    $url = $baseUrl . "competitions/$competition/standings";
+    $response = fetchWithRetry($url, $apiKey, true);
+    if ($response['error']) {
+        return $response;
+    }
+    return ['error' => false, 'data' => $response['data']['standings'][0]['table'] ?? []];
+}
+
+// Team strength calculation with standings
+function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form'])) {
             $response = fetchTeamResults($teamId, $apiKey, $baseUrl);
             if ($response['error']) {
-                $teamStats[$teamId] = ['results' => [], 'form' => '', 'needsRetry' => true];
+                $teamStats[$teamId] = ['results' => [], 'form' => '', 'needsRetry' => true, 'standings' => []];
                 return $teamStats[$teamId];
             }
             $results = $response['data'];
-            
+
+            // Fetch standings for the competition
+            $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
+            $standings = $standingsResponse['error'] ? [] : $standingsResponse['data'];
+
             $stats = [
                 'wins' => 0, 'draws' => 0, 'goalsScored' => 0, 
                 'goalsConceded' => 0, 'games' => 0, 'results' => [],
-                'form' => '', 'needsRetry' => false
+                'form' => '', 'needsRetry' => false, 'standings' => []
             ];
-            
+
             foreach ($results as $match) {
                 $homeId = $match['homeTeam']['id'] ?? 0;
                 $awayId = $match['awayTeam']['id'] ?? 0;
@@ -157,14 +171,14 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
                 }
                 $stats['games']++;
             }
-            
+
             $formArray = [];
             foreach (array_reverse($results) as $match) {
                 $homeId = $match['homeTeam']['id'] ?? 0;
                 $awayId = $match['awayTeam']['id'] ?? 0;
                 $homeGoals = $match['score']['fullTime']['home'] ?? 0;
                 $awayGoals = $match['score']['fullTime']['away'] ?? 0;
-                
+
                 if ($teamId == $homeId) {
                     $formArray[] = ($homeGoals > $awayGoals) ? 'W' : (($homeGoals == $awayGoals) ? 'D' : 'L');
                 } elseif ($teamId == $awayId) {
@@ -172,6 +186,20 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
                 }
             }
             $stats['form'] = implode('', array_slice($formArray, 0, 6));
+
+            // Add standings data
+            foreach ($standings as $standing) {
+                if ($standing['team']['id'] == $teamId) {
+                    $stats['standings'] = [
+                        'position' => $standing['position'],
+                        'goalsScored' => $standing['goalsFor'],
+                        'goalDifference' => $standing['goalDifference'],
+                        'points' => $standing['points']
+                    ];
+                    break;
+                }
+            }
+
             $teamStats[$teamId] = $stats;
         }
         return $teamStats[$teamId];
@@ -180,18 +208,18 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats) {
     }
 }
 
-// Match prediction function
-function predictMatch($match, $apiKey, $baseUrl, &$teamStats) {
+// Match prediction function with competition parameter
+function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
         $awayTeamId = $match['awayTeam']['id'] ?? 0;
-        
+
         if (!$homeTeamId || !$awayTeamId) {
             return ["N/A", "0%", "", "0-0"];
         }
 
-        $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats);
-        $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats);
+        $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $competition);
+        $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $competition);
 
         if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
             return ["Loading...", "N/A", "", "N/A"];
@@ -272,7 +300,7 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 handleJsonError('No results fetched');
             }
             
-            $stats = calculateTeamStrength($teamId, $apiKey, $baseUrl, $teamStats);
+            $stats = calculateTeamStrength($teamId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
             $teamName = '';
             foreach ($results as $match) {
                 if (($match['homeTeam']['id'] ?? 0) == $teamId) {
@@ -288,7 +316,8 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 'success' => true,
                 'teamName' => $teamName,
                 'results' => $stats['results'],
-                'form' => $stats['form']
+                'form' => $stats['form'],
+                'standings' => $stats['standings']
             ]);
             exit;
 
@@ -300,8 +329,8 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 handleJsonError('Invalid team IDs');
             }
             
-            $homeStats = calculateTeamStrength($homeId, $apiKey, $baseUrl, $teamStats);
-            $awayStats = calculateTeamStrength($awayId, $apiKey, $baseUrl, $teamStats);
+            $homeStats = calculateTeamStrength($homeId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
+            $awayStats = calculateTeamStrength($awayId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
             
             if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
                 echo json_encode(['success' => false, 'retry' => true]);
@@ -315,7 +344,7 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
             $predictionData = predictMatch([
                 'homeTeam' => ['id' => $homeId],
                 'awayTeam' => ['id' => $awayId]
-            ], $apiKey, $baseUrl, $teamStats);
+            ], $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
             
             echo json_encode([
                 'success' => true,
@@ -328,7 +357,7 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
     }
 }
 
-// Only output navigation if not an AJAX request
+// Navigation bar
 if (!isset($_GET['ajax'])) {
     echo "<nav class='navbar' style='width: 100%; position: relative;'>";
     echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
@@ -467,7 +496,24 @@ try {
             flex-wrap: wrap;
         }
 
-        .theme-toggle, select {
+        .theme-toggle {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--secondary-color);
+        }
+
+        select {
             padding: 10px 20px;
             margin: 5px;
             background-color: var(--primary-color);
@@ -478,7 +524,7 @@ try {
             transition: background-color 0.3s ease;
         }
 
-        .theme-toggle:hover, select:hover {
+        select:hover {
             background-color: var(--secondary-color);
         }
 
@@ -654,6 +700,17 @@ try {
             margin: 0;
         }
 
+        .standings {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: var(--text-color);
+        }
+
+        .standings span {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
         .view-history-btn {
             margin-top: 10px;
             padding: 8px 15px;
@@ -818,9 +875,9 @@ try {
                         $status = $match['status'];
                         $homeGoals = $match['score']['fullTime']['home'] ?? null;
                         $awayGoals = $match['score']['fullTime']['away'] ?? null;
-                        [$prediction, $confidence, $resultIndicator, $predictedScore] = predictMatch($match, $apiKey, $baseUrl, $teamStats);
-                        $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats);
-                        $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats);
+                        [$prediction, $confidence, $resultIndicator, $predictedScore] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                        $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                        $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
 
                         $needsRetry = $homeStats['needsRetry'] || $awayStats['needsRetry'];
                         if ($needsRetry) {
@@ -882,12 +939,24 @@ try {
                                 echo "<li>$result</li>";
                             }
                             echo "</ul>
+                                <div class='standings'>
+                                    <span>POS: " . ($homeStats['standings']['position'] ?? 'N/A') . "</span>
+                                    <span>GS: " . ($homeStats['standings']['goalsScored'] ?? 'N/A') . "</span>
+                                    <span>GD: " . ($homeStats['standings']['goalDifference'] ?? 'N/A') . "</span>
+                                    <span>PTS: " . ($homeStats['standings']['points'] ?? 'N/A') . "</span>
+                                </div>
                                 <p><strong>$awayTeam Recent Results:</strong></p>
                                 <ul>";
                             foreach ($awayStats['results'] as $result) {
                                 echo "<li>$result</li>";
                             }
-                            echo "</ul>";
+                            echo "</ul>
+                                <div class='standings'>
+                                    <span>POS: " . ($awayStats['standings']['position'] ?? 'N/A') . "</span>
+                                    <span>GS: " . ($awayStats['standings']['goalsScored'] ?? 'N/A') . "</span>
+                                    <span>GD: " . ($awayStats['standings']['goalDifference'] ?? 'N/A') . "</span>
+                                    <span>PTS: " . ($awayStats['standings']['points'] ?? 'N/A') . "</span>
+                                </div>";
                         } else {
                             echo "<p>Loading history...</p>";
                         }
@@ -961,7 +1030,7 @@ try {
         });
 
         function fetchTeamData(teamId, index, isHome) {
-            fetch(`?action=fetch_team_data&teamId=${teamId}`, {
+            fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
@@ -985,13 +1054,23 @@ try {
                     if (isHome) {
                         historyHtml += `<p><strong>${data.teamName} Recent Results:</strong></p><ul>`;
                         data.results.forEach(result => historyHtml += `<li>${result}</li>`);
-                        historyHtml += '</ul>';
+                        historyHtml += `</ul><div class='standings'>
+                            <span>POS: ${data.standings.position || 'N/A'}</span>
+                            <span>GS: ${data.standings.goalsScored || 'N/A'}</span>
+                            <span>GD: ${data.standings.goalDifference || 'N/A'}</span>
+                            <span>PTS: ${data.standings.points || 'N/A'}</span>
+                        </div>`;
                         historyElement.innerHTML = historyHtml + historyElement.innerHTML;
                     } else {
                         historyHtml = historyElement.innerHTML.replace('Loading history...', '');
                         historyHtml += `<p><strong>${data.teamName} Recent Results:</strong></p><ul>`;
                         data.results.forEach(result => historyHtml += `<li>${result}</li>`);
-                        historyHtml += '</ul>';
+                        historyHtml += `</ul><div class='standings'>
+                            <span>POS: ${data.standings.position || 'N/A'}</span>
+                            <span>GS: ${data.standings.goalsScored || 'N/A'}</span>
+                            <span>GD: ${data.standings.goalDifference || 'N/A'}</span>
+                            <span>PTS: ${data.standings.points || 'N/A'}</span>
+                        </div>`;
                         historyElement.innerHTML = historyHtml;
                     }
 
@@ -1025,7 +1104,7 @@ try {
         }
 
         function fetchPrediction(index, homeId, awayId) {
-            fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}`, {
+            fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
@@ -1083,6 +1162,5 @@ try {
     handleError("Unexpected error: " . $e->getMessage());
 }
 ?>
-<?php  include 'back-to-top.php'; ?>
-  <!-- Include network-status.js -->
+<?php include 'back-to-top.php'; ?>
 <script src="network-status.js"></script>
