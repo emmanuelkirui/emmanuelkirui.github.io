@@ -34,19 +34,15 @@ $year = date("Y"); // Auto-updating year
         .footer-links {
             list-style: none;
             padding: 0;
-            margin: 20px 0; /* Increased margin for more vertical spacing */
+            margin: 15px 0;
             display: flex;
-            flex-wrap: wrap; /* Ensures wrapping to multiple lines */
-            justify-content: space-between; /* Distributes items across the container */
-            gap: 25px; /* Increased gap between items */
-            width: 100%; /* Ensures full width usage */
-            max-width: 1000px; /* Optional: limits max width for better control */
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .footer-links li {
-            margin: 10px 0; /* Adds vertical spacing between items */
-            flex: 1 0 45%; /* Makes each item take roughly half the width, forcing wrapping */
-            text-align: center; /* Centers text within each item */
+            margin: 0;
         }
 
         .footer-links a {
@@ -55,8 +51,6 @@ $year = date("Y"); // Auto-updating year
             font-size: 16px;
             font-weight: bold;
             transition: color 0.3s ease-in-out;
-            display: block; /* Makes the entire link area clickable */
-            padding: 10px; /* Adds padding for better spacing */
         }
 
         .footer-links a:hover {
@@ -121,12 +115,8 @@ $year = date("Y"); // Auto-updating year
         /* Responsive Design */
         @media (max-width: 768px) {
             .footer-links {
-                flex-direction: column; /* Stacks vertically on mobile */
-                gap: 15px; /* Maintains spacing on smaller screens */
-            }
-            
-            .footer-links li {
-                flex: 1 0 100%; /* Full width on mobile */
+                flex-direction: column;
+                align-items: center;
             }
             
             .footer-links a {
@@ -152,15 +142,15 @@ $year = date("Y"); // Auto-updating year
 <!-- Footer -->
 <footer class="footer">
     <div class="footer-container">
-        <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
+        <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
         
-        <ul class="footer-links" aria-label="Footer Navigation">
-            <li><a href="terms-and-conditions.php"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
-            <li><a href="privacy-policy.php"><i class="fas fa-user-shield"></i> Privacy Policy</a></li>
-            <li><a href="third-party.php"><i class="fas fa-handshake"></i> Third-Party Services</a></li>
-            <li><a href="docs.php"><i class="fas fa-folder-open"></i> Documentation</a></li>
-            <li><a href="aboutus.php"><i class="fas fa-info-circle"></i> About Us</a></li>
-            <li><a href="contactus.php"><i class="fas fa-envelope"></i> Contact Us</a></li>
+        <ul class="footer-links">
+          <li><a href="terms-and-conditions.php"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
+          <li><a href="privacy-policy.php"><i class="fas fa-user-shield"></i> Privacy Policy</a></li>
+          <li><a href="third-party.php"><i class="fas fa-handshake"></i> Third-Party Services</a></li>
+          <li><a href="docs.php"><i class="fas fa-folder-open"></i> Documentation</a></li>
+          <li><a href="aboutus.php"><i class="fas fa-info-circle"></i> About Us</a></li>
+          <li><a href="contactus.php"><i class="fas fa-envelope"></i> Contact Us</a></li><ul class="footer-links" aria-label="Footer Navigation">
         </ul>
 
         <p class="gambling-disclaimer">
