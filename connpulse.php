@@ -26,16 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
             exit;
         }
 
-        if ((time() - $startTime) > $maxExecutionTime) {
-            header('HTTP/1.1 504 Gateway Timeout');
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Server timeout after 10 seconds',
-                'progress' => $progress
-            ]);
-            exit;
-        }
-
         // Simulate progressive task
         $progress += rand(20, 40);
         $progress = min($progress, 100);
@@ -47,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
             'message' => "Processing: $progress%",
             'progress' => $progress
         ]);
-        flush(); // Push the output to client
+        flush();
         if ($progress < 100) sleep(1);
     }
 
@@ -161,11 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
                         });
 
                         clearTimeout(timeoutId);
-
-                        if (!response.ok) {
-                            throw new Error(`Server error: ${response.status}`);
-                        }
-
                         const data = await response.json();
                         this.updateUI(data.status, data.message, data.progress);
 
@@ -176,18 +161,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
 
                     } catch (error) {
                         this.currentAttempt++;
-                        const errorMsg = error.message === 'Failed to fetch' 
-                            ? 'Connection lost or server not responding'
-                            : error.message === 'AbortError' 
-                            ? 'Client timeout after 8 seconds'
-                            : error.message;
-
                         if (this.currentAttempt < this.retryAttempts) {
-                            this.updateUI('error', `Attempt ${this.currentAttempt} failed: ${errorMsg}. Retrying...`);
+                            this.updateUI('error', 'Connection lost. Retrying...');
                             await new Promise(resolve => setTimeout(resolve, this.retryDelay));
                             continue;
                         }
-                        this.updateUI('error', `All attempts failed: ${errorMsg}`);
+                        this.updateUI('error', 'Connection lost after all attempts');
                         this.isProcessing = false;
                         return;
                     }
@@ -210,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['ajax'])) {
                 // Set up periodic checking
                 setInterval(() => {
                     if (!this.isProcessing) this.processRequest();
-                }, 15000); // Check every 15 seconds
+                }, 15000);
             }
         }
 
