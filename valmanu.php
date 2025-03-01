@@ -1084,4 +1084,5 @@ try {
 }
 ?>
 <?php  include 'back-to-top.php'; ?>
-<?php  include 'connpulse.php'; ?>
+  <!-- Include network-status.js -->
+<script src="network-status.js"></script>
