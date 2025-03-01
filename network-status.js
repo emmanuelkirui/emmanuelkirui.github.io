@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Append elements
     reconnectNotice.appendChild(spinner);
     reconnectNotice.appendChild(message);
-    document.body.insertBefore(reconnectNotice, document.body.firstChild); // Place at top of body
+    document.body.appendChild(reconnectNotice);
 
     // Connection states
     const states = {
@@ -28,23 +28,19 @@ document.addEventListener("DOMContentLoaded", function () {
     const statusConfig = {
         [states.ONLINE]: { 
             display: "none", 
-            message: "", 
-            spinner: false 
+            message: "" 
         },
         [states.OFFLINE]: { 
             display: "flex", 
-            message: "Offline - No Internet Connection", 
-            spinner: true 
+            message: "Offline - No Internet Connection" 
         },
         [states.SLOW]: { 
             display: "flex", 
-            message: "Slow Connection Detected", 
-            spinner: true 
+            message: "Slow Connection Detected" 
         },
         [states.ERROR]: { 
             display: "flex", 
-            message: "Connection Error", 
-            spinner: true 
+            message: "Connection Error" 
         }
     };
 
@@ -52,11 +48,13 @@ document.addEventListener("DOMContentLoaded", function () {
     async function testConnectionSpeed() {
         const startTime = performance.now();
         try {
-            await fetch('https://speed.cloudflare.com/__down?bytes=1000', { 
+            // Use a small test file or endpoint - replace with your own URL
+            await fetch('https://example.com/ping', { 
                 cache: 'no-store',
                 mode: 'no-cors'
             });
-            return performance.now() - startTime;
+            const endTime = performance.now();
+            return endTime - startTime;
         } catch (error) {
             return Infinity; // Indicates error
         }
@@ -68,22 +66,12 @@ document.addEventListener("DOMContentLoaded", function () {
         reconnectNotice.style.display = config.display;
         message.textContent = config.message;
         
-        // Spinner control
-        if (config.spinner) {
-            spinner.style.display = 'block';
-            spinner.classList.add('active');
-        } else {
-            spinner.style.display = 'none';
-            spinner.classList.remove('active');
-        }
-        
+        // Add status-specific styling
         reconnectNotice.className = `fade-in ${status}`;
     }
 
     // Main network status check
     async function checkNetworkStatus() {
-        spinner.classList.add('active');
-        
         if (!navigator.onLine) {
             updateUI(states.OFFLINE);
             return;
@@ -93,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
         if (latency === Infinity) {
             updateUI(states.ERROR);
-        } else if (latency > 1000) { // Threshold of 1 second for slow connection
+        } else if (latency > 1000) { // Adjust threshold as needed (1000ms = 1s)
             updateUI(states.SLOW);
         } else {
             updateUI(states.ONLINE);
@@ -122,139 +110,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initial check
     checkNetworkStatus();
-
-    // Inject CSS into the document
-    const styles = `
-        #reconnect-notice {
-            position: fixed;
-            top: 0.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 0.75rem 1rem;
-            border-radius: 0.25rem;
-            background: rgba(0, 0, 0, 0.85);
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            z-index: 2000;
-            min-width: 240px;
-            max-width: 90vw;
-            font-size: clamp(0.875rem, 2vw, 1rem);
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.2);
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .spinner {
-            width: clamp(1rem, 2vw, 1.25rem);
-            height: clamp(1rem, 2vw, 1.25rem);
-            min-width: 16px;
-            min-height: 16px;
-            border: 0.2rem solid #fff;
-            border-top: 0.2rem solid transparent;
-            border-radius: 50%;
-            display: none;
-            flex-shrink: 0;
-            order: 1;
-        }
-
-        .spinner.active {
-            display: block;
-            animation: spin 1s linear infinite;
-        }
-
-        .status-message {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: calc(90vw - 48px);
-            min-width: 0;
-            flex-grow: 1;
-            order: 2;
-        }
-
-        .fade-in {
-            transition: opacity 0.3s ease;
-            opacity: 0;
-        }
-
-        .fade-in.online { opacity: 0; }
-        .fade-in.offline { opacity: 1; background: #ff3860; }
-        .fade-in.slow { opacity: 1; background: #ffdd57; color: #000; }
-        .fade-in.error { opacity: 1; background: #ff3860; }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        section.section #reconnect-notice {
-            top: 4rem;
-        }
-
-        .table-container #reconnect-notice {
-            position: fixed;
-            top: 0.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: fit-content;
-            min-width: 240px;
-            max-width: 90%;
-        }
-
-        @media (max-width: 768px) {
-            #reconnect-notice {
-                top: 0;
-                padding: 0.5rem 0.75rem;
-                min-width: 200px;
-                flex-wrap: nowrap;
-                justify-content: flex-start;
-            }
-            
-            .spinner {
-                margin-right: 0.5rem;
-            }
-            
-            .status-message {
-                max-width: calc(85vw - 40px);
-            }
-        }
-
-        @media (max-width: 480px) {
-            #reconnect-notice {
-                width: 100%;
-                max-width: 100vw;
-                min-width: 180px;
-                left: 0;
-                transform: none;
-                border-radius: 0;
-            }
-            
-            .status-message {
-                max-width: calc(85vw - 36px);
-            }
-            
-            .spinner {
-                min-width: 14px;
-                min-height: 14px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            #reconnect-notice {
-                min-width: 260px;
-                padding: 1rem 1.5rem;
-            }
-            
-            .spinner {
-                min-width: 18px;
-                min-height: 18px;
-            }
-        }
-    `;
-
-    // Create and append the style element
-    const styleSheet = document.createElement("style");
-    styleSheet.textContent = styles;
-    document.head.appendChild(styleSheet);
 });
+
+// Suggested CSS to add
+const styles = `
+    #reconnect-notice {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 10px 20px;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        align-items: center;
+        gap: 10px;
+        z-index: 1000;
+    }
+
+    .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid #fff;
+        border-top: 3px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .fade-in {
+        transition: opacity 0.3s ease;
+        opacity: 0;
+    }
+
+    .fade-in.online { opacity: 0; }
+    .fade-in.offline { opacity: 1; background: #dc3545; }
+    .fade-in.slow { opacity: 1; background: #ffc107; }
+    .fade-in.error { opacity: 1; background: #dc3545; }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+`;
