@@ -145,9 +145,9 @@ $year = date("Y"); // Auto-updating year
         <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
         
         <ul class="footer-links">
-            <li><a href="#"><i class="fa fa-file-contract"></i> Terms</a></li>
-            <li><a href="#"><i class="fa fa-user-shield"></i> Privacy</a></li>
-            <li><a href="#"><i class="fa fa-handshake"></i> Third-Party</a></li>
+            <li><a href="terms-conditions.php"><i class="fa fa-file-contract"></i> Terms</a></li>
+            <li><a href="privacy-policy.php"><i class="fa fa-user-shield"></i> Privacy</a></li>
+            <li><a href="third-party.php"><i class="fa fa-handshake"></i> Third-Party</a></li>
         </ul>
 
         <p class="gambling-disclaimer">
@@ -173,7 +173,7 @@ $year = date("Y"); // Auto-updating year
 <!-- Cookie Consent -->
 <div id="cookieConsent">
     <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience. 
-        <a href="privacy-policy.html">Learn more</a>.
+        <a href="privacy-policy.php">Learn more</a>.
     </p>
     <button id="acceptCookies">Accept</button>
 </div>
