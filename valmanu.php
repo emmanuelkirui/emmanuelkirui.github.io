@@ -395,30 +395,42 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
 
 // Navigation bar
 if (!isset($_GET['ajax'])) {
-    echo "<nav class='navbar' style='width: 100%; position: relative;'>";
-    echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
-    echo "<div class='nav-menu' id='navMenu' style='display: none;'>";
-    echo "<a href='valmanu' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
-    echo "<a href='liv' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
-    echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
+    echo "<nav class='navbar'>";
+    echo "<div class='navbar-container'>";
+    echo "<div class='navbar-brand'>CPS Football</div>";
+    echo "<div class='hamburger' onclick='toggleMenu()'><span></span><span></span><span></span></div>";
+    echo "<div class='nav-menu' id='navMenu'>";
+    echo "<a href='valmanu' class='nav-link'>Home</a>";
+    echo "<a href='liv' class='nav-link'>Predictions</a>";
+    echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+    echo "</div>";
     echo "</div>";
     echo "</nav>";
 
     echo "<script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
-        const currentDisplay = menu.style.display;
-        if (currentDisplay === 'none') {
-            menu.style.display = 'inline-block';
-        } else {
-            menu.style.display = 'none';
-        }
+        const hamburger = document.querySelector('.hamburger');
+        menu.classList.toggle('active');
+        hamburger.classList.toggle('active');
     }
-    
+
     window.addEventListener('resize', function() {
         const menu = document.getElementById('navMenu');
+        const hamburger = document.querySelector('.hamburger');
         if (window.innerWidth > 768) {
-            menu.style.display = 'inline-block';
+            menu.classList.remove('active');
+            hamburger.classList.remove('active');
+            menu.style.display = 'flex';
+        } else {
+            menu.style.display = menu.classList.contains('active') ? 'flex' : 'none';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const menu = document.getElementById('navMenu');
+        if (window.innerWidth > 768) {
+            menu.style.display = 'flex';
         }
     });
     </script>";
@@ -508,10 +520,90 @@ try {
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 70px 20px 20px; /* Adjusted padding to account for fixed navbar */
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: all 0.3s ease;
+        }
+
+        .navbar {
+            width: 100%;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .navbar-brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--text-color);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
         }
 
         .container {
@@ -879,6 +971,35 @@ try {
             height: 100%;
             background-color: var(--primary-color);
             transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-menu {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--card-bg);
+                box-shadow: var(--shadow);
+                padding: 20px;
+                gap: 10px;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .nav-link {
+                width: 100%;
+                text-align: center;
+                padding: 15px;
+            }
         }
     </style>
 </head>
