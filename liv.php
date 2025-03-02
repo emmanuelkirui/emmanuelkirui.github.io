@@ -3,37 +3,135 @@
 $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
-
 // Only output the navigation bar and script if it's not an AJAX request
 if (!isset($_GET['ajax'])) {
-    echo "<nav class='navbar' style='width: 100%; position: relative;'>";
-    echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
-    echo "<div class='nav-menu' id='navMenu' style='display: none;'>"; // Changed from inline-block to none
-    echo "<a href='liv' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
-    echo "<a href='valmanu' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
-    echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
+    echo "<nav class='navbar'>";
+    echo "<div class='hamburger' onclick='toggleMenu()'>☰</div>";
+    echo "<div class='nav-menu' id='navMenu'>";
+    echo "<a href='liv' class='nav-link'>Home</a>";
+    echo "<a href='valmanu' class='nav-link'>More Predictions</a>";
+    echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
     echo "</div>";
     echo "</nav>";
 
-    // JavaScript for toggling the menu
+    // Inline CSS for professional styling
+    echo "<style>
+        /* Navbar container */
+        .navbar {
+            width: 100%;
+            background-color: #2c3e50; /* Dark blue for professionalism */
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            position: fixed; /* Fixed positioning for a modern look */
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Hamburger menu */
+        .hamburger {
+            font-size: 24px;
+            color: #ecf0f1; /* Light color for contrast */
+            cursor: pointer;
+            padding: 10px;
+            display: none; /* Hidden by default on larger screens */
+        }
+
+        /* Navigation menu */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 30px; /* Spacing between items */
+        }
+
+        /* Navigation links */
+        .nav-link {
+            color: #ecf0f1; /* Light text color */
+            text-decoration: none;
+            font-family: 'Arial', sans-serif; /* Clean, professional font */
+            font-size: 16px;
+            font-weight: 500; /* Slightly bold for emphasis */
+            padding: 10px 15px;
+            transition: all 0.3s ease; /* Smooth hover effect */
+            border-radius: 5px;
+        }
+
+        /* Hover effect for nav links */
+        .nav-link:hover {
+            background-color: #3498db; /* Bright blue on hover */
+            color: #fff;
+        }
+
+        /* Active link styling */
+        .nav-link:active {
+            background-color: #2980b9; /* Slightly darker blue */
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block; /* Show hamburger on small screens */
+            }
+
+            .nav-menu {
+                display: none; /* Hidden by default on mobile */
+                position: absolute;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: #2c3e50;
+                flex-direction: column;
+                gap: 10px;
+                padding: 20px 0;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+
+            .nav-link {
+                width: 100%;
+                text-align: center;
+                padding: 15px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle divider */
+            }
+
+            .nav-link:last-child {
+                border-bottom: none; /* Remove border from last item */
+            }
+
+            /* Show menu when toggled */
+            .nav-menu.active {
+                display: flex;
+            }
+        }
+    </style>";
+
+    // JavaScript for toggling the menu with class toggle
     echo "<script>
-    function toggleMenu() {
-        const menu = document.getElementById('navMenu');
-        const currentDisplay = menu.style.display;
-        if (currentDisplay === 'none') {
-            menu.style.display = 'inline-block';
-        } else {
-            menu.style.display = 'none';
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            menu.classList.toggle('active');
         }
-    }
-    
-    // Optional: Show menu on larger screens
-    window.addEventListener('resize', function() {
-        const menu = document.getElementById('navMenu');
-        if (window.innerWidth > 768) {
-            menu.style.display = 'inline-block';
-        }
-    });
+
+        // Optional: Show menu on larger screens by default
+        window.addEventListener('resize', function() {
+            const menu = document.getElementById('navMenu');
+            if (window.innerWidth > 768) {
+                menu.classList.remove('active'); // Reset toggle state
+                menu.style.display = 'flex'; // Ensure visibility
+            } else {
+                menu.style.display = ''; // Reset inline style for mobile
+            }
+        });
+
+        // Ensure correct initial state on page load
+        window.addEventListener('load', function() {
+            const menu = document.getElementById('navMenu');
+            if (window.innerWidth > 768) {
+                menu.style.display = 'flex';
+            }
+        });
     </script>";
 }
 
