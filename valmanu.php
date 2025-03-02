@@ -1060,41 +1060,48 @@ try {
         }
 
         .retry-message {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 1.2em;
-            color: #dc3545;
-        }
+    text-align: center;
+    margin: 2rem 0;
+    font-size: 1.25rem;
+    color: #dc3545;
+    line-height: 1.5;
+}
 
-        .countdown-box {
-            background-color: rgba(220, 53, 69, 0.1);
-            border: 2px solid #dc3545;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px auto;
-            max-width: 500px;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+.countdown-box {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 2px solid #dc3545;
+    border-radius: 0.625rem;
+    padding: 1.25rem;
+    margin: 2rem auto;
+    max-width: 31.25rem; /* 500px */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.625rem; /* 10px */
+}
 
-        .retry-text {
-            color: #dc3545;
-            font-weight: bold;
-        }
+.retry-text {
+    color: #dc3545;
+    font-weight: 600;
+    flex: 0 1 auto;
+}
 
-        .countdown-timer {
-            display: inline-block;
-            background-color: #dc3545;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin: 0 5px;
-            font-size: 1.4em;
-            min-width: 40px;
-            text-align: center;
-        }
+.countdown-timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #dc3545;
+    color: #ffffff;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.3125rem;
+    margin: 0 0.3125rem;
+    font-size: 1.5rem;
+    min-width: 2.5rem;
+    text-align: center;
+    flex: 0 0 auto;
+}
 
         [data-theme="dark"] .countdown-box {
             background-color: rgba(220, 53, 69, 0.2);
