@@ -14,7 +14,7 @@
         select { padding: 5px; margin-bottom: 10px; }
         #retryCountdown { color: red; font-weight: bold; }
         .team-list { margin-top: 10px; }
-        .team-list ul { list-style-type: none; padding: 0; }
+        .team-list ul { list-style-type: none; padding-left: 20px; }
         .team-list li { margin: 5px 0; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -168,7 +168,6 @@
         echo "new Chart(ctx, { type: 'bar', data: { labels: ['Home Win', 'Draw', 'Away Win'], datasets: [{ label: 'Percentage', data: [$homeWinPerc, $drawPerc, $awayWinPerc], backgroundColor: ['#4CAF50', '#FFC107', '#F44336'] }] }, options: { scales: { y: { beginAtZero: true, max: 100 } } } });";
         echo "</script>";
 
-        // Categorize teams
         $likelyHomeWinners = array_filter($homeTeams, function($stats) {
             return $stats['winPerc'] > 50;
         });
@@ -179,26 +178,25 @@
             return $stats['drawPerc'] > 30;
         });
 
-        // Display team names only
         echo "<div class='team-list'>";
         echo "<h3>Likely to Win at Home (>50%)</h3>";
         echo "<ul>";
         foreach ($likelyHomeWinners as $teamName => $stats) {
-            echo "<li>$teamName</li>";
+            echo "<li>- $teamName</li>";
         }
         echo "</ul>";
 
         echo "<h3>Likely to Win Away (>40%)</h3>";
         echo "<ul>";
         foreach ($likelyAwayWinners as $teamName => $perc) {
-            echo "<li>$teamName</li>";
+            echo "<li>- $teamName</li>";
         }
         echo "</ul>";
 
         echo "<h3>Likely to Draw (>30%)</h3>";
         echo "<ul>";
         foreach ($likelyDrawTeams as $teamName => $stats) {
-            echo "<li>$teamName</li>";
+            echo "<li>- $teamName</li>";
         }
         echo "</ul>";
         echo "</div>";
