@@ -767,6 +767,12 @@ try {
             margin-top: 5px;
             font-size: 0.9em;
             font-weight: bold;
+            white-space: nowrap; /* Prevents wrapping to a new line */
+        }
+
+        .form-line {
+            display: inline-flex; /* Keeps all spans in one line */
+            gap: 2px; /* Small spacing between form characters */
         }
 
         .form-display span {
@@ -774,7 +780,7 @@ try {
             width: 20px;
             text-align: center;
             border-radius: 3px;
-            margin: 0 1px;
+            margin: 0; /* Remove margin to prevent wrapping */
         }
 
         .form-display .win {
@@ -963,13 +969,15 @@ try {
                         if ($homeStats['needsRetry']) {
                             echo "<div class='loading-spinner'></div>";
                         } else {
-                            $homeForm = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
-                            $homeForm = strrev($homeForm);
+                            $homeForm = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT); // Dynamic form
+                            $homeForm = strrev($homeForm); // Reverse to show latest on right
+                            echo "<span class='form-line'>";
                             for ($i = 0; $i < 6; $i++) {
                                 $class = $homeForm[$i] === 'W' ? 'win' : ($homeForm[$i] === 'D' ? 'draw' : ($homeForm[$i] === 'L' ? 'loss' : 'empty'));
                                 if ($i === 5 && $homeForm[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) $class .= ' latest';
                                 echo "<span class='$class'>" . $homeForm[$i] . "</span>";
                             }
+                            echo "</span>";
                         }
                         echo "</div>
                                 </div>
@@ -981,13 +989,15 @@ try {
                         if ($awayStats['needsRetry']) {
                             echo "<div class='loading-spinner'></div>";
                         } else {
-                            $awayForm = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
-                            $awayForm = strrev($awayForm);
+                            $awayForm = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT); // Dynamic form
+                            $awayForm = strrev($awayForm); // Reverse to show latest on right
+                            echo "<span class='form-line'>";
                             for ($i = 0; $i < 6; $i++) {
                                 $class = $awayForm[$i] === 'W' ? 'win' : ($awayForm[$i] === 'D' ? 'draw' : ($awayForm[$i] === 'L' ? 'loss' : 'empty'));
                                 if ($i === 5 && $awayForm[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) $class .= ' latest';
                                 echo "<span class='$class'>" . $awayForm[$i] . "</span>";
                             }
+                            echo "</span>";
                         }
                         echo "</div>
                                 </div>
@@ -1117,7 +1127,7 @@ try {
                     const historyElement = document.getElementById(`history-${index}`);
                     const predictionElement = document.getElementById(`prediction-${index}`);
 
-                    let formHtml = '';
+                    let formHtml = '<span class="form-line">';
                     const form = data.form.slice(-6).padStart(6, '-');
                     const reversedForm = form.split('').reverse().join('');
                     for (let i = 0; i < 6; i++) {
@@ -1125,6 +1135,7 @@ try {
                         if (i === 5 && reversedForm[i] !== '-' && form.trim('-').length > 0) className += ' latest';
                         formHtml += `<span class="${className}">${reversedForm[i]}</span>`;
                     }
+                    formHtml += '</span>';
                     formElement.innerHTML = formHtml;
 
                     let historyHtml = '';
@@ -1253,7 +1264,7 @@ try {
                             return;
                         }
 
-                        let formHtml = '';
+                        let formHtml = '<span class="form-line">';
                         const form = data.form.slice(-6).padStart(6, '-');
                         const reversedForm = form.split('').reverse().join('');
                         for (let i = 0; i < 6; i++) {
@@ -1261,6 +1272,7 @@ try {
                             if (i === 5 && reversedForm[i] !== '-' && form.trim('-').length > 0) className += ' latest';
                             formHtml += `<span class="${className}">${reversedForm[i]}</span>`;
                         }
+                        formHtml += '</span>';
                         formElement.innerHTML = formHtml;
 
                         let historyHtml = isHome ? `<p><strong>Team Recent Results:</strong></p><ul>` : historyElement.innerHTML;
