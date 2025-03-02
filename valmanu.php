@@ -608,18 +608,28 @@ try {
         }
 
         .theme-toggle {
-            padding: 8px 15px;
+            width: 36px;
+            height: 36px;
             background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 50%;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 1em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-size: 1.2em;
+            padding: 0;
         }
 
         .theme-toggle:hover {
             background-color: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
         }
 
         .container {
@@ -994,10 +1004,16 @@ try {
                 display: flex;
             }
 
-            .nav-link, .theme-toggle {
+            .nav-link {
                 width: 100%;
                 text-align: center;
                 padding: 15px;
+            }
+
+            .theme-toggle {
+                width: 40px; /* Slightly larger on mobile for touch */
+                height: 40px;
+                margin: 10px auto; /* Center on mobile */
             }
         }
     </style>
