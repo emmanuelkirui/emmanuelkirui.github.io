@@ -422,16 +422,13 @@ if (!isset($_GET['ajax'])) {
         if (window.innerWidth > 768) {
             menu.classList.remove('active');
             hamburger.classList.remove('active');
-            menu.style.display = 'flex';
-        } else {
-            menu.style.display = menu.classList.contains('active') ? 'flex' : 'none';
         }
     });
 
     document.addEventListener('DOMContentLoaded', function() {
         const menu = document.getElementById('navMenu');
         if (window.innerWidth > 768) {
-            menu.style.display = 'flex';
+            menu.classList.remove('active');
         }
     });
     </script>";
@@ -521,7 +518,7 @@ try {
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 70px 20px 20px; /* Adjusted padding for fixed navbar */
+            padding: 0; /* Remove top padding since navbar handles spacing */
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: all 0.3s ease;
@@ -531,7 +528,6 @@ try {
             width: 100%;
             background-color: var(--card-bg);
             box-shadow: var(--shadow);
-            padding: 15px 0;
             position: fixed;
             top: 0;
             left: 0;
@@ -545,7 +541,8 @@ try {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            padding: 15px 20px;
+            flex-wrap: wrap; /* Allow wrapping for mobile */
         }
 
         .navbar-brand {
@@ -562,6 +559,7 @@ try {
             margin: 0;
             padding: 0;
             list-style: none;
+            transition: max-height 0.3s ease; /* Smooth height transition */
         }
 
         .nav-link {
@@ -635,6 +633,7 @@ try {
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 20px;
         }
 
         .header {
@@ -988,20 +987,19 @@ try {
             }
 
             .nav-menu {
-                display: none;
                 flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
                 width: 100%;
+                max-height: 0; /* Collapsed state */
+                overflow: hidden; /* Hide content when collapsed */
                 background-color: var(--card-bg);
                 box-shadow: var(--shadow);
-                padding: 20px;
+                padding: 0;
                 gap: 10px;
             }
 
             .nav-menu.active {
-                display: flex;
+                max-height: 300px; /* Expanded height (adjust as needed) */
+                padding: 20px;
             }
 
             .nav-link {
@@ -1011,9 +1009,9 @@ try {
             }
 
             .theme-toggle {
-                width: 40px; /* Slightly larger on mobile for touch */
+                width: 40px;
                 height: 40px;
-                margin: 10px auto; /* Center on mobile */
+                margin: 10px auto;
             }
         }
     </style>
