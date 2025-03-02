@@ -18,8 +18,9 @@ $year = date("Y"); // Auto-updating year
             color: white;
             text-align: center;
             padding: 20px;
-            margin: 20px; /* Adds space around */
+            margin: 20px;
             border-top: 3px solid #f39c12;
+            font-family: Arial, sans-serif; /* Ensures font consistency */
         }
 
         .footer-container {
@@ -65,7 +66,7 @@ $year = date("Y"); // Auto-updating year
             gap: 15px;
             margin-top: 20px;
             padding-top: 10px;
-            border-top: 2px solid #f39c12; /* Separator */
+            border-top: 2px solid #f39c12;
         }
 
         .social-icons a {
@@ -86,6 +87,29 @@ $year = date("Y"); // Auto-updating year
             padding: 10px;
             border-radius: 5px;
             margin-top: 15px;
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            font-size: 14px;
+            color: #666;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .disclaimer a {
+            font-size: inherit;
+            font-family: inherit;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: normal;
+        }
+
+        .disclaimer a:hover {
+            text-decoration: underline;
         }
 
         /* Cookie Consent */
@@ -118,15 +142,15 @@ $year = date("Y"); // Auto-updating year
                 flex-direction: column;
                 align-items: center;
             }
-            
+
             .footer-links a {
                 font-size: 14px;
             }
-            
+
             .disclaimer, .gambling-disclaimer {
                 font-size: 12px;
             }
-            
+
             .social-icons {
                 gap: 10px;
             }
@@ -143,27 +167,27 @@ $year = date("Y"); // Auto-updating year
 <footer class="footer">
     <div class="footer-container">
         <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
-        
+
         <ul class="footer-links">
-          <li><a href="terms-and-conditions.php"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
-          <li><a href="privacy-policy.php"><i class="fas fa-user-shield"></i> Privacy Policy</a></li>
-          <li><a href="third-party.php"><i class="fas fa-handshake"></i> Third-Party Services</a></li>
-          <li><a href="docs.php"><i class="fas fa-folder-open"></i> Documentation</a></li>
-          <li><a href="aboutus.php"><i class="fas fa-info-circle"></i> About Us</a></li>
-          <li><a href="contactus.php"><i class="fas fa-envelope"></i> Contact Us</a></li><ul class="footer-links" aria-label="Footer Navigation">
+            <li><a href="terms-and-conditions.php"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
+            <li><a href="privacy-policy.php"><i class="fas fa-user-shield"></i> Privacy Policy</a></li>
+            <li><a href="third-party.php"><i class="fas fa-handshake"></i> Third-Party Services</a></li>
+            <li><a href="docs.php"><i class="fas fa-folder-open"></i> Documentation</a></li>
+            <li><a href="aboutus.php"><i class="fas fa-info-circle"></i> About Us</a></li>
+            <li><a href="contactus.php"><i class="fas fa-envelope"></i> Contact Us</a></li>
         </ul>
 
         <p class="gambling-disclaimer">
-            <i class="fa fa-exclamation-triangle"></i> Responsible Gambling: This site is for **18+ users** only. 
+            <i class="fa fa-exclamation-triangle"></i> Responsible Gambling: This site is for **18+ users** only.
             If you or someone you know has a gambling problem, seek help. Play responsibly.
         </p>
 
         <p class="disclaimer">
-           This site uses third-party services, cookies, and advertisements. These third parties have their own policies, and we are not responsible for their actions. Please review their terms.
-           <a href="privacy-policy.php" class="disclaimer">View our Privacy Policy</a>
+            This site uses third-party services, cookies, and advertisements. These third parties have their own policies, and we are not responsible for their actions. Please review their terms.
+            <a href="privacy-policy.php">View our Privacy Policy</a>
         </p>
 
-        <!-- Social Media Icons (Moved to Bottom) -->
+        <!-- Social Media Icons -->
         <div class="social-icons">
             <a href="https://facebook.com/emmanuelkirui042" target="_blank"><i class="fab fa-facebook"></i></a>
             <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
@@ -176,8 +200,8 @@ $year = date("Y"); // Auto-updating year
 
 <!-- Cookie Consent -->
 <div id="cookieConsent">
-    <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience. 
-        <a href="privacy-policy.php">No-Manage</a>.
+    <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience.
+        <a href="privacy-policy.php">Manage</a>.
     </p>
     <button id="acceptCookies">Accept</button>
 </div>
