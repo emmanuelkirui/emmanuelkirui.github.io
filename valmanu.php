@@ -903,21 +903,21 @@ try {
             justify-content: center;
             align-items: center;
             margin-bottom: 15px;
-            gap: 10px; /* Reduced from 20px to 10px for a tighter layout */
+            gap: calc(1vw + 5px); /* Dynamic gap based on viewport width */
         }
 
         .team {
             text-align: center;
-            flex: 1; /* Allows teams to take equal space */
-            max-width: 48%; /* Slightly increased from 45% to 48% to reduce overlap risk */
+            flex: 1;
+            max-width: 48%;
         }
 
         .home-team {
-            padding-right: 5px; /* Reduced from 10px to 5px */
+            padding-right: 0.5em; /* Scales with font size */
         }
 
         .away-team {
-            padding-left: 5px; /* Reduced from 10px to 5px */
+            padding-left: 0.5em; /* Scales with font size */
         }
 
         .team img {
@@ -930,9 +930,8 @@ try {
             font-size: 1.2em;
             font-weight: bold;
             color: var(--primary-color);
-            padding: 0 8px; /* Reduced from 15px to 8px */
-            min-width: 30px; /* Reduced from 40px to 30px */
             text-align: center;
+            min-width: 30px; /* Minimum width to prevent collapse */
         }
 
         .match-info {
@@ -1591,7 +1590,7 @@ try {
                             autocompleteDropdown.innerHTML = '<div class="autocomplete-item">No teams found</div>';
                         } else {
                             autocompleteDropdown.innerHTML = teams.map(team => `
-                                <div class="autocomplete-item" data-team-id="${team.id}"="${team.name}">
+                                <div class="autocomplete-item" data-team-id="${team.id}" data-team-name="${team.name}">
                                     ${team.crest ? `<img src="${team.crest}" alt="${team.name}">` : ''}
                                     <span>${team.name}</span>
                                 </div>
@@ -1622,6 +1621,29 @@ try {
             }
         });
 
+        // Dynamic spacing adjustment function
+        function adjustTeamSpacing() {
+            document.querySelectorAll('.match-card').forEach(card => {
+                const teamsContainer = card.querySelector('.teams');
+                const homeTeam = card.querySelector('.home-team');
+                const awayTeam = card.querySelector('.away-team');
+                const vsElement = card.querySelector('.vs');
+                const cardWidth = card.offsetWidth;
+
+                // Calculate dynamic padding for 'VS' based on card width
+                const vsPadding = Math.max(5, cardWidth * 0.03); // 3% of card width, min 5px
+                vsElement.style.padding = `0 ${vsPadding}px`;
+
+                // Optionally, adjust team padding based on content length
+                const homeTextWidth = homeTeam.querySelector('p').scrollWidth;
+                const awayTextWidth = awayTeam.querySelector('p').scrollWidth;
+                const maxTextWidth = Math.max(homeTextWidth, awayTextWidth);
+                const extraPadding = Math.min(10, maxTextWidth * 0.05); // 5% of longest team name, max 10px
+                homeTeam.style.paddingRight = `${0.5 + extraPadding / 16}em`; // Convert px to em
+                awayTeam.style.paddingLeft = `${0.5 + extraPadding / 16}em`; // Convert px to em
+            });
+        }
+
         window.onload = function() {
             const theme = document.cookie.split('; ')
                 .find(row => row.startsWith('theme='))
@@ -1651,6 +1673,12 @@ try {
                 }
             });
 
+            // Initial spacing adjustment
+            adjustTeamSpacing();
+
+            // Adjust spacing on resize
+            window.addEventListener('resize', adjustTeamSpacing);
+
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
                 const eventSource = new EventSource(`?action=progress_stream&teamIds=${encodeURIComponent(JSON.stringify(incompleteTeams))}&competition=<?php echo $selectedComp; ?>`);
                 const processedTeams = new Set();
@@ -1660,6 +1688,7 @@ try {
                     
                     if (data.complete) {
                         eventSource.close();
+                        adjustTeamSpacing(); // Re-adjust spacing after data load
                         return;
                     }
 
