@@ -118,7 +118,7 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     return ['error' => false, 'data' => $response['data']['matches'] ?? []];
 }
 
-// New function to fetch standings data
+// Fetch standings data
 function fetchStandings($competition, $apiKey, $baseUrl) {
     $url = $baseUrl . "competitions/$competition/standings";
     $response = fetchWithRetry($url, $apiKey, true);
@@ -188,7 +188,6 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
             $stats['form'] = implode('', array_slice($formArray, 0, 6));
 
-            // Add standings data
             foreach ($standings as $standing) {
                 if ($standing['team']['id'] == $teamId) {
                     $stats['standings'] = [
@@ -209,7 +208,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
     }
 }
 
-// Match prediction function with competition parameter
+// Match prediction function
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
@@ -270,6 +269,42 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     } catch (Exception $e) {
         return ["Error", "N/A", "", "N/A"];
     }
+}
+
+// Progress stream for incomplete data
+if (isset($_GET['action']) && $_GET['action'] === 'progress_stream') {
+    header('Content-Type: text/event-stream');
+    header('Cache-Control: no-cache');
+    header('Connection: keep-alive');
+
+    $teamIds = json_decode($_GET['teamIds'] ?? '[]', true);
+    $progress = 0;
+    $totalTeams = count($teamIds);
+
+    foreach ($teamIds as $index => $teamId) {
+        $progress = ($index + 1) / $totalTeams * 100;
+        $stats = calculateTeamStrength($teamId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
+
+        echo "data: " . json_encode([
+            'teamId' => $teamId,
+            'progress' => $progress,
+            'status' => $stats['needsRetry'] ? 'retrying' : 'complete',
+            'form' => $stats['form'],
+            'results' => $stats['results'],
+            'standings' => $stats['standings']
+        ]) . "\n\n";
+        ob_flush();
+        flush();
+
+        if ($stats['needsRetry']) {
+            sleep(1); // Simulate retry delay
+        }
+    }
+
+    echo "data: " . json_encode(['complete' => true]) . "\n\n";
+    ob_flush();
+    flush();
+    exit;
 }
 
 // Handle AJAX requests
@@ -815,6 +850,36 @@ try {
         [data-theme="dark"] .countdown-timer {
             background-color: #e74c3c;
         }
+
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.5s ease;
+        }
     </style>
 </head>
 <body>
@@ -895,13 +960,16 @@ try {
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
                                     <div class='form-display' id='form-home-$index'>";
-                        $homeForm = substr($homeStats['form'], -6);
-                        $homeForm = str_pad($homeForm, 6, '-', STR_PAD_LEFT);
-                        $homeForm = strrev($homeForm);
-                        for ($i = 0; $i < 6; $i++) {
-                            $class = $homeForm[$i] === 'W' ? 'win' : ($homeForm[$i] === 'D' ? 'draw' : ($homeForm[$i] === 'L' ? 'loss' : 'empty'));
-                            if ($i === 5 && $homeForm[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) $class .= ' latest';
-                            echo "<span class='$class'>" . $homeForm[$i] . "</span>";
+                        if ($homeStats['needsRetry']) {
+                            echo "<div class='loading-spinner'></div>";
+                        } else {
+                            $homeForm = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                            $homeForm = strrev($homeForm);
+                            for ($i = 0; $i < 6; $i++) {
+                                $class = $homeForm[$i] === 'W' ? 'win' : ($homeForm[$i] === 'D' ? 'draw' : ($homeForm[$i] === 'L' ? 'loss' : 'empty'));
+                                if ($i === 5 && $homeForm[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) $class .= ' latest';
+                                echo "<span class='$class'>" . $homeForm[$i] . "</span>";
+                            }
                         }
                         echo "</div>
                                 </div>
@@ -910,13 +978,16 @@ try {
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
                                     <div class='form-display' id='form-away-$index'>";
-                        $awayForm = substr($awayStats['form'], -6);
-                        $awayForm = str_pad($awayForm, 6, '-', STR_PAD_LEFT);
-                        $awayForm = strrev($awayForm);
-                        for ($i = 0; $i < 6; $i++) {
-                            $class = $awayForm[$i] === 'W' ? 'win' : ($awayForm[$i] === 'D' ? 'draw' : ($awayForm[$i] === 'L' ? 'loss' : 'empty'));
-                            if ($i === 5 && $awayForm[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) $class .= ' latest';
-                            echo "<span class='$class'>" . $awayForm[$i] . "</span>";
+                        if ($awayStats['needsRetry']) {
+                            echo "<div class='loading-spinner'></div>";
+                        } else {
+                            $awayForm = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                            $awayForm = strrev($awayForm);
+                            for ($i = 0; $i < 6; $i++) {
+                                $class = $awayForm[$i] === 'W' ? 'win' : ($awayForm[$i] === 'D' ? 'draw' : ($awayForm[$i] === 'L' ? 'loss' : 'empty'));
+                                if ($i === 5 && $awayForm[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) $class .= ' latest';
+                                echo "<span class='$class'>" . $awayForm[$i] . "</span>";
+                            }
                         }
                         echo "</div>
                                 </div>
@@ -924,11 +995,16 @@ try {
                             <div class='match-info " . (isset($_COOKIE['theme']) && $_COOKIE['theme'] === 'dark' ? 'dark' : '') . "'>
                                 <p>$date ($status)" . ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null ? " - $homeGoals : $awayGoals" : "") . "</p>
                             </div>
-                            <div class='prediction' id='prediction-$index'>
-                                <p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
-                                <p class='predicted-score'>Predicted Score: $predictedScore</p>
-                                <p class='confidence'>Confidence: $confidence</p>
-                            </div>
+                            <div class='prediction' id='prediction-$index'>";
+                        if ($needsRetry) {
+                            echo "<p>Loading prediction...</p>
+                                  <div class='progress-bar'><div class='progress-fill' style='width: 0%;'></div></div>";
+                        } else {
+                            echo "<p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
+                                  <p class='predicted-score'>Predicted Score: $predictedScore</p>
+                                  <p class='confidence'>Confidence: $confidence</p>";
+                        }
+                        echo "</div>
                             <button class='view-history-btn' onclick='toggleHistory(this)'>👁️ View History</button>
                             <div class='past-results' id='history-$index' style='display: none;'>";
                         
@@ -1149,10 +1225,68 @@ try {
             }
 
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
-                incompleteTeams.forEach(teamId => {
-                    document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`)
-                        .forEach(card => fetchTeamData(teamId, card.dataset.index, card.dataset.homeId == teamId));
-                });
+                const eventSource = new EventSource(`?action=progress_stream&teamIds=${encodeURIComponent(JSON.stringify(incompleteTeams))}&competition=<?php echo $selectedComp; ?>`);
+                const processedTeams = new Set();
+
+                eventSource.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.complete) {
+                        eventSource.close();
+                        return;
+                    }
+
+                    const teamId = data.teamId;
+                    if (processedTeams.has(teamId)) return;
+                    processedTeams.add(teamId);
+
+                    document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
+                        const index = card.dataset.index;
+                        const isHome = card.dataset.homeId == teamId;
+                        const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
+                        const historyElement = document.getElementById(`history-${index}`);
+                        const predictionElement = document.getElementById(`prediction-${index}`);
+                        const progressBar = predictionElement.querySelector('.progress-fill');
+
+                        if (data.status === 'retrying') {
+                            progressBar.style.width = `${data.progress}%`;
+                            return;
+                        }
+
+                        let formHtml = '';
+                        const form = data.form.slice(-6).padStart(6, '-');
+                        const reversedForm = form.split('').reverse().join('');
+                        for (let i = 0; i < 6; i++) {
+                            let className = reversedForm[i] === 'W' ? 'win' : (reversedForm[i] === 'D' ? 'draw' : (reversedForm[i] === 'L' ? 'loss' : 'empty'));
+                            if (i === 5 && reversedForm[i] !== '-' && form.trim('-').length > 0) className += ' latest';
+                            formHtml += `<span class="${className}">${reversedForm[i]}</span>`;
+                        }
+                        formElement.innerHTML = formHtml;
+
+                        let historyHtml = isHome ? `<p><strong>Team Recent Results:</strong></p><ul>` : historyElement.innerHTML;
+                        data.results.forEach(result => historyHtml += `<li>${result}</li>`);
+                        historyHtml += `</ul><div class='standings'>
+                            <span>POS: ${data.standings.position || 'N/A'}</span>
+                            <span>GS: ${data.standings.goalsScored || 'N/A'}</span>
+                            <span>GD: ${data.standings.goalDifference || 'N/A'}</span>
+                            <span>PTS: ${data.standings.points || 'N/A'}</span>
+                        </div>`;
+                        historyElement.innerHTML = isHome ? historyHtml + historyElement.innerHTML : historyHtml;
+
+                        const otherTeamId = isHome ? card.dataset.awayId : card.dataset.homeId;
+                        if (processedTeams.has(otherTeamId)) {
+                            fetchPrediction(index, card.dataset.homeId, card.dataset.awayId);
+                        }
+
+                        progressBar.parentElement.remove();
+                    });
+                };
+
+                eventSource.onerror = function() {
+                    console.error('SSE error, retrying...');
+                    eventSource.close();
+                    setTimeout(() => window.location.reload(), 5000);
+                };
             }
         }
     </script>
