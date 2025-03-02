@@ -128,6 +128,16 @@ function fetchStandings($competition, $apiKey, $baseUrl) {
     return ['error' => false, 'data' => $response['data']['standings'][0]['table'] ?? []];
 }
 
+// New function to fetch teams for autocomplete
+function fetchTeams($competition, $apiKey, $baseUrl) {
+    $url = $baseUrl . "competitions/$competition/teams";
+    $response = fetchWithRetry($url, $apiKey, true);
+    if ($response['error']) {
+        return [];
+    }
+    return $response['data']['teams'] ?? [];
+}
+
 // Team strength calculation with standings
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
@@ -313,7 +323,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'progress_stream') {
 
 // Handle AJAX requests
 $action = $_GET['action'] ?? 'main';
-if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match'])) {
+if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match', 'search_teams'])) {
     header('Content-Type: application/json');
     switch ($action) {
         case 'fetch_team_data':
@@ -395,6 +405,18 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 'advantage' => $predictionData[4]
             ]);
             exit;
+
+        case 'search_teams':
+            $query = strtolower($_GET['query'] ?? '');
+            $competition = $_GET['competition'] ?? 'PL';
+            $teams = fetchTeams($competition, $apiKey, $baseUrl);
+            $filteredTeams = array_filter($teams, function($team) use ($query) {
+                return stripos($team['name'], $query) !== false || stripos($team['shortName'] ?? '', $query) !== false;
+            });
+            echo json_encode(array_values(array_map(function($team) {
+                return ['id' => $team['id'], 'name' => $team['name'], 'crest' => $team['crest'] ?? ''];
+            }, $filteredTeams)));
+            exit;
     }
 }
 
@@ -423,7 +445,7 @@ if (!isset($_GET['ajax'])) {
         
         if (window.innerWidth <= 768) {
             if (menu.classList.contains('active')) {
-                const menuHeight = menu.scrollHeight + 20; // Include padding
+                const menuHeight = menu.scrollHeight + 20;
                 container.style.paddingTop = (60 + menuHeight) + 'px';
             } else {
                 container.style.paddingTop = '80px';
@@ -441,7 +463,7 @@ if (!isset($_GET['ajax'])) {
             container.style.paddingTop = '80px';
         } else {
             if (menu.classList.contains('active')) {
-                const menuHeight = menu.scrollHeight + 20; // Include padding
+                const menuHeight = menu.scrollHeight + 20;
                 container.style.paddingTop = (60 + menuHeight) + 'px';
             } else {
                 container.style.paddingTop = '80px';
@@ -479,6 +501,7 @@ try {
     $filter = $_GET['filter'] ?? 'upcoming';
     $customStart = $_GET['start'] ?? '';
     $customEnd = $_GET['end'] ?? '';
+    $searchTeam = $_GET['team'] ?? ''; // New parameter for team search
 
     $dateOptions = [
         'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))],
@@ -516,6 +539,14 @@ try {
         handleError($matchResponse['message']);
     }
     $allMatches = $matchResponse['data']['matches'] ?? [];
+
+    // Filter matches by team name if search is provided
+    if ($searchTeam) {
+        $allMatches = array_filter($allMatches, function($match) use ($searchTeam) {
+            return stripos($match['homeTeam']['name'] ?? '', $searchTeam) !== false ||
+                   stripos($match['awayTeam']['name'] ?? '', $searchTeam) !== false;
+        });
+    }
 ?>
 
 <!DOCTYPE html>
@@ -682,6 +713,7 @@ try {
             align-items: center;
             margin-bottom: 20px;
             flex-wrap: wrap;
+            gap: 10px;
         }
 
         select {
@@ -784,6 +816,68 @@ try {
             border: none;
             border-radius: 5px;
             cursor: pointer;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 5px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 25px;
+            font-size: 1em;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .autocomplete-item {
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .autocomplete-item:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .autocomplete-item img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .search-container.active .autocomplete-dropdown {
+            display: block;
         }
 
         .match-grid {
@@ -1016,7 +1110,6 @@ try {
             transition: width 0.5s ease;
         }
 
-        /* Advantage Highlighting Styles */
         .team.home-advantage {
             background-color: rgba(46, 204, 113, 0.2);
             border: 2px solid var(--primary-color);
@@ -1111,6 +1204,10 @@ try {
                 height: 40px;
                 margin: 10px 0;
             }
+
+            .search-container {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -1118,7 +1215,7 @@ try {
     <div class="container">
         <div class="header">
             <h1>CPS Football Predictions</h1>
-            <p>Select Competition and Date Range (EAT)</p>
+            <p>Select Competition, Date Range (EAT), or Search Teams</p>
         </div>
 
         <div class="controls">
@@ -1152,6 +1249,11 @@ try {
                         <button type="submit">Apply</button>
                     </form>
                 </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search teams..." value="<?php echo htmlspecialchars($searchTeam); ?>">
+                <div class="autocomplete-dropdown"></div>
             </div>
         </div>
 
@@ -1272,7 +1374,7 @@ try {
                     }
                 }
             } else {
-                echo "<p>No matches available for the selected competition and date range.</p>";
+                echo "<p>No matches available for the selected competition, date range, or team search.</p>";
             }
             ?>
         </div>
@@ -1306,6 +1408,8 @@ try {
                 const end = document.querySelector('input[name="end"]').value;
                 if (start && end) url += `&start=${start}&end=${end}`;
             }
+            const searchTeam = document.querySelector('.search-input').value.trim();
+            if (searchTeam) url += `&team=${encodeURIComponent(searchTeam)}`;
             window.location.href = url;
         }
 
@@ -1451,6 +1555,59 @@ try {
                 matchCard.classList.add('draw-likely');
             }
         }
+
+        const searchInput = document.querySelector('.search-input');
+        const autocompleteDropdown = document.querySelector('.autocomplete-dropdown');
+        const searchContainer = document.querySelector('.search-container');
+        let debounceTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                const query = this.value.trim();
+                if (query.length < 2) {
+                    autocompleteDropdown.innerHTML = '';
+                    searchContainer.classList.remove('active');
+                    return;
+                }
+
+                fetch(`?action=search_teams&query=${encodeURIComponent(query)}&competition=<?php echo $selectedComp; ?>`)
+                    .then(response => response.json())
+                    .then(teams => {
+                        if (teams.length === 0) {
+                            autocompleteDropdown.innerHTML = '<div class="autocomplete-item">No teams found</div>';
+                        } else {
+                            autocompleteDropdown.innerHTML = teams.map(team => `
+                                <div class="autocomplete-item" data-team-id="${team.id}" data-team-name="${team.name}">
+                                    ${team.crest ? `<img src="${team.crest}" alt="${team.name}">` : ''}
+                                    <span>${team.name}</span>
+                                </div>
+                            `).join('');
+                        }
+                        searchContainer.classList.add('active');
+                    })
+                    .catch(error => {
+                        console.error('Error fetching teams:', error);
+                        autocompleteDropdown.innerHTML = '<div class="autocomplete-item">Error loading teams</div>';
+                        searchContainer.classList.add('active');
+                    });
+            }, 300);
+        });
+
+        autocompleteDropdown.addEventListener('click', function(e) {
+            const item = e.target.closest('.autocomplete-item');
+            if (item && item.dataset.teamName) {
+                searchInput.value = item.dataset.teamName;
+                searchContainer.classList.remove('active');
+                window.location.href = `?competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>&team=${encodeURIComponent(item.dataset.teamName)}`;
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!searchContainer.contains(e.target)) {
+                searchContainer.classList.remove('active');
+            }
+        });
 
         window.onload = function() {
             const theme = document.cookie.split('; ')
