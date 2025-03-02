@@ -4,6 +4,7 @@
 // Configuration
 define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
 define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key
+
 class RecaptchaHandler {
     private $siteKey;
     private $secretKey;
@@ -42,11 +43,11 @@ class RecaptchaHandler {
     private function verify($recaptcha_response) {
         $result = ['success' => false, 'message' => ''];
         if (!$this->checkRateLimit()) {
-            $result['message'] = 'Too many attempts. Please try again later.';
+            $result['message'] = 'Rate limit exceeded (5 attempts/hour). Please try again later.';
             return $result;
         }
         if (empty($recaptcha_response)) {
-            $result['message'] = 'No CAPTCHA response provided';
+            $result['message'] = 'Please complete the CAPTCHA verification';
             return $result;
         }
         try {
@@ -54,7 +55,7 @@ class RecaptchaHandler {
             $data = [
                 'secret' => $this->secretKey,
                 'response' => $recaptcha_response,
-                'remoteip' => $_SERVER['REMOTE_ADDR']
+                'remoteip' => $this->getClientIp()
             ];
             $options = [
                 'http' => [
@@ -66,19 +67,19 @@ class RecaptchaHandler {
             $context = stream_context_create($options);
             $response = file_get_contents($url, false, $context);
             if ($response === false) {
-                throw new Exception('Failed to contact reCAPTCHA server');
+                throw new Exception('Failed to contact verification server');
             }
             $responseData = json_decode($response);
             if ($responseData->success) {
                 $result['success'] = true;
-                $result['message'] = 'Verification successful';
-                $_SESSION['recaptcha_verified'] = true; // Set verification flag
+                $result['message'] = 'Verification completed successfully';
+                $_SESSION['recaptcha_verified'] = true;
             } else {
-                $result['message'] = 'CAPTCHA verification failed';
+                $result['message'] = 'CAPTCHA verification failed. Please try again';
             }
         } catch (Exception $e) {
             error_log('reCAPTCHA error: ' . $e->getMessage());
-            $result['message'] = 'Verification error occurred';
+            $result['message'] = 'Temporary verification error. Please try again';
         }
         return $result;
     }
@@ -91,52 +92,140 @@ class RecaptchaHandler {
         }
     }
     
+    private function getClientIp() {
+        // Check for proxy headers first
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            // Take the first IP (client's original IP) from the list
+            return trim($ipList[0]);
+        } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            return $_SERVER['HTTP_CLIENT_IP'];
+        }
+        // Fallback to REMOTE_ADDR
+        return $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
+    }
+    
     public function displayOverlay() {
         if ($this->processed && $this->result['success']) {
-            return; // Don't display if verified
+            return;
         }
         $nonce = bin2hex(random_bytes(16));
         $_SESSION['recaptcha_nonce'] = $nonce;
+        $clientIp = htmlspecialchars($this->getClientIp(), ENT_QUOTES, 'UTF-8'); // Sanitized IP
         
         echo '
-        <div id="recaptcha-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-            <div style="background: white; padding: 20px; border-radius: 5px; text-align: center;">
-                <h2>Please Verify</h2>
-                <div id="recaptcha-container">
-                    <input type="hidden" name="nonce" value="' . $nonce . '">
-                    <div class="g-recaptcha" data-sitekey="' . $this->siteKey . '" data-callback="onRecaptchaSuccess"></div>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Security Verification</title>
+            <style>
+                body {
+                    margin: 0;
+                    font-family: "Segoe UI", Arial, sans-serif;
+                    background: #f4f7fa;
+                }
+                #recaptcha-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.75);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10000;
+                }
+                .recaptcha-box {
+                    background: #ffffff;
+                    padding: 40px;
+                    border-radius: 12px;
+                    max-width: 420px;
+                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+                    text-align: center;
+                    animation: fadeIn 0.3s ease-in-out;
+                }
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(-20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                h2 {
+                    color: #2c3e50;
+                    font-size: 24px;
+                    margin-bottom: 25px;
+                    font-weight: 600;
+                }
+                .info-section {
+                    color: #7f8c8d;
+                    font-size: 13px;
+                    margin-top: 20px;
+                    line-height: 1.6;
+                    background: #f9fafb;
+                    padding: 15px;
+                    border-radius: 8px;
+                }
+                .info-section p {
+                    margin: 5px 0;
+                }
+                .highlight {
+                    color: #2980b9;
+                    font-weight: 500;
+                }
+                #recaptcha-message {
+                    margin-top: 20px;
+                    font-size: 14px;
+                }
+            </style>
+        </head>
+        <body>
+            <div id="recaptcha-overlay">
+                <div class="recaptcha-box">
+                    <h2>Security Verification</h2>
+                    <div id="recaptcha-container">
+                        <input type="hidden" name="nonce" value="' . $nonce . '">
+                        <div class="g-recaptcha" data-sitekey="' . $this->siteKey . '" data-callback="onRecaptchaSuccess"></div>
+                    </div>
+                    <div id="recaptcha-message"></div>
+                    <div class="info-section">
+                        <p>Security Performed By: <span class="highlight">Google reCAPTCHA v2</span></p>
+                        <p>Site: <span class="highlight">creativepulse.42web.io</span></p>
+                        <p>Maintained By: <span class="highlight">xAI Security Team</span></p>
+                        <p>Your IP Address: <span class="highlight">' . $clientIp . '</span></p>
+                    </div>
                 </div>
-                <div id="recaptcha-message"></div>
             </div>
-        </div>
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        <script>
-            function onRecaptchaSuccess(token) {
-                fetch(window.location.href, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "X-Requested-With": "XMLHttpRequest"
-                    },
-                    body: "g-recaptcha-response=" + encodeURIComponent(token)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    let container = document.getElementById("recaptcha-message");
-                    if (data.success) {
-                        document.getElementById("recaptcha-overlay").remove();
-                    } else {
-                        container.innerHTML = "<div style=\'color: red;\'>Error: " + data.message + "</div>";
+            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+            <script>
+                function onRecaptchaSuccess(token) {
+                    fetch(window.location.href, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: "g-recaptcha-response=" + encodeURIComponent(token)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        let container = document.getElementById("recaptcha-message");
+                        if (data.success) {
+                            document.getElementById("recaptcha-overlay").remove();
+                        } else {
+                            container.innerHTML = "<div style=\'color: #e74c3c; font-size: 14px;\'>" + data.message + "</div>";
+                            grecaptcha.reset();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Verification Error:", error);
                         grecaptcha.reset();
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    grecaptcha.reset();
-                });
-            }
-        </script>';
-        exit; // Stop further processing
+                    });
+                }
+            </script>
+        </body>
+        </html>';
+        exit;
     }
     
     public function isVerified() {
@@ -150,12 +239,8 @@ class RecaptchaHandler {
     }
 }
 
-// Usage example in your page
 $recaptcha = RecaptchaHandler::getInstance();
 if (!$recaptcha->isVerified()) {
-    // This will display the overlay and stop execution
     $recaptcha->displayOverlay();
 }
-
-// Your protected content goes here
-echo "Welcome to the protected page!";
+?>
