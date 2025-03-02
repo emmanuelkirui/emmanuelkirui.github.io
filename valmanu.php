@@ -115,7 +115,9 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     if ($response['error']) {
         return $response;
     }
-    return ['error' => false, 'data' => $response['data']['matches'] ?? []];
+    $data = $response['data'];
+    error_log("Team $teamId last updated: " . ($data['lastUpdated'] ?? 'unknown'));
+    return ['error' => false, 'data' => $data['matches'] ?? []];
 }
 
 // Fetch standings data
@@ -141,7 +143,10 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
 // Team strength calculation with standings
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
-        if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form'])) {
+        // Check if we need to refresh (no stats, empty stats, or force refresh)
+        $forceRefresh = isset($_GET['force_refresh']) && $_GET['force_refresh'] === 'true';
+
+        if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form']) || $forceRefresh) {
             $response = fetchTeamResults($teamId, $apiKey, $baseUrl);
             if ($response['error']) {
                 $teamStats[$teamId] = ['results' => [], 'form' => '', 'needsRetry' => true, 'standings' => []];
@@ -899,43 +904,43 @@ try {
         }
 
         .teams {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
-    gap: 2px; /* Further reduced from 5px for tighter spacing */
-    margin-left: 5px; /* Kept for inward movement */
-    margin-right: 5px; /* Kept for inward movement */
-}
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 2px;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
 
-.team {
-    text-align: center;
-    flex: 1;
-    max-width: 48%;
-}
+        .team {
+            text-align: center;
+            flex: 1;
+            max-width: 48%;
+        }
 
-.home-team {
-    padding-right: 0.1em; /* Further reduced from 0.2em for even tighter spacing */
-}
+        .home-team {
+            padding-right: 0.1em;
+        }
 
-.away-team {
-    padding-left: 0.1em; /* Further reduced from 0.2em for even tighter spacing */
-}
+        .away-team {
+            padding-left: 0.1em;
+        }
 
-.team img {
-    max-width: 50px;
-    height: auto;
-    margin-bottom: 10px;
-}
+        .team img {
+            max-width: 50px;
+            height: auto;
+            margin-bottom: 10px;
+        }
 
-.vs {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: var(--primary-color);
-    text-align: center;
-    min-width: 15px; /* Further reduced from 20px for minimal width */
-    padding: 0 1px; /* Reduced padding for tighter fit */
-}
+        .vs {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: center;
+            min-width: 15px;
+            padding: 0 1px;
+        }
 
         .match-info {
             text-align: center;
@@ -1008,50 +1013,48 @@ try {
         }
 
         .form-display {
-    display: flex; /* Flex for tight alignment */
-    justify-content: center;
-    align-items: center;
-    font-family: 'monospace'; /* Monospace font for equal spacing */
-    font-size: 16px; /* Consistent size */
-    line-height: 1; /* No extra vertical space */
-    padding: 2px; /* Minimal container padding */
-    background-color: rgba(0, 0, 0, 0.05); /* Subtle background for contrast */
-    border-radius: 4px;
-}
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'monospace';
+            font-size: 16px;
+            line-height: 1;
+            padding: 2px;
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+        }
 
-.form-display span {
-    display: block;
-    width: 16px; /* Fixed width for each letter */
-    text-align: center;
-    margin: 0; /* No margin */
-    padding: 0; /* No padding */
-    border: none; /* Remove individual borders except for latest */
-}
+        .form-display span {
+            display: block;
+            width: 16px;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
 
-.form-display .latest {
-    border: 2px solid #3498db; /* Blue border for latest */
-    border-radius: 2px; /* Slight rounding */
-    font-weight: bold;
-    background-color: rgba(52, 152, 219, 0.1); /* Light blue background */
-}
+        .form-display .latest {
+            border: 2px solid #3498db;
+            border-radius: 2px;
+            font-weight: bold;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
 
-.form-display .win {
-    color: #28a745; /* Green */
-}
+        .form-display .win {
+            color: #28a745;
+        }
 
-.form-display .draw {
-    color: #fd7e14; /* Orange */
-}
+        .form-display .draw {
+            color: #fd7e14;
+        }
 
-.form-display .loss {
-    color: #dc3545; /* Red */
-}
+        .form-display .loss {
+            color: #dc3545;
+        }
 
-.form-display .empty {
-    color: #6c757d; /* Gray */
-}
-
-
+        .form-display .empty {
+            color: #6c757d;
+        }
 
         .retry-message {
             text-align: center;
@@ -1133,55 +1136,54 @@ try {
             transition: width 0.5s ease;
         }
 
-        /* Advantage Highlight Adjustments */
-.team.home-advantage {
-    background-color: rgba(46, 204, 113, 0.2);
-    border: 1px solid var(--primary-color); /* Reduced from 2px to 1px */
-    border-radius: 5px;
-    padding: 2px; /* Reduced from 5px for less internal spacing */
-    transition: all 0.3s ease;
-}
+        .team.home-advantage {
+            background-color: rgba(46, 204, 113, 0.2);
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            padding: 2px;
+            transition: all 0.3s ease;
+        }
 
-.team.away-advantage {
-    background-color: rgba(231, 76, 60, 0.2);
-    border: 1px solid #e74c3c; /* Reduced from 2px to 1px */
-    border-radius: 5px;
-    padding: 2px; /* Reduced from 5px for less internal spacing */
-    transition: all 0.3s ease;
-}
+        .team.away-advantage {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            border-radius: 5px;
+            padding: 2px;
+            transition: all 0.3s ease;
+        }
 
-.match-card.draw-likely .teams {
-    background-color: rgba(241, 196, 15, 0.2);
-    border: 1px solid #f1c40f; /* Reduced from 2px to 1px */
-    border-radius: 5px;
-    padding: 2px; /* Reduced from 5px for less internal spacing */
-    transition: all 0.3s ease;
-    display: flex;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    justify-content: center;
-    align-items: center;
-}
+        .match-card.draw-likely .teams {
+            background-color: rgba(241, 196, 15, 0.2);
+            border: 1px solid #f1c40f;
+            border-radius: 5px;
+            padding: 2px;
+            transition: all 0.3s ease;
+            display: flex;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+        }
 
-/* Dark Theme Adjustments */
-[data-theme="dark"] .team.home-advantage {
-    background-color: rgba(46, 204, 113, 0.3);
-    border: 1px solid var(--primary-color); /* Consistent with light theme */
-    padding: 2px; /* Consistent reduction */
-}
+        [data-theme="dark"] .team.home-advantage {
+            background-color: rgba(46, 204, 113, 0.3);
+            border: 1px solid var(--primary-color);
+            padding: 2px;
+        }
 
-[data-theme="dark"] .team.away-advantage {
-    background-color: rgba(231, 76, 60, 0.3);
-    border: 1px solid #e74c3c; /* Consistent with light theme */
-    padding: 2px; /* Consistent reduction */
-}
+        [data-theme="dark"] .team.away-advantage {
+            background-color: rgba(231, 76, 60, 0.3);
+            border: 1px solid #e74c3c;
+            padding: 2px;
+        }
 
-[data-theme="dark"] .match-card.draw-likely .teams {
-    background-color: rgba(241, 196, 15, 0.3);
-    border: 1px solid #f1c40f; /* Consistent with light theme */
-    padding: 2px; /* Consistent reduction */
-}
+        [data-theme="dark"] .match-card.draw-likely .teams {
+            background-color: rgba(241, 196, 15, 0.3);
+            border: 1px solid #f1c40f;
+            padding: 2px;
+        }
+
         .advantage {
             font-size: 0.9em;
             font-weight: bold;
@@ -1198,18 +1200,6 @@ try {
 
         .advantage-likely-draw {
             color: #f1c40f;
-        }
-
-        [data-theme="dark"] .team.home-advantage {
-            background-color: rgba(46, 204, 113, 0.3);
-        }
-
-        [data-theme="dark"] .team.away-advantage {
-            background-color: rgba(231, 76, 60, 0.3);
-        }
-
-        [data-theme="dark"] .match-card.draw-likely .teams {
-            background-color: rgba(241, 196, 15, 0.3);
         }
 
         @media (max-width: 768px) {
@@ -1489,7 +1479,7 @@ try {
         });
 
         function fetchTeamData(teamId, index, isHome) {
-            fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>`, {
+            fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
@@ -1569,7 +1559,8 @@ try {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById(`prediction-${index}`).innerHTML = `
+                    const predictionElement = document.getElementById(`prediction-${index}`);
+                    predictionElement.innerHTML = `
                         <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
                         <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
                         <p class="confidence">Confidence: ${data.confidence}</p>
@@ -1577,6 +1568,12 @@ try {
                     `;
                     const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
                     applyAdvantageHighlight(matchCard, data.advantage);
+
+                    // If match is finished, refresh form for both teams
+                    if (data.resultIndicator) {
+                        fetchTeamData(homeId, index, true);
+                        fetchTeamData(awayId, index, false);
+                    }
                 } else if (data.retry) {
                     setTimeout(() => fetchPrediction(index, homeId, awayId), 5000);
                 }
@@ -1602,6 +1599,28 @@ try {
             } else if (advantage === 'Likely Draw') {
                 matchCard.classList.add('draw-likely');
             }
+        }
+
+        function startMatchPolling() {
+            setInterval(() => {
+                document.querySelectorAll('.match-card').forEach(card => {
+                    const homeId = card.dataset.homeId;
+                    const awayId = card.dataset.awayId;
+                    const index = card.dataset.index;
+                    const matchInfo = card.querySelector('.match-info p').textContent;
+
+                    if (!matchInfo.includes('FINISHED') || card.querySelector('.result-indicator')) return;
+
+                    fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.resultIndicator) {
+                                fetchTeamData(homeId, index, true);
+                                fetchTeamData(awayId, index, false);
+                            }
+                        });
+                });
+            }, 60000); // Check every minute
         }
 
         const searchInput = document.querySelector('.search-input');
@@ -1657,7 +1676,6 @@ try {
             }
         });
 
-        // Dynamic spacing adjustment function
         function adjustTeamSpacing() {
             document.querySelectorAll('.match-card').forEach(card => {
                 const teamsContainer = card.querySelector('.teams');
@@ -1666,17 +1684,15 @@ try {
                 const vsElement = card.querySelector('.vs');
                 const cardWidth = card.offsetWidth;
 
-                // Calculate dynamic padding for 'VS' based on card width
-                const vsPadding = Math.max(5, cardWidth * 0.03); // 3% of card width, min 5px
+                const vsPadding = Math.max(5, cardWidth * 0.03);
                 vsElement.style.padding = `0 ${vsPadding}px`;
 
-                // Optionally, adjust team padding based on content length
                 const homeTextWidth = homeTeam.querySelector('p').scrollWidth;
                 const awayTextWidth = awayTeam.querySelector('p').scrollWidth;
                 const maxTextWidth = Math.max(homeTextWidth, awayTextWidth);
-                const extraPadding = Math.min(10, maxTextWidth * 0.05); // 5% of longest team name, max 10px
-                homeTeam.style.paddingRight = `${0.5 + extraPadding / 16}em`; // Convert px to em
-                awayTeam.style.paddingLeft = `${0.5 + extraPadding / 16}em`; // Convert px to em
+                const extraPadding = Math.min(10, maxTextWidth * 0.05);
+                homeTeam.style.paddingRight = `${0.5 + extraPadding / 16}em`;
+                awayTeam.style.paddingLeft = `${0.5 + extraPadding / 16}em`;
             });
         }
 
@@ -1709,11 +1725,9 @@ try {
                 }
             });
 
-            // Initial spacing adjustment
             adjustTeamSpacing();
-
-            // Adjust spacing on resize
             window.addEventListener('resize', adjustTeamSpacing);
+            startMatchPolling();
 
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
                 const eventSource = new EventSource(`?action=progress_stream&teamIds=${encodeURIComponent(JSON.stringify(incompleteTeams))}&competition=<?php echo $selectedComp; ?>`);
@@ -1724,7 +1738,7 @@ try {
                     
                     if (data.complete) {
                         eventSource.close();
-                        adjustTeamSpacing(); // Re-adjust spacing after data load
+                        adjustTeamSpacing();
                         return;
                     }
 
