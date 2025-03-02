@@ -416,7 +416,7 @@ if (!isset($_GET['ajax'])) {
         menu.classList.toggle('active');
         hamburger.classList.toggle('active');
         if (window.innerWidth <= 768) {
-            container.style.paddingTop = menu.classList.contains('active') ? '200px' : '60px';
+            container.style.paddingTop = menu.classList.contains('active') ? '260px' : '80px';
         }
     }
 
@@ -427,9 +427,9 @@ if (!isset($_GET['ajax'])) {
         if (window.innerWidth > 768) {
             menu.classList.remove('active');
             hamburger.classList.remove('active');
-            container.style.paddingTop = '60px';
+            container.style.paddingTop = '80px';
         } else {
-            container.style.paddingTop = menu.classList.contains('active') ? '200px' : '60px';
+            container.style.paddingTop = menu.classList.contains('active') ? '260px' : '80px';
         }
     });
 
@@ -438,9 +438,9 @@ if (!isset($_GET['ajax'])) {
         const container = document.querySelector('.container');
         if (window.innerWidth > 768) {
             menu.classList.remove('active');
-            container.style.paddingTop = '60px';
+            container.style.paddingTop = '80px';
         } else {
-            container.style.paddingTop = '60px';
+            container.style.paddingTop = '80px';
         }
     });
     </script>";
@@ -554,7 +554,7 @@ try {
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
-            height: 60px; /* Fixed height for navbar */
+            height: 60px; /* Fixed navbar height */
         }
 
         .navbar-brand {
@@ -644,8 +644,8 @@ try {
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 60px 20px 20px; /* Default padding for navbar height */
-            transition: padding-top 0.3s ease; /* Smooth transition for padding */
+            padding: 80px 20px 20px; /* Default padding to clear navbar */
+            transition: padding-top 0.3s ease;
         }
 
         .header {
@@ -1000,7 +1000,7 @@ try {
 
             .nav-menu {
                 position: absolute;
-                top: 60px; /* Below the fixed navbar height */
+                top: 60px; /* Below navbar-container */
                 left: 0;
                 width: 100%;
                 flex-direction: column;
@@ -1014,7 +1014,7 @@ try {
             }
 
             .nav-menu.active {
-                max-height: 300px; /* Adjust based on content */
+                max-height: 200px; /* Adjusted to fit content */
                 padding: 20px;
             }
 
