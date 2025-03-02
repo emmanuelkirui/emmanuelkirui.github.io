@@ -899,12 +899,14 @@ try {
         }
 
         .teams {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: calc(1vw + 5px); /* Dynamic gap based on viewport width */
-        }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: calc(1vw + 5px); /* Dynamic gap based on viewport width */
+    margin-left: 5px; /* Move inward from the left */
+    margin-right: 5px; /* Move inward from the right */
+}
 
         .team {
             text-align: center;
