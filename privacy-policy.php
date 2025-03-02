@@ -190,8 +190,8 @@ $year = date("Y");
         </header>
 
         <section>
-            <p>At Emmanuel Kirui's website ("Website"), we are committed to protecting your privacy and ensuring transparency in how we handle your personal information. This Privacy Policy ("Policy") explains how we collect, use, disclose, and safeguard your data when you access our Website or interact with our services (collectively, "Services"). By using our Services, you consent to the practices outlined in this Policy, which is designed to comply with applicable data protection laws, including [Insert Applicable Laws, e.g., "GDPR," "CCPA"].</p>
-            <p>If you have any questions or concerns about this Policy, please contact us at <a href="mailto:privacy@emmanuelkirui.com" class="contact-link">privacy@emmanuelkirui.com</a>.</p>
+            <p>At Emmanuel Kirui's website (<a href="http://creativepulse.42web.io" class="contact-link">creativepulse.42web.io</a>) ("Website"), we are committed to protecting your privacy and ensuring transparency in how we handle your personal information. This Privacy Policy ("Policy") explains how we collect, use, disclose, and safeguard your data when you access our Website or interact with our services (collectively, "Services"). By using our Services, you consent to the practices outlined in this Policy, which is designed to comply with applicable data protection laws, including [Insert Applicable Laws, e.g., "GDPR," "CCPA"].</p>
+            <p>If you have any questions or concerns about this Policy, please contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
         </section>
 
         <section>
@@ -285,7 +285,7 @@ $year = date("Y");
                 <li><strong>Portability:</strong> Receive your data in a structured, machine-readable format.</li>
                 <li><strong>Opt-Out:</strong> Unsubscribe from marketing communications or object to processing based on legitimate interests.</li>
             </ul>
-            <p>To exercise these rights, contact us at <a href="mailto:privacy@emmanuelkirui.com" class="contact-link">privacy@emmanuelkirui.com</a>. We will respond within [Insert Timeframe, e.g., "30 days"] and may require identity verification for security.</p>
+            <p>To exercise these rights, contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>. We will respond within [Insert Timeframe, e.g., "30 days"] and may require identity verification for security.</p>
         </section>
 
         <section>
@@ -307,7 +307,7 @@ $year = date("Y");
             <h2>12. Contact Us</h2>
             <p>For questions, requests, or complaints about this Privacy Policy or our data practices, please reach out to:</p>
             <ul>
-                <li><strong>Email:</strong> <a href="mailto:privacy@emmanuelkirui.com" class="contact-link">privacy@emmanuelkirui.com</a></li>
+                <li><strong>Email:</strong> <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a></li>
                 <li><strong>Mail:</strong> [Insert Physical Address, if applicable]</li>
             </ul>
             <p>We are dedicated to resolving your concerns promptly and transparently.</p>
@@ -320,7 +320,7 @@ $year = date("Y");
 
         <!-- Footer -->
         <footer class="footer">
-            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>For additional inquiries, contact us at <a href="mailto:info@emmanuelkirui.com" class="contact-link">info@emmanuelkirui.com</a>.</p>
+            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>For additional inquiries, contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
         </footer>
     </main>
 </body>
