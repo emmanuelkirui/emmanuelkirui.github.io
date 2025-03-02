@@ -1,10 +1,11 @@
 <?php
 // recaptcha_handler.php
+(ini_set('display_errors', 1);
 
 // Configuration
 define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
-define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key (store securely in production)
-define('VERIFICATION_DURATION', 1800); // 30 minutes in seconds, adjust as needed
+define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key (store securely)
+define('VERIFICATION_DURATION', 1800); // 30 minutes in seconds
 
 class RecaptchaHandler {
     private $siteKey;
@@ -17,7 +18,7 @@ class RecaptchaHandler {
         $this->siteKey = RECAPTCHA_SITE_KEY;
         $this->secretKey = RECAPTCHA_SECRET_KEY;
         
-        // Ensure session starts successfully
+        // Start session with error handling
         if (session_status() === PHP_SESSION_NONE) {
             if (!session_start()) {
                 error_log('Failed to start session in RecaptchaHandler');
@@ -28,7 +29,7 @@ class RecaptchaHandler {
             }
         }
         
-        // Store redirect URL if not already set
+        // Store redirect URL
         if (!isset($_SESSION['redirect_url'])) {
             $_SESSION['redirect_url'] = $_SERVER['HTTP_REFERER'] ?? '/';
         }
@@ -44,9 +45,9 @@ class RecaptchaHandler {
     }
     
     private function handleRequest() {
-        $token = $_POST['g-recaptcha-response'] ?? ''; // Restrict to POST only
+        $token = $_POST['g-recaptcha-response'] ?? '';
         if ($token) {
-            $token = filter_var($token, FILTER_SANITIZE_STRING); // Basic sanitization
+            $token = filter_var($token, FILTER_SANITIZE_STRING);
             $this->result = $this->verify($token);
             $this->processed = true;
             $this->outputResult();
@@ -77,22 +78,37 @@ class RecaptchaHandler {
                 'remoteip' => $this->getClientIp()
             ];
             
-            // Use cURL instead of file_get_contents for reliability
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $response = curl_exec($ch);
-            if ($response === false) {
-                throw new Exception('cURL error: ' . curl_error($ch));
+            // Check if cURL is available; fall back to file_get_contents if not
+            if (function_exists('curl_init')) {
+                $ch = curl_init($url);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $response = curl_exec($ch);
+                if ($response === false) {
+                    throw new Exception('cURL error: ' . curl_error($ch));
+                }
+                curl_close($ch);
+            } else {
+                $options = [
+                    'http' => [
+                        'header' => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method' => 'POST',
+                        'content' => http_build_query($data)
+                    ]
+                ];
+                $context = stream_context_create($options);
+                $response = file_get_contents($url, false, $context);
+                if ($response === false) {
+                    throw new Exception('Failed to contact verification server');
+                }
             }
-            curl_close($ch);
             
             $responseData = json_decode($response);
             if ($responseData && $responseData->success) {
                 $result['success'] = true;
                 $result['message'] = 'Verification completed successfully';
-                $result['redirect_url'] = $_SESSION['redirect_url']; // Include redirect URL
+                $result['redirect_url'] = $_SESSION['redirect_url'];
                 $_SESSION['recaptcha_verified'] = true;
                 $_SESSION['recaptcha_verified_time'] = time();
             } else {
@@ -132,7 +148,7 @@ class RecaptchaHandler {
         $_SESSION['recaptcha_nonce'] = $nonce;
         $clientIp = htmlspecialchars($this->getClientIp(), ENT_QUOTES, 'UTF-8');
         
-        // Add CSP header with nonce
+        // Attempt CSP header (may not work on InfinityFree)
         header("Content-Security-Policy: script-src 'nonce-$nonce' https://www.google.com; object-src 'none';");
         
         echo '
@@ -233,7 +249,7 @@ class RecaptchaHandler {
                     .then(data => {
                         let container = document.getElementById("recaptcha-message");
                         if (data.success) {
-                            window.location.href = data.redirect_url || "/"; // Redirect on success
+                            window.location.href = data.redirect_url || "/";
                         } else {
                             container.innerHTML = "<div style=\'color: #e74c3c; font-size: 14px;\'>" + data.message + "</div>";
                             grecaptcha.reset();
@@ -255,7 +271,6 @@ class RecaptchaHandler {
             return false;
         }
         
-        // Check if verification has expired
         if (isset($_SESSION['recaptcha_verified_time'])) {
             $elapsed = time() - $_SESSION['recaptcha_verified_time'];
             if ($elapsed > VERIFICATION_DURATION) {
@@ -268,7 +283,6 @@ class RecaptchaHandler {
     }
     
     private function checkRateLimit() {
-        // Use IP-based rate limiting combined with session
         $attempt_key = 'recaptcha_attempts_' . date('YmdH') . '_' . md5($this->getClientIp());
         $_SESSION[$attempt_key] = isset($_SESSION[$attempt_key]) ? $_SESSION[$attempt_key] + 1 : 1;
         return $_SESSION[$attempt_key] <= 5;
