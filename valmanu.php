@@ -208,21 +208,21 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
     }
 }
 
-// Match prediction function
+// Match prediction function with advantage highlighting
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
         $awayTeamId = $match['awayTeam']['id'] ?? 0;
 
         if (!$homeTeamId || !$awayTeamId) {
-            return ["N/A", "0%", "", "0-0"];
+            return ["N/A", "0%", "", "0-0", ""];
         }
 
         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $competition);
         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $competition);
 
         if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
-            return ["Loading...", "N/A", "", "N/A"];
+            return ["Loading...", "N/A", "", "N/A", ""];
         }
 
         $homeWinRate = $homeStats['games'] ? $homeStats['wins'] / $homeStats['games'] : 0;
@@ -232,7 +232,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoalAvg = $homeStats['games'] ? $homeStats['goalsScored'] / $homeStats['games'] : 0;
         $awayGoalAvg = $awayStats['games'] ? $awayStats['goalsScored'] / $awayStats['games'] : 0;
 
-        $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1;
+        $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1; // Home advantage multiplier
         $awayStrength = $awayWinRate * 50 + $awayDrawRate * 20 + $awayGoalAvg * 20;
 
         $diff = $homeStrength - $awayStrength;
@@ -248,15 +248,19 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
 
+        // Determine prediction and advantage
         if ($diff > 15) {
             $prediction = "$homeTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
+            $advantage = "Home Advantage";
         } elseif ($diff < -15) {
             $prediction = "$awayTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
+            $advantage = "Away Advantage";
         } else {
             $prediction = "Draw";
             $confidence = sprintf("%.1f%%", min(70, $confidence));
+            $advantage = "Likely Draw";
         }
 
         $resultIndicator = "";
@@ -265,9 +269,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
         }
 
-        return [$prediction, $confidence, $resultIndicator, $predictedScore];
+        return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage];
     } catch (Exception $e) {
-        return ["Error", "N/A", "", "N/A"];
+        return ["Error", "N/A", "", "N/A", ""];
     }
 }
 
@@ -387,7 +391,8 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 'prediction' => $predictionData[0],
                 'confidence' => $predictionData[1],
                 'resultIndicator' => $predictionData[2],
-                'predictedScore' => $predictionData[3]
+                'predictedScore' => $predictionData[3],
+                'advantage' => $predictionData[4]
             ]);
             exit;
     }
@@ -1011,6 +1016,61 @@ try {
             transition: width 0.5s ease;
         }
 
+        /* Advantage Highlighting Styles */
+        .team.home-advantage {
+            background-color: rgba(46, 204, 113, 0.2);
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .team.away-advantage {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 2px solid #e74c3c;
+            border-radius: 5px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .match-card.draw-likely .teams {
+            background-color: rgba(241, 196, 15, 0.2);
+            border: 2px solid #f1c40f;
+            border-radius: 5px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .advantage {
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .advantage-home-advantage {
+            color: var(--primary-color);
+        }
+
+        .advantage-away-advantage {
+            color: #e74c3c;
+        }
+
+        .advantage-likely-draw {
+            color: #f1c40f;
+        }
+
+        [data-theme="dark"] .team.home-advantage {
+            background-color: rgba(46, 204, 113, 0.3);
+        }
+
+        [data-theme="dark"] .team.away-advantage {
+            background-color: rgba(231, 76, 60, 0.3);
+        }
+
+        [data-theme="dark"] .match-card.draw-likely .teams {
+            background-color: rgba(241, 196, 15, 0.3);
+        }
+
         @media (max-width: 768px) {
             .hamburger {
                 display: flex;
@@ -1032,7 +1092,7 @@ try {
             }
 
             .nav-menu.active {
-                max-height: 500px; /* Large enough to trigger transition, actual height set by JS */
+                max-height: 500px;
             }
 
             .nav-link {
@@ -1110,7 +1170,7 @@ try {
                         $status = $match['status'];
                         $homeGoals = $match['score']['fullTime']['home'] ?? null;
                         $awayGoals = $match['score']['fullTime']['away'] ?? null;
-                        [$prediction, $confidence, $resultIndicator, $predictedScore] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
                         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
                         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
 
@@ -1123,7 +1183,7 @@ try {
                         }
 
                         echo "
-                        <div class='match-card' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-index='$index'>
+                        <div class='match-card' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-index='$index' data-advantage='$advantage'>
                             <div class='teams'>
                                 <div class='team'>
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
@@ -1171,7 +1231,8 @@ try {
                         } else {
                             echo "<p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
                                   <p class='predicted-score'>Predicted Score: $predictedScore</p>
-                                  <p class='confidence'>Confidence: $confidence</p>";
+                                  <p class='confidence'>Confidence: $confidence</p>
+                                  <p class='advantage advantage-" . strtolower(str_replace(' ', '-', $advantage)) . "'>$advantage</p>";
                         }
                         echo "</div>
                             <button class='view-history-btn' onclick='toggleHistory(this)'>👁️ View History</button>
@@ -1360,7 +1421,10 @@ try {
                         <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
                         <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
                         <p class="confidence">Confidence: ${data.confidence}</p>
+                        <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
                     `;
+                    const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
+                    applyAdvantageHighlight(matchCard, data.advantage);
                 } else if (data.retry) {
                     setTimeout(() => fetchPrediction(index, homeId, awayId), 5000);
                 }
@@ -1369,6 +1433,23 @@ try {
                 console.error('Error fetching prediction:', error);
                 setTimeout(() => fetchPrediction(index, homeId, awayId), 5000);
             });
+        }
+
+        function applyAdvantageHighlight(matchCard, advantage) {
+            const homeTeam = matchCard.querySelector('.teams .team:first-child');
+            const awayTeam = matchCard.querySelector('.teams .team:last-child');
+            
+            homeTeam.classList.remove('home-advantage');
+            awayTeam.classList.remove('away-advantage');
+            matchCard.classList.remove('draw-likely');
+
+            if (advantage === 'Home Advantage') {
+                homeTeam.classList.add('home-advantage');
+            } else if (advantage === 'Away Advantage') {
+                awayTeam.classList.add('away-advantage');
+            } else if (advantage === 'Likely Draw') {
+                matchCard.classList.add('draw-likely');
+            }
         }
 
         window.onload = function() {
@@ -1392,6 +1473,13 @@ try {
             if (currentFilter === 'custom') {
                 document.querySelector('.custom-date-range').classList.add('active');
             }
+
+            document.querySelectorAll('.match-card').forEach(matchCard => {
+                const advantage = matchCard.dataset.advantage;
+                if (advantage && !matchCard.querySelector('.prediction').innerHTML.includes('Loading')) {
+                    applyAdvantageHighlight(matchCard, advantage);
+                }
+            });
 
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
                 const eventSource = new EventSource(`?action=progress_stream&teamIds=${encodeURIComponent(JSON.stringify(incompleteTeams))}&competition=<?php echo $selectedComp; ?>`);
