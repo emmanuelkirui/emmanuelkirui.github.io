@@ -3,7 +3,7 @@
 
 // Configuration
 define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
-define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key
+define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key (store securely in production)
 define('VERIFICATION_DURATION', 1800); // 30 minutes in seconds, adjust as needed
 
 class RecaptchaHandler {
@@ -16,9 +16,23 @@ class RecaptchaHandler {
     private function __construct() {
         $this->siteKey = RECAPTCHA_SITE_KEY;
         $this->secretKey = RECAPTCHA_SECRET_KEY;
+        
+        // Ensure session starts successfully
         if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+            if (!session_start()) {
+                error_log('Failed to start session in RecaptchaHandler');
+                $this->result['message'] = 'Internal server error. Please try again later.';
+                $this->processed = true;
+                $this->outputResult();
+                exit;
+            }
         }
+        
+        // Store redirect URL if not already set
+        if (!isset($_SESSION['redirect_url'])) {
+            $_SESSION['redirect_url'] = $_SERVER['HTTP_REFERER'] ?? '/';
+        }
+        
         $this->handleRequest();
     }
     
@@ -30,8 +44,9 @@ class RecaptchaHandler {
     }
     
     private function handleRequest() {
-        $token = $_POST['g-recaptcha-response'] ?? $_GET['token'] ?? '';
+        $token = $_POST['g-recaptcha-response'] ?? ''; // Restrict to POST only
         if ($token) {
+            $token = filter_var($token, FILTER_SANITIZE_STRING); // Basic sanitization
             $this->result = $this->verify($token);
             $this->processed = true;
             $this->outputResult();
@@ -43,14 +58,17 @@ class RecaptchaHandler {
     
     private function verify($recaptcha_response) {
         $result = ['success' => false, 'message' => ''];
+        
         if (!$this->checkRateLimit()) {
             $result['message'] = 'Rate limit exceeded (5 attempts/hour). Please try again later.';
             return $result;
         }
+        
         if (empty($recaptcha_response)) {
             $result['message'] = 'Please complete the CAPTCHA verification';
             return $result;
         }
+        
         try {
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $data = [
@@ -58,24 +76,25 @@ class RecaptchaHandler {
                 'response' => $recaptcha_response,
                 'remoteip' => $this->getClientIp()
             ];
-            $options = [
-                'http' => [
-                    'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method' => 'POST',
-                    'content' => http_build_query($data)
-                ]
-            ];
-            $context = stream_context_create($options);
-            $response = file_get_contents($url, false, $context);
+            
+            // Use cURL instead of file_get_contents for reliability
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($ch);
             if ($response === false) {
-                throw new Exception('Failed to contact verification server');
+                throw new Exception('cURL error: ' . curl_error($ch));
             }
+            curl_close($ch);
+            
             $responseData = json_decode($response);
-            if ($responseData->success) {
+            if ($responseData && $responseData->success) {
                 $result['success'] = true;
                 $result['message'] = 'Verification completed successfully';
+                $result['redirect_url'] = $_SESSION['redirect_url']; // Include redirect URL
                 $_SESSION['recaptcha_verified'] = true;
-                $_SESSION['recaptcha_verified_time'] = time(); // Store verification timestamp
+                $_SESSION['recaptcha_verified_time'] = time();
             } else {
                 $result['message'] = 'CAPTCHA verification failed. Please try again';
             }
@@ -108,9 +127,13 @@ class RecaptchaHandler {
         if ($this->processed && $this->result['success']) {
             return;
         }
+        
         $nonce = bin2hex(random_bytes(16));
         $_SESSION['recaptcha_nonce'] = $nonce;
         $clientIp = htmlspecialchars($this->getClientIp(), ENT_QUOTES, 'UTF-8');
+        
+        // Add CSP header with nonce
+        header("Content-Security-Policy: script-src 'nonce-$nonce' https://www.google.com; object-src 'none';");
         
         echo '
         <!DOCTYPE html>
@@ -195,8 +218,8 @@ class RecaptchaHandler {
                     </div>
                 </div>
             </div>
-            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-            <script>
+            <script nonce="' . $nonce . '" src="https://www.google.com/recaptcha/api.js" async defer></script>
+            <script nonce="' . $nonce . '">
                 function onRecaptchaSuccess(token) {
                     fetch(window.location.href, {
                         method: "POST",
@@ -210,7 +233,7 @@ class RecaptchaHandler {
                     .then(data => {
                         let container = document.getElementById("recaptcha-message");
                         if (data.success) {
-                            document.getElementById("recaptcha-overlay").remove();
+                            window.location.href = data.redirect_url || "/"; // Redirect on success
                         } else {
                             container.innerHTML = "<div style=\'color: #e74c3c; font-size: 14px;\'>" + data.message + "</div>";
                             grecaptcha.reset();
@@ -231,11 +254,12 @@ class RecaptchaHandler {
         if (!isset($_SESSION['recaptcha_verified']) || $_SESSION['recaptcha_verified'] !== true) {
             return false;
         }
+        
         // Check if verification has expired
         if (isset($_SESSION['recaptcha_verified_time'])) {
             $elapsed = time() - $_SESSION['recaptcha_verified_time'];
             if ($elapsed > VERIFICATION_DURATION) {
-                unset($_SESSION['recaptcha_verified']); // Clear verification
+                unset($_SESSION['recaptcha_verified']);
                 unset($_SESSION['recaptcha_verified_time']);
                 return false;
             }
@@ -244,7 +268,8 @@ class RecaptchaHandler {
     }
     
     private function checkRateLimit() {
-        $attempt_key = 'recaptcha_attempts_' . date('YmdH');
+        // Use IP-based rate limiting combined with session
+        $attempt_key = 'recaptcha_attempts_' . date('YmdH') . '_' . md5($this->getClientIp());
         $_SESSION[$attempt_key] = isset($_SESSION[$attempt_key]) ? $_SESSION[$attempt_key] + 1 : 1;
         return $_SESSION[$attempt_key] <= 5;
     }
