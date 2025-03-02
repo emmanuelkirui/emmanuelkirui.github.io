@@ -2,8 +2,8 @@
 // recaptcha_handler.php
 
 // Configuration
-define('RECAPTCHA_SITE_KEY', 'your-site-key-here');     // Replace with your Site Key
-define('RECAPTCHA_SECRET_KEY', 'your-secret-key-here'); // Replace with your Secret Key
+define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
+define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key
 
 class RecaptchaHandler {
     private $siteKey;
