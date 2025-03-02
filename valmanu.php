@@ -900,14 +900,24 @@ try {
 
         .teams {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             margin-bottom: 15px;
+            gap: 20px; /* Adds consistent spacing between elements */
         }
 
         .team {
             text-align: center;
-            width: 45%;
+            flex: 1; /* Allows teams to take equal space */
+            max-width: 45%; /* Limits width to ensure spacing */
+        }
+
+        .home-team {
+            padding-right: 10px; /* Extra padding on the right of home team */
+        }
+
+        .away-team {
+            padding-left: 10px; /* Extra padding on the left of away team */
         }
 
         .team img {
@@ -920,6 +930,9 @@ try {
             font-size: 1.2em;
             font-weight: bold;
             color: var(--primary-color);
+            padding: 0 15px; /* Adds padding on both sides of 'VS' */
+            min-width: 40px; /* Ensures 'VS' has a minimum width */
+            text-align: center;
         }
 
         .match-info {
@@ -1287,7 +1300,7 @@ try {
                         echo "
                         <div class='match-card' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-index='$index' data-advantage='$advantage'>
                             <div class='teams'>
-                                <div class='team'>
+                                <div class='team home-team'>
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
                                     <div class='form-display' id='form-home-$index'>";
@@ -1305,7 +1318,7 @@ try {
                         echo "</div>
                                 </div>
                                 <span class='vs'>VS</span>
-                                <div class='team'>
+                                <div class='team away-team'>
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
                                     <div class='form-display' id='form-away-$index'>";
