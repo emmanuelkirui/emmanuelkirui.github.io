@@ -6,7 +6,11 @@ $competitions_url = "https://api.football-data.org/v4/competitions"; // List all
 // Only output the navigation bar and script if it's not an AJAX request
 if (!isset($_GET['ajax'])) {
     echo "<nav class='navbar'>";
-    echo "<div class='hamburger' onclick='toggleMenu()'>☰</div>";
+    echo "<div class='hamburger' onclick='toggleMenu()'>
+            <span class='bar'></span>
+            <span class='bar'></span>
+            <span class='bar'></span>
+          </div>";
     echo "<div class='nav-menu' id='navMenu'>";
     echo "<a href='liv' class='nav-link'>Home</a>";
     echo "<a href='valmanu' class='nav-link'>More Predictions</a>";
@@ -14,66 +18,95 @@ if (!isset($_GET['ajax'])) {
     echo "</div>";
     echo "</nav>";
 
-    // Inline CSS for professional styling
+    // Inline CSS for professional styling with animated hamburger
     echo "<style>
         /* Navbar container */
         .navbar {
             width: 100%;
-            background-color: #2c3e50; /* Dark blue for professionalism */
+            background-color: #2c3e50;
             padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-            position: fixed; /* Fixed positioning for a modern look */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            height: 60px; /* Fixed height for content offset */
+            box-sizing: border-box;
         }
 
         /* Hamburger menu */
         .hamburger {
-            font-size: 24px;
-            color: #ecf0f1; /* Light color for contrast */
+            display: none; /* Hidden by default on larger screens */
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 20px;
             cursor: pointer;
             padding: 10px;
-            display: none; /* Hidden by default on larger screens */
+        }
+
+        .hamburger .bar {
+            width: 100%;
+            height: 3px;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            transition: all 0.3s ease; /* Smooth animation */
+        }
+
+        /* Hamburger animation when active */
+        .hamburger.active .bar:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .hamburger.active .bar:nth-child(2) {
+            opacity: 0; /* Middle bar disappears */
+        }
+
+        .hamburger.active .bar:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
         }
 
         /* Navigation menu */
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 30px; /* Spacing between items */
+            gap: 30px;
         }
 
         /* Navigation links */
         .nav-link {
-            color: #ecf0f1; /* Light text color */
+            color: #ecf0f1;
             text-decoration: none;
-            font-family: 'Arial', sans-serif; /* Clean, professional font */
+            font-family: 'Arial', sans-serif;
             font-size: 16px;
-            font-weight: 500; /* Slightly bold for emphasis */
+            font-weight: 500;
             padding: 10px 15px;
-            transition: all 0.3s ease; /* Smooth hover effect */
+            transition: all 0.3s ease;
             border-radius: 5px;
         }
 
-        /* Hover effect for nav links */
         .nav-link:hover {
-            background-color: #3498db; /* Bright blue on hover */
+            background-color: #3498db;
             color: #fff;
         }
 
-        /* Active link styling */
         .nav-link:active {
-            background-color: #2980b9; /* Slightly darker blue */
+            background-color: #2980b9;
+        }
+
+        /* Prevent content overlap */
+        body {
+            margin: 0;
+            padding-top: 60px; /* Offset for fixed navbar */
         }
 
         /* Responsive design */
         @media (max-width: 768px) {
             .hamburger {
-                display: block; /* Show hamburger on small screens */
+                display: flex; /* Show hamburger on small screens */
             }
 
             .nav-menu {
@@ -87,45 +120,49 @@ if (!isset($_GET['ajax'])) {
                 gap: 10px;
                 padding: 20px 0;
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                transition: all 0.3s ease; /* Smooth slide-in */
             }
 
             .nav-link {
                 width: 100%;
                 text-align: center;
                 padding: 15px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle divider */
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             .nav-link:last-child {
-                border-bottom: none; /* Remove border from last item */
+                border-bottom: none;
             }
 
-            /* Show menu when toggled */
             .nav-menu.active {
-                display: flex;
+                display: flex; /* Show when toggled */
             }
         }
     </style>";
 
-    // JavaScript for toggling the menu with class toggle
+    // JavaScript for toggling the menu and hamburger animation
     echo "<script>
         function toggleMenu() {
             const menu = document.getElementById('navMenu');
+            const hamburger = document.querySelector('.hamburger');
             menu.classList.toggle('active');
+            hamburger.classList.toggle('active'); // Toggle hamburger animation
         }
 
-        // Optional: Show menu on larger screens by default
+        // Ensure menu visibility on resize
         window.addEventListener('resize', function() {
             const menu = document.getElementById('navMenu');
+            const hamburger = document.querySelector('.hamburger');
             if (window.innerWidth > 768) {
-                menu.classList.remove('active'); // Reset toggle state
-                menu.style.display = 'flex'; // Ensure visibility
+                menu.classList.remove('active');
+                hamburger.classList.remove('active');
+                menu.style.display = 'flex';
             } else {
-                menu.style.display = ''; // Reset inline style for mobile
+                menu.style.display = '';
             }
         });
 
-        // Ensure correct initial state on page load
+        // Set initial state on load
         window.addEventListener('load', function() {
             const menu = document.getElementById('navMenu');
             if (window.innerWidth > 768) {
@@ -134,6 +171,9 @@ if (!isset($_GET['ajax'])) {
         });
     </script>";
 }
+
+            
+
 
 
 // Start session to store competitions and their data
