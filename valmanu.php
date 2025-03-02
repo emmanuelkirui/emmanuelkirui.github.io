@@ -1149,9 +1149,12 @@ try {
         .match-card.draw-likely .teams {
             background-color: rgba(241, 196, 15, 0.2);
             border: 2px solid #f1c40f;
-            border-radius: 6px;
+            border-radius: 5px;
             padding: 5px;
             transition: all 0.3s ease;
+            display: flex; /* Consistent with parent .teams */
+    width: 100%; /* Full width of parent container */
+    max-width: 100%;
         }
 
         .advantage {
