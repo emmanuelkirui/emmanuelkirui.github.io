@@ -107,8 +107,8 @@ function fetchWithRetry($url, $apiKey, $isAjax = false) {
 
 // Team results fetch function
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
-    $pastDate = date('Y-m-d', strtotime('-60 days')); // Nairobi time (UTC+3)
-    $currentDate = date('Y-m-d'); // Nairobi time (UTC+3)
+    $pastDate = date('Y-m-d', strtotime('-60 days'));
+    $currentDate = date('Y-m-d');
     $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=$currentDate&limit=10&status=FINISHED";
     
     $response = fetchWithRetry($url, $apiKey, true);
@@ -116,7 +116,7 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
         return $response;
     }
     $data = $response['data'];
-    error_log("Team $teamId last updated: " . ($data['lastUpdated'] ?? 'unknown'));
+    error_log("Team $teamId fetched at " . date('Y-m-d H:i:s') . " - Last Updated: " . ($data['lastUpdated'] ?? 'unknown'));
     return ['error' => false, 'data' => $data['matches'] ?? []];
 }
 
@@ -130,7 +130,7 @@ function fetchStandings($competition, $apiKey, $baseUrl) {
     return ['error' => false, 'data' => $response['data']['standings'][0]['table'] ?? []];
 }
 
-// New function to fetch teams for autocomplete
+// Fetch teams for autocomplete
 function fetchTeams($competition, $apiKey, $baseUrl) {
     $url = $baseUrl . "competitions/$competition/teams";
     $response = fetchWithRetry($url, $apiKey, true);
@@ -143,10 +143,14 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
 // Team strength calculation with standings
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
-        // Check if we need to refresh (no stats, empty stats, or force refresh)
+        // Force refresh if explicitly requested or if match just finished
         $forceRefresh = isset($_GET['force_refresh']) && $_GET['force_refresh'] === 'true';
-
-        if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form']) || $forceRefresh) {
+        
+        if ($forceRefresh && isset($teamStats[$teamId])) {
+            unset($teamStats[$teamId]); // Clear cache if forced
+        }
+        
+        if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form'])) {
             $response = fetchTeamResults($teamId, $apiKey, $baseUrl);
             if ($response['error']) {
                 $teamStats[$teamId] = ['results' => [], 'form' => '', 'needsRetry' => true, 'standings' => []];
@@ -154,7 +158,6 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
             $results = $response['data'];
 
-            // Fetch standings for the competition
             $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
             $standings = $standingsResponse['error'] ? [] : $standingsResponse['data'];
 
@@ -247,7 +250,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoalAvg = $homeStats['games'] ? $homeStats['goalsScored'] / $homeStats['games'] : 0;
         $awayGoalAvg = $awayStats['games'] ? $awayStats['goalsScored'] / $awayStats['games'] : 0;
 
-        $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1; // Home advantage multiplier
+        $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1;
         $awayStrength = $awayWinRate * 50 + $awayDrawRate * 20 + $awayGoalAvg * 20;
 
         $diff = $homeStrength - $awayStrength;
@@ -263,7 +266,14 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
 
-        // Determine prediction and advantage
+        if ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null) {
+            // Invalidate cache for both teams when match finishes
+            unset($teamStats[$homeTeamId]);
+            unset($teamStats[$awayTeamId]);
+            $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $competition);
+            $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $competition);
+        }
+
         if ($diff > 15) {
             $prediction = "$homeTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
@@ -316,7 +326,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'progress_stream') {
         flush();
 
         if ($stats['needsRetry']) {
-            sleep(1); // Simulate retry delay
+            sleep(1);
         }
     }
 
@@ -506,7 +516,7 @@ try {
     $filter = $_GET['filter'] ?? 'upcoming';
     $customStart = $_GET['start'] ?? '';
     $customEnd = $_GET['end'] ?? '';
-    $searchTeam = $_GET['team'] ?? ''; // New parameter for team search
+    $searchTeam = $_GET['team'] ?? '';
 
     $dateOptions = [
         'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))],
@@ -545,7 +555,6 @@ try {
     }
     $allMatches = $matchResponse['data']['matches'] ?? [];
 
-    // Filter matches by team name if search is provided
     if ($searchTeam) {
         $allMatches = array_filter($allMatches, function($match) use ($searchTeam) {
             return stripos($match['homeTeam']['name'] ?? '', $searchTeam) !== false ||
@@ -1479,11 +1488,13 @@ try {
         });
 
         function fetchTeamData(teamId, index, isHome) {
+            console.log(`Fetching team data for ${teamId}, isHome: ${isHome}`);
             fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
             .then(data => {
+                console.log(`Team ${teamId} data received:`, data);
                 if (data.success) {
                     const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
                     const historyElement = document.getElementById(`history-${index}`);
@@ -1553,11 +1564,13 @@ try {
         }
 
         function fetchPrediction(index, homeId, awayId) {
+            console.log(`Fetching prediction for match ${index}: ${homeId} vs ${awayId}`);
             fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
             .then(data => {
+                console.log(`Prediction data for ${homeId} vs ${awayId}:`, data);
                 if (data.success) {
                     const predictionElement = document.getElementById(`prediction-${index}`);
                     predictionElement.innerHTML = `
@@ -1569,8 +1582,8 @@ try {
                     const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
                     applyAdvantageHighlight(matchCard, data.advantage);
 
-                    // If match is finished, refresh form for both teams
                     if (data.resultIndicator) {
+                        console.log(`Match finished, updating forms for ${homeId} and ${awayId}`);
                         fetchTeamData(homeId, index, true);
                         fetchTeamData(awayId, index, false);
                     }
@@ -1609,18 +1622,12 @@ try {
                     const index = card.dataset.index;
                     const matchInfo = card.querySelector('.match-info p').textContent;
 
-                    if (!matchInfo.includes('FINISHED') || card.querySelector('.result-indicator')) return;
-
-                    fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.resultIndicator) {
-                                fetchTeamData(homeId, index, true);
-                                fetchTeamData(awayId, index, false);
-                            }
-                        });
+                    if (matchInfo.includes('FINISHED') && !card.querySelector('.result-indicator')) {
+                        console.log(`Polling detected finished match ${index} without resultIndicator, fetching prediction`);
+                        fetchPrediction(index, homeId, awayId);
+                    }
                 });
-            }, 60000); // Check every minute
+            }, 30000); // Check every 30 seconds instead of 60 to be more responsive
         }
 
         const searchInput = document.querySelector('.search-input');
@@ -1802,7 +1809,7 @@ try {
 } catch (Exception $e) {
     handleError("Unexpected error: " . $e->getMessage());
 }
-?>
-<?php include 'back-to-top.php'; ?>
+    <?php include 'back-to-top.php'; ?>
 <script src="network-status.js"></script>
 <?php include 'global-footer.php'; ?>
+?>
