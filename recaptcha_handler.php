@@ -4,6 +4,7 @@
 // Configuration
 define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
 define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key
+define('VERIFICATION_DURATION', 1800); // 30 minutes in seconds, adjust as needed
 
 class RecaptchaHandler {
     private $siteKey;
@@ -74,6 +75,7 @@ class RecaptchaHandler {
                 $result['success'] = true;
                 $result['message'] = 'Verification completed successfully';
                 $_SESSION['recaptcha_verified'] = true;
+                $_SESSION['recaptcha_verified_time'] = time(); // Store verification timestamp
             } else {
                 $result['message'] = 'CAPTCHA verification failed. Please try again';
             }
@@ -93,15 +95,12 @@ class RecaptchaHandler {
     }
     
     private function getClientIp() {
-        // Check for proxy headers first
         if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            // Take the first IP (client's original IP) from the list
             return trim($ipList[0]);
         } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
             return $_SERVER['HTTP_CLIENT_IP'];
         }
-        // Fallback to REMOTE_ADDR
         return $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
     }
     
@@ -111,7 +110,7 @@ class RecaptchaHandler {
         }
         $nonce = bin2hex(random_bytes(16));
         $_SESSION['recaptcha_nonce'] = $nonce;
-        $clientIp = htmlspecialchars($this->getClientIp(), ENT_QUOTES, 'UTF-8'); // Sanitized IP
+        $clientIp = htmlspecialchars($this->getClientIp(), ENT_QUOTES, 'UTF-8');
         
         echo '
         <!DOCTYPE html>
@@ -229,7 +228,19 @@ class RecaptchaHandler {
     }
     
     public function isVerified() {
-        return isset($_SESSION['recaptcha_verified']) && $_SESSION['recaptcha_verified'] === true;
+        if (!isset($_SESSION['recaptcha_verified']) || $_SESSION['recaptcha_verified'] !== true) {
+            return false;
+        }
+        // Check if verification has expired
+        if (isset($_SESSION['recaptcha_verified_time'])) {
+            $elapsed = time() - $_SESSION['recaptcha_verified_time'];
+            if ($elapsed > VERIFICATION_DURATION) {
+                unset($_SESSION['recaptcha_verified']); // Clear verification
+                unset($_SESSION['recaptcha_verified_time']);
+                return false;
+            }
+        }
+        return true;
     }
     
     private function checkRateLimit() {
