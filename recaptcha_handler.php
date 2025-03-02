@@ -141,12 +141,13 @@ class RecaptchaHandler {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Security Verification</title>
+            <title>creativepulse.42web.io - Security Verification</title>
             <style>
                 body {
                     margin: 0;
-                    font-family: "Segoe UI", Arial, sans-serif;
-                    background: #f4f7fa;
+                    font-family: "Poppins", sans-serif;
+                    background: linear-gradient(135deg, #1e3c72, #2a5298);
+                    overflow: hidden;
                 }
                 #recaptcha-overlay {
                     position: fixed;
@@ -154,67 +155,101 @@ class RecaptchaHandler {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.75);
+                    background: rgba(0, 0, 0, 0.6);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     z-index: 10000;
                 }
                 .recaptcha-box {
-                    background: #ffffff;
+                    background: #fff;
                     padding: 40px;
-                    border-radius: 12px;
-                    max-width: 420px;
-                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+                    border-radius: 16px;
+                    max-width: 450px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
                     text-align: center;
-                    animation: fadeIn 0.3s ease-in-out;
+                    position: relative;
+                    overflow: hidden;
+                    animation: pulseIn 0.5s ease-out;
                 }
-                @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(-20px); }
-                    to { opacity: 1; transform: translateY(0); }
+                @keyframes pulseIn {
+                    0% { transform: scale(0.95); opacity: 0; }
+                    50% { transform: scale(1.05); }
+                    100% { transform: scale(1); opacity: 1; }
                 }
                 h2 {
-                    color: #2c3e50;
-                    font-size: 24px;
-                    margin-bottom: 25px;
-                    font-weight: 600;
+                    color: #1e3c72;
+                    font-size: 28px;
+                    margin-bottom: 10px;
+                    font-weight: 700;
+                    letter-spacing: 1px;
+                }
+                .recaptcha-box::before {
+                    content: "";
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(42, 82, 152, 0.1), transparent);
+                    animation: pulseBg 6s infinite;
+                    z-index: -1;
+                }
+                @keyframes pulseBg {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                    100% { transform: scale(1); }
+                }
+                .verify-text {
+                    color: #777;
+                    font-size: 14px;
+                    margin-bottom: 20px;
+                    font-style: italic;
                 }
                 .info-section {
-                    color: #7f8c8d;
+                    color: #555;
                     font-size: 13px;
-                    margin-top: 20px;
-                    line-height: 1.6;
-                    background: #f9fafb;
+                    margin-top: 25px;
+                    line-height: 1.8;
+                    background: #f5f7fa;
                     padding: 15px;
-                    border-radius: 8px;
+                    border-radius: 10px;
+                    border-left: 4px solid #2a5298;
                 }
                 .info-section p {
                     margin: 5px 0;
                 }
                 .highlight {
-                    color: #2980b9;
-                    font-weight: 500;
+                    color: #e67e22;
+                    font-weight: 600;
                 }
                 #recaptcha-message {
                     margin-top: 20px;
                     font-size: 14px;
+                    color: #e74c3c;
+                }
+                .g-recaptcha {
+                    margin: 20px auto;
+                    transform: scale(1.05);
+                    transform-origin: center;
                 }
             </style>
         </head>
         <body>
             <div id="recaptcha-overlay">
                 <div class="recaptcha-box">
-                    <h2>Security Verification</h2>
+                    <h2>creativepulse.42web.io</h2>
+                    <p class="verify-text">Verifying you are human. This may take a few seconds.</p>
                     <div id="recaptcha-container">
                         <input type="hidden" name="nonce" value="' . $nonce . '">
                         <div class="g-recaptcha" data-sitekey="' . $this->siteKey . '" data-callback="onRecaptchaSuccess"></div>
                     </div>
                     <div id="recaptcha-message"></div>
                     <div class="info-section">
-                        <p>Security Performed By: <span class="highlight">Google reCAPTCHA</span></p>
-                        <p>Site: <span class="highlight">creativepulse.42web.io</span></p>
-                        <p>Maintained By: <span class="highlight">xAI Security Team</span></p>
-                        <p>Your IP Address: <span class="highlight">' . $clientIp . '</span></p>
+                        <p><span class="highlight">creativepulse.42web.io</span> needs to review the security of your connection before proceeding</p>
+                        <p>Powered By: <span class="highlight">Google reCAPTCHA</span></p>
+                        <p>Secured By: <span class="highlight">xAI Security Team</span></p>
+                        <p>Your IP: <span class="highlight">' . $clientIp . '</span></p>
                     </div>
                 </div>
             </div>
@@ -233,7 +268,8 @@ class RecaptchaHandler {
                     .then(data => {
                         let container = document.getElementById("recaptcha-message");
                         if (data.success) {
-                            window.location.href = data.redirect_url || "/"; // Redirect on success
+                            container.innerHTML = "<div style=\'color: #27ae60; font-size: 14px;\'>Success! Redirecting...</div>";
+                            setTimeout(() => window.location.href = data.redirect_url || "/", 1000);
                         } else {
                             container.innerHTML = "<div style=\'color: #e74c3c; font-size: 14px;\'>" + data.message + "</div>";
                             grecaptcha.reset();
@@ -241,6 +277,7 @@ class RecaptchaHandler {
                     })
                     .catch(error => {
                         console.error("Verification Error:", error);
+                        document.getElementById("recaptcha-message").innerHTML = "<div style=\'color: #e74c3c;\'>Error occurred. Please try again.</div>";
                         grecaptcha.reset();
                     });
                 }
