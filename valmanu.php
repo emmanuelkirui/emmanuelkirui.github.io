@@ -1005,19 +1005,19 @@ try {
         }
 
         .form-display {
-            margin-top: 5px;
-            font-size: 0.9em;
-            font-weight: bold;
+          display: inline-flex; /* Use flex to keep items tight */
+          gap: 0; /* Ensure no gaps */
         }
 
         .form-display span {
-           display: inline-block;
-           width: 18px; /* Slightly reduced width for continuous look */
-           text-align: center;
-           border-radius: 3px;
-           margin: 0; /* Remove margin to make it continuous */
-           padding: 0 2px; /* Add minimal padding instead */
-}
+          display: inline-block;
+          width: 18px; /* Fixed width for consistency */
+          text-align: center;
+          border-radius: 0; /* Remove rounding for continuous look */
+          margin: 0; /* No margin */
+          padding: 0; /* No padding */
+          line-height: 1; /* Tighten vertical spacing */
+       }
 
         .form-display .win {
             color: #28a745; /* Green for Win */
