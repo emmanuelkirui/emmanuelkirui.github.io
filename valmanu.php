@@ -143,7 +143,6 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
 // Team strength calculation with standings
 function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
-        // Check if we need to refresh (no stats, empty stats, or force refresh)
         $forceRefresh = isset($_GET['force_refresh']) && $_GET['force_refresh'] === 'true';
 
         if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form']) || $forceRefresh) {
@@ -154,7 +153,6 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
             $results = $response['data'];
 
-            // Fetch standings for the competition
             $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
             $standings = $standingsResponse['error'] ? [] : $standingsResponse['data'];
 
@@ -223,21 +221,21 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
     }
 }
 
-// Match prediction function with advantage highlighting
+// Match prediction function with form data
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
         $awayTeamId = $match['awayTeam']['id'] ?? 0;
 
         if (!$homeTeamId || !$awayTeamId) {
-            return ["N/A", "0%", "", "0-0", ""];
+            return ["N/A", "0%", "", "0-0", "", "", ""];
         }
 
         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $competition);
         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $competition);
 
         if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
-            return ["Loading...", "N/A", "", "N/A", ""];
+            return ["Loading...", "N/A", "", "N/A", "", $homeStats['form'], $awayStats['form']];
         }
 
         $homeWinRate = $homeStats['games'] ? $homeStats['wins'] / $homeStats['games'] : 0;
@@ -247,7 +245,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoalAvg = $homeStats['games'] ? $homeStats['goalsScored'] / $homeStats['games'] : 0;
         $awayGoalAvg = $awayStats['games'] ? $awayStats['goalsScored'] / $awayStats['games'] : 0;
 
-        $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1; // Home advantage multiplier
+        $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1;
         $awayStrength = $awayWinRate * 50 + $awayDrawRate * 20 + $awayGoalAvg * 20;
 
         $diff = $homeStrength - $awayStrength;
@@ -263,7 +261,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
 
-        // Determine prediction and advantage
         if ($diff > 15) {
             $prediction = "$homeTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
@@ -284,9 +281,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
         }
 
-        return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage];
+        return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form']];
     } catch (Exception $e) {
-        return ["Error", "N/A", "", "N/A", ""];
+        return ["Error", "N/A", "", "N/A", "", "", ""];
     }
 }
 
@@ -316,7 +313,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'progress_stream') {
         flush();
 
         if ($stats['needsRetry']) {
-            sleep(1); // Simulate retry delay
+            sleep(1);
         }
     }
 
@@ -398,7 +395,14 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
             
             $predictionData = predictMatch([
                 'homeTeam' => ['id' => $homeId],
-                'awayTeam' => ['id' => $awayId]
+                'awayTeam' => ['id' => $awayId],
+                'status' => $_GET['status'] ?? 'SCHEDULED',
+                'score' => [
+                    'fullTime' => [
+                        'home' => $_GET['homeGoals'] ?? null,
+                        'away' => $_GET['awayGoals'] ?? null
+                    ]
+                ]
             ], $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
             
             echo json_encode([
@@ -407,7 +411,9 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 'confidence' => $predictionData[1],
                 'resultIndicator' => $predictionData[2],
                 'predictedScore' => $predictionData[3],
-                'advantage' => $predictionData[4]
+                'advantage' => $predictionData[4],
+                'homeForm' => $predictionData[5],
+                'awayForm' => $predictionData[6]
             ]);
             exit;
 
@@ -506,7 +512,7 @@ try {
     $filter = $_GET['filter'] ?? 'upcoming';
     $customStart = $_GET['start'] ?? '';
     $customEnd = $_GET['end'] ?? '';
-    $searchTeam = $_GET['team'] ?? ''; // New parameter for team search
+    $searchTeam = $_GET['team'] ?? '';
 
     $dateOptions = [
         'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))],
@@ -545,7 +551,6 @@ try {
     }
     $allMatches = $matchResponse['data']['matches'] ?? [];
 
-    // Filter matches by team name if search is provided
     if ($searchTeam) {
         $allMatches = array_filter($allMatches, function($match) use ($searchTeam) {
             return stripos($match['homeTeam']['name'] ?? '', $searchTeam) !== false ||
@@ -596,7 +601,6 @@ try {
             top: 0;
             left: 0;
             z-index: 1000;
-            transition: background-color 0.3s ease;
         }
 
         .navbar-container {
@@ -633,18 +637,12 @@ try {
             padding: 12px 20px;
             border-radius: 8px;
             transition: all 0.3s ease;
-            background-color: transparent;
-            letter-spacing: 0.5px;
         }
 
         .nav-link:hover {
             background-color: var(--primary-color);
             color: white;
             transform: translateY(-2px);
-        }
-
-        .nav-link:active {
-            transform: translateY(0);
         }
 
         .hamburger {
@@ -688,16 +686,11 @@ try {
             align-items: center;
             transition: all 0.3s ease;
             font-size: 1.3em;
-            padding: 0;
         }
 
         .theme-toggle:hover {
             background-color: var(--secondary-color);
             transform: scale(1.1);
-        }
-
-        .theme-toggle:active {
-            transform: scale(0.95);
         }
 
         .container {
@@ -1056,6 +1049,16 @@ try {
             color: #6c757d;
         }
 
+        .form-display.updated {
+            animation: pulse 0.5s ease-in-out 2;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         .retry-message {
             text-align: center;
             margin: 20px 0;
@@ -1141,7 +1144,6 @@ try {
             border: 1px solid var(--primary-color);
             border-radius: 5px;
             padding: 2px;
-            transition: all 0.3s ease;
         }
 
         .team.away-advantage {
@@ -1149,7 +1151,6 @@ try {
             border: 1px solid #e74c3c;
             border-radius: 5px;
             padding: 2px;
-            transition: all 0.3s ease;
         }
 
         .match-card.draw-likely .teams {
@@ -1157,7 +1158,6 @@ try {
             border: 1px solid #f1c40f;
             border-radius: 5px;
             padding: 2px;
-            transition: all 0.3s ease;
             display: flex;
             width: 100%;
             max-width: 100%;
@@ -1168,20 +1168,14 @@ try {
 
         [data-theme="dark"] .team.home-advantage {
             background-color: rgba(46, 204, 113, 0.3);
-            border: 1px solid var(--primary-color);
-            padding: 2px;
         }
 
         [data-theme="dark"] .team.away-advantage {
             background-color: rgba(231, 76, 60, 0.3);
-            border: 1px solid #e74c3c;
-            padding: 2px;
         }
 
         [data-theme="dark"] .match-card.draw-likely .teams {
             background-color: rgba(241, 196, 15, 0.3);
-            border: 1px solid #f1c40f;
-            padding: 2px;
         }
 
         .advantage {
@@ -1310,7 +1304,7 @@ try {
                         $status = $match['status'];
                         $homeGoals = $match['score']['fullTime']['home'] ?? null;
                         $awayGoals = $match['score']['fullTime']['away'] ?? null;
-                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
                         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
                         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
 
@@ -1323,21 +1317,21 @@ try {
                         }
 
                         echo "
-                        <div class='match-card' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-index='$index' data-advantage='$advantage'>
+                        <div class='match-card' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-index='$index' data-advantage='$advantage' data-status='$status'>
                             <div class='teams'>
                                 <div class='team home-team'>
                                     " . ($homeCrest ? "<img src='$homeCrest' alt='$homeTeam'>" : "") . "
                                     <p>$homeTeam</p>
-                                    <div class='form-display' id='form-home-$index'>";
+                                    <div class='form-display' id='form-home-$index' data-form='$homeForm'>";
                         if ($homeStats['needsRetry']) {
                             echo "<div class='loading-spinner'></div>";
                         } else {
-                            $homeForm = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
-                            $homeForm = strrev($homeForm);
+                            $homeFormDisplay = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                            $homeFormDisplay = strrev($homeFormDisplay);
                             for ($i = 0; $i < 6; $i++) {
-                                $class = $homeForm[$i] === 'W' ? 'win' : ($homeForm[$i] === 'D' ? 'draw' : ($homeForm[$i] === 'L' ? 'loss' : 'empty'));
-                                if ($i === 5 && $homeForm[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) $class .= ' latest';
-                                echo "<span class='$class'>" . $homeForm[$i] . "</span>";
+                                $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
+                                if ($i === 5 && $homeFormDisplay[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) $class .= ' latest';
+                                echo "<span class='$class'>" . $homeFormDisplay[$i] . "</span>";
                             }
                         }
                         echo "</div>
@@ -1346,16 +1340,16 @@ try {
                                 <div class='team away-team'>
                                     " . ($awayCrest ? "<img src='$awayCrest' alt='$awayTeam'>" : "") . "
                                     <p>$awayTeam</p>
-                                    <div class='form-display' id='form-away-$index'>";
+                                    <div class='form-display' id='form-away-$index' data-form='$awayForm'>";
                         if ($awayStats['needsRetry']) {
                             echo "<div class='loading-spinner'></div>";
                         } else {
-                            $awayForm = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
-                            $awayForm = strrev($awayForm);
+                            $awayFormDisplay = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                            $awayFormDisplay = strrev($awayFormDisplay);
                             for ($i = 0; $i < 6; $i++) {
-                                $class = $awayForm[$i] === 'W' ? 'win' : ($awayForm[$i] === 'D' ? 'draw' : ($awayForm[$i] === 'L' ? 'loss' : 'empty'));
-                                if ($i === 5 && $awayForm[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) $class .= ' latest';
-                                echo "<span class='$class'>" . $awayForm[$i] . "</span>";
+                                $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
+                                if ($i === 5 && $awayFormDisplay[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) $class .= ' latest';
+                                echo "<span class='$class'>" . $awayFormDisplay[$i] . "</span>";
                             }
                         }
                         echo "</div>
@@ -1569,7 +1563,6 @@ try {
                     const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
                     applyAdvantageHighlight(matchCard, data.advantage);
 
-                    // If match is finished, refresh form for both teams
                     if (data.resultIndicator) {
                         fetchTeamData(homeId, index, true);
                         fetchTeamData(awayId, index, false);
@@ -1607,20 +1600,69 @@ try {
                     const homeId = card.dataset.homeId;
                     const awayId = card.dataset.awayId;
                     const index = card.dataset.index;
+                    const status = card.dataset.status;
                     const matchInfo = card.querySelector('.match-info p').textContent;
 
-                    if (!matchInfo.includes('FINISHED') || card.querySelector('.result-indicator')) return;
+                    if (matchInfo.includes('FINISHED') && card.querySelector('.result-indicator')) return;
 
                     fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`)
                         .then(response => response.json())
                         .then(data => {
-                            if (data.resultIndicator) {
-                                fetchTeamData(homeId, index, true);
-                                fetchTeamData(awayId, index, false);
+                            if (data.success) {
+                                const predictionElement = document.getElementById(`prediction-${index}`);
+                                const homeFormElement = document.getElementById(`form-home-${index}`);
+                                const awayFormElement = document.getElementById(`form-away-${index}`);
+                                const matchInfoElement = card.querySelector('.match-info p');
+
+                                predictionElement.innerHTML = `
+                                    <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
+                                    <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
+                                    <p class="confidence">Confidence: ${data.confidence}</p>
+                                    <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
+                                `;
+                                applyAdvantageHighlight(card, data.advantage);
+
+                                if (data.resultIndicator) {
+                                    card.dataset.status = 'FINISHED';
+                                    const currentText = matchInfoElement.textContent.split(' - ')[0];
+                                    fetch(`?action=fetch_team_data&teamId=${homeId}&competition=<?php echo $selectedComp; ?>&force_refresh=true`)
+                                        .then(res => res.json())
+                                        .then(homeData => {
+                                            const homeGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[1] || 'N/A';
+                                            const awayGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[2] || 'N/A';
+                                            matchInfoElement.textContent = `${currentText} - ${homeGoals} : ${awayGoals}`;
+                                        });
+
+                                    const homeForm = data.homeForm.slice(-6).padStart(6, '-').split('').reverse().join('');
+                                    let homeFormHtml = '';
+                                    for (let i = 0; i < 6; i++) {
+                                        let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
+                                        if (i === 5 && homeForm[i] !== '-' && data.homeForm.trim('-').length > 0) className += ' latest';
+                                        homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
+                                    }
+                                    homeFormElement.innerHTML = homeFormHtml;
+                                    homeFormElement.dataset.form = data.homeForm;
+
+                                    const awayForm = data.awayForm.slice(-6).padStart(6, '-').split('').reverse().join('');
+                                    let awayFormHtml = '';
+                                    for (let i = 0; i < 6; i++) {
+                                        let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
+                                        if (i === 5 && awayForm[i] !== '-' && data.awayForm.trim('-').length > 0) className += ' latest';
+                                        awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
+                                    }
+                                    awayFormElement.innerHTML = awayFormHtml;
+                                    awayFormElement.dataset.form = data.awayForm;
+
+                                    [homeFormElement, awayFormElement].forEach(el => {
+                                        el.classList.add('updated');
+                                        setTimeout(() => el.classList.remove('updated'), 2000);
+                                    });
+                                }
                             }
-                        });
+                        })
+                        .catch(error => console.error('Polling error:', error));
                 });
-            }, 60000); // Check every minute
+            }, 60000);
         }
 
         const searchInput = document.querySelector('.search-input');
@@ -1769,7 +1811,7 @@ try {
                         }
                         formElement.innerHTML = formHtml;
 
-                        let historyHtml = isHome ? `<p><strong>Team Recent Results:</strong></p><ul>` : historyElement.innerHTML;
+                                                let historyHtml = isHome ? `<p><strong>Team Recent Results:</strong></p><ul>` : historyElement.innerHTML;
                         data.results.forEach(result => historyHtml += `<li>${result}</li>`);
                         historyHtml += `</ul><div class='standings'>
                             <span>POS: ${data.standings.position || 'N/A'}</span>
