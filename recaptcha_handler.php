@@ -211,7 +211,7 @@ class RecaptchaHandler {
                     </div>
                     <div id="recaptcha-message"></div>
                     <div class="info-section">
-                        <p>Security Performed By: <span class="highlight">Google reCAPTCHA v2</span></p>
+                        <p>Security Performed By: <span class="highlight">Google reCAPTCHA</span></p>
                         <p>Site: <span class="highlight">creativepulse.42web.io</span></p>
                         <p>Maintained By: <span class="highlight">xAI Security Team</span></p>
                         <p>Your IP Address: <span class="highlight">' . $clientIp . '</span></p>
