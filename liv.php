@@ -18,13 +18,12 @@ if (!isset($_GET['ajax'])) {
     echo "</div>";
     echo "</nav>";
 
-    // Inline CSS with nav items hidden by default and hamburger always visible
+    // Inline CSS with no background on navbar, only on menu items
     echo "<style>
         /* Navbar container */
         .navbar {
             width: 100%;
-            background-color: #2c3e50;
-            padding: 15px 20px;
+            padding: 15px 20px; /* No background color */
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             position: fixed;
             top: 0;
@@ -39,7 +38,7 @@ if (!isset($_GET['ajax'])) {
 
         /* Hamburger menu */
         .hamburger {
-            display: flex; /* Always visible by default */
+            display: flex; /* Always visible */
             flex-direction: column;
             justify-content: space-between;
             width: 30px;
@@ -51,7 +50,7 @@ if (!isset($_GET['ajax'])) {
         .hamburger .bar {
             width: 100%;
             height: 3px;
-            background-color: #ecf0f1;
+            background-color: #2c3e50; /* Dark color for visibility */
             border-radius: 10px;
             transition: all 0.3s ease;
         }
@@ -70,12 +69,12 @@ if (!isset($_GET['ajax'])) {
 
         /* Navigation menu */
         .nav-menu {
-            display: none; /* Hidden by default on all screens */
+            display: none; /* Hidden by default */
             position: absolute;
             top: 60px;
             left: 0;
             width: 100%;
-            background-color: #2c3e50;
+            background-color: #2c3e50; /* Background only here */
             flex-direction: column;
             gap: 10px;
             padding: 20px 0;
@@ -103,12 +102,12 @@ if (!isset($_GET['ajax'])) {
         }
 
         .nav-link:hover {
-            background-color: #3498db;
+            background-color: #3498db; /* Hover background */
             color: #fff;
         }
 
         .nav-link:active {
-            background-color: #2980b9;
+            background-color: #2980b9; /* Active background */
         }
 
         /* Show menu when toggled */
@@ -121,13 +120,6 @@ if (!isset($_GET['ajax'])) {
             margin: 0;
             padding-top: 60px;
         }
-
-        /* Responsive adjustments (optional) */
-        @media (min-width: 769px) {
-            .nav-menu {
-                /* Still hidden by default, but can be styled differently if desired */
-            }
-        }
     </style>";
 
     // JavaScript for toggling the menu and hamburger animation
@@ -139,22 +131,20 @@ if (!isset($_GET['ajax'])) {
             hamburger.classList.toggle('active');
         }
 
-        // Remove forced display on resize/load since menu is hidden by default
         window.addEventListener('resize', function() {
             const menu = document.getElementById('navMenu');
             const hamburger = document.querySelector('.hamburger');
-            // Only reset inline styles if needed, but keep menu hidden unless toggled
             menu.style.display = '';
-            hamburger.style.display = 'flex'; // Ensure hamburger stays visible
+            hamburger.style.display = 'flex';
         });
 
-        // No need to force menu visibility on load
         window.addEventListener('load', function() {
             const hamburger = document.querySelector('.hamburger');
-            hamburger.style.display = 'flex'; // Ensure hamburger is visible
+            hamburger.style.display = 'flex';
         });
     </script>";
 }
+
 
 
 // Start session to store competitions and their data
