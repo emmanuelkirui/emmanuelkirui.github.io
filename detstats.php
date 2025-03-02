@@ -13,21 +13,22 @@
         .away { background: #F44336; }
         select { padding: 5px; margin-bottom: 10px; }
         #retryCountdown { color: red; font-weight: bold; }
+        .team-list { margin-top: 10px; }
+        .team-list ul { list-style-type: none; padding: 0; }
+        .team-list li { margin: 5px 0; }
     </style>
-    <!-- Include Chart.js for charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         function startCountdown(seconds, elementId) {
             let timeLeft = seconds;
             const countdownElement = document.getElementById(elementId);
             countdownElement.innerHTML = `Retrying in ${timeLeft} seconds...`;
-            
             const interval = setInterval(() => {
                 timeLeft--;
                 countdownElement.innerHTML = `Retrying in ${timeLeft} seconds...`;
                 if (timeLeft <= 0) {
                     clearInterval(interval);
-                    window.location.reload(); // Retry by reloading the page
+                    window.location.reload();
                 }
             }, 1000);
         }
@@ -37,11 +38,9 @@
     <h1>Football Win Percentages by League</h1>
 
     <?php
-    // Your football-data.org API key
-    $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
-    $defaultCompId = 2021; // Premier League ID
+    $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
+    $defaultCompId = 2021; // Premier League
 
-    // Function to fetch data from API with retry mechanism
     function fetchData($url, $apiKey, $maxRetries = 5, $retryDelay = 60) {
         $attempt = 0;
         while ($attempt < $maxRetries) {
@@ -64,7 +63,7 @@
                 echo "<p>Rate limit exceeded (429). Attempt $attempt of $maxRetries.</p>";
                 echo "<div id='retryCountdown'></div>";
                 echo "<script>startCountdown($retryDelay, 'retryCountdown');</script>";
-                sleep($retryDelay); // Wait before retrying
+                sleep($retryDelay);
                 continue;
             } else {
                 echo "<p>API error (HTTP $httpCode). Unable to fetch data.</p>";
@@ -74,11 +73,9 @@
         return null;
     }
 
-    // Get all available competitions
     $competitionsUrl = "http://api.football-data.org/v4/competitions/";
     $competitions = fetchData($competitionsUrl, $apiKey);
 
-    // Dropdown form
     if (isset($competitions['competitions'])) {
         echo "<form method='GET'>";
         echo "<label for='competition'>Select a Competition: </label>";
@@ -98,7 +95,6 @@
         exit;
     }
 
-    // Process selected competition (default to Premier League if no selection)
     $compId = isset($_GET['compId']) && !empty($_GET['compId']) ? $_GET['compId'] : $defaultCompId;
     $selectedComp = array_filter($competitions['competitions'], function($comp) use ($compId) {
         return $comp['id'] == $compId;
@@ -106,7 +102,6 @@
     $selectedComp = reset($selectedComp);
     $compName = $selectedComp['name'];
 
-    // Fetch standings for the selected competition
     $standingsUrl = "http://api.football-data.org/v4/competitions/$compId/standings";
     $standings = fetchData($standingsUrl, $apiKey);
 
@@ -116,27 +111,50 @@
         $awayWins = 0;
         $totalGames = 0;
 
-        // Process standings (using TOTAL standings)
+        // Arrays to store team stats
+        $homeTeams = [];
+        $awayTeams = [];
+        $drawTeams = [];
+
+        // Process standings
         foreach ($standings['standings'] as $standing) {
             if ($standing['type'] === 'TOTAL') {
                 foreach ($standing['table'] as $team) {
+                    $totalGames += $team['playedGames'];
                     $homeWins += $team['won'];
                     $draws += $team['draw'];
-                    $totalGames += $team['playedGames'];
+                }
+            }
+            if ($standing['type'] === 'HOME') {
+                foreach ($standing['table'] as $team) {
+                    $teamName = $team['team']['name'];
+                    $played = $team['playedGames'];
+                    $won = $team['won'];
+                    $drawn = $team['draw'];
+                    $homeWinPerc = $played > 0 ? round(($won / $played) * 100, 2) : 0;
+                    $drawPerc = $played > 0 ? round(($drawn / $played) * 100, 2) : 0;
+                    $homeTeams[$teamName] = ['winPerc' => $homeWinPerc, 'drawPerc' => $drawPerc];
+                }
+            }
+            if ($standing['type'] === 'AWAY') {
+                foreach ($standing['table'] as $team) {
+                    $teamName = $team['team']['name'];
+                    $played = $team['playedGames'];
+                    $won = $team['won'];
+                    $awayWinPerc = $played > 0 ? round(($won / $played) * 100, 2) : 0;
+                    $awayTeams[$teamName] = $awayWinPerc;
                 }
             }
         }
 
-        // Adjust for double-counting in TOTAL standings
         $totalGames = $totalGames / 2;
-        $awayWins = $totalGames - $homeWins - $draws; // Calculate away wins
+        $awayWins = $totalGames - $homeWins - $draws;
 
-        // Calculate percentages
         $homeWinPerc = $totalGames > 0 ? round(($homeWins / $totalGames) * 100, 2) : 0;
         $drawPerc = $totalGames > 0 ? round(($draws / $totalGames) * 100, 2) : 0;
         $awayWinPerc = $totalGames > 0 ? round(($awayWins / $totalGames) * 100, 2) : 0;
 
-        // Display results
+        // Display league stats
         echo "<div class='league'>";
         echo "<h2>$compName</h2>";
         echo "<p>Total Games: $totalGames</p>";
@@ -147,23 +165,46 @@
         echo "<div>Away Win: $awayWinPerc% ($awayWins wins)</div>";
         echo "<div class='bar-container'><div class='bar away' style='width: $awayWinPerc%'>$awayWinPerc%</div></div>";
 
-        // Chart.js visualization
         echo "<canvas id='chart-$compId' width='400' height='200'></canvas>";
         echo "<script>";
         echo "var ctx = document.getElementById('chart-$compId').getContext('2d');";
-        echo "new Chart(ctx, {";
-        echo "    type: 'bar',";
-        echo "    data: {";
-        echo "        labels: ['Home Win', 'Draw', 'Away Win'],";
-        echo "        datasets: [{";
-        echo "            label: 'Percentage',";
-        echo "            data: [$homeWinPerc, $drawPerc, $awayWinPerc],";
-        echo "            backgroundColor: ['#4CAF50', '#FFC107', '#F44336']";
-        echo "        }]";
-        echo "    },";
-        echo "    options: { scales: { y: { beginAtZero: true, max: 100 } } }";
-        echo "});";
+        echo "new Chart(ctx, { type: 'bar', data: { labels: ['Home Win', 'Draw', 'Away Win'], datasets: [{ label: 'Percentage', data: [$homeWinPerc, $drawPerc, $awayWinPerc], backgroundColor: ['#4CAF50', '#FFC107', '#F44336'] }] }, options: { scales: { y: { beginAtZero: true, max: 100 } } } });";
         echo "</script>";
+
+        // Categorize teams
+        $likelyHomeWinners = array_filter($homeTeams, function($stats) {
+            return $stats['winPerc'] > 50; // Home win > 50%
+        });
+        $likelyAwayWinners = array_filter($awayTeams, function($perc) {
+            return $perc > 40; // Away win > 40%
+        });
+        $likelyDrawTeams = array_filter($homeTeams, function($stats) {
+            return $stats['drawPerc'] > 30; // Draw > 30%
+        });
+
+        // Display team lists
+        echo "<div class='team-list'>";
+        echo "<h3>Likely to Win at Home (>50%)</h3>";
+        echo "<ul>";
+        foreach ($likelyHomeWinners as $teamName => $stats) {
+            echo "<li>$teamName - {$stats['winPerc']}%</li>";
+        }
+        echo "</ul>";
+
+        echo "<h3>Likely to Win Away (>40%)</h3>";
+        echo "<ul>";
+        foreach ($likelyAwayWinners as $teamName => $perc) {
+            echo "<li>$teamName - $perc%</li>";
+        }
+        echo "</ul>";
+
+        echo "<h3>Likely to Draw (>30%)</h3>";
+        echo "<ul>";
+        foreach ($likelyDrawTeams as $teamName => $stats) {
+            echo "<li>$teamName - {$stats['drawPerc']}%</li>";
+        }
+        echo "</ul>";
+        echo "</div>";
 
         echo "</div>";
     } else {
