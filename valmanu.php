@@ -403,6 +403,7 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+    echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
     echo "</nav>";
@@ -520,7 +521,7 @@ try {
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 70px 20px 20px; /* Adjusted padding to account for fixed navbar */
+            padding: 70px 20px 20px; /* Adjusted padding for fixed navbar */
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: all 0.3s ease;
@@ -606,6 +607,21 @@ try {
             transform: rotate(-45deg) translate(7px, -7px);
         }
 
+        .theme-toggle {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--secondary-color);
+        }
+
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -622,23 +638,6 @@ try {
             align-items: center;
             margin-bottom: 20px;
             flex-wrap: wrap;
-        }
-
-        .theme-toggle {
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-        }
-
-        .theme-toggle:hover {
-            background-color: var(--secondary-color);
         }
 
         select {
@@ -995,7 +994,7 @@ try {
                 display: flex;
             }
 
-            .nav-link {
+            .nav-link, .theme-toggle {
                 width: 100%;
                 text-align: center;
                 padding: 15px;
@@ -1004,9 +1003,6 @@ try {
     </style>
 </head>
 <body>
-    <button class="theme-toggle" onclick="toggleTheme()">
-        <span class="theme-icon">☀️</span>
-    </button>
     <div class="container">
         <div class="header">
             <h1>CPS Football Predictions</h1>
