@@ -12,9 +12,26 @@
         .draw { background: #FFC107; }
         .away { background: #F44336; }
         select { padding: 5px; margin-bottom: 10px; }
+        #retryCountdown { color: red; font-weight: bold; }
     </style>
-    <!-- Optional: Include Chart.js for charts -->
+    <!-- Include Chart.js for charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function startCountdown(seconds, elementId) {
+            let timeLeft = seconds;
+            const countdownElement = document.getElementById(elementId);
+            countdownElement.innerHTML = `Retrying in ${timeLeft} seconds...`;
+            
+            const interval = setInterval(() => {
+                timeLeft--;
+                countdownElement.innerHTML = `Retrying in ${timeLeft} seconds...`;
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    window.location.reload(); // Retry by reloading the page
+                }
+            }, 1000);
+        }
+    </script>
 </head>
 <body>
     <h1>Football Win Percentages by League</h1>
@@ -22,25 +39,42 @@
     <?php
     // Your football-data.org API key
     $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Your API key
+    $defaultCompId = 2021; // Premier League ID
 
-    // Function to fetch data from API
-    function fetchData($url, $apiKey) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Auth-Token: ' . $apiKey));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        
-        if ($httpCode == 429) {
-            echo "<p>Rate limit exceeded. Please wait a minute and try again.</p>";
-            return null;
+    // Function to fetch data from API with retry mechanism
+    function fetchData($url, $apiKey, $maxRetries = 5, $retryDelay = 60) {
+        $attempt = 0;
+        while ($attempt < $maxRetries) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Auth-Token: ' . $apiKey));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode == 200) {
+                return json_decode($response, true);
+            } elseif ($httpCode == 429) {
+                $attempt++;
+                if ($attempt == $maxRetries) {
+                    echo "<p>Max retries reached. Please try again later.</p>";
+                    return null;
+                }
+                echo "<p>Rate limit exceeded (429). Attempt $attempt of $maxRetries.</p>";
+                echo "<div id='retryCountdown'></div>";
+                echo "<script>startCountdown($retryDelay, 'retryCountdown');</script>";
+                sleep($retryDelay); // Wait before retrying
+                continue;
+            } else {
+                echo "<p>API error (HTTP $httpCode). Unable to fetch data.</p>";
+                return null;
+            }
         }
-        return json_decode($response, true);
+        return null;
     }
 
-    // Get all available competitions (free tier limits to top competitions)
+    // Get all available competitions
     $competitionsUrl = "http://api.football-data.org/v4/competitions/";
     $competitions = fetchData($competitionsUrl, $apiKey);
 
@@ -51,10 +85,10 @@
         echo "<select name='compId' id='competition' onchange='this.form.submit()'>";
         echo "<option value=''>-- Select a League --</option>";
         foreach ($competitions['competitions'] as $competition) {
-            if ($competition['plan'] !== 'TIER_ONE') continue; // Free tier only
+            if ($competition['plan'] !== 'TIER_ONE') continue;
             $compId = $competition['id'];
             $compName = $competition['name'];
-            $selected = (isset($_GET['compId']) && $_GET['compId'] == $compId) ? 'selected' : '';
+            $selected = (!isset($_GET['compId']) && $compId == $defaultCompId) || (isset($_GET['compId']) && $_GET['compId'] == $compId) ? 'selected' : '';
             echo "<option value='$compId' $selected>$compName</option>";
         }
         echo "</select>";
@@ -64,80 +98,76 @@
         exit;
     }
 
-    // Process selected competition
-    if (isset($_GET['compId']) && !empty($_GET['compId'])) {
-        $compId = $_GET['compId'];
-        $selectedComp = array_filter($competitions['competitions'], function($comp) use ($compId) {
-            return $comp['id'] == $compId;
-        });
-        $selectedComp = reset($selectedComp); // Get first match
-        $compName = $selectedComp['name'];
+    // Process selected competition (default to Premier League if no selection)
+    $compId = isset($_GET['compId']) && !empty($_GET['compId']) ? $_GET['compId'] : $defaultCompId;
+    $selectedComp = array_filter($competitions['competitions'], function($comp) use ($compId) {
+        return $comp['id'] == $compId;
+    });
+    $selectedComp = reset($selectedComp);
+    $compName = $selectedComp['name'];
 
-        // Fetch standings for the selected competition
-        $standingsUrl = "http://api.football-data.org/v4/competitions/$compId/standings";
-        $standings = fetchData($standingsUrl, $apiKey);
+    // Fetch standings for the selected competition
+    $standingsUrl = "http://api.football-data.org/v4/competitions/$compId/standings";
+    $standings = fetchData($standingsUrl, $apiKey);
 
-        if ($standings && isset($standings['standings'])) {
-            $homeWins = 0;
-            $draws = 0;
-            $awayWins = 0;
-            $totalGames = 0;
+    if ($standings && isset($standings['standings'])) {
+        $homeWins = 0;
+        $draws = 0;
+        $awayWins = 0;
+        $totalGames = 0;
 
-            // Process standings (using TOTAL standings for simplicity and accuracy)
-            foreach ($standings['standings'] as $standing) {
-                if ($standing['type'] === 'TOTAL') { // Use TOTAL standings
-                    foreach ($standing['table'] as $team) {
-                        $homeWins += $team['won'] + $team['lost'] + $team['draw'] > 0 ? $team['won'] : 0; // Total wins
-                        $draws += $team['draw'];
-                        $totalGames += $team['playedGames'];
-                    }
+        // Process standings (using TOTAL standings)
+        foreach ($standings['standings'] as $standing) {
+            if ($standing['type'] === 'TOTAL') {
+                foreach ($standing['table'] as $team) {
+                    $homeWins += $team['won'];
+                    $draws += $team['draw'];
+                    $totalGames += $team['playedGames'];
                 }
             }
-
-            // Adjust for double-counting in TOTAL standings
-            $totalGames = $totalGames / 2; // Each match is counted twice (home and away)
-            $homeWins = $totalGames > 0 ? $homeWins - $awayWins : 0; // Correct home wins
-
-            // Calculate percentages
-            $homeWinPerc = $totalGames > 0 ? round(($homeWins / $totalGames) * 100, 2) : 0;
-            $drawPerc = $totalGames > 0 ? round(($draws / $totalGames) * 100, 2) : 0;
-            $awayWinPerc = $totalGames > 0 ? round(($awayWins / $totalGames) * 100, 2) : 0;
-
-            // Display results
-            echo "<div class='league'>";
-            echo "<h2>$compName</h2>";
-            echo "<p>Total Games: $totalGames</p>";
-            echo "<div>Home Win: $homeWinPerc% ($homeWins wins)</div>";
-            echo "<div class='bar-container'><div class='bar home' style='width: $homeWinPerc%'>$homeWinPerc%</div></div>";
-            echo "<div>Draw: $drawPerc% ($draws draws)</div>";
-            echo "<div class='bar-container'><div class='bar draw' style='width: $drawPerc%'>$drawPerc%</div></div>";
-            echo "<div>Away Win: $awayWinPerc% ($awayWins wins)</div>";
-            echo "<div class='bar-container'><div class='bar away' style='width: $awayWinPerc%'>$awayWinPerc%</div></div>";
-
-            // Chart.js visualization
-            echo "<canvas id='chart-$compId' width='400' height='200'></canvas>";
-            echo "<script>";
-            echo "var ctx = document.getElementById('chart-$compId').getContext('2d');";
-            echo "new Chart(ctx, {";
-            echo "    type: 'bar',";
-            echo "    data: {";
-            echo "        labels: ['Home Win', 'Draw', 'Away Win'],";
-            echo "        datasets: [{";
-            echo "            label: 'Percentage',";
-            echo "            data: [$homeWinPerc, $drawPerc, $awayWinPerc],";
-            echo "            backgroundColor: ['#4CAF50', '#FFC107', '#F44336']";
-            echo "        }]";
-            echo "    },";
-            echo "    options: { scales: { y: { beginAtZero: true, max: 100 } } }";
-            echo "});";
-            echo "</script>";
-
-            echo "</div>";
-        } else {
-            echo "<p>No standings data available for $compName or rate limit exceeded.</p>";
         }
+
+        // Adjust for double-counting in TOTAL standings
+        $totalGames = $totalGames / 2;
+        $awayWins = $totalGames - $homeWins - $draws; // Calculate away wins
+
+        // Calculate percentages
+        $homeWinPerc = $totalGames > 0 ? round(($homeWins / $totalGames) * 100, 2) : 0;
+        $drawPerc = $totalGames > 0 ? round(($draws / $totalGames) * 100, 2) : 0;
+        $awayWinPerc = $totalGames > 0 ? round(($awayWins / $totalGames) * 100, 2) : 0;
+
+        // Display results
+        echo "<div class='league'>";
+        echo "<h2>$compName</h2>";
+        echo "<p>Total Games: $totalGames</p>";
+        echo "<div>Home Win: $homeWinPerc% ($homeWins wins)</div>";
+        echo "<div class='bar-container'><div class='bar home' style='width: $homeWinPerc%'>$homeWinPerc%</div></div>";
+        echo "<div>Draw: $drawPerc% ($draws draws)</div>";
+        echo "<div class='bar-container'><div class='bar draw' style='width: $drawPerc%'>$drawPerc%</div></div>";
+        echo "<div>Away Win: $awayWinPerc% ($awayWins wins)</div>";
+        echo "<div class='bar-container'><div class='bar away' style='width: $awayWinPerc%'>$awayWinPerc%</div></div>";
+
+        // Chart.js visualization
+        echo "<canvas id='chart-$compId' width='400' height='200'></canvas>";
+        echo "<script>";
+        echo "var ctx = document.getElementById('chart-$compId').getContext('2d');";
+        echo "new Chart(ctx, {";
+        echo "    type: 'bar',";
+        echo "    data: {";
+        echo "        labels: ['Home Win', 'Draw', 'Away Win'],";
+        echo "        datasets: [{";
+        echo "            label: 'Percentage',";
+        echo "            data: [$homeWinPerc, $drawPerc, $awayWinPerc],";
+        echo "            backgroundColor: ['#4CAF50', '#FFC107', '#F44336']";
+        echo "        }]";
+        echo "    },";
+        echo "    options: { scales: { y: { beginAtZero: true, max: 100 } } }";
+        echo "});";
+        echo "</script>";
+
+        echo "</div>";
     } else {
-        echo "<p>Please select a competition from the dropdown.</p>";
+        echo "<p>No standings data available for $compName or failed to fetch after retries.</p>";
     }
     ?>
 </body>
