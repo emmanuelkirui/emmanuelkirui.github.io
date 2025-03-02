@@ -903,7 +903,7 @@ try {
     justify-content: center;
     align-items: center;
     margin-bottom: 15px;
-    gap: 5px; /* Reduced from calc(1vw + 5px) to a fixed small value */
+    gap: 2px; /* Further reduced from 5px for tighter spacing */
     margin-left: 5px; /* Kept for inward movement */
     margin-right: 5px; /* Kept for inward movement */
 }
@@ -915,11 +915,11 @@ try {
 }
 
 .home-team {
-    padding-right: 0.2em; /* Reduced from 0.5em for tighter spacing */
+    padding-right: 0.1em; /* Further reduced from 0.2em for even tighter spacing */
 }
 
 .away-team {
-    padding-left: 0.2em; /* Reduced from 0.5em for tighter spacing */
+    padding-left: 0.1em; /* Further reduced from 0.2em for even tighter spacing */
 }
 
 .team img {
@@ -933,8 +933,8 @@ try {
     font-weight: bold;
     color: var(--primary-color);
     text-align: center;
-    min-width: 20px; /* Reduced from 30px to allow closer positioning */
-    padding: 0 2px; /* Added minimal padding to control spacing */
+    min-width: 15px; /* Further reduced from 20px for minimal width */
+    padding: 0 1px; /* Reduced padding for tighter fit */
 }
 
         .match-info {
@@ -1133,34 +1133,54 @@ try {
             transition: width 0.5s ease;
         }
 
-        .team.home-advantage {
-            background-color: rgba(46, 204, 113, 0.2);
-            border: 2px solid var(--primary-color);
-            border-radius: 5px;
-            padding: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .team.away-advantage {
-            background-color: rgba(231, 76, 60, 0.2);
-            border: 2px solid #e74c3c;
-            border-radius: 5px;
-            padding: 5px;
-            transition: all 0.3s ease;
-        }
-
-        .match-card.draw-likely .teams {
-    background-color: rgba(241, 196, 15, 0.2);
-    border: 2px solid #f1c40f;
+        /* Advantage Highlight Adjustments */
+.team.home-advantage {
+    background-color: rgba(46, 204, 113, 0.2);
+    border: 1px solid var(--primary-color); /* Reduced from 2px to 1px */
     border-radius: 5px;
-    padding: 5px;
+    padding: 2px; /* Reduced from 5px for less internal spacing */
     transition: all 0.3s ease;
-    display: flex; /* Consistent with parent .teams */
-    width: 100%; /* Full width of parent container */
-    max-width: 100%; /* Prevent overflow */
-    box-sizing: border-box; /* Include padding/border in width */
-    justify-content: center; /* Center content */
-    align-items: center; /* Vertically align */
+}
+
+.team.away-advantage {
+    background-color: rgba(231, 76, 60, 0.2);
+    border: 1px solid #e74c3c; /* Reduced from 2px to 1px */
+    border-radius: 5px;
+    padding: 2px; /* Reduced from 5px for less internal spacing */
+    transition: all 0.3s ease;
+}
+
+.match-card.draw-likely .teams {
+    background-color: rgba(241, 196, 15, 0.2);
+    border: 1px solid #f1c40f; /* Reduced from 2px to 1px */
+    border-radius: 5px;
+    padding: 2px; /* Reduced from 5px for less internal spacing */
+    transition: all 0.3s ease;
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Dark Theme Adjustments */
+[data-theme="dark"] .team.home-advantage {
+    background-color: rgba(46, 204, 113, 0.3);
+    border: 1px solid var(--primary-color); /* Consistent with light theme */
+    padding: 2px; /* Consistent reduction */
+}
+
+[data-theme="dark"] .team.away-advantage {
+    background-color: rgba(231, 76, 60, 0.3);
+    border: 1px solid #e74c3c; /* Consistent with light theme */
+    padding: 2px; /* Consistent reduction */
+}
+
+[data-theme="dark"] .match-card.draw-likely .teams {
+    background-color: rgba(241, 196, 15, 0.3);
+    border: 1px solid #f1c40f; /* Consistent with light theme */
+    padding: 2px; /* Consistent reduction */
 }
         .advantage {
             font-size: 0.9em;
