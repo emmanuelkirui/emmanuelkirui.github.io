@@ -415,8 +415,14 @@ if (!isset($_GET['ajax'])) {
         const container = document.querySelector('.container');
         menu.classList.toggle('active');
         hamburger.classList.toggle('active');
+        
         if (window.innerWidth <= 768) {
-            container.style.paddingTop = menu.classList.contains('active') ? '260px' : '80px';
+            if (menu.classList.contains('active')) {
+                const menuHeight = menu.scrollHeight + 20; // Include padding
+                container.style.paddingTop = (60 + menuHeight) + 'px';
+            } else {
+                container.style.paddingTop = '80px';
+            }
         }
     }
 
@@ -429,7 +435,12 @@ if (!isset($_GET['ajax'])) {
             hamburger.classList.remove('active');
             container.style.paddingTop = '80px';
         } else {
-            container.style.paddingTop = menu.classList.contains('active') ? '260px' : '80px';
+            if (menu.classList.contains('active')) {
+                const menuHeight = menu.scrollHeight + 20; // Include padding
+                container.style.paddingTop = (60 + menuHeight) + 'px';
+            } else {
+                container.style.paddingTop = '80px';
+            }
         }
     });
 
@@ -554,7 +565,7 @@ try {
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
-            height: 60px; /* Fixed navbar height */
+            height: 60px;
         }
 
         .navbar-brand {
@@ -567,7 +578,7 @@ try {
         .nav-menu {
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 20px;
             margin: 0;
             padding: 0;
             list-style: none;
@@ -577,15 +588,22 @@ try {
             color: var(--text-color);
             text-decoration: none;
             font-size: 1.1em;
-            font-weight: 500;
-            padding: 10px 15px;
-            border-radius: 5px;
-            transition: color 0.3s ease, background-color 0.3s ease;
+            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            letter-spacing: 0.5px;
         }
 
         .nav-link:hover {
-            color: var(--primary-color);
-            background-color: rgba(46, 204, 113, 0.1);
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-link:active {
+            transform: translateY(0);
         }
 
         .hamburger {
@@ -617,8 +635,8 @@ try {
         }
 
         .theme-toggle {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -627,8 +645,8 @@ try {
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            font-size: 1.2em;
+            transition: all 0.3s ease;
+            font-size: 1.3em;
             padding: 0;
         }
 
@@ -644,7 +662,7 @@ try {
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 80px 20px 20px; /* Default padding to clear navbar */
+            padding: 80px 20px 20px;
             transition: padding-top 0.3s ease;
         }
 
@@ -1000,7 +1018,7 @@ try {
 
             .nav-menu {
                 position: absolute;
-                top: 60px; /* Below navbar-container */
+                top: 60px;
                 left: 0;
                 width: 100%;
                 flex-direction: column;
@@ -1009,25 +1027,29 @@ try {
                 max-height: 0;
                 overflow: hidden;
                 transition: max-height 0.3s ease;
-                padding: 0;
+                padding: 0 20px;
                 gap: 10px;
             }
 
             .nav-menu.active {
-                max-height: 200px; /* Adjusted to fit content */
-                padding: 20px;
+                max-height: 500px; /* Large enough to trigger transition, actual height set by JS */
             }
 
             .nav-link {
                 width: 100%;
-                text-align: center;
-                padding: 15px;
+                text-align: left;
+                padding: 12px 20px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-link:last-child {
+                border-bottom: none;
             }
 
             .theme-toggle {
                 width: 40px;
                 height: 40px;
-                margin: 10px auto;
+                margin: 10px 0;
             }
         }
     </style>
