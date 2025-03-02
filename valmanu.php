@@ -903,38 +903,39 @@ try {
     justify-content: center;
     align-items: center;
     margin-bottom: 15px;
-    gap: calc(1vw + 5px); /* Dynamic gap based on viewport width */
-    margin-left: 5px; /* Move inward from the left */
-    margin-right: 5px; /* Move inward from the right */
+    gap: 5px; /* Reduced from calc(1vw + 5px) to a fixed small value */
+    margin-left: 5px; /* Kept for inward movement */
+    margin-right: 5px; /* Kept for inward movement */
 }
 
-        .team {
-            text-align: center;
-            flex: 1;
-            max-width: 48%;
-        }
+.team {
+    text-align: center;
+    flex: 1;
+    max-width: 48%;
+}
 
-        .home-team {
-            padding-right: 0.5em; /* Scales with font size */
-        }
+.home-team {
+    padding-right: 0.2em; /* Reduced from 0.5em for tighter spacing */
+}
 
-        .away-team {
-            padding-left: 0.5em; /* Scales with font size */
-        }
+.away-team {
+    padding-left: 0.2em; /* Reduced from 0.5em for tighter spacing */
+}
 
-        .team img {
-            max-width: 50px;
-            height: auto;
-            margin-bottom: 10px;
-        }
+.team img {
+    max-width: 50px;
+    height: auto;
+    margin-bottom: 10px;
+}
 
-        .vs {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--primary-color);
-            text-align: center;
-            min-width: 30px; /* Minimum width to prevent collapse */
-        }
+.vs {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-align: center;
+    min-width: 20px; /* Reduced from 30px to allow closer positioning */
+    padding: 0 2px; /* Added minimal padding to control spacing */
+}
 
         .match-info {
             text-align: center;
