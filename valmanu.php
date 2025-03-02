@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'recaptcha_handler.php';
 
 // Set timezone to East Africa Time (Nairobi, Kenya, UTC+3)
 date_default_timezone_set('Africa/Nairobi');
