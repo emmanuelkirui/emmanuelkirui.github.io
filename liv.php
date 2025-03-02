@@ -18,7 +18,7 @@ if (!isset($_GET['ajax'])) {
     echo "</div>";
     echo "</nav>";
 
-    // Inline CSS for professional styling with animated hamburger
+    // Inline CSS with nav items hidden by default and hamburger always visible
     echo "<style>
         /* Navbar container */
         .navbar {
@@ -33,13 +33,13 @@ if (!isset($_GET['ajax'])) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 60px; /* Fixed height for content offset */
+            height: 60px;
             box-sizing: border-box;
         }
 
         /* Hamburger menu */
         .hamburger {
-            display: none; /* Hidden by default on larger screens */
+            display: flex; /* Always visible by default */
             flex-direction: column;
             justify-content: space-between;
             width: 30px;
@@ -53,16 +53,15 @@ if (!isset($_GET['ajax'])) {
             height: 3px;
             background-color: #ecf0f1;
             border-radius: 10px;
-            transition: all 0.3s ease; /* Smooth animation */
+            transition: all 0.3s ease;
         }
 
-        /* Hamburger animation when active */
         .hamburger.active .bar:nth-child(1) {
             transform: translateY(8px) rotate(45deg);
         }
 
         .hamburger.active .bar:nth-child(2) {
-            opacity: 0; /* Middle bar disappears */
+            opacity: 0;
         }
 
         .hamburger.active .bar:nth-child(3) {
@@ -71,9 +70,17 @@ if (!isset($_GET['ajax'])) {
 
         /* Navigation menu */
         .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 30px;
+            display: none; /* Hidden by default on all screens */
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
         }
 
         /* Navigation links */
@@ -83,9 +90,16 @@ if (!isset($_GET['ajax'])) {
             font-family: 'Arial', sans-serif;
             font-size: 16px;
             font-weight: 500;
-            padding: 10px 15px;
+            padding: 15px;
             transition: all 0.3s ease;
             border-radius: 5px;
+            width: 100%;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link:last-child {
+            border-bottom: none;
         }
 
         .nav-link:hover {
@@ -97,45 +111,21 @@ if (!isset($_GET['ajax'])) {
             background-color: #2980b9;
         }
 
+        /* Show menu when toggled */
+        .nav-menu.active {
+            display: flex;
+        }
+
         /* Prevent content overlap */
         body {
             margin: 0;
-            padding-top: 60px; /* Offset for fixed navbar */
+            padding-top: 60px;
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .hamburger {
-                display: flex; /* Show hamburger on small screens */
-            }
-
+        /* Responsive adjustments (optional) */
+        @media (min-width: 769px) {
             .nav-menu {
-                display: none; /* Hidden by default on mobile */
-                position: absolute;
-                top: 60px;
-                left: 0;
-                width: 100%;
-                background-color: #2c3e50;
-                flex-direction: column;
-                gap: 10px;
-                padding: 20px 0;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-                transition: all 0.3s ease; /* Smooth slide-in */
-            }
-
-            .nav-link {
-                width: 100%;
-                text-align: center;
-                padding: 15px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-
-            .nav-link:last-child {
-                border-bottom: none;
-            }
-
-            .nav-menu.active {
-                display: flex; /* Show when toggled */
+                /* Still hidden by default, but can be styled differently if desired */
             }
         }
     </style>";
@@ -146,34 +136,25 @@ if (!isset($_GET['ajax'])) {
             const menu = document.getElementById('navMenu');
             const hamburger = document.querySelector('.hamburger');
             menu.classList.toggle('active');
-            hamburger.classList.toggle('active'); // Toggle hamburger animation
+            hamburger.classList.toggle('active');
         }
 
-        // Ensure menu visibility on resize
+        // Remove forced display on resize/load since menu is hidden by default
         window.addEventListener('resize', function() {
             const menu = document.getElementById('navMenu');
             const hamburger = document.querySelector('.hamburger');
-            if (window.innerWidth > 768) {
-                menu.classList.remove('active');
-                hamburger.classList.remove('active');
-                menu.style.display = 'flex';
-            } else {
-                menu.style.display = '';
-            }
+            // Only reset inline styles if needed, but keep menu hidden unless toggled
+            menu.style.display = '';
+            hamburger.style.display = 'flex'; // Ensure hamburger stays visible
         });
 
-        // Set initial state on load
+        // No need to force menu visibility on load
         window.addEventListener('load', function() {
-            const menu = document.getElementById('navMenu');
-            if (window.innerWidth > 768) {
-                menu.style.display = 'flex';
-            }
+            const hamburger = document.querySelector('.hamburger');
+            hamburger.style.display = 'flex'; // Ensure hamburger is visible
         });
     </script>";
 }
-
-            
-
 
 
 // Start session to store competitions and their data
