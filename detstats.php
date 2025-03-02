@@ -111,12 +111,10 @@
         $awayWins = 0;
         $totalGames = 0;
 
-        // Arrays to store team stats
         $homeTeams = [];
         $awayTeams = [];
         $drawTeams = [];
 
-        // Process standings
         foreach ($standings['standings'] as $standing) {
             if ($standing['type'] === 'TOTAL') {
                 foreach ($standing['table'] as $team) {
@@ -154,7 +152,6 @@
         $drawPerc = $totalGames > 0 ? round(($draws / $totalGames) * 100, 2) : 0;
         $awayWinPerc = $totalGames > 0 ? round(($awayWins / $totalGames) * 100, 2) : 0;
 
-        // Display league stats
         echo "<div class='league'>";
         echo "<h2>$compName</h2>";
         echo "<p>Total Games: $totalGames</p>";
@@ -173,35 +170,35 @@
 
         // Categorize teams
         $likelyHomeWinners = array_filter($homeTeams, function($stats) {
-            return $stats['winPerc'] > 50; // Home win > 50%
+            return $stats['winPerc'] > 50;
         });
         $likelyAwayWinners = array_filter($awayTeams, function($perc) {
-            return $perc > 40; // Away win > 40%
+            return $perc > 40;
         });
         $likelyDrawTeams = array_filter($homeTeams, function($stats) {
-            return $stats['drawPerc'] > 30; // Draw > 30%
+            return $stats['drawPerc'] > 30;
         });
 
-        // Display team lists
+        // Display team names only
         echo "<div class='team-list'>";
         echo "<h3>Likely to Win at Home (>50%)</h3>";
         echo "<ul>";
         foreach ($likelyHomeWinners as $teamName => $stats) {
-            echo "<li>$teamName - {$stats['winPerc']}%</li>";
+            echo "<li>$teamName</li>";
         }
         echo "</ul>";
 
         echo "<h3>Likely to Win Away (>40%)</h3>";
         echo "<ul>";
         foreach ($likelyAwayWinners as $teamName => $perc) {
-            echo "<li>$teamName - $perc%</li>";
+            echo "<li>$teamName</li>";
         }
         echo "</ul>";
 
         echo "<h3>Likely to Draw (>30%)</h3>";
         echo "<ul>";
         foreach ($likelyDrawTeams as $teamName => $stats) {
-            echo "<li>$teamName - {$stats['drawPerc']}%</li>";
+            echo "<li>$teamName</li>";
         }
         echo "</ul>";
         echo "</div>";
