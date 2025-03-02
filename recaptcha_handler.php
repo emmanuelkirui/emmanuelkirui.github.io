@@ -33,9 +33,13 @@ class RecaptchaHandler {
         if ($token) {
             $this->result = $this->verify($token);
             $this->processed = true;
+            if ($this->result['success']) {
+                $_SESSION['recaptcha_verified'] = true;
+            } else {
+                $_SESSION['recaptcha_verified'] = false;
+            }
             $this->outputResult();
         }
-        // Always register shutdown function to display widget if not processed
         register_shutdown_function([$this, 'displayWidget']);
     }
     
@@ -83,27 +87,18 @@ class RecaptchaHandler {
     }
     
     private function outputResult() {
-        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-            header('Content-Type: application/json');
-            echo json_encode($this->result);
-            exit;
-        } else {
-            if ($this->result['success']) {
-                echo "<div style='color: green;'>Success: " . $this->result['message'] . "</div>";
-                // Optionally redirect: header('Location: /success.php'); exit;
-            } else {
-                echo "<div style='color: red;'>Error: " . $this->result['message'] . "</div>";
-            }
-        }
+        header('Content-Type: application/json');
+        echo json_encode($this->result);
+        exit;
     }
     
     public function displayWidget() {
         if ($this->processed) {
-            return; // Don't display if already processed
+            return;
         }
         $nonce = bin2hex(random_bytes(16));
         $_SESSION['recaptcha_nonce'] = $nonce;
-        
+
         echo '
         <div id="recaptcha-container">
             <input type="hidden" name="nonce" value="' . $nonce . '">
@@ -111,7 +106,7 @@ class RecaptchaHandler {
             <script src="https://www.google.com/recaptcha/api.js" async defer></script>
             <script>
                 function onRecaptchaSuccess(token) {
-                    fetch(window.location.href, {
+                    fetch("recaptcha_handler.php", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded",
@@ -124,7 +119,7 @@ class RecaptchaHandler {
                         let container = document.getElementById("recaptcha-container");
                         if (data.success) {
                             container.innerHTML = "<div style=\'color: green;\'>Success: " + data.message + "</div>";
-                            // Optional: window.location.href = "/success.php";
+                            enableActions();
                         } else {
                             container.innerHTML = "<div style=\'color: red;\'>Error: " + data.message + "</div>";
                             grecaptcha.reset();
@@ -135,12 +130,27 @@ class RecaptchaHandler {
                         grecaptcha.reset();
                     });
                 }
+
+                function disableActions() {
+                    document.getElementById("submit-button").disabled = true;
+                    document.getElementById("user-input").disabled = true;
+                }
+
+                function enableActions() {
+                    document.getElementById("submit-button").disabled = false;
+                    document.getElementById("user-input").disabled = false;
+                }
+
+                function showRecaptchaPopup() {
+                    disableActions();
+                    grecaptcha.reset();
+                    grecaptcha.execute();
+                }
+
+                disableActions();
+                setInterval(showRecaptchaPopup, 300000);
             </script>
         </div>';
-    }
-    
-    public function getResult() {
-        return $this->result;
     }
     
     private function checkRateLimit() {
