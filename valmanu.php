@@ -1147,12 +1147,17 @@ try {
         }
 
         .match-card.draw-likely .teams {
-            background-color: rgba(241, 196, 15, 0.2);
-            border: 2px solid #f1c40f;
-            border-radius: 5px;
-            padding: 5px;
-            transition: all 0.3s ease;
-        }
+    background-color: rgba(241, 196, 15, 0.2);
+    border: 2px solid #f1c40f;
+    border-radius: 5px;
+    padding: 2%; /* Dynamic padding based on element width */
+    transition: all 0.3s ease;
+    display: inline-flex; /* From previous dynamic width/height request */
+    width: auto;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+}
 
         .advantage {
             font-size: 0.9em;
