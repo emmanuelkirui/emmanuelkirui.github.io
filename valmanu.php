@@ -1011,12 +1011,13 @@ try {
         }
 
         .form-display span {
-            display: inline-block;
-            width: 20px;
-            text-align: center;
-            border-radius: 3px;
-            margin: 0 1px;
-        }
+           display: inline-block;
+           width: 18px; /* Slightly reduced width for continuous look */
+           text-align: center;
+           border-radius: 3px;
+           margin: 0; /* Remove margin to make it continuous */
+           padding: 0 2px; /* Add minimal padding instead */
+}
 
         .form-display .win {
             color: #28a745; /* Green for Win */
@@ -1035,9 +1036,10 @@ try {
         }
 
         .form-display .latest {
-            border: 2px solid #000; /* Black border for latest result */
-            font-weight: bold;
+          border: 2px solid #3498db; /* Blue border for latest result */
+          font-weight: bold;
         }
+
 
         .retry-message {
             text-align: center;
