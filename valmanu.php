@@ -1005,40 +1005,49 @@ try {
         }
 
         .form-display {
-          display: inline-flex; /* Use flex to keep items tight */
-          gap: 0; /* Ensure no gaps */
-        }
+    display: flex; /* Flex for tight alignment */
+    justify-content: center;
+    align-items: center;
+    font-family: 'monospace'; /* Monospace font for equal spacing */
+    font-size: 16px; /* Consistent size */
+    line-height: 1; /* No extra vertical space */
+    padding: 2px; /* Minimal container padding */
+    background-color: rgba(0, 0, 0, 0.05); /* Subtle background for contrast */
+    border-radius: 4px;
+}
 
-        .form-display span {
-          display: inline-block;
-          width: 18px; /* Fixed width for consistency */
-          text-align: center;
-          border-radius: 0; /* Remove rounding for continuous look */
-          margin: 0; /* No margin */
-          padding: 0; /* No padding */
-          line-height: 1; /* Tighten vertical spacing */
-       }
+.form-display span {
+    display: block;
+    width: 16px; /* Fixed width for each letter */
+    text-align: center;
+    margin: 0; /* No margin */
+    padding: 0; /* No padding */
+    border: none; /* Remove individual borders except for latest */
+}
 
-        .form-display .win {
-            color: #28a745; /* Green for Win */
-        }
+.form-display .latest {
+    border: 2px solid #3498db; /* Blue border for latest */
+    border-radius: 2px; /* Slight rounding */
+    font-weight: bold;
+    background-color: rgba(52, 152, 219, 0.1); /* Light blue background */
+}
 
-        .form-display .draw {
-            color: #fd7e14; /* Orange for Draw */
-        }
+.form-display .win {
+    color: #28a745; /* Green */
+}
 
-        .form-display .loss {
-            color: #dc3545; /* Red for Loss */
-        }
+.form-display .draw {
+    color: #fd7e14; /* Orange */
+}
 
-        .form-display .empty {
-            color: #6c757d; /* Gray for Empty */
-        }
+.form-display .loss {
+    color: #dc3545; /* Red */
+}
 
-        .form-display .latest {
-          border: 2px solid #3498db; /* Blue border for latest result */
-          font-weight: bold;
-        }
+.form-display .empty {
+    color: #6c757d; /* Gray */
+}
+
 
 
         .retry-message {
