@@ -1019,27 +1019,24 @@ try {
         }
 
         .form-display .win {
-            background-color: #28a745;
-            color: white;
+            color: #28a745; /* Green for Win */
         }
 
         .form-display .draw {
-            background-color: #fd7e14;
-            color: white;
+            color: #fd7e14; /* Orange for Draw */
         }
 
         .form-display .loss {
-            background-color: #dc3545;
-            color: white;
+            color: #dc3545; /* Red for Loss */
         }
 
         .form-display .empty {
-            background-color: #6c757d;
-            color: white;
+            color: #6c757d; /* Gray for Empty */
         }
 
         .form-display .latest {
-            border: 2px solid #000;
+            border: 2px solid #000; /* Black border for latest result */
+            font-weight: bold;
         }
 
         .retry-message {
