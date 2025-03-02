@@ -18,13 +18,13 @@ if (!isset($_GET['ajax'])) {
     echo "</div>";
     echo "</nav>";
 
-    // Inline CSS with no background on navbar, only on menu items
+    // Inline CSS for a more professional look
     echo "<style>
         /* Navbar container */
         .navbar {
             width: 100%;
-            padding: 15px 20px; /* No background color */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 25px; /* Slightly more padding for elegance */
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05); /* Softer shadow */
             position: fixed;
             top: 0;
             left: 0;
@@ -32,7 +32,7 @@ if (!isset($_GET['ajax'])) {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 60px;
+            height: 70px; /* Increased height for a premium feel */
             box-sizing: border-box;
         }
 
@@ -41,22 +41,22 @@ if (!isset($_GET['ajax'])) {
             display: flex; /* Always visible */
             flex-direction: column;
             justify-content: space-between;
-            width: 30px;
-            height: 20px;
+            width: 35px; /* Slightly larger */
+            height: 25px; /* Slightly taller */
             cursor: pointer;
             padding: 10px;
         }
 
         .hamburger .bar {
             width: 100%;
-            height: 3px;
-            background-color: #2c3e50; /* Dark color for visibility */
-            border-radius: 10px;
-            transition: all 0.3s ease;
+            height: 4px; /* Thicker bars for visibility */
+            background-color: #2c3e50; /* Dark blue for professionalism */
+            border-radius: 5px; /* Slightly less rounded */
+            transition: all 0.4s ease; /* Smoother animation */
         }
 
         .hamburger.active .bar:nth-child(1) {
-            transform: translateY(8px) rotate(45deg);
+            transform: translateY(10px) rotate(45deg); /* Adjusted for new height */
         }
 
         .hamburger.active .bar:nth-child(2) {
@@ -64,37 +64,36 @@ if (!isset($_GET['ajax'])) {
         }
 
         .hamburger.active .bar:nth-child(3) {
-            transform: translateY(-8px) rotate(-45deg);
+            transform: translateY(-10px) rotate(-45deg); /* Adjusted for new height */
         }
 
         /* Navigation menu */
         .nav-menu {
             display: none; /* Hidden by default */
             position: absolute;
-            top: 60px;
+            top: 70px; /* Matches navbar height */
             left: 0;
             width: 100%;
-            background-color: #2c3e50; /* Background only here */
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); /* Subtle gradient */
             flex-direction: column;
-            gap: 10px;
-            padding: 20px 0;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
+            gap: 5px; /* Tighter spacing */
+            padding: 15px 0; /* Slightly less padding */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Deeper shadow */
+            transition: all 0.4s ease; /* Smooth toggle */
         }
 
         /* Navigation links */
         .nav-link {
             color: #ecf0f1;
             text-decoration: none;
-            font-family: 'Arial', sans-serif;
-            font-size: 16px;
-            font-weight: 500;
-            padding: 15px;
+            font-family: 'Roboto', sans-serif; /* More professional font */
+            font-size: 18px; /* Slightly larger text */
+            font-weight: 600; /* Bolder for emphasis */
+            padding: 15px 20px; /* More padding for touch targets */
             transition: all 0.3s ease;
-            border-radius: 5px;
             width: 100%;
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Subtler divider */
         }
 
         .nav-link:last-child {
@@ -102,12 +101,14 @@ if (!isset($_GET['ajax'])) {
         }
 
         .nav-link:hover {
-            background-color: #3498db; /* Hover background */
+            background-color: #3498db; /* Bright blue hover */
             color: #fff;
+            transform: translateX(5px); /* Subtle shift effect */
         }
 
         .nav-link:active {
-            background-color: #2980b9; /* Active background */
+            background-color: #2980b9; /* Darker active state */
+            transform: translateX(0); /* Reset shift */
         }
 
         /* Show menu when toggled */
@@ -118,7 +119,8 @@ if (!isset($_GET['ajax'])) {
         /* Prevent content overlap */
         body {
             margin: 0;
-            padding-top: 60px;
+            padding-top: 70px; /* Matches navbar height */
+            font-family: 'Roboto', sans-serif; /* Consistent typography */
         }
     </style>";
 
@@ -144,6 +146,9 @@ if (!isset($_GET['ajax'])) {
         });
     </script>";
 }
+
+
+
 
 
 
