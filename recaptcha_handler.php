@@ -4,7 +4,6 @@
 // Configuration
 define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
 define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key
-
 class RecaptchaHandler {
     private $siteKey;
     private $secretKey;
@@ -33,14 +32,11 @@ class RecaptchaHandler {
         if ($token) {
             $this->result = $this->verify($token);
             $this->processed = true;
-            if ($this->result['success']) {
-                $_SESSION['recaptcha_verified'] = true;
-            } else {
-                $_SESSION['recaptcha_verified'] = false;
-            }
             $this->outputResult();
         }
-        register_shutdown_function([$this, 'displayWidget']);
+        if (!$this->isVerified()) {
+            $this->displayOverlay();
+        }
     }
     
     private function verify($recaptcha_response) {
@@ -76,6 +72,7 @@ class RecaptchaHandler {
             if ($responseData->success) {
                 $result['success'] = true;
                 $result['message'] = 'Verification successful';
+                $_SESSION['recaptcha_verified'] = true; // Set verification flag
             } else {
                 $result['message'] = 'CAPTCHA verification failed';
             }
@@ -87,70 +84,63 @@ class RecaptchaHandler {
     }
     
     private function outputResult() {
-        header('Content-Type: application/json');
-        echo json_encode($this->result);
-        exit;
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            echo json_encode($this->result);
+            exit;
+        }
     }
     
-    public function displayWidget() {
-        if ($this->processed) {
-            return;
+    public function displayOverlay() {
+        if ($this->processed && $this->result['success']) {
+            return; // Don't display if verified
         }
         $nonce = bin2hex(random_bytes(16));
         $_SESSION['recaptcha_nonce'] = $nonce;
-
+        
         echo '
-        <div id="recaptcha-container">
-            <input type="hidden" name="nonce" value="' . $nonce . '">
-            <div class="g-recaptcha" data-sitekey="' . $this->siteKey . '" data-callback="onRecaptchaSuccess"></div>
-            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-            <script>
-                function onRecaptchaSuccess(token) {
-                    fetch("recaptcha_handler.php", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                            "X-Requested-With": "XMLHttpRequest"
-                        },
-                        body: "g-recaptcha-response=" + encodeURIComponent(token)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        let container = document.getElementById("recaptcha-container");
-                        if (data.success) {
-                            container.innerHTML = "<div style=\'color: green;\'>Success: " + data.message + "</div>";
-                            enableActions();
-                        } else {
-                            container.innerHTML = "<div style=\'color: red;\'>Error: " + data.message + "</div>";
-                            grecaptcha.reset();
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
+        <div id="recaptcha-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 20px; border-radius: 5px; text-align: center;">
+                <h2>Please Verify</h2>
+                <div id="recaptcha-container">
+                    <input type="hidden" name="nonce" value="' . $nonce . '">
+                    <div class="g-recaptcha" data-sitekey="' . $this->siteKey . '" data-callback="onRecaptchaSuccess"></div>
+                </div>
+                <div id="recaptcha-message"></div>
+            </div>
+        </div>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script>
+            function onRecaptchaSuccess(token) {
+                fetch(window.location.href, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: "g-recaptcha-response=" + encodeURIComponent(token)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    let container = document.getElementById("recaptcha-message");
+                    if (data.success) {
+                        document.getElementById("recaptcha-overlay").remove();
+                    } else {
+                        container.innerHTML = "<div style=\'color: red;\'>Error: " + data.message + "</div>";
                         grecaptcha.reset();
-                    });
-                }
-
-                function disableActions() {
-                    document.getElementById("submit-button").disabled = true;
-                    document.getElementById("user-input").disabled = true;
-                }
-
-                function enableActions() {
-                    document.getElementById("submit-button").disabled = false;
-                    document.getElementById("user-input").disabled = false;
-                }
-
-                function showRecaptchaPopup() {
-                    disableActions();
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
                     grecaptcha.reset();
-                    grecaptcha.execute();
-                }
-
-                disableActions();
-                setInterval(showRecaptchaPopup, 300000);
-            </script>
-        </div>';
+                });
+            }
+        </script>';
+        exit; // Stop further processing
+    }
+    
+    public function isVerified() {
+        return isset($_SESSION['recaptcha_verified']) && $_SESSION['recaptcha_verified'] === true;
     }
     
     private function checkRateLimit() {
@@ -160,10 +150,12 @@ class RecaptchaHandler {
     }
 }
 
-// Auto-initialize
+// Usage example in your page
 $recaptcha = RecaptchaHandler::getInstance();
-
-if (basename($_SERVER['PHP_SELF']) === basename(__FILE__)) {
-    header('HTTP/1.0 403 Forbidden');
-    exit('Direct access not allowed');
+if (!$recaptcha->isVerified()) {
+    // This will display the overlay and stop execution
+    $recaptcha->displayOverlay();
 }
+
+// Your protected content goes here
+echo "Welcome to the protected page!";
