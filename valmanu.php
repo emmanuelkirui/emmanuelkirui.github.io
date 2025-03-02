@@ -412,23 +412,35 @@ if (!isset($_GET['ajax'])) {
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
         const hamburger = document.querySelector('.hamburger');
+        const container = document.querySelector('.container');
         menu.classList.toggle('active');
         hamburger.classList.toggle('active');
+        if (window.innerWidth <= 768) {
+            container.style.paddingTop = menu.classList.contains('active') ? '200px' : '60px';
+        }
     }
 
     window.addEventListener('resize', function() {
         const menu = document.getElementById('navMenu');
         const hamburger = document.querySelector('.hamburger');
+        const container = document.querySelector('.container');
         if (window.innerWidth > 768) {
             menu.classList.remove('active');
             hamburger.classList.remove('active');
+            container.style.paddingTop = '60px';
+        } else {
+            container.style.paddingTop = menu.classList.contains('active') ? '200px' : '60px';
         }
     });
 
     document.addEventListener('DOMContentLoaded', function() {
         const menu = document.getElementById('navMenu');
+        const container = document.querySelector('.container');
         if (window.innerWidth > 768) {
             menu.classList.remove('active');
+            container.style.paddingTop = '60px';
+        } else {
+            container.style.paddingTop = '60px';
         }
     });
     </script>";
@@ -518,7 +530,7 @@ try {
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
-            padding: 0; /* Remove top padding since navbar handles spacing */
+            padding: 0;
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: all 0.3s ease;
@@ -542,7 +554,7 @@ try {
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
-            flex-wrap: wrap; /* Allow wrapping for mobile */
+            height: 60px; /* Fixed height for navbar */
         }
 
         .navbar-brand {
@@ -559,7 +571,6 @@ try {
             margin: 0;
             padding: 0;
             list-style: none;
-            transition: max-height 0.3s ease; /* Smooth height transition */
         }
 
         .nav-link {
@@ -633,7 +644,8 @@ try {
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 60px 20px 20px; /* Default padding for navbar height */
+            transition: padding-top 0.3s ease; /* Smooth transition for padding */
         }
 
         .header {
@@ -987,18 +999,22 @@ try {
             }
 
             .nav-menu {
-                flex-direction: column;
+                position: absolute;
+                top: 60px; /* Below the fixed navbar height */
+                left: 0;
                 width: 100%;
-                max-height: 0; /* Collapsed state */
-                overflow: hidden; /* Hide content when collapsed */
+                flex-direction: column;
                 background-color: var(--card-bg);
                 box-shadow: var(--shadow);
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
                 padding: 0;
                 gap: 10px;
             }
 
             .nav-menu.active {
-                max-height: 300px; /* Expanded height (adjust as needed) */
+                max-height: 300px; /* Adjust based on content */
                 padding: 20px;
             }
 
