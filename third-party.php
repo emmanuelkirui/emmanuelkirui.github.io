@@ -190,7 +190,7 @@ $year = date("Y");
         </header>
 
         <section>
-            <p>Welcome to Emmanuel Kirui's website. To provide you with a robust, secure, and user-friendly experience, we leverage a variety of third-party services. This page outlines these services, their purposes, and how they integrate with our site. It also provides transparency into their respective terms of service and privacy policies, ensuring you understand how your data may be handled when interacting with our platform.</p>
+            <p>Welcome to Emmanuel Kirui's website (<a href="http://creativepulse.42web.io" class="contact-link">creativepulse.42web.io</a>). To provide you with a robust, secure, and user-friendly experience, we leverage a variety of third-party services. This page outlines these services, their purposes, and how they integrate with our site. It also provides transparency into their respective terms of service and privacy policies, ensuring you understand how your data may be handled when interacting with our platform.</p>
         </section>
 
         <section>
@@ -248,7 +248,7 @@ $year = date("Y");
 
         <section>
             <h2>7. Contact Information</h2>
-            <p>For inquiries regarding our use of third-party services or any other concerns, please contact us at <a href="mailto:support@emmanuelkirui.com" class="contact-link">support@emmanuelkirui.com</a>. We are committed to addressing your questions promptly and thoroughly.</p>
+            <p>For inquiries regarding our use of third-party services or any other concerns, please contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>. We are committed to addressing your questions promptly and thoroughly.</p>
         </section>
 
         <!-- Back Button -->
@@ -258,7 +258,7 @@ $year = date("Y");
 
         <!-- Footer -->
         <footer class="footer">
-            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>For further inquiries, reach us at <a href="mailto:info@emmanuelkirui.com" class="contact-link">info@emmanuelkirui.com</a>.</p>
+            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>For further inquiries, reach us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
         </footer>
     </main>
 </body>
