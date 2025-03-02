@@ -169,7 +169,7 @@ $year = date("Y"); // Auto-updating year
         <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
 
         <ul class="footer-links">
-            <li><a href="terms-and-conditions.php"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
+            <li><a href="terms-conditions.php"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
             <li><a href="privacy-policy.php"><i class="fas fa-user-shield"></i> Privacy Policy</a></li>
             <li><a href="third-party.php"><i class="fas fa-handshake"></i> Third-Party Services</a></li>
             <li><a href="docs.php"><i class="fas fa-folder-open"></i> Documentation</a></li>
