@@ -3,75 +3,45 @@
 $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
+
 // Only output the navigation bar and script if it's not an AJAX request
 if (!isset($_GET['ajax'])) {
-    echo "<nav class='navbar'>";
-    echo "<div class='navbar-container'>";
-    echo "<div class='navbar-brand'>CPS Football</div>";
-    echo "<div class='hamburger' onclick='toggleMenu()'><span></span><span></span><span></span></div>";
-    echo "<div class='nav-menu' id='navMenu'>";
-    echo "<a href='liv' class='nav-link'>Home</a>";
-    echo "<a href='valmanu' class='nav-link'>More Predictions</a>";
-    echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
-    echo "</div>";
+    echo "<nav class='navbar' style='width: 100%; position: relative;'>";
+    echo "<div class='hamburger' onclick='toggleMenu()' style='display: inline-block; cursor: pointer; padding: 10px; font-size: 20px;'>☰</div>";
+    echo "<div class='nav-menu' id='navMenu' style='display: none;'>"; // Changed from inline-block to none
+    echo "<a href='liv' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Home</a>";
+    echo "<a href='valmanu' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>More Predictions</a>";
+    echo "<a href='javascript:history.back()' class='nav-link' style='padding: 10px; text-decoration: none; color: #000; display: inline-block;'>Back</a>";
     echo "</div>";
     echo "</nav>";
 
-    // JavaScript for toggling the menu with auto-adjusting height
+    // JavaScript for toggling the menu
     echo "<script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
-        const hamburger = document.querySelector('.hamburger');
-        const container = document.querySelector('.container');
-        menu.classList.toggle('active');
-        hamburger.classList.toggle('active');
-        
-        if (window.innerWidth <= 768) {
-            if (menu.classList.contains('active')) {
-                const menuHeight = menu.scrollHeight + 20; // Include padding
-                container.style.paddingTop = (60 + menuHeight) + 'px';
-            } else {
-                container.style.paddingTop = '80px';
-            }
+        const currentDisplay = menu.style.display;
+        if (currentDisplay === 'none') {
+            menu.style.display = 'inline-block';
+        } else {
+            menu.style.display = 'none';
         }
     }
-
+    
+    // Optional: Show menu on larger screens
     window.addEventListener('resize', function() {
         const menu = document.getElementById('navMenu');
-        const hamburger = document.querySelector('.hamburger');
-        const container = document.querySelector('.container');
         if (window.innerWidth > 768) {
-            menu.classList.remove('active');
-            hamburger.classList.remove('active');
-            container.style.paddingTop = '80px';
-        } else {
-            if (menu.classList.contains('active')) {
-                const menuHeight = menu.scrollHeight + 20;
-                container.style.paddingTop = (60 + menuHeight) + 'px';
-            } else {
-                container.style.paddingTop = '80px';
-            }
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const menu = document.getElementById('navMenu');
-        const container = document.querySelector('.container');
-        if (window.innerWidth > 768) {
-            menu.classList.remove('active');
-            container.style.paddingTop = '80px';
-        } else {
-            container.style.paddingTop = '80px';
+            menu.style.display = 'inline-block';
         }
     });
     </script>";
 }
 
+
 // Start session to store competitions and their data
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
 // Function to fetch data from the API
 function fetchAPI($url, $api_key, $retries = 3) {
     $curl = curl_init();
@@ -89,43 +59,54 @@ function fetchAPI($url, $api_key, $retries = 3) {
 
     // Handle rate limits (HTTP 429)
     if ($http_code == 429) {
-        if ($retries > 0) {
-            $wait_time = pow(2, 4 - $retries); // Exponential backoff
-            echo "
-            <div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
-                <h2 style='color: red;'>Too Many Requests (429)</h2>
-                <p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>$wait_time</span> seconds...</p>
-            </div>";
-            echo "
-            <script>
-                let timeLeft = $wait_time;
-                const countdownElement = document.getElementById('countdown');
-                const interval = setInterval(() => {
-                    timeLeft--;
-                    countdownElement.textContent = timeLeft;
-                    if (timeLeft <= 0) {
-                        clearInterval(interval);
-                        window.location.reload();
-                    }
-                }, 1000);
-            </script>";
-            flush();
-            sleep($wait_time);
-            return fetchAPI($url, $api_key, $retries - 1);
+    if ($retries > 0) {
+        // Calculate wait time using exponential backoff
+        $wait_time = pow(2, 4 - $retries); // 2^3 = 8, 2^2 = 4, 2^1 = 2
+
+        // Output the initial countdown message and embed JavaScript for dynamic countdown
+        echo "
+        <div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
+            <h2 style='color: red;'>Too Many Requests (429)</h2>
+            <p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>$wait_time</span> seconds...</p>
+        </div>";
+
+        echo "
+        <script>
+            // Initialize countdown variables
+            let timeLeft = $wait_time;
+            const countdownElement = document.getElementById('countdown');
+
+            // Update the countdown every second
+            const interval = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+
+                // Reload the page when the countdown reaches 0
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    window.location.reload(); // Reload the page to retry
+                }
+            }, 1000); // Update every second
+        </script>";
+            flush(); // Send output to the browser immediately
+            sleep($wait_time); // Wait for the countdown to finish on the server side
+
+            return fetchAPI($url, $api_key, $retries - 1); // Retry with one less retry attempt
         } else {
-            header('Location: error');
+            // All retries exhausted for 429 error
+            header('Location: error'); // Redirect to an error page
             exit;
         }
     }
 
+    // Handle other errors
     if ($http_code != 200) {
-        header('Location: error');
+        header('Location: error'); // Redirect to an error page
         exit;
     }
 
     return json_decode($response, true);
-}
-
+}                       
 // Fetch all competitions only once and store in session
 if (!isset($_SESSION['competitions'])) {
     $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
@@ -144,7 +125,7 @@ function getTeamMetrics($standings_data) {
         $losses = isset($team['lost']) ? $team['lost'] : 0;
 
         $metrics[$team_name] = [
-            'crest' => $team['team']['crest'],
+            'crest' => $team['team']['crest'], // Add team crest
             'played' => $played,
             'win_ratio' => $played > 0 ? round($wins / $played, 2) : 0,
             'avg_goals_scored' => $played > 0 ? round($goals_for / $played, 2) : 0,
@@ -162,55 +143,79 @@ function getStandingsData($standings_data) {
     $standings = [];
     foreach ($standings_data['standings'][0]['table'] as $team) {
         $team_name = $team['team']['name'];
+        $position = $team['position'];
+        $goal_difference = $team['goalDifference'];
+        $points = $team['points'];
+        $goals_scored = $team['goalsFor'];
         $standings[$team_name] = [
-            'position' => $team['position'],
-            'goal_difference' => $team['goalDifference'],
-            'points' => $team['points'],
-            'goals_scored' => $team['goalsFor']
+            'position' => $position,
+            'goal_difference' => $goal_difference,
+            'points' => $points,
+            'goals_scored' => $goals_scored
         ];
     }
     return $standings;
 }
-
 function getPredictionSuggestion($home_team, $away_team, $standings, $home_last6, $away_last6) {
-    $home_position = $standings[$home_team]['position'] ?? 20;
+    // Extract metrics for home team
+    $home_position = $standings[$home_team]['position'] ?? 20; // Default to worst position if not found
     $home_gd = $standings[$home_team]['goal_difference'] ?? 0;
     $home_gs = $standings[$home_team]['goals_scored'] ?? 0;
     $home_points = $standings[$home_team]['points'] ?? 0;
     $home_form_weight = calculateRecentFormWeight($home_last6);
 
-    $away_position = $standings[$away_team]['position'] ?? 20;
+    // Extract metrics for away team
+    $away_position = $standings[$away_team]['position'] ?? 20; // Default to worst position if not found
     $away_gd = $standings[$away_team]['goal_difference'] ?? 0;
     $away_gs = $standings[$away_team]['goals_scored'] ?? 0;
     $away_points = $standings[$away_team]['points'] ?? 0;
     $away_form_weight = calculateRecentFormWeight($away_last6);
 
+    // Decision logic
     if ($home_position < $away_position && $home_form_weight > $away_form_weight) {
-        return ['decision' => "Home Win", 'reason' => "Home team is higher in the table and in better form."];
+        $decision = "Home Win";
+        $reason = "Home team is higher in the table and in better form.";
     } elseif ($home_position > $away_position && $home_form_weight < $away_form_weight) {
-        return ['decision' => "Away Win", 'reason' => "Away team is higher in the table and in better form."];
+        $decision = "Away Win";
+        $reason = "Away team is higher in the table and in better form.";
     } elseif ($home_gd > $away_gd && $home_gs > $away_gs) {
-        return ['decision' => "Home Win", 'reason' => "Home team has a stronger goal difference and scoring record."];
+        $decision = "Home Win";
+        $reason = "Home team has a stronger goal difference and scoring record.";
     } elseif ($home_gd < $away_gd && $home_gs < $away_gs) {
-        return ['decision' => "Away Win", 'reason' => "Away team has a stronger goal difference and scoring record."];
+        $decision = "Away Win";
+        $reason = "Away team has a stronger goal difference and scoring record.";
     } elseif ($home_points > $away_points) {
-        return ['decision' => "Home Win", 'reason' => "Home team has more points in the standings."];
+        $decision = "Home Win";
+        $reason = "Home team has more points in the standings.";
     } elseif ($home_points < $away_points) {
-        return ['decision' => "Away Win", 'reason' => "Away team has more points in the standings."];
+        $decision = "Away Win";
+        $reason = "Away team has more points in the standings.";
     } else {
-        return ['decision' => "Draw", 'reason' => "Teams are evenly matched based on current data."];
+        $decision = "Draw";
+        $reason = "Teams are evenly matched based on current data.";
     }
-}
 
+    return [
+        'decision' => $decision,
+        'reason' => $reason
+    ];
+}
+// Helper function to calculate a numeric weight for recent form
 function calculateRecentFormWeight($recent_form) {
-    $form_weights = ['W' => 3, 'D' => 1, 'L' => 0];
+    $form_weights = [
+        'W' => 3,  // Win = 3 points
+        'D' => 1,  // Draw = 1 point
+        'L' => 0   // Loss = 0 points
+    ];
     $total_weight = 0;
 
+    // Calculate weight based on the recent form string (e.g., "WWLDLD")
     for ($i = 0; $i < strlen($recent_form); $i++) {
         $match_result = strtoupper($recent_form[$i]);
-        $total_weight += $form_weights[$match_result] ?? 0;
+        $total_weight += isset($form_weights[$match_result]) ? $form_weights[$match_result] : 0;
     }
 
+    // Average weight across last 6 matches
     return strlen($recent_form) > 0 ? $total_weight / strlen($recent_form) : 0;
 }
 
@@ -225,13 +230,14 @@ function calculateHomeAwayAdvantage($fixtures_data) {
             $home_score = $match['score']['fullTime']['home'];
             $away_score = $match['score']['fullTime']['away'];
 
+            // Calculate points for home and away teams
             if ($home_score > $away_score) {
-                $home_points += 3;
+                $home_points += 3; // Home win
             } elseif ($home_score < $away_score) {
-                $away_points += 3;
+                $away_points += 3; // Away win
             } else {
-                $home_points += 1;
-                $away_points += 1;
+                $home_points += 1; // Draw
+                $away_points += 1; // Draw
             }
 
             $total_home_matches++;
@@ -239,109 +245,150 @@ function calculateHomeAwayAdvantage($fixtures_data) {
         }
     }
 
+    // Avoid division by zero
     if ($total_home_matches == 0 || $total_away_matches == 0) {
-        return ['home_advantage' => 1.2, 'away_advantage' => 1.0];
+        return ['home_advantage' => 1.2, 'away_advantage' => 1.0]; // Default values
     }
 
+    // Calculate average points per match for home and away teams
     $avg_home_points = $home_points / $total_home_matches;
     $avg_away_points = $away_points / $total_away_matches;
 
-    return [
-        'home_advantage' => $avg_home_points / $avg_away_points,
-        'away_advantage' => $avg_away_points / $avg_home_points
-    ];
+    // Home and away advantage factors
+    $home_advantage = $avg_home_points / $avg_away_points;
+    $away_advantage = $avg_away_points / $avg_home_points; // Inverse of home advantage
+
+    return ['home_advantage' => $home_advantage, 'away_advantage' => $away_advantage];
 }
 
+// Function to predict match outcome with revised weights
 function predictMatch($home_metrics, $away_metrics, $advantages) {
     $home_advantage = $advantages['home_advantage'];
     $away_advantage = $advantages['away_advantage'];
 
+    // Calculate recent form weights
     $home_recent_form_weight = calculateRecentFormWeight($home_metrics['recent_form'] ?? '');
     $away_recent_form_weight = calculateRecentFormWeight($away_metrics['recent_form'] ?? '');
 
+    // Calculate home and away scores with both advantages
     $home_score = ($home_metrics['win_ratio'] * 1.3)  
                 + ($home_metrics['avg_goals_scored'] * 1.2) 
                 - ($home_metrics['avg_goals_conceded'] * 0.8)
                 + ($home_recent_form_weight * 0.7)
-                + $home_advantage;
+                + $home_advantage; // Include home advantage
 
     $away_score = ($away_metrics['win_ratio'] * 1.3) 
                 + ($away_metrics['avg_goals_scored'] * 1.2) 
                 - ($away_metrics['avg_goals_conceded'] * 0.8)
                 + ($away_recent_form_weight * 0.7)
-                + $away_advantage;
+                + $away_advantage; // Include away advantage
 
+    // Adjust thresholds with added consideration for draws
     $score_difference = $home_score - $away_score;
 
-    if ($score_difference > 0.8) {
+    if ($score_difference > 0.8) {  
         return "Win for Home";
-    } elseif ($score_difference < -0.8) {
+    } elseif ($score_difference < -0.8) {  
         return "Win for Away";
     } else {
         return "Draw";
     }
 }
 
+// Function to predict goals
 function predictGoals($home_metrics, $away_metrics, $advantages) {
     $home_advantage = $advantages['home_advantage'];
     $away_advantage = $advantages['away_advantage'];
 
+    // Calculate recent form weights
     $home_recent_form_weight = calculateRecentFormWeight($home_metrics['recent_form'] ?? '');
     $away_recent_form_weight = calculateRecentFormWeight($away_metrics['recent_form'] ?? '');
 
+    // Calculate home and away scores with both advantages
     $home_score = ($home_metrics['win_ratio'] * 1.3)  
                 + ($home_metrics['avg_goals_scored'] * 1.2) 
                 - ($home_metrics['avg_goals_conceded'] * 0.8)
                 + ($home_recent_form_weight * 0.7)
-                + $home_advantage;
+                + $home_advantage; // Include home advantage
 
     $away_score = ($away_metrics['win_ratio'] * 1.3) 
                 + ($away_metrics['avg_goals_scored'] * 1.2) 
                 - ($away_metrics['avg_goals_conceded'] * 0.8)
                 + ($away_recent_form_weight * 0.7)
-                + $away_advantage;
+                + $away_advantage; // Include away advantage
+
+    // Use the scores to predict goals
+    $predicted_home_goals = max(0, round($home_score)); // Round to whole number
+    $predicted_away_goals = max(0, round($away_score)); // Round to whole number
 
     return [
-        'home_goals' => max(0, round($home_score)),
-        'away_goals' => max(0, round($away_score))
+        'home_goals' => $predicted_home_goals,
+        'away_goals' => $predicted_away_goals
     ];
 }
 
+// Function to get last 6 matches for a team
 function getLast6Matches($team_name, $fixtures) {
-    $results = [];
+    $results = []; // To store the results of the last 6 matches
+    
+    // Reverse the fixtures to get the latest matches first
     $fixtures = array_reverse($fixtures);
-
+    
     foreach ($fixtures as $match) {
+        // Check if the team is part of this match
         if (strcasecmp($match['homeTeam']['name'], $team_name) === 0 || strcasecmp($match['awayTeam']['name'], $team_name) === 0) {
+            // Ensure the match is finished and has a valid score
             if ($match['status'] === 'FINISHED' && isset($match['score']['fullTime']['home'], $match['score']['fullTime']['away'])) {
                 $home_score = $match['score']['fullTime']['home'];
                 $away_score = $match['score']['fullTime']['away'];
 
+                // Determine if the team won, lost, or drew
                 if (strcasecmp($match['homeTeam']['name'], $team_name) === 0) {
-                    $result = $home_score > $away_score ? 'W' : ($home_score < $away_score ? 'L' : 'D');
-                    $color = $home_score > $away_score ? 'green' : ($home_score < $away_score ? 'red' : 'blue');
+                    // Team is the home team
+                    if ($home_score > $away_score) {
+                        $results[] = ['result' => 'W', 'color' => 'green'];
+                    } elseif ($home_score < $away_score) {
+                        $results[] = ['result' => 'L', 'color' => 'red'];
+                    } else {
+                        $results[] = ['result' => 'D', 'color' => 'blue'];
+                    }
                 } else {
-                    $result = $away_score > $home_score ? 'W' : ($away_score < $home_score ? 'L' : 'D');
-                    $color = $away_score > $home_score ? 'green' : ($away_score < $home_score ? 'red' : 'blue');
+                    // Team is the away team
+                    if ($away_score > $home_score) {
+                        $results[] = ['result' => 'W', 'color' => 'green'];
+                    } elseif ($away_score < $home_score) {
+                        $results[] = ['result' => 'L', 'color' => 'red'];
+                    } else {
+                        $results[] = ['result' => 'D', 'color' => 'blue'];
+                    }
                 }
-                $results[] = ['result' => $result, 'color' => $color];
             }
         }
-        if (count($results) >= 6) break;
+
+        // Stop once we have 6 results
+        if (count($results) >= 6) {
+            break;
+        }
     }
 
+    // Reverse the results array to have the most recent match at the end
     $results = array_reverse($results);
+
+    // Format results for display without spaces
     if (!empty($results)) {
         $formatted_results = '';
         foreach ($results as $index => $result) {
-            $style = $index === count($results) - 1 ? 'font-weight: bold; text-decoration: underline;' : '';
+            $style = $index === count($results) - 1 ? 'font-weight: bold; text-decoration: underline;' : ''; // Highlight the latest match
             $formatted_results .= "<span style='color: {$result['color']}; $style; display: inline-block; line-height: 1; padding: 0; margin: 0;'>{$result['result']}</span>";
         }
         return $formatted_results;
     }
+
+    // Return "N/A" if no matches found
     return "N/A";
 }
 
+// Function to calculate date range filter (Yesterday, Today, Tomorrow)
 function filterMatchesByDate($matches, $filter, $start_date = null, $end_date = null) {
     $filtered_matches = [];
     $now = new DateTime('now', new DateTimeZone('Africa/Nairobi'));
@@ -388,13 +435,14 @@ function filterMatchesByDate($matches, $filter, $start_date = null, $end_date = 
                 if ($start_date && $end_date && $match_date >= $start_date && $match_date <= $end_date) $filtered_matches[] = $match;
                 break;
             default:
-                $filtered_matches[] = $match;
+                $filtered_matches[] = $match; // Default to all matches
                 break;
         }
     }
     return $filtered_matches;
 }
 
+// Function to search matches by team
 function searchMatchesByTeam($matches, $team) {
     $filtered_matches = [];
     foreach ($matches as $match) {
@@ -406,14 +454,17 @@ function searchMatchesByTeam($matches, $team) {
     return $filtered_matches;
 }
 
+// Convert UTC time to EAT (UTC +3)
 function convertToEAT($utcDate) {
     $date = new DateTime($utcDate, new DateTimeZone('UTC'));
-    $date->setTimezone(new DateTimeZone('Africa/Nairobi'));
+    $date->setTimezone(new DateTimeZone('Africa/Nairobi')); // Nairobi is in EAT (UTC+3)
     return $date->format('Y-m-d H:i:s');
 }
 
-$selected_competition = isset($_GET['competition']) ? $_GET['competition'] : 'PL';
+// Get selected competition and fetch its data
+$selected_competition = isset($_GET['competition']) ? $_GET['competition'] : 'PL'; // Default to Premier League
 
+// Fetch data for the selected competition
 if ($selected_competition) {
     $competition_id = $selected_competition;
     $standings_url = "https://api.football-data.org/v4/competitions/$competition_id/standings";
@@ -421,19 +472,23 @@ if ($selected_competition) {
     $standings_data = fetchAPI($standings_url, $api_key);
     $fixtures_data = fetchAPI($fixtures_url, $api_key);
     $team_metrics = getTeamMetrics($standings_data);
-    $standings = getStandingsData($standings_data);
+    $standings = getStandingsData($standings_data); // Get standings data
 } else {
     $fixtures_data = null;
     $team_metrics = null;
     $standings = null;
 }
 
+// Display the competition dropdown
 echo "<h1>Football Match Predictions</h1>";
+
+// Add link to external CSS file
 echo '<link rel="stylesheet" type="text/css" href="css/liv.css">';
 echo '<link rel="stylesheet" type="text/css" href="css/network-status.css">';
 
-echo '<?php include("search-form.php"); ?>';
+echo "<?php include('search-form.php'); ?>";
 
+// Retrieve selected values from the query string
 $selected_competition = isset($_GET['competition']) ? $_GET['competition'] : '';
 $selected_date_filter = isset($_GET['date_filter']) ? $_GET['date_filter'] : '';
 $selected_start_date = isset($_GET['start_date']) ? htmlspecialchars($_GET['start_date']) : '';
@@ -448,6 +503,7 @@ echo '<!-- Status Light -->
     <span class="status_message">Processing</span>
 </div>';
 echo '<style>
+/* Status light container */
 .status {
     position: fixed;
     top: 0;
@@ -467,6 +523,7 @@ echo '<style>
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
+/* Light ring and LED */
 .status_light {
     position: relative;
     display: flex;
@@ -499,22 +556,46 @@ echo '<style>
     animation: glow 1.5s infinite alternate ease-in-out;
 }
 
+/* Enhanced Pulse Animation */
 @keyframes pulse {
-    0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
-    50% { transform: scale(1.2); opacity: 0.8; box-shadow: 0 0 20px 10px rgba(52, 152, 219, 0.2); }
-    100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+        box-shadow: 0 0 20px 10px rgba(52, 152, 219, 0.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4);
+    }
 }
 
 @keyframes rotateRing {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes glow {
-    0% { background-color: #fff; box-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
-    100% { background-color: #3498db; box-shadow: 0 0 15px rgba(52, 152, 219, 0.8); }
+    0% {
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    }
+    100% {
+        background-color: #3498db;
+        box-shadow: 0 0 15px rgba(52, 152, 219, 0.8);
+    }
 }
 
+/* Status message */
 .status_message {
     margin-top: 20px;
     color: #2c3e50;
@@ -525,10 +606,17 @@ echo '<style>
 }
 
 @keyframes fadeIn {
-    0% { opacity: 0; transform: translateY(-20px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+/* Dot animation for status message */
 .status_message:after {
     content: "";
     display: inline-block;
@@ -541,12 +629,21 @@ echo '<style>
 }
 
 @keyframes dots {
-    0% { content: "."; }
-    33% { content: ".."; }
-    66% { content: "..."; }
-    100% { content: "."; }
+    0% {
+        content: ".";
+    }
+    33% {
+        content: "..";
+    }
+    66% {
+        content: "...";
+    }
+    100% {
+        content: ".";
+    }
 }
 
+/* Add a glowing effect on hover for the status light */
 .status:hover .status_light_ring {
     box-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
 }
@@ -555,149 +652,33 @@ echo '<style>
     background-color: #3498db;
     box-shadow: 0 0 20px rgba(52, 152, 219, 0.8);
 }
-
-.navbar {
-    width: 100%;
-    background-color: var(--card-bg);
-    box-shadow: var(--shadow);
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    transition: background-color 0.3s ease;
-}
-
-.navbar-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    height: 60px;
-}
-
-.navbar-brand {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.nav-menu {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.nav-link {
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 1.1em;
-    font-weight: 600;
-    padding: 12px 20px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    background-color: transparent;
-    letter-spacing: 0.5px;
-}
-
-.nav-link:hover {
-    background-color: var(--primary-color);
-    color: white;
-    transform: translateY(-2px);
-}
-
-.nav-link:active {
-    transform: translateY(0);
-}
-
-.hamburger {
-    display: none;
-    flex-direction: column;
-    cursor: pointer;
-    gap: 5px;
-    padding: 10px;
-}
-
-.hamburger span {
-    width: 25px;
-    height: 3px;
-    background-color: var(--text-color);
-    border-radius: 2px;
-    transition: all 0.3s ease;
-}
-
-.hamburger.active span:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.hamburger.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.hamburger.active span:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -7px);
-}
-
-@media (max-width: 768px) {
-    .hamburger {
-        display: flex;
-    }
-
-    .nav-menu {
-        position: absolute;
-        top: 60px;
-        left: 0;
-        width: 100%;
-        flex-direction: column;
-        background-color: var(--card-bg);
-        box-shadow: var(--shadow);
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.3s ease;
-        padding: 0 20px;
-        gap: 10px;
-    }
-
-    .nav-menu.active {
-        max-height: 500px; /* Large enough to trigger transition, actual height set by JS */
-    }
-
-    .nav-link {
-        width: 100%;
-        text-align: left;
-        padding: 12px 20px;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .nav-link:last-child {
-        border-bottom: none;
-    }
-}
 </style>';
 
 echo '<script>
+// Function to show the status light
 function showStatusLight() {
     document.getElementById("status_light").style.display = "flex";
 }
 
+// Attach event listeners to forms
 document.addEventListener("DOMContentLoaded", function () {
     const competitionForm = document.getElementById("competitionForm");
     const searchForm = document.getElementById("searchForm");
 
     if (competitionForm) {
-        competitionForm.addEventListener("submit", showStatusLight);
+        competitionForm.addEventListener("submit", function () {
+            showStatusLight();
+        });
     }
 
     if (searchForm) {
-        searchForm.addEventListener("submit", showStatusLight);
+        searchForm.addEventListener("submit", function () {
+            showStatusLight();
+        });
     }
 });
 
+// Hide the status light after page load (optional)
 window.onload = function () {
     const statusLight = document.getElementById("status_light");
     if (statusLight) {
@@ -706,15 +687,19 @@ window.onload = function () {
 };
 </script>';
 
+// Competition dropdown
+echo '<form id="searchForm" method="GET" action="">';
+// Default selected competition and date filter values
 $default_competition = 'PL';
 $default_date_filter = 'all';
 
+// Set selected values from GET request or defaults
 $selected_competition = isset($_GET['competition']) ? $_GET['competition'] : $default_competition;
 $selected_date_filter = isset($_GET['date_filter']) ? $_GET['date_filter'] : $default_date_filter;
 $selected_start_date = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $selected_end_date = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 
-echo '<form id="searchForm" method="GET" action="">';
+// Competition dropdown
 echo '<label for="competition">Select Competition:</label>
       <select name="competition" id="competition">
           <option value="">-- Select Competition --</option>';
@@ -725,12 +710,14 @@ foreach ($_SESSION['competitions'] as $competition) {
     echo "<option value='$competition_id' " . ($selected_competition == $competition_id ? 'selected' : '') . ">$competition_name</option>";
 }
 
+// Add default option if not already selected
 if (!$selected_competition || !in_array($selected_competition, array_column($_SESSION['competitions'], 'code'))) {
     echo "<option value='$default_competition' selected>Premier League</option>";
 }
 
 echo '</select>';
 
+// Date filter dropdown
 echo '<label for="date_filter">Filter by Date:</label>
       <select name="date_filter" id="date_filter" onchange="toggleCustomRange(this.value)">';
 
@@ -752,6 +739,7 @@ foreach ($date_filters as $value => $label) {
 
 echo '</select>';
 
+// Custom date range inputs
 echo '<div id="custom_range" style="' . ($selected_date_filter == 'custom' ? 'display: block;' : 'display: none;') . '">
           <label for="start_date">Start Date:</label>
           <input type="date" name="start_date" id="start_date" value="' . $selected_start_date . '">
@@ -759,9 +747,11 @@ echo '<div id="custom_range" style="' . ($selected_date_filter == 'custom' ? 'di
           <input type="date" name="end_date" id="end_date" value="' . $selected_end_date . '">
       </div>';
 
+// Submit button
 echo '<input type="submit" value="Search" />
       </form>';
 
+// JavaScript for toggling the custom date range
 echo "<script>
 function toggleCustomRange(value) {
     const customRange = document.getElementById('custom_range');
@@ -770,6 +760,7 @@ function toggleCustomRange(value) {
 </script>";
 
 if ($selected_competition && $fixtures_data) {
+    // Filter matches by date
     $date_filter = isset($_GET['date_filter']) ? $_GET['date_filter'] : 'all';
     $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : null;
     $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : null;
@@ -779,6 +770,7 @@ if ($selected_competition && $fixtures_data) {
     echo "<h2>" . $_SESSION['competitions'][array_search($selected_competition, array_column($_SESSION['competitions'], 'code'))]['name'] . "</h2>";
 
     if (empty($filtered_matches)) {
+        // Display message if no matches found
         echo "<p style='color: red; font-weight: bold;'>No matches found for the selected date range.</p>";
     } else {
         echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">';
@@ -792,7 +784,7 @@ if ($selected_competition && $fixtures_data) {
                 </button>
               </div>';
 
-        echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+            echo '<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 function getFormattedTimestamp() {
     const now = new Date();
@@ -807,10 +799,12 @@ function getFormattedTimestamp() {
 
 function captureTable(callback) {
     const table = document.querySelector("table");
+
+    // Make sure the table is fully loaded before capturing
     setTimeout(() => {
         html2canvas(table, {
             scale: 3,
-            useCORS: true,
+            useCORS: true, // Fixes cross-origin issues
             backgroundColor: "#ffffff",
             width: table.scrollWidth,
             height: table.scrollHeight
@@ -917,7 +911,6 @@ document.getElementById("downloadButton").addEventListener("click", function() {
     }, 5);
 });
 </script>';
-
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
         echo "<tr>
                 <th>Date (EAT)</th>
@@ -931,24 +924,29 @@ document.getElementById("downloadButton").addEventListener("click", function() {
               </tr>";
 
         foreach ($filtered_matches as $match) {
+            // Calculate home and away advantage dynamically
             $advantages = calculateHomeAwayAdvantage($fixtures_data);
-            $date_eat = convertToEAT($match['utcDate']);
+            $date_utc = $match['utcDate'];
+            $date_eat = convertToEAT($date_utc); // Convert UTC to EAT
             $home_team = $match['homeTeam']['name'];
             $away_team = $match['awayTeam']['name'];
             $status = $match['status'];
             $score = isset($match['score']['fullTime']) ? "{$match['score']['fullTime']['home']} - {$match['score']['fullTime']['away']}" : "N/A";
-            $venue = isset($match['matchday']) ? $match['matchday'] : "Unknown";
+            $venue = isset($match['matchday']) ? $match['matchday'] : "Unknown"; // Some APIs may not provide a venue
 
+            // Fetch last 6 matches for home and away teams
             $last6_home = getLast6Matches($match['homeTeam']['name'], $fixtures_data['matches']);
             $last6_away = getLast6Matches($match['awayTeam']['name'], $fixtures_data['matches']);
 
+            // Team crests
             $home_crest = isset($team_metrics[$home_team]['crest']) ? $team_metrics[$home_team]['crest'] : '';
             $away_crest = isset($team_metrics[$away_team]['crest']) ? $team_metrics[$away_team]['crest'] : '';
-
-            $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
-            $decision = $prediction['decision'];
-            $reason = $prediction['reason'];
-
+// Get prediction suggestion with decision
+    $prediction = getPredictionSuggestion($home_team, $away_team, $standings, $last6_home, $last6_away);
+    $decision = $prediction['decision'];
+    $reason = $prediction['reason'];
+            
+            // Get standings position, goal difference, points, and goals scored
             $home_position = isset($standings[$home_team]['position']) ? $standings[$home_team]['position'] : 'N/A';
             $home_goal_diff = isset($standings[$home_team]['goal_difference']) ? $standings[$home_team]['goal_difference'] : 'N/A';
             $home_points = isset($standings[$home_team]['points']) ? $standings[$home_team]['points'] : 'N/A';
@@ -958,23 +956,31 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             $away_points = isset($standings[$away_team]['points']) ? $standings[$away_team]['points'] : 'N/A';
             $away_goals_scored = isset($standings[$away_team]['goals_scored']) ? $standings[$away_team]['goals_scored'] : 'N/A';
 
+            // Check if score matches prediction
             $prediction = '';
             $match_result = '';
-            $predicted_goals = '';
+            $predicted_goals = ''; // Initialize predicted goals variable
             if (isset($team_metrics[$home_team]) && isset($team_metrics[$away_team])) {
                 $home_metrics = $team_metrics[$home_team];
                 $away_metrics = $team_metrics[$away_team];
+                // Call predictMatch for outcome prediction
                 $prediction = predictMatch($home_metrics, $away_metrics, $advantages);
+
+                // Call predictGoals for goal prediction
                 $predicted_goals_data = predictGoals($home_metrics, $away_metrics, $advantages);
                 $predicted_goals = "{$predicted_goals_data['home_goals']} - {$predicted_goals_data['away_goals']}";
 
                 if ($status == 'FINISHED' && $score != 'N/A') {
                     $score_home = explode(" - ", $score)[0];
                     $score_away = explode(" - ", $score)[1];
-                    $match_result = ($prediction == "Win for Home" && $score_home > $score_away) || 
-                                    ($prediction == "Win for Away" && $score_away > $score_home) || 
-                                    ($prediction == "Draw" && $score_home == $score_away) ? 
-                                    "<span style='color: green;'>✓</span>" : "<span style='color: red;'>✕</span>";
+
+                    if (($prediction == "Win for Home" && $score_home > $score_away) || 
+                        ($prediction == "Win for Away" && $score_away > $score_home) || 
+                        ($prediction == "Draw" && $score_home == $score_away)) {
+                        $match_result = "<span style='color: green;'>&#10003;</span>";
+                    } else {
+                        $match_result = "<span style='color: red;'>&#10005;</span>";
+                    }
                 }
             }
 
@@ -987,10 +993,10 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                             <span style='font-weight: bold; font-size: 14px; color: #2c3e50;'>$home_team</span>
                             <span style='font-size: 12px; color: #7f8c8d; margin-left: 4px; font-style: italic;'>($last6_home)</span>
                             <div style='font-size: 10px; color: #555; margin-top: 2px; white-space: nowrap;'>Pos: $home_position | GD: $home_goal_diff | PTS: $home_points | GS: $home_goals_scored</div>
-                            <div style='font-size: 5px; color: #777; font-style: italic; margin-top: 2px;'>
+                              <div style='font-size: 5px; color: #777; font-style: italic; margin-top: 2px;'>
                                 <strong>$decision</strong><br>
                                 <strong>$reason</strong>
-                            </div>
+                               </div>
                         </a>
                     </div>
                 </td>
@@ -1004,7 +1010,7 @@ document.getElementById("downloadButton").addEventListener("click", function() {
                             <div style='font-size: 5px; color: #777; font-style: italic; margin-top: 2px;'>
                                 <strong>$decision</strong><br>
                                 <strong>$reason</strong>
-                            </div>
+                           </div>
                         </a>
                     </div>
                 </td>
@@ -1018,11 +1024,16 @@ document.getElementById("downloadButton").addEventListener("click", function() {
             </tr>";
         }
 
-        echo "</table>";
+        echo "</table>"; 
     }
 }
 ?>
 
+<script>
+function toggleCustomRange(value) {
+    const customRange = document.getElementById('custom_range');
+    customRange.style.display = (value === 'custom') ? 'block' : 'none';
+}
+</script>
 <script src="network-status.js"></script>
 <?php include 'back-to-top.php'; ?>
-<?php include 'global-footer.php'; ?>
