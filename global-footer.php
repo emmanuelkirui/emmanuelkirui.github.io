@@ -160,6 +160,7 @@ $year = date("Y"); // Auto-updating year
 
         <p class="disclaimer">
             This site uses third-party services, cookies, and advertisements. These third parties have their own policies, and we are not responsible for their actions. Please review their terms.
+            <a href="privacy-policy.php">Privacy Policy</a>
         </p>
 
         <!-- Social Media Icons (Moved to Bottom) -->
