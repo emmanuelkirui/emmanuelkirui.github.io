@@ -903,21 +903,21 @@ try {
             justify-content: center;
             align-items: center;
             margin-bottom: 15px;
-            gap: 20px; /* Adds consistent spacing between elements */
+            gap: 10px; /* Reduced from 20px to 10px for a tighter layout */
         }
 
         .team {
             text-align: center;
             flex: 1; /* Allows teams to take equal space */
-            max-width: 45%; /* Limits width to ensure spacing */
+            max-width: 48%; /* Slightly increased from 45% to 48% to reduce overlap risk */
         }
 
         .home-team {
-            padding-right: 10px; /* Extra padding on the right of home team */
+            padding-right: 5px; /* Reduced from 10px to 5px */
         }
 
         .away-team {
-            padding-left: 10px; /* Extra padding on the left of away team */
+            padding-left: 5px; /* Reduced from 10px to 5px */
         }
 
         .team img {
@@ -930,8 +930,8 @@ try {
             font-size: 1.2em;
             font-weight: bold;
             color: var(--primary-color);
-            padding: 0 15px; /* Adds padding on both sides of 'VS' */
-            min-width: 40px; /* Ensures 'VS' has a minimum width */
+            padding: 0 8px; /* Reduced from 15px to 8px */
+            min-width: 30px; /* Reduced from 40px to 30px */
             text-align: center;
         }
 
@@ -1591,7 +1591,7 @@ try {
                             autocompleteDropdown.innerHTML = '<div class="autocomplete-item">No teams found</div>';
                         } else {
                             autocompleteDropdown.innerHTML = teams.map(team => `
-                                <div class="autocomplete-item" data-team-id="${team.id}" data-team-name="${team.name}">
+                                <div class="autocomplete-item" data-team-id="${team.id}"="${team.name}">
                                     ${team.crest ? `<img src="${team.crest}" alt="${team.name}">` : ''}
                                     <span>${team.name}</span>
                                 </div>
