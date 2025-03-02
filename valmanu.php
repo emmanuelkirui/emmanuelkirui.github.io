@@ -899,14 +899,12 @@ try {
         }
 
         .teams {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
-    gap: calc(1vw + 5px);
-    width: auto;
-    height: auto;
-}
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: calc(1vw + 5px); /* Dynamic gap based on viewport width */
+        }
 
         .team {
             text-align: center;
@@ -1133,43 +1131,29 @@ try {
         }
 
         .team.home-advantage {
-    background-color: rgba(46, 204, 113, 0.2);
-    border: 2px solid var(--primary-color);
-    border-radius: 8px;
-    padding: 5px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    width: auto;
-    height: auto;
-    justify-content: center;
-    align-items: center;
-}
+            background-color: rgba(46, 204, 113, 0.2);
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
 
-.team.away-advantage {
-    background-color: rgba(231, 76, 60, 0.2);
-    border: 2px solid #e74c3c;
-    border-radius: 8px;
-    padding: 5px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    width: auto;
-    height: auto;
-    justify-content: center;
-    align-items: center;
-}
+        .team.away-advantage {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 2px solid #e74c3c;
+            border-radius: 5px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
 
-.match-card.draw-likely .teams {
-    background-color: rgba(241, 196, 15, 0.2);
-    border: 2px solid #f1c40f;
-    border-radius: 8px;
-    padding: 5px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    width: auto;
-    height: auto;
-    justify-content: center;
-    align-items: center;
-}
+        .match-card.draw-likely .teams {
+            background-color: rgba(241, 196, 15, 0.2);
+            border: 2px solid #f1c40f;
+            border-radius: 5px;
+            padding: 5px;
+            transition: all 0.3s ease;
+        }
+
         .advantage {
             font-size: 0.9em;
             font-weight: bold;
