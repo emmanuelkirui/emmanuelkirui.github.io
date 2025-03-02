@@ -450,7 +450,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Football Predictions</title>
+    <title>CPS Football Predictions</title>
     <style>
         :root {
             --primary-color: #2ecc71;
@@ -823,8 +823,8 @@ try {
     </button>
     <div class="container">
         <div class="header">
-            <h1>Advanced Football Predictions</h1>
-            <p>Select Competition and Date Range (Times in EAT - Nairobi, Kenya)</p>
+            <h1>CPS Football Predictions</h1>
+            <p>Select Competition and Date Range (EAT)</p>
         </div>
 
         <div class="controls">
