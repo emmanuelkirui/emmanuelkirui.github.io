@@ -9,6 +9,22 @@ date_default_timezone_set('Africa/Nairobi');
 if (!isset($_SESSION['teamStats'])) {
     $_SESSION['teamStats'] = [];
 }
+if (!isset($_SESSION['predictionStats'])) {
+    $_SESSION['predictionStats'] = [
+        'total' => 0,
+        'correct' => 0,
+        'tracked' => []
+    ];
+}
+
+// Reset stats if requested
+if (isset($_GET['reset_stats']) && $_GET['reset_stats'] === 'true') {
+    $_SESSION['predictionStats'] = [
+        'total' => 0,
+        'correct' => 0,
+        'tracked' => []
+    ];
+}
 
 $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
@@ -221,7 +237,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
     }
 }
 
-// Match prediction function with form data
+// Match prediction function with form data and prediction tracking
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
@@ -275,10 +291,20 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $advantage = "Likely Draw";
         }
 
+        $predictionStats = &$_SESSION['predictionStats'];
         $resultIndicator = "";
         if ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null) {
             $actualResult = ($homeGoals > $awayGoals) ? "$homeTeam to win" : (($homeGoals < $awayGoals) ? "$awayTeam to win" : "Draw");
             $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
+            
+            $matchId = $match['id'] ?? md5($homeTeam . $awayTeam . $match['utcDate']);
+            if (!isset($predictionStats['tracked'][$matchId])) {
+                $predictionStats['total']++;
+                if ($prediction === $actualResult) {
+                    $predictionStats['correct']++;
+                }
+                $predictionStats['tracked'][$matchId] = true;
+            }
         }
 
         return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form']];
@@ -705,6 +731,21 @@ try {
             margin-bottom: 30px;
         }
 
+        .prediction-stats {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+        }
+
+        .prediction-stats span {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+
         .controls {
             display: flex;
             justify-content: space-between;
@@ -1060,48 +1101,48 @@ try {
         }
 
         .retry-message {
-    text-align: center;
-    margin: 2rem 0;
-    font-size: 1.25rem;
-    color: #dc3545;
-    line-height: 1.5;
-}
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 1.25rem;
+            color: #dc3545;
+            line-height: 1.5;
+        }
 
-.countdown-box {
-    background-color: rgba(220, 53, 69, 0.1);
-    border: 2px solid #dc3545;
-    border-radius: 0.625rem;
-    padding: 1.25rem;
-    margin: 2rem auto;
-    max-width: 31.25rem; /* 500px */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 0.625rem; /* 10px */
-}
+        .countdown-box {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 2px solid #dc3545;
+            border-radius: 0.625rem;
+            padding: 1.25rem;
+            margin: 2rem auto;
+            max-width: 31.25rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 0.625rem;
+        }
 
-.retry-text {
-    color: #dc3545;
-    font-weight: 600;
-    flex: 0 1 auto;
-}
+        .retry-text {
+            color: #dc3545;
+            font-weight: 600;
+            flex: 0 1 auto;
+        }
 
-.countdown-timer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #dc3545;
-    color: #ffffff;
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.3125rem;
-    margin: 0 0.3125rem;
-    font-size: 1.5rem;
-    min-width: 2.5rem;
-    text-align: center;
-    flex: 0 0 auto;
-}
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #dc3545;
+            color: #ffffff;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.3125rem;
+            margin: 0 0.3125rem;
+            font-size: 1.5rem;
+            min-width: 2.5rem;
+            text-align: center;
+            flex: 0 0 auto;
+        }
 
         [data-theme="dark"] .countdown-box {
             background-color: rgba(220, 53, 69, 0.2);
@@ -1256,6 +1297,17 @@ try {
             <h1>CPS Football Predictions</h1>
             <p>Select Competition, Date Range (EAT), or Search Teams</p>
         </div>
+        
+        <?php
+        $predictionStats = $_SESSION['predictionStats'];
+        $accuracy = $predictionStats['total'] > 0 ? ($predictionStats['correct'] / $predictionStats['total'] * 100) : 0;
+        ?>
+        <div class="prediction-stats">
+            <p>Prediction Accuracy: 
+                <span><?php echo $predictionStats['correct']; ?> / <?php echo $predictionStats['total']; ?></span> 
+                (<?php echo sprintf("%.1f%%", $accuracy); ?>)
+            </p>
+        </div>
 
         <div class="controls">
             <select onchange="updateUrl(this.value, '<?php echo $filter; ?>')">
@@ -1294,6 +1346,8 @@ try {
                 <input type="text" class="search-input" placeholder="Search teams..." value="<?php echo htmlspecialchars($searchTeam); ?>">
                 <div class="autocomplete-dropdown"></div>
             </div>
+
+            <button onclick="window.location.href='?reset_stats=true&competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>'" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; border-radius: 20px; cursor: pointer;">Reset Stats</button>
         </div>
 
         <div class="match-grid">
@@ -1818,7 +1872,7 @@ try {
                         }
                         formElement.innerHTML = formHtml;
 
-                                                let historyHtml = isHome ? `<p><strong>Team Recent Results:</strong></p><ul>` : historyElement.innerHTML;
+                        let historyHtml = isHome ? `<p><strong>Team Recent Results:</strong></p><ul>` : historyElement.innerHTML;
                         data.results.forEach(result => historyHtml += `<li>${result}</li>`);
                         historyHtml += `</ul><div class='standings'>
                             <span>POS: ${data.standings.position || 'N/A'}</span>
