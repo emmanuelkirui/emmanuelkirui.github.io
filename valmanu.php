@@ -34,10 +34,15 @@ function handleJsonError($message) {
     exit;
 }
 
-// Enhanced fetch function with retry mechanism for 429 errors
+// Enhanced fetch function with retry mechanism
 function fetchWithRetry($url, $apiKey, $isAjax = false) {
+    $maxAttempts = 5;
     $attempt = isset($_GET['attempt']) ? (int)$_GET['attempt'] : 0;
     
+    if ($attempt >= $maxAttempts) {
+        return ['error' => true, 'message' => 'Max retry attempts reached'];
+    }
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -59,7 +64,7 @@ function fetchWithRetry($url, $apiKey, $isAjax = false) {
     curl_close($ch);
 
     if ($httpCode == 429) {
-        $retrySeconds = min(pow(2, $attempt), 32);
+        $retrySeconds = min(pow(2, $attempt) * 2, 60);
         $nextAttempt = $attempt + 1;
         
         preg_match('/Retry-After: (\d+)/i', $headers, $matches);
@@ -81,7 +86,7 @@ function fetchWithRetry($url, $apiKey, $isAjax = false) {
                     const retryDiv = document.createElement('div');
                     retryDiv.id = 'retry-message';
                     retryDiv.className = 'retry-message countdown-box';
-                    retryDiv.innerHTML = '<span class=\"retry-text\">Rate limit exceeded. Retry attempt ' + $nextAttempt + '. Retrying in </span><span id=\"countdown\" class=\"countdown-timer\">' + timeLeft + '</span><span class=\"retry-text\"> seconds...</span>';
+                    retryDiv.innerHTML = '<span class=\"retry-text\">Rate limit hit. Attempt ' + $nextAttempt + ' of $maxAttempts. Retrying in </span><span id=\"countdown\" class=\"countdown-timer\">' + timeLeft + '</span><span class=\"retry-text\"> seconds...</span>';
                     document.body.insertBefore(retryDiv, document.body.firstChild.nextSibling);
                     
                     const timer = setInterval(() => {
@@ -107,8 +112,8 @@ function fetchWithRetry($url, $apiKey, $isAjax = false) {
 
 // Team results fetch function
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
-    $pastDate = date('Y-m-d', strtotime('-60 days')); // Nairobi time (UTC+3)
-    $currentDate = date('Y-m-d'); // Nairobi time (UTC+3)
+    $pastDate = date('Y-m-d', strtotime('-60 days'));
+    $currentDate = date('Y-m-d');
     $url = $baseUrl . "teams/$teamId/matches?dateFrom=$pastDate&dateTo=$currentDate&limit=10&status=FINISHED";
     
     $response = fetchWithRetry($url, $apiKey, true);
@@ -128,7 +133,7 @@ function fetchStandings($competition, $apiKey, $baseUrl) {
     return ['error' => false, 'data' => $response['data']['standings'][0]['table'] ?? []];
 }
 
-// New function to fetch teams for autocomplete
+// Fetch teams for autocomplete
 function fetchTeams($competition, $apiKey, $baseUrl) {
     $url = $baseUrl . "competitions/$competition/teams";
     $response = fetchWithRetry($url, $apiKey, true);
@@ -149,7 +154,6 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
             $results = $response['data'];
 
-            // Fetch standings for the competition
             $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
             $standings = $standingsResponse['error'] ? [] : $standingsResponse['data'];
 
@@ -218,7 +222,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
     }
 }
 
-// Match prediction function with advantage highlighting
+// Enhanced match prediction function
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
@@ -235,6 +239,12 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             return ["Loading...", "N/A", "", "N/A", ""];
         }
 
+        $homeFormWeight = calculateFormWeight($homeStats['form']);
+        $awayFormWeight = calculateFormWeight($awayStats['form']);
+
+        $homeStandingFactor = isset($homeStats['standings']['position']) ? (20 - min($homeStats['standings']['position'], 20)) / 20 : 0.5;
+        $awayStandingFactor = isset($awayStats['standings']['position']) ? (20 - min($awayStats['standings']['position'], 20)) / 20 : 0.5;
+
         $homeWinRate = $homeStats['games'] ? $homeStats['wins'] / $homeStats['games'] : 0;
         $homeDrawRate = $homeStats['games'] ? $homeStats['draws'] / $homeStats['games'] : 0;
         $awayWinRate = $awayStats['games'] ? $awayStats['wins'] / $awayStats['games'] : 0;
@@ -242,14 +252,14 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoalAvg = $homeStats['games'] ? $homeStats['goalsScored'] / $homeStats['games'] : 0;
         $awayGoalAvg = $awayStats['games'] ? $awayStats['goalsScored'] / $awayStats['games'] : 0;
 
-        $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1; // Home advantage multiplier
-        $awayStrength = $awayWinRate * 50 + $awayDrawRate * 20 + $awayGoalAvg * 20;
+        $homeStrength = ($homeWinRate * 40 + $homeDrawRate * 15 + $homeGoalAvg * 15 + $homeFormWeight * 20 + $homeStandingFactor * 10) * 1.1;
+        $awayStrength = ($awayWinRate * 40 + $awayDrawRate * 15 + $awayGoalAvg * 15 + $awayFormWeight * 20 + $awayStandingFactor * 10);
 
         $diff = $homeStrength - $awayStrength;
-        $confidence = min(90, abs($diff) / ($homeStrength + $awayStrength + 1) * 100);
+        $confidence = min(95, abs($diff) / ($homeStrength + $awayStrength + 1) * 100);
 
-        $predictedHomeGoals = round($homeGoalAvg * (1 + $diff/100));
-        $predictedAwayGoals = round($awayGoalAvg * (1 - $diff/100));
+        $predictedHomeGoals = max(0, round($homeGoalAvg * (1 + $diff / 100) + rand(-1, 1) * 0.2));
+        $predictedAwayGoals = max(0, round($awayGoalAvg * (1 - $diff / 100) + rand(-1, 1) * 0.2));
         $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
 
         $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
@@ -258,18 +268,17 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
 
-        // Determine prediction and advantage
-        if ($diff > 15) {
+        if ($diff > 20) {
             $prediction = "$homeTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
             $advantage = "Home Advantage";
-        } elseif ($diff < -15) {
+        } elseif ($diff < -20) {
             $prediction = "$awayTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
             $advantage = "Away Advantage";
         } else {
             $prediction = "Draw";
-            $confidence = sprintf("%.1f%%", min(70, $confidence));
+            $confidence = sprintf("%.1f%%", min(75, $confidence));
             $advantage = "Likely Draw";
         }
 
@@ -283,6 +292,16 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     } catch (Exception $e) {
         return ["Error", "N/A", "", "N/A", ""];
     }
+}
+
+// Helper function to weight recent form
+function calculateFormWeight($form) {
+    $formArray = str_split(substr($form, -3));
+    $weight = 0;
+    foreach ($formArray as $result) {
+        $weight += ($result === 'W' ? 1 : ($result === 'D' ? 0.5 : 0));
+    }
+    return $weight / 3;
 }
 
 // Progress stream for incomplete data
@@ -299,20 +318,30 @@ if (isset($_GET['action']) && $_GET['action'] === 'progress_stream') {
         $progress = ($index + 1) / $totalTeams * 100;
         $stats = calculateTeamStrength($teamId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
 
+        if ($stats['needsRetry']) {
+            echo "data: " . json_encode([
+                'teamId' => $teamId,
+                'progress' => $progress,
+                'status' => 'retrying',
+                'retrySeconds' => min(pow(2, $index), 32)
+            ]) . "\n\n";
+            ob_flush();
+            flush();
+            sleep(2);
+            continue;
+        }
+
         echo "data: " . json_encode([
             'teamId' => $teamId,
             'progress' => $progress,
-            'status' => $stats['needsRetry'] ? 'retrying' : 'complete',
+            'status' => 'complete',
             'form' => $stats['form'],
             'results' => $stats['results'],
-            'standings' => $stats['standings']
+            'standings' => $stats['standings'],
+            'updatedPrediction' => predictMatchForTeam($teamId, $teamStats, $_GET['competition'] ?? 'PL', $apiKey, $baseUrl)
         ]) . "\n\n";
         ob_flush();
         flush();
-
-        if ($stats['needsRetry']) {
-            sleep(1); // Simulate retry delay
-        }
     }
 
     echo "data: " . json_encode(['complete' => true]) . "\n\n";
@@ -321,16 +350,28 @@ if (isset($_GET['action']) && $_GET['action'] === 'progress_stream') {
     exit;
 }
 
+// Helper function to re-predict matches involving this team
+function predictMatchForTeam($teamId, &$teamStats, $competition, $apiKey, $baseUrl) {
+    $matchesUrl = $baseUrl . "competitions/$competition/matches?dateFrom=" . date('Y-m-d') . "&dateTo=" . date('Y-m-d', strtotime('+7 days'));
+    $matchResponse = fetchWithRetry($matchesUrl, $apiKey);
+    if ($matchResponse['error']) return null;
+
+    foreach ($matchResponse['data']['matches'] as $match) {
+        if ($match['homeTeam']['id'] == $teamId || $match['awayTeam']['id'] == $teamId) {
+            return predictMatch($match, $apiKey, $baseUrl, $teamStats, $competition);
+        }
+    }
+    return null;
+}
+
 // Handle AJAX requests
 $action = $_GET['action'] ?? 'main';
-if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match', 'search_teams'])) {
+if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match', 'search_teams', 'submit_feedback'])) {
     header('Content-Type: application/json');
     switch ($action) {
         case 'fetch_team_data':
             $teamId = (int)($_GET['teamId'] ?? 0);
-            if (!$teamId) {
-                handleJsonError('Invalid team ID');
-            }
+            if (!$teamId) handleJsonError('Invalid team ID');
             
             $response = fetchTeamResults($teamId, $apiKey, $baseUrl);
             if ($response['error']) {
@@ -346,9 +387,7 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 handleJsonError($response['message']);
             }
             $results = $response['data'];
-            if (empty($results)) {
-                handleJsonError('No results fetched');
-            }
+            if (empty($results)) handleJsonError('No results fetched');
             
             $stats = calculateTeamStrength($teamId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
             $teamName = '';
@@ -375,9 +414,7 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
             $homeId = (int)($_GET['homeId'] ?? 0);
             $awayId = (int)($_GET['awayId'] ?? 0);
             
-            if (!$homeId || !$awayId) {
-                handleJsonError('Invalid team IDs');
-            }
+            if (!$homeId || !$awayId) handleJsonError('Invalid team IDs');
             
             $homeStats = calculateTeamStrength($homeId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
             $awayStats = calculateTeamStrength($awayId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
@@ -416,6 +453,18 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
             echo json_encode(array_values(array_map(function($team) {
                 return ['id' => $team['id'], 'name' => $team['name'], 'crest' => $team['crest'] ?? ''];
             }, $filteredTeams)));
+            exit;
+
+        case 'submit_feedback':
+            $matchIndex = $_GET['matchIndex'] ?? '';
+            $prediction = $_GET['prediction'] ?? '';
+            $feedback = $_GET['feedback'] ?? '';
+            if ($matchIndex && $prediction && $feedback) {
+                file_put_contents('feedback.log', "$matchIndex|$prediction|$feedback|" . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Invalid feedback data']);
+            }
             exit;
     }
 }
@@ -501,7 +550,7 @@ try {
     $filter = $_GET['filter'] ?? 'upcoming';
     $customStart = $_GET['start'] ?? '';
     $customEnd = $_GET['end'] ?? '';
-    $searchTeam = $_GET['team'] ?? ''; // New parameter for team search
+    $searchTeam = $_GET['team'] ?? '';
 
     $dateOptions = [
         'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))],
@@ -540,7 +589,6 @@ try {
     }
     $allMatches = $matchResponse['data']['matches'] ?? [];
 
-    // Filter matches by team name if search is provided
     if ($searchTeam) {
         $allMatches = array_filter($allMatches, function($match) use ($searchTeam) {
             return stripos($match['homeTeam']['name'] ?? '', $searchTeam) !== false ||
@@ -591,7 +639,6 @@ try {
             top: 0;
             left: 0;
             z-index: 1000;
-            transition: background-color 0.3s ease;
         }
 
         .navbar-container {
@@ -615,31 +662,20 @@ try {
             display: flex;
             align-items: center;
             gap: 20px;
-            margin: 0;
-            padding: 0;
-            list-style: none;
         }
 
         .nav-link {
             color: var(--text-color);
             text-decoration: none;
             font-size: 1.1em;
-            font-weight: 600;
             padding: 12px 20px;
             border-radius: 8px;
             transition: all 0.3s ease;
-            background-color: transparent;
-            letter-spacing: 0.5px;
         }
 
         .nav-link:hover {
             background-color: var(--primary-color);
             color: white;
-            transform: translateY(-2px);
-        }
-
-        .nav-link:active {
-            transform: translateY(0);
         }
 
         .hamburger {
@@ -647,15 +683,12 @@ try {
             flex-direction: column;
             cursor: pointer;
             gap: 5px;
-            padding: 10px;
         }
 
         .hamburger span {
             width: 25px;
             height: 3px;
             background-color: var(--text-color);
-            border-radius: 2px;
-            transition: all 0.3s ease;
         }
 
         .hamburger.active span:nth-child(1) {
@@ -681,25 +714,16 @@ try {
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: all 0.3s ease;
-            font-size: 1.3em;
-            padding: 0;
         }
 
         .theme-toggle:hover {
             background-color: var(--secondary-color);
-            transform: scale(1.1);
-        }
-
-        .theme-toggle:active {
-            transform: scale(0.95);
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 80px 20px 20px;
-            transition: padding-top 0.3s ease;
         }
 
         .header {
@@ -718,23 +742,16 @@ try {
 
         select {
             padding: 10px 20px;
-            margin: 5px;
             background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 20px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        select:hover {
-            background-color: var(--secondary-color);
         }
 
         .filter-container {
             position: relative;
             display: inline-block;
-            margin: 5px;
         }
 
         .filter-dropdown-btn {
@@ -744,16 +761,11 @@ try {
             border: none;
             border-radius: 20px;
             cursor: pointer;
-            min-width: 120px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .filter-dropdown-btn::after {
             content: '▼';
             margin-left: 10px;
-            font-size: 0.8em;
         }
 
         .filter-dropdown {
@@ -766,7 +778,6 @@ try {
             min-width: 200px;
             z-index: 10;
             display: none;
-            margin-top: 5px;
         }
 
         .filter-dropdown.active {
@@ -776,7 +787,6 @@ try {
         .filter-option {
             padding: 10px 15px;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
 
         .filter-option:hover {
@@ -791,7 +801,6 @@ try {
 
         .custom-date-range {
             padding: 15px;
-            border-top: 1px solid rgba(0,0,0,0.1);
             display: none;
         }
 
@@ -803,8 +812,6 @@ try {
             width: 100%;
             margin: 5px 0;
             padding: 5px;
-            border-radius: 5px;
-            border: 1px solid var(--text-color);
         }
 
         .custom-date-range button {
@@ -815,14 +822,12 @@ try {
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
         }
 
         .search-container {
             position: relative;
             width: 100%;
             max-width: 400px;
-            margin: 5px;
         }
 
         .search-input {
@@ -830,16 +835,8 @@ try {
             padding: 12px 20px;
             border: 2px solid var(--primary-color);
             border-radius: 25px;
-            font-size: 1em;
             background-color: var(--card-bg);
             color: var(--text-color);
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
         }
 
         .autocomplete-dropdown {
@@ -852,28 +849,17 @@ try {
             box-shadow: var(--shadow);
             max-height: 200px;
             overflow-y: auto;
-            z-index: 100;
             display: none;
         }
 
         .autocomplete-item {
             padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
         }
 
         .autocomplete-item:hover {
             background-color: var(--primary-color);
             color: white;
-        }
-
-        .autocomplete-item img {
-            width: 20px;
-            height: 20px;
-            object-fit: contain;
         }
 
         .search-container.active .autocomplete-dropdown {
@@ -891,51 +877,33 @@ try {
             border-radius: 10px;
             padding: 20px;
             box-shadow: var(--shadow);
-            transition: transform 0.2s ease;
-        }
-
-        .match-card:hover {
-            transform: translateY(-5px);
         }
 
         .teams {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
-    gap: 2px; /* Further reduced from 5px for tighter spacing */
-    margin-left: 5px; /* Kept for inward movement */
-    margin-right: 5px; /* Kept for inward movement */
-}
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 5px;
+        }
 
-.team {
-    text-align: center;
-    flex: 1;
-    max-width: 48%;
-}
+        .team {
+            text-align: center;
+            flex: 1;
+            max-width: 48%;
+        }
 
-.home-team {
-    padding-right: 0.1em; /* Further reduced from 0.2em for even tighter spacing */
-}
+        .team img {
+            max-width: 50px;
+            height: auto;
+            margin-bottom: 10px;
+        }
 
-.away-team {
-    padding-left: 0.1em; /* Further reduced from 0.2em for even tighter spacing */
-}
-
-.team img {
-    max-width: 50px;
-    height: auto;
-    margin-bottom: 10px;
-}
-
-.vs {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: var(--primary-color);
-    text-align: center;
-    min-width: 15px; /* Further reduced from 20px for minimal width */
-    padding: 0 1px; /* Reduced padding for tighter fit */
-}
+        .vs {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
 
         .match-info {
             text-align: center;
@@ -953,7 +921,6 @@ try {
             background-color: rgba(46, 204, 113, 0.1);
             border-radius: 5px;
             text-align: center;
-            font-weight: bold;
         }
 
         .confidence {
@@ -972,6 +939,7 @@ try {
             background-color: rgba(52, 152, 219, 0.1);
             border-radius: 5px;
             font-size: 0.85em;
+            display: none;
         }
 
         .past-results ul {
@@ -983,12 +951,6 @@ try {
         .standings {
             margin-top: 10px;
             font-size: 0.9em;
-            color: var(--text-color);
-        }
-
-        .standings span {
-            margin-right: 10px;
-            font-weight: bold;
         }
 
         .view-history-btn {
@@ -1000,58 +962,39 @@ try {
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.3s ease;
         }
 
-        .view-history-btn:hover {
-            background-color: var(--secondary-color);
+        .feedback-btn {
+            margin-top: 10px;
+            padding: 6px 12px;
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         .form-display {
-    display: flex; /* Flex for tight alignment */
-    justify-content: center;
-    align-items: center;
-    font-family: 'monospace'; /* Monospace font for equal spacing */
-    font-size: 16px; /* Consistent size */
-    line-height: 1; /* No extra vertical space */
-    padding: 2px; /* Minimal container padding */
-    background-color: rgba(0, 0, 0, 0.05); /* Subtle background for contrast */
-    border-radius: 4px;
-}
+            display: flex;
+            justify-content: center;
+            font-family: 'monospace';
+            font-size: 16px;
+        }
 
-.form-display span {
-    display: block;
-    width: 16px; /* Fixed width for each letter */
-    text-align: center;
-    margin: 0; /* No margin */
-    padding: 0; /* No padding */
-    border: none; /* Remove individual borders except for latest */
-}
+        .form-display span {
+            width: 16px;
+            text-align: center;
+        }
 
-.form-display .latest {
-    border: 2px solid #3498db; /* Blue border for latest */
-    border-radius: 2px; /* Slight rounding */
-    font-weight: bold;
-    background-color: rgba(52, 152, 219, 0.1); /* Light blue background */
-}
+        .form-display .latest {
+            border: 2px solid #3498db;
+            font-weight: bold;
+        }
 
-.form-display .win {
-    color: #28a745; /* Green */
-}
-
-.form-display .draw {
-    color: #fd7e14; /* Orange */
-}
-
-.form-display .loss {
-    color: #dc3545; /* Red */
-}
-
-.form-display .empty {
-    color: #6c757d; /* Gray */
-}
-
-
+        .form-display .win { color: #28a745; }
+        .form-display .draw { color: #fd7e14; }
+        .form-display .loss { color: #dc3545; }
+        .form-display .empty { color: #6c757d; }
 
         .retry-message {
             text-align: center;
@@ -1067,10 +1010,8 @@ try {
             padding: 15px;
             margin: 20px auto;
             max-width: 500px;
-            box-shadow: var(--shadow);
             display: flex;
             justify-content: center;
-            align-items: center;
         }
 
         .retry-text {
@@ -1079,28 +1020,12 @@ try {
         }
 
         .countdown-timer {
-            display: inline-block;
             background-color: #dc3545;
             color: white;
             padding: 5px 10px;
             border-radius: 5px;
             margin: 0 5px;
             font-size: 1.4em;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        [data-theme="dark"] .countdown-box {
-            background-color: rgba(220, 53, 69, 0.2);
-            border-color: #e74c3c;
-        }
-
-        [data-theme="dark"] .retry-text {
-            color: #e74c3c;
-        }
-
-        [data-theme="dark"] .countdown-timer {
-            background-color: #e74c3c;
         }
 
         .loading-spinner {
@@ -1124,7 +1049,6 @@ try {
             background-color: #ddd;
             border-radius: 5px;
             margin-top: 10px;
-            overflow: hidden;
         }
 
         .progress-fill {
@@ -1133,90 +1057,39 @@ try {
             transition: width 0.5s ease;
         }
 
-        /* Advantage Highlight Adjustments */
-.team.home-advantage {
-    background-color: rgba(46, 204, 113, 0.2);
-    border: 1px solid var(--primary-color); /* Reduced from 2px to 1px */
-    border-radius: 5px;
-    padding: 2px; /* Reduced from 5px for less internal spacing */
-    transition: all 0.3s ease;
-}
+        .team.home-advantage {
+            background-color: rgba(46, 204, 113, 0.2);
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            padding: 2px;
+        }
 
-.team.away-advantage {
-    background-color: rgba(231, 76, 60, 0.2);
-    border: 1px solid #e74c3c; /* Reduced from 2px to 1px */
-    border-radius: 5px;
-    padding: 2px; /* Reduced from 5px for less internal spacing */
-    transition: all 0.3s ease;
-}
+        .team.away-advantage {
+            background-color: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            border-radius: 5px;
+            padding: 2px;
+        }
 
-.match-card.draw-likely .teams {
-    background-color: rgba(241, 196, 15, 0.2);
-    border: 1px solid #f1c40f; /* Reduced from 2px to 1px */
-    border-radius: 5px;
-    padding: 2px; /* Reduced from 5px for less internal spacing */
-    transition: all 0.3s ease;
-    display: flex;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    justify-content: center;
-    align-items: center;
-}
+        .match-card.draw-likely .teams {
+            background-color: rgba(241, 196, 15, 0.2);
+            border: 1px solid #f1c40f;
+            border-radius: 5px;
+            padding: 2px;
+        }
 
-/* Dark Theme Adjustments */
-[data-theme="dark"] .team.home-advantage {
-    background-color: rgba(46, 204, 113, 0.3);
-    border: 1px solid var(--primary-color); /* Consistent with light theme */
-    padding: 2px; /* Consistent reduction */
-}
-
-[data-theme="dark"] .team.away-advantage {
-    background-color: rgba(231, 76, 60, 0.3);
-    border: 1px solid #e74c3c; /* Consistent with light theme */
-    padding: 2px; /* Consistent reduction */
-}
-
-[data-theme="dark"] .match-card.draw-likely .teams {
-    background-color: rgba(241, 196, 15, 0.3);
-    border: 1px solid #f1c40f; /* Consistent with light theme */
-    padding: 2px; /* Consistent reduction */
-}
         .advantage {
             font-size: 0.9em;
             font-weight: bold;
             margin-top: 5px;
         }
 
-        .advantage-home-advantage {
-            color: var(--primary-color);
-        }
-
-        .advantage-away-advantage {
-            color: #e74c3c;
-        }
-
-        .advantage-likely-draw {
-            color: #f1c40f;
-        }
-
-        [data-theme="dark"] .team.home-advantage {
-            background-color: rgba(46, 204, 113, 0.3);
-        }
-
-        [data-theme="dark"] .team.away-advantage {
-            background-color: rgba(231, 76, 60, 0.3);
-        }
-
-        [data-theme="dark"] .match-card.draw-likely .teams {
-            background-color: rgba(241, 196, 15, 0.3);
-        }
+        .advantage-home-advantage { color: var(--primary-color); }
+        .advantage-away-advantage { color: #e74c3c; }
+        .advantage-likely-draw { color: #f1c40f; }
 
         @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-
+            .hamburger { display: flex; }
             .nav-menu {
                 position: absolute;
                 top: 60px;
@@ -1228,34 +1101,9 @@ try {
                 max-height: 0;
                 overflow: hidden;
                 transition: max-height 0.3s ease;
-                padding: 0 20px;
-                gap: 10px;
             }
-
-            .nav-menu.active {
-                max-height: 500px;
-            }
-
-            .nav-link {
-                width: 100%;
-                text-align: left;
-                padding: 12px 20px;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            .nav-link:last-child {
-                border-bottom: none;
-            }
-
-            .theme-toggle {
-                width: 40px;
-                height: 40px;
-                margin: 10px 0;
-            }
-
-            .search-container {
-                max-width: 100%;
-            }
+            .nav-menu.active { max-height: 500px; }
+            .nav-link { width: 100%; text-align: left; }
         }
     </style>
 </head>
@@ -1382,11 +1230,12 @@ try {
                             echo "<p>Prediction: $prediction <span class='result-indicator'>$resultIndicator</span></p>
                                   <p class='predicted-score'>Predicted Score: $predictedScore</p>
                                   <p class='confidence'>Confidence: $confidence</p>
-                                  <p class='advantage advantage-" . strtolower(str_replace(' ', '-', $advantage)) . "'>$advantage</p>";
+                                  <p class='advantage advantage-" . strtolower(str_replace(' ', '-', $advantage)) . "'>$advantage</p>
+                                  <button class='feedback-btn' onclick='provideFeedback($index, \"$prediction\")'>Feedback</button>";
                         }
                         echo "</div>
                             <button class='view-history-btn' onclick='toggleHistory(this)'>👁️ View History</button>
-                            <div class='past-results' id='history-$index' style='display: none;'>";
+                            <div class='past-results' id='history-$index'>";
                         
                         if (!empty($homeStats['results']) && !empty($awayStats['results']) && !$needsRetry) {
                             echo "
@@ -1438,8 +1287,7 @@ try {
             document.querySelectorAll('.match-info').forEach(el => {
                 el.classList.toggle('dark', newTheme === 'dark');
             });
-            const themeIcon = document.querySelector('.theme-icon');
-            themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            document.querySelector('.theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
 
         function toggleHistory(button) {
@@ -1474,18 +1322,13 @@ try {
             const dropdown = document.querySelector('.filter-dropdown');
             dropdown.classList.toggle('active');
             const customRange = document.querySelector('.custom-date-range');
-            if ('<?php echo $filter; ?>' === 'custom') {
-                customRange.classList.add('active');
-            } else {
-                customRange.classList.remove('active');
-            }
+            if ('<?php echo $filter; ?>' === 'custom') customRange.classList.add('active');
+            else customRange.classList.remove('active');
         });
 
         document.addEventListener('click', function(e) {
             const container = document.querySelector('.filter-container');
-            if (!container.contains(e.target)) {
-                document.querySelector('.filter-dropdown').classList.remove('active');
-            }
+            if (!container.contains(e.target)) document.querySelector('.filter-dropdown').classList.remove('active');
         });
 
         function fetchTeamData(teamId, index, isHome) {
@@ -1555,10 +1398,6 @@ try {
                         }
                     }, 1000);
                 }
-            })
-            .catch(error => {
-                console.error('Error fetching team data:', error);
-                setTimeout(() => fetchTeamData(teamId, index, isHome), 5000);
             });
         }
 
@@ -1569,21 +1408,20 @@ try {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById(`prediction-${index}`).innerHTML = `
+                    const predictionElement = document.getElementById(`prediction-${index}`);
+                    predictionElement.innerHTML = `
                         <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
                         <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
                         <p class="confidence">Confidence: ${data.confidence}</p>
                         <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
+                        <button class="feedback-btn" onclick="provideFeedback(${index}, '${data.prediction}')">Feedback</button>
                     `;
                     const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
                     applyAdvantageHighlight(matchCard, data.advantage);
+                    animatePredictionUpdate(predictionElement);
                 } else if (data.retry) {
-                    setTimeout(() => fetchPrediction(index, homeId, awayId), 5000);
+                    setTimeout(() => fetchPrediction(index, homeId, awayId), data.retrySeconds * 1000);
                 }
-            })
-            .catch(error => {
-                console.error('Error fetching prediction:', error);
-                setTimeout(() => fetchPrediction(index, homeId, awayId), 5000);
             });
         }
 
@@ -1595,12 +1433,26 @@ try {
             awayTeam.classList.remove('away-advantage');
             matchCard.classList.remove('draw-likely');
 
-            if (advantage === 'Home Advantage') {
-                homeTeam.classList.add('home-advantage');
-            } else if (advantage === 'Away Advantage') {
-                awayTeam.classList.add('away-advantage');
-            } else if (advantage === 'Likely Draw') {
-                matchCard.classList.add('draw-likely');
+            if (advantage === 'Home Advantage') homeTeam.classList.add('home-advantage');
+            else if (advantage === 'Away Advantage') awayTeam.classList.add('away-advantage');
+            else if (advantage === 'Likely Draw') matchCard.classList.add('draw-likely');
+        }
+
+        function animatePredictionUpdate(element) {
+            element.style.transition = 'opacity 0.5s';
+            element.style.opacity = '0';
+            setTimeout(() => element.style.opacity = '1', 100);
+        }
+
+        function provideFeedback(index, prediction) {
+            const feedback = prompt(`Was the prediction "${prediction}" accurate? (Yes/No)`);
+            if (feedback) {
+                fetch(`?action=submit_feedback&matchIndex=${index}&prediction=${prediction}&feedback=${feedback}`, {
+                    method: 'POST'
+                }).then(response => response.json())
+                  .then(data => {
+                      if (data.success) alert('Thank you for your feedback!');
+                  });
             }
         }
 
@@ -1633,11 +1485,6 @@ try {
                             `).join('');
                         }
                         searchContainer.classList.add('active');
-                    })
-                    .catch(error => {
-                        console.error('Error fetching teams:', error);
-                        autocompleteDropdown.innerHTML = '<div class="autocomplete-item">Error loading teams</div>';
-                        searchContainer.classList.add('active');
                     });
             }, 300);
         });
@@ -1652,54 +1499,15 @@ try {
         });
 
         document.addEventListener('click', function(e) {
-            if (!searchContainer.contains(e.target)) {
-                searchContainer.classList.remove('active');
-            }
+            if (!searchContainer.contains(e.target)) searchContainer.classList.remove('active');
         });
 
-        // Dynamic spacing adjustment function
-        function adjustTeamSpacing() {
-            document.querySelectorAll('.match-card').forEach(card => {
-                const teamsContainer = card.querySelector('.teams');
-                const homeTeam = card.querySelector('.home-team');
-                const awayTeam = card.querySelector('.away-team');
-                const vsElement = card.querySelector('.vs');
-                const cardWidth = card.offsetWidth;
-
-                // Calculate dynamic padding for 'VS' based on card width
-                const vsPadding = Math.max(5, cardWidth * 0.03); // 3% of card width, min 5px
-                vsElement.style.padding = `0 ${vsPadding}px`;
-
-                // Optionally, adjust team padding based on content length
-                const homeTextWidth = homeTeam.querySelector('p').scrollWidth;
-                const awayTextWidth = awayTeam.querySelector('p').scrollWidth;
-                const maxTextWidth = Math.max(homeTextWidth, awayTextWidth);
-                const extraPadding = Math.min(10, maxTextWidth * 0.05); // 5% of longest team name, max 10px
-                homeTeam.style.paddingRight = `${0.5 + extraPadding / 16}em`; // Convert px to em
-                awayTeam.style.paddingLeft = `${0.5 + extraPadding / 16}em`; // Convert px to em
-            });
-        }
-
         window.onload = function() {
-            const theme = document.cookie.split('; ')
-                .find(row => row.startsWith('theme='))
-                ?.split('=')[1];
-            const themeIcon = document.querySelector('.theme-icon');
+            const theme = document.cookie.split('; ').find(row => row.startsWith('theme='))?.split('=')[1];
             if (theme) {
                 document.body.setAttribute('data-theme', theme);
                 document.querySelectorAll('.match-info').forEach(el => el.classList.toggle('dark', theme === 'dark'));
-                themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-            } else {
-                themeIcon.textContent = '🌙';
-            }
-
-            const currentFilter = '<?php echo $filter; ?>';
-            document.querySelectorAll('.filter-option').forEach(option => {
-                option.classList.toggle('selected', option.getAttribute('data-filter') === currentFilter);
-            });
-
-            if (currentFilter === 'custom') {
-                document.querySelector('.custom-date-range').classList.add('active');
+                document.querySelector('.theme-icon').textContent = theme === 'dark' ? '☀️' : '🌙';
             }
 
             document.querySelectorAll('.match-card').forEach(matchCard => {
@@ -1708,12 +1516,6 @@ try {
                     applyAdvantageHighlight(matchCard, advantage);
                 }
             });
-
-            // Initial spacing adjustment
-            adjustTeamSpacing();
-
-            // Adjust spacing on resize
-            window.addEventListener('resize', adjustTeamSpacing);
 
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
                 const eventSource = new EventSource(`?action=progress_stream&teamIds=${encodeURIComponent(JSON.stringify(incompleteTeams))}&competition=<?php echo $selectedComp; ?>`);
@@ -1724,7 +1526,6 @@ try {
                     
                     if (data.complete) {
                         eventSource.close();
-                        adjustTeamSpacing(); // Re-adjust spacing after data load
                         return;
                     }
 
@@ -1738,10 +1539,9 @@ try {
                         const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
                         const historyElement = document.getElementById(`history-${index}`);
                         const predictionElement = document.getElementById(`prediction-${index}`);
-                        const progressBar = predictionElement.querySelector('.progress-fill');
 
                         if (data.status === 'retrying') {
-                            progressBar.style.width = `${data.progress}%`;
+                            predictionElement.innerHTML = `<p>Loading... Retrying in ${data.retrySeconds}s</p>`;
                             return;
                         }
 
@@ -1765,19 +1565,18 @@ try {
                         </div>`;
                         historyElement.innerHTML = isHome ? historyHtml + historyElement.innerHTML : historyHtml;
 
-                        const otherTeamId = isHome ? card.dataset.awayId : card.dataset.homeId;
-                        if (processedTeams.has(otherTeamId)) {
-                            fetchPrediction(index, card.dataset.homeId, card.dataset.awayId);
+                        if (data.updatedPrediction) {
+                            predictionElement.innerHTML = `
+                                <p>Prediction: ${data.updatedPrediction[0]} <span class="result-indicator">${data.updatedPrediction[2]}</span></p>
+                                <p class="predicted-score">Predicted Score: ${data.updatedPrediction[3]}</p>
+                                <p class="confidence">Confidence: ${data.updatedPrediction[1]}</p>
+                                <p class="advantage advantage-${data.updatedPrediction[4].toLowerCase().replace(' ', '-')}">${data.updatedPrediction[4]}</p>
+                                <button class="feedback-btn" onclick="provideFeedback(${index}, '${data.updatedPrediction[0]}')">Feedback</button>
+                            `;
+                            applyAdvantageHighlight(card, data.updatedPrediction[4]);
+                            animatePredictionUpdate(predictionElement);
                         }
-
-                        progressBar.parentElement.remove();
                     });
-                };
-
-                eventSource.onerror = function() {
-                    console.error('SSE error, retrying...');
-                    eventSource.close();
-                    setTimeout(() => window.location.reload(), 5000);
                 };
             }
         }
@@ -1788,7 +1587,7 @@ try {
 } catch (Exception $e) {
     handleError("Unexpected error: " . $e->getMessage());
 }
-?>
-<?php include 'back-to-top.php'; ?>
+    <?php include 'back-to-top.php'; ?>
 <script src="network-status.js"></script>
 <?php include 'global-footer.php'; ?>
+?>
