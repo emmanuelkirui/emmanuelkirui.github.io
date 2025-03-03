@@ -136,7 +136,9 @@ $year = date("Y"); // Auto-updating year
             border-radius: 3px;
         }
 
-        /* Responsive Design */
+        /* Media Queries */
+
+        /* Mobile Devices (up to 768px) */
         @media (max-width: 768px) {
             .footer-links {
                 flex-direction: column;
@@ -158,6 +160,100 @@ $year = date("Y"); // Auto-updating year
             .social-icons a {
                 font-size: 20px;
             }
+
+            #cookieConsent {
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                padding: 8px;
+            }
+
+            #cookieConsent p {
+                font-size: 12px;
+            }
+
+            #cookieConsent button {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+        }
+
+        /* Tablets (769px to 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .footer-links {
+                gap: 20px;
+            }
+
+            .footer-links a {
+                font-size: 15px;
+            }
+
+            .social-icons a {
+                font-size: 22px;
+            }
+
+            .disclaimer, .gambling-disclaimer {
+                font-size: 13px;
+            }
+
+            #cookieConsent {
+                bottom: 15px;
+                padding: 12px;
+            }
+
+            #cookieConsent p {
+                font-size: 14px;
+            }
+        }
+
+        /* Desktops (1025px and above) */
+        @media (min-width: 1025px) {
+            .footer {
+                padding: 30px;
+            }
+
+            .footer-container {
+                max-width: 1400px;
+            }
+
+            .footer-links {
+                gap: 25px;
+            }
+
+            .footer-links a {
+                font-size: 18px;
+            }
+
+            .social-icons {
+                gap: 20px;
+            }
+
+            .social-icons a {
+                font-size: 26px;
+            }
+
+            .disclaimer, .gambling-disclaimer {
+                font-size: 16px;
+                padding: 15px;
+            }
+
+            #cookieConsent {
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                max-width: 600px;
+                right: auto;
+                padding: 15px;
+            }
+
+            #cookieConsent p {
+                font-size: 16px;
+            }
+
+            #cookieConsent button {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -166,7 +262,7 @@ $year = date("Y"); // Auto-updating year
 <!-- Footer -->
 <footer class="footer">
     <div class="footer-container">
-        <p>&copy; <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
+        <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.</p>
 
         <ul class="footer-links">
             <li><a href="terms-conditions.php"><i class="fas fa-file-contract"></i> Terms & Conditions</a></li>
@@ -206,15 +302,43 @@ $year = date("Y"); // Auto-updating year
     <button id="acceptCookies">Accept</button>
 </div>
 
-<!-- Cookie Consent Script -->
+<!-- Cookie Consent Script with Expiration -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    if (!localStorage.getItem("cookiesAccepted")) {
-        document.getElementById("cookieConsent").style.display = "block";
+    const cookieConsent = document.getElementById("cookieConsent");
+    const acceptCookiesButton = document.getElementById("acceptCookies");
+    const cookieKey = "cookiesAccepted";
+    const expirationDays = 30; // Set expiration to 30 days (adjust as needed)
+
+    // Function to check if cookie consent is still valid
+    function isCookieConsentValid() {
+        const consentData = JSON.parse(localStorage.getItem(cookieKey));
+        if (!consentData) return false;
+
+        const expirationDate = new Date(consentData.expires);
+        return new Date() < expirationDate; // Check if current date is before expiration
     }
-    document.getElementById("acceptCookies").addEventListener("click", function () {
-        localStorage.setItem("cookiesAccepted", "true");
-        document.getElementById("cookieConsent").style.display = "none";
+
+    // Show cookie consent popup if not accepted or expired
+    if (!isCookieConsentValid()) {
+        cookieConsent.style.display = "block";
+    }
+
+    // Handle the "Accept" button click
+    acceptCookiesButton.addEventListener("click", function () {
+        // Calculate expiration date
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + expirationDays);
+
+        // Store consent with expiration in localStorage
+        const consentData = {
+            accepted: true,
+            expires: expirationDate.toISOString()
+        };
+        localStorage.setItem(cookieKey, JSON.stringify(consentData));
+
+        // Hide the popup
+        cookieConsent.style.display = "none";
     });
 });
 </script>
