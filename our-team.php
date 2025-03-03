@@ -6,13 +6,13 @@ $team_members = [
     [
         'name' => 'Emmanuel Kirui',
         'role' => 'Founder & Lead Developer',
-        'profile_pic' => 'uploads/avatars/Valmanu.jpg',
+        'profile_pic' => 'uploads/avatars/logov1.1.png',
         'bio' => 'Passionate about creating innovative solutions and leading the team to success.'
     ],
     [
         'name' => 'Valentine Cheptoo',
         'role' => 'Creative Director',
-        'profile_pic' => 'uploads/avatars/logov1.1.png',
+        'profile_pic' => 'uploads/avatars/valm.png',
         'bio' => 'Expert in design and branding, bringing creativity to every project.'
     ]
     // Add more team members here later
