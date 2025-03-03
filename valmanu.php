@@ -153,14 +153,26 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
             $results = $response['data'];
 
-            // Fetch standings with retry on error
+            // Fetch standings with infinite retry until success
             $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
-            if ($standingsResponse['error']) {
-                sleep(2); // Respect rate limits
-                $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl); // Retry
-            }
-            $standings = $standingsResponse['error'] ? [] : $standingsResponse['data'];
+            $attempt = 0;
+            $maxDelay = 32; // Cap delay at 32 seconds to avoid excessive waiting
+            while ($standingsResponse['error']) {
+                $attempt++;
+                $delay = min(pow(2, $attempt), $maxDelay); // Exponential backoff: 2, 4, 8, 16, 32...
+                error_log("Standings fetch failed for $competition (attempt $attempt): " . $standingsResponse['message'] . ". Retrying in $delay seconds...");
+                sleep($delay);
+                $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
 
+                // Optional: Check for retry-after header if available
+                if (isset($standingsResponse['retrySeconds'])) {
+                    $delay = max($delay, $standingsResponse['retrySeconds']);
+                    error_log("Using Retry-After delay of $delay seconds from API header.");
+                    sleep($delay - $delay); // Adjust if already slept
+                    $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
+                }
+            }
+            $standings = $standingsResponse['data']; // Guaranteed to have data here
             $stats = [
                 'wins' => 0, 'draws' => 0, 'goalsScored' => 0, 
                 'goalsConceded' => 0, 'games' => 0, 'results' => [],
