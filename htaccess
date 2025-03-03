@@ -1,0 +1,27 @@
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Removes .php extension from URL
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# Enable support for video and audio streaming
+<IfModule mod_headers.c>
+    Header set Accept-Ranges bytes
+</IfModule>
+
+# Ensure correct MIME types for video and audio files
+AddType video/mp4 .mp4
+AddType video/ogg .ogv
+AddType video/webm .webm
+AddType audio/mpeg .mp3
+AddType audio/ogg .ogg
+AddType audio/wav .wav
+AddType audio/aac .aac
+
+# Custom error pages
+ErrorDocument 404 /error404
+ErrorDocument 403 /index
