@@ -147,7 +147,7 @@ $year = date("Y");
         </header>
 
         <section>
-            <p>Welcome to Emmanuel Kirui’s website (<a href="http://creativepulse.42web.io" class="contact-link">creativepulse.42web.io</a>)! I’m Emmanuel Kirui, [insert brief personal intro, e.g., "a passionate developer, writer, and innovator dedicated to creating meaningful digital experiences"]. This platform reflects my commitment to [insert focus, e.g., "sharing knowledge, building innovative solutions, and connecting with a global community"].</p>
+            <p>Welcome to Emmanuel Kirui’s website (<a href="http://creativepulse.42web.io" class="contact-link">creativepulse.42web.io</a>)! I’m Emmanuel Kirui, a passionate developer, writer, and innovator dedicated to creating meaningful digital experiences. This platform reflects my commitment to sharing knowledge, building innovative solutions, and connecting with a global community.</p>
         </section>
 
         <section>
@@ -173,7 +173,7 @@ $year = date("Y");
 
         <section>
             <h2>Get in Touch</h2>
-            <p>I’d love to hear from you! For questions, feedback, or collaboration opportunities, please reach out via our <a href="/contactus" class="contact-link">Contact Us</a> page or email me directly at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
+            <p>I’d love to hear from you! For questions, feedback, or collaboration opportunities, please reach out via our <a href="contactus" class="contact-link">Contact Us</a> page or email me directly at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
         </section>
 
         <button class="back-button" onclick="history.back()" aria-label="Return to Previous Page">
