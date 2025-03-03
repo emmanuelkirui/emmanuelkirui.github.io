@@ -272,10 +272,11 @@ $year = date("Y"); // Auto-updating year
             <li><a href="aboutus.php"><i class="fas fa-info-circle"></i> About Us</a></li>
             <li><a href="contactus.php"><i class="fas fa-envelope"></i> Contact Us</a></li>
             <li><a href="global-blog.php"><i class="fas fa-blog"></i> Blog</a></li>
+            <li><a href="our-team.php"><i class="fas fa-users"></i> Our Team</a></li>
         </ul>
 
         <p class="gambling-disclaimer">
-            <i class="fa fa-exclamation-triangle"></i> Responsible Gambling: This site is for **18+ users** only.
+            <i class="fa fa-exclamation-triangle"></i> Responsible Gambling: This site is for <strong style="color: #ff0000;">18+</strong> users only.
             If you or someone you know has a gambling problem, seek help. Play responsibly.
         </p>
 
