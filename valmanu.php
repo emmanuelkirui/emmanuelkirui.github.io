@@ -138,7 +138,7 @@ function fetchStandings($competition, $apiKey, $baseUrl) {
     return ['error' => false, 'data' => $response['data']['standings'][0]['table'] ?? []];
 }
 
-// New function to fetch teams for autocomplete
+// Fetch teams for autocomplete
 function fetchTeams($competition, $apiKey, $baseUrl) {
     $url = $baseUrl . "competitions/$competition/teams";
     $response = fetchWithRetry($url, $apiKey, true);
@@ -166,7 +166,6 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
             $results = $response['data'];
 
-            // Fetch standings with retry until success
             $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
             $attempt = 0;
             $maxDelay = 32;
@@ -501,7 +500,7 @@ try {
     $filter = $_GET['filter'] ?? 'upcoming';
     $customStart = $_GET['start'] ?? '';
     $customEnd = $_GET['end'] ?? '';
-    $searchTeam = $_GET['team'] ?? '';
+    $searchTeam = trim($_GET['team'] ?? '');
 
     $dateOptions = [
         'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))],
@@ -517,7 +516,7 @@ try {
         : ($dateOptions[$filter]['label'] ?? 'Select Date');
 
     $fromDate = $toDate = date('Y-m-d');
-    if (isset($dateOptions[$filter])) {
+    if (isset($dateOptions[$filter]) && !$searchTeam) { // Only apply date filters if no team is searched
         if (isset($dateOptions[$filter]['date'])) {
             $fromDate = $toDate = $dateOptions[$filter]['date'];
         } elseif (isset($dateOptions[$filter]['from']) && isset($dateOptions[$filter]['to'])) {
@@ -529,22 +528,44 @@ try {
         }
     }
 
-    $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
-    $matchResponse = fetchWithRetry($matchesUrl, $apiKey);
-    if ($matchResponse['error']) {
-        if (isset($matchResponse['retry'])) {
-            echo "</body></html>";
-            exit;
-        }
-        handleError($matchResponse['message']);
-    }
-    $allMatches = $matchResponse['data']['matches'] ?? [];
-
     if ($searchTeam) {
-        $allMatches = array_filter($allMatches, function($match) use ($searchTeam) {
-            return stripos($match['homeTeam']['name'] ?? '', $searchTeam) !== false ||
-                   stripos($match['awayTeam']['name'] ?? '', $searchTeam) !== false;
-        });
+        // Fetch teams matching the search term from the selected competition first
+        $teams = fetchTeams($selectedComp, $apiKey, $baseUrl);
+        $teamId = null;
+        foreach ($teams as $team) {
+            if (stripos($team['name'], $searchTeam) !== false || stripos($team['shortName'] ?? '', $searchTeam) !== false) {
+                $teamId = $team['id'];
+                break;
+            }
+        }
+
+        if ($teamId) {
+            // Fetch all matches for the team, ignoring date filters and competition
+            $matchesUrl = $baseUrl . "teams/$teamId/matches?status=FINISHED,SCHEDULED&limit=50";
+            $matchResponse = fetchWithRetry($matchesUrl, $apiKey);
+            if ($matchResponse['error']) {
+                if (isset($matchResponse['retry'])) {
+                    echo "</body></html>";
+                    exit;
+                }
+                handleError($matchResponse['message']);
+            }
+            $allMatches = $matchResponse['data']['matches'] ?? [];
+        } else {
+            $allMatches = []; // No team found, show no matches
+        }
+    } else {
+        // Default behavior: fetch matches for the selected competition and date range
+        $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
+        $matchResponse = fetchWithRetry($matchesUrl, $apiKey);
+        if ($matchResponse['error']) {
+            if (isset($matchResponse['retry'])) {
+                echo "</body></html>";
+                exit;
+            }
+            handleError($matchResponse['message']);
+        }
+        $allMatches = $matchResponse['data']['matches'] ?? [];
     }
 ?>
 
@@ -1243,7 +1264,7 @@ try {
     <div class="container">
         <div class="header">
             <h1>CPS Football Predictions</h1>
-            <p>Select Competition, Date Range (EAT), or Search Teams</p>
+            <p>Select Competition, Date Range (EAT), or Search Teams<?php echo $searchTeam ? " (Showing all matches for '$searchTeam')" : ''; ?></p>
         </div>
 
         <div class="controls">
@@ -1300,9 +1321,10 @@ try {
                         $status = $match['status'];
                         $homeGoals = $match['score']['fullTime']['home'] ?? null;
                         $awayGoals = $match['score']['fullTime']['away'] ?? null;
-                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm, $retryInfo] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
-                        $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
-                        $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                        $matchComp = $match['competition']['code'] ?? $selectedComp;
+                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm, $retryInfo] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $matchComp);
+                        $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $matchComp);
+                        $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $matchComp);
 
                         $needsRetry = $homeStats['needsRetry'] || $awayStats['needsRetry'];
                         if ($needsRetry) {
@@ -1402,7 +1424,7 @@ try {
                     }
                 }
             } else {
-                echo "<p>No matches available for the selected competition, date range, or team search.</p>";
+                echo "<p>No matches available " . ($searchTeam ? "for '$searchTeam'" : "for the selected competition and date range") . ".</p>";
             }
             ?>
         </div>
@@ -1437,7 +1459,7 @@ try {
                 if (start && end) url += `&start=${start}&end=${end}`;
             }
             const searchTeam = document.querySelector('.search-input').value.trim();
-            if (searchTeam) url += `&team=${encodeURIComponent(searchTeam)}`;
+            if (searchTeam) url = `?team=${encodeURIComponent(searchTeam)}`;
             window.location.href = url;
         }
 
@@ -1468,80 +1490,77 @@ try {
             }
         });
 
-        
-            function fetchTeamData(teamId, index, isHome, attempt = 0, maxAttempts = 10) {
-    const delay = Math.min(Math.pow(2, attempt) * 1000, 10000); // Max delay reduced to 10s
-    const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
-    const historyElement = document.getElementById(`history-${index}`);
-    const predictionElement = document.getElementById(`prediction-${index}`);
-    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
+        function fetchTeamData(teamId, index, isHome, attempt = 0, maxAttempts = 10) {
+            const delay = Math.min(Math.pow(2, attempt) * 1000, 10000);
+            const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
+            const historyElement = document.getElementById(`history-${index}`);
+            const predictionElement = document.getElementById(`prediction-${index}`);
+            const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
 
-    // Add progress bar if not already present
-    if (!progressBar.classList.contains('progress-fill')) {
-        progressBar.classList.add('progress-fill');
-        const progressContainer = document.createElement('div');
-        progressContainer.classList.add('progress-bar');
-        progressContainer.appendChild(progressBar);
-        predictionElement.appendChild(progressContainer);
-    }
-
-    // Notify user after 5 attempts
-    if (attempt === 5) {
-        const retryNotice = document.createElement('div');
-        retryNotice.className = 'retry-notice';
-        retryNotice.innerHTML = 'Still trying to load data for this team. Please wait...';
-        retryNotice.style.cssText = `
-            background-color: #fff3cd; 
-            border: 1px solid #ffeeba; 
-            color: #856404; 
-            padding: 10px; 
-            margin-top: 10px; 
-            border-radius: 5px; 
-            text-align: center;
-            font-size: 0.9em;
-        `;
-        predictionElement.appendChild(retryNotice);
-        setTimeout(() => retryNotice.remove(), 5000); // Remove notice after 5 seconds
-    }
-
-    fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
-        headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateTeamUI(data, index, isHome, formElement, historyElement, predictionElement);
-            progressBar.parentElement.remove();
-
-            const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
-            const otherTeamLoaded = isHome ?
-                !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
-                !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
-            if (otherTeamLoaded) {
-                fetchPrediction(index, matchCard.dataset.homeId, matchCard.dataset.awayId);
+            if (!progressBar.classList.contains('progress-fill')) {
+                progressBar.classList.add('progress-fill');
+                const progressContainer = document.createElement('div');
+                progressContainer.classList.add('progress-bar');
+                progressContainer.appendChild(progressBar);
+                predictionElement.appendChild(progressContainer);
             }
-        } else if (data.retry && attempt < maxAttempts) {
-            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-            setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
-        } else {
-            console.error(`Max retries reached for team ${teamId}`);
-            formElement.innerHTML = '<p>Error loading data</p>';
-            progressBar.parentElement.remove();
-            predictionElement.querySelector('.retry-notice')?.remove();
+
+            if (attempt === 5) {
+                const retryNotice = document.createElement('div');
+                retryNotice.className = 'retry-notice';
+                retryNotice.innerHTML = 'Still trying to load data for this team. Please wait...';
+                retryNotice.style.cssText = `
+                    background-color: #fff3cd; 
+                    border: 1px solid #ffeeba; 
+                    color: #856404; 
+                    padding: 10px; 
+                    margin-top: 10px; 
+                    border-radius: 5px; 
+                    text-align: center;
+                    font-size: 0.9em;
+                `;
+                predictionElement.appendChild(retryNotice);
+                setTimeout(() => retryNotice.remove(), 5000);
+            }
+
+            fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
+                headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateTeamUI(data, index, isHome, formElement, historyElement, predictionElement);
+                    progressBar.parentElement.remove();
+
+                    const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
+                    const otherTeamLoaded = isHome ?
+                        !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
+                        !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
+                    if (otherTeamLoaded) {
+                        fetchPrediction(index, matchCard.dataset.homeId, matchCard.dataset.awayId);
+                    }
+                } else if (data.retry && attempt < maxAttempts) {
+                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+                    setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+                } else {
+                    console.error(`Max retries reached for team ${teamId}`);
+                    formElement.innerHTML = '<p>Error loading data</p>';
+                    progressBar.parentElement.remove();
+                    predictionElement.querySelector('.retry-notice')?.remove();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching team data:', error);
+                if (attempt < maxAttempts) {
+                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+                    setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+                } else {
+                    formElement.innerHTML = '<p>Failed to load data</p>';
+                    progressBar.parentElement.remove();
+                    predictionElement.querySelector('.retry-notice')?.remove();
+                }
+            });
         }
-    })
-    .catch(error => {
-        console.error('Error fetching team data:', error);
-        if (attempt < maxAttempts) {
-            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-            setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
-        } else {
-            formElement.innerHTML = '<p>Failed to load data</p>';
-            progressBar.parentElement.remove();
-            predictionElement.querySelector('.retry-notice')?.remove();
-        }
-    });
-}
 
         function updateTeamUI(data, index, isHome, formElement, historyElement, predictionElement) {
             let formHtml = '';
@@ -1581,76 +1600,73 @@ try {
             }
         }
 
-        
-            function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 10) {
-    const delay = Math.min(Math.pow(2, attempt) * 1000, 10000); // Max delay reduced to 10s
-    const predictionElement = document.getElementById(`prediction-${index}`);
-    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
+        function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 10) {
+            const delay = Math.min(Math.pow(2, attempt) * 1000, 10000);
+            const predictionElement = document.getElementById(`prediction-${index}`);
+            const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
 
-    // Add progress bar if not already present
-    if (!progressBar.classList.contains('progress-fill')) {
-        progressBar.classList.add('progress-fill');
-        const progressContainer = document.createElement('div');
-        progressContainer.classList.add('progress-bar');
-        progressContainer.appendChild(progressBar);
-        predictionElement.appendChild(progressContainer);
-    }
+            if (!progressBar.classList.contains('progress-fill')) {
+                progressBar.classList.add('progress-fill');
+                const progressContainer = document.createElement('div');
+                progressContainer.classList.add('progress-bar');
+                progressContainer.appendChild(progressBar);
+                predictionElement.appendChild(progressContainer);
+            }
 
-    // Notify user after 5 attempts
-    if (attempt === 5) {
-        const retryNotice = document.createElement('div');
-        retryNotice.className = 'retry-notice';
-        retryNotice.innerHTML = 'Still predicting match outcome. Please wait...';
-        retryNotice.style.cssText = `
-            background-color: #fff3cd; 
-            border: 1px solid #ffeeba; 
-            color: #856404; 
-            padding: 10px; 
-            margin-top: 10px; 
-            border-radius: 5px; 
-            text-align: center;
-            font-size: 0.9em;
-        `;
-        predictionElement.appendChild(retryNotice);
-        setTimeout(() => retryNotice.remove(), 5000); // Remove notice after 5 seconds
-    }
+            if (attempt === 5) {
+                const retryNotice = document.createElement('div');
+                retryNotice.className = 'retry-notice';
+                retryNotice.innerHTML = 'Still predicting match outcome. Please wait...';
+                retryNotice.style.cssText = `
+                    background-color: #fff3cd; 
+                    border: 1px solid #ffeeba; 
+                    color: #856404; 
+                    padding: 10px; 
+                    margin-top: 10px; 
+                    border-radius: 5px; 
+                    text-align: center;
+                    font-size: 0.9em;
+                `;
+                predictionElement.appendChild(retryNotice);
+                setTimeout(() => retryNotice.remove(), 5000);
+            }
 
-    fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
-        headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            predictionElement.innerHTML = `
-                <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
-                <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
-                <p class="confidence">Confidence: ${data.confidence}</p>
-                <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
-            `;
-            const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
-            applyAdvantageHighlight(matchCard, data.advantage);
-            progressBar.parentElement.remove();
-            predictionElement.querySelector('.retry-notice')?.remove();
-        } else if (data.retry && attempt < maxAttempts) {
-            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-            setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
-        } else {
-            console.error(`Max retries reached for prediction ${index}`);
-            progressBar.parentElement.remove();
-            predictionElement.querySelector('.retry-notice')?.remove();
+            fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
+                headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    predictionElement.innerHTML = `
+                        <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
+                        <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
+                        <p class="confidence">Confidence: ${data.confidence}</p>
+                        <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
+                    `;
+                    const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
+                    applyAdvantageHighlight(matchCard, data.advantage);
+                    progressBar.parentElement.remove();
+                    predictionElement.querySelector('.retry-notice')?.remove();
+                } else if (data.retry && attempt < maxAttempts) {
+                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+                    setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
+                } else {
+                    console.error(`Max retries reached for prediction ${index}`);
+                    progressBar.parentElement.remove();
+                    predictionElement.querySelector('.retry-notice')?.remove();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching prediction:', error);
+                if (attempt < maxAttempts) {
+                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+                    setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
+                } else {
+                    progressBar.parentElement.remove();
+                    predictionElement.querySelector('.retry-notice')?.remove();
+                }
+            });
         }
-    })
-    .catch(error => {
-        console.error('Error fetching prediction:', error);
-        if (attempt < maxAttempts) {
-            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-            setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
-        } else {
-            progressBar.parentElement.remove();
-            predictionElement.querySelector('.retry-notice')?.remove();
-        }
-    });
-}
 
         function applyAdvantageHighlight(matchCard, advantage) {
             const homeTeam = matchCard.querySelector('.teams .team:first-child');
@@ -1778,12 +1794,12 @@ try {
             }, 300);
         });
 
-        autocompleteDropdown.addEventListener('click', function(e) {
+                autocompleteDropdown.addEventListener('click', function(e) {
             const item = e.target.closest('.autocomplete-item');
             if (item && item.dataset.teamName) {
                 searchInput.value = item.dataset.teamName;
                 searchContainer.classList.remove('active');
-                window.location.href = `?competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>&team=${encodeURIComponent(item.dataset.teamName)}`;
+                window.location.href = `?team=${encodeURIComponent(item.dataset.teamName)}`; // Only team param for search
             }
         });
 
@@ -1848,7 +1864,7 @@ try {
 
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
                 incompleteTeams.forEach(teamId => {
-                    document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${                    teamId}"]`).forEach(card => {
+                    document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
                         const index = card.dataset.index;
                         const homeId = card.dataset.homeId;
                         const awayId = card.dataset.awayId;
