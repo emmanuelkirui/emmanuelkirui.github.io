@@ -195,7 +195,7 @@ $year = date("Y");
 
         <section>
             <h2>1. Acceptance of Terms</h2>
-            <p>Your use of the Services indicates that you have read, understood, and agreed to comply with these Terms, as well as our <a href="/privacy-policy" class="contact-link">Privacy Policy</a> and any other policies or guidelines referenced herein. These Terms apply to all visitors, registered users, and others who interact with the Services, regardless of location or method of access.</p>
+            <p>Your use of the Services indicates that you have read, understood, and agreed to comply with these Terms, as well as our <a href="/privacy-policy.php" class="contact-link">Privacy Policy</a> and any other policies or guidelines referenced herein. These Terms apply to all visitors, registered users, and others who interact with the Services, regardless of location or method of access.</p>
             <p>We reserve the right to refuse service to anyone for any reason at any time, subject to applicable laws.</p>
         </section>
 
@@ -246,7 +246,7 @@ $year = date("Y");
 
         <section>
             <h2>6. Third-Party Links and Services</h2>
-            <p>The Services may contain links to third-party websites or resources. We are not responsible for the availability, accuracy, or practices of these external sites, and linking to them does not imply endorsement. Your interactions with third-party services are governed by their respective terms and policies. Please review our <a href="/third-party-services" class="contact-link">Third-Party Services</a> page for more details.</p>
+            <p>The Services may contain links to third-party websites or resources. We are not responsible for the availability, accuracy, or practices of these external sites, and linking to them does not imply endorsement. Your interactions with third-party services are governed by their respective terms and policies. Please review our <a href="/third-party.php" class="contact-link">Third-Party Services</a> page for more details.</p>
         </section>
 
         <section>
