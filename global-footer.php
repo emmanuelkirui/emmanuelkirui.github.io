@@ -18,17 +18,17 @@ $year = date("Y"); // Auto-updating year
             color: white;
             text-align: center;
             padding: 20px;
-            margin: 20px;
+            margin: 20px; /* Kept original margin */
             border-top: 3px solid #f39c12;
-            font-family: Arial, sans-serif; /* Ensures font consistency */
+            font-family: Arial, sans-serif;
         }
 
         .footer-container {
-            max-width: 1200px;
             margin: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
+            width: 100%; /* Allow dynamic width adjustment */
         }
 
         /* Footer Links */
@@ -140,9 +140,20 @@ $year = date("Y"); // Auto-updating year
 
         /* Mobile Devices (up to 768px) */
         @media (max-width: 768px) {
+            .footer {
+                padding: 10px;
+                margin: 10px;
+            }
+
+            .footer-container {
+                max-width: 100%;
+                padding: 0 10px; /* Add slight padding for content */
+            }
+
             .footer-links {
                 flex-direction: column;
                 align-items: center;
+                gap: 10px;
             }
 
             .footer-links a {
@@ -151,6 +162,8 @@ $year = date("Y"); // Auto-updating year
 
             .disclaimer, .gambling-disclaimer {
                 font-size: 12px;
+                padding: 8px;
+                max-width: 90%; /* Prevent overflow */
             }
 
             .social-icons {
@@ -180,12 +193,28 @@ $year = date("Y"); // Auto-updating year
 
         /* Tablets (769px to 1024px) */
         @media (min-width: 769px) and (max-width: 1024px) {
+            .footer {
+                padding: 15px;
+                margin: 15px;
+            }
+
+            .footer-container {
+                max-width: 90%; /* Dynamic width adjustment */
+                padding: 0 15px;
+            }
+
             .footer-links {
                 gap: 20px;
+                flex-direction: row; /* Keep horizontal layout */
+                flex-wrap: wrap; /* Allow wrapping if needed */
             }
 
             .footer-links a {
                 font-size: 15px;
+            }
+
+            .social-icons {
+                gap: 15px;
             }
 
             .social-icons a {
@@ -194,10 +223,13 @@ $year = date("Y"); // Auto-updating year
 
             .disclaimer, .gambling-disclaimer {
                 font-size: 13px;
+                max-width: 85%; /* Slightly narrower than mobile */
             }
 
             #cookieConsent {
                 bottom: 15px;
+                left: 15px;
+                right: 15px;
                 padding: 12px;
             }
 
@@ -209,15 +241,18 @@ $year = date("Y"); // Auto-updating year
         /* Desktops (1025px and above) */
         @media (min-width: 1025px) {
             .footer {
-                padding: 30px;
+                padding: 20px;
+                margin: 20px;
             }
 
             .footer-container {
-                max-width: 1400px;
+                max-width: 1200px; /* Fixed max-width like cookie consent */
+                padding: 0 20px;
             }
 
             .footer-links {
                 gap: 25px;
+                flex-direction: row;
             }
 
             .footer-links a {
@@ -235,6 +270,7 @@ $year = date("Y"); // Auto-updating year
             .disclaimer, .gambling-disclaimer {
                 font-size: 16px;
                 padding: 15px;
+                max-width: 80%; /* Comfortable width for desktops */
             }
 
             #cookieConsent {
@@ -297,7 +333,7 @@ $year = date("Y"); // Auto-updating year
 <!-- Cookie Consent -->
 <div id="cookieConsent">
     <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience.
-        <a href="privacy-policy.php">Learn</a>.
+        <a href="privacy-policy.php">Manage</a>.
     </p>
     <button id="acceptCookies">Accept</button>
 </div>
