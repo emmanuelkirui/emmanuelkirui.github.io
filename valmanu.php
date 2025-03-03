@@ -113,6 +113,14 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     
     $response = fetchWithRetry($url, $apiKey, true);
     if ($response['error']) {
+        if (isset($response['retry'])) {
+            return [
+                'error' => true,
+                'retry' => true,
+                'retrySeconds' => $response['retrySeconds'],
+                'nextAttempt' => $response['nextAttempt']
+            ];
+        }
         return $response;
     }
     $data = $response['data'];
@@ -149,30 +157,34 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             $response = fetchTeamResults($teamId, $apiKey, $baseUrl);
             if ($response['error']) {
                 $teamStats[$teamId] = ['results' => [], 'form' => '', 'needsRetry' => true, 'standings' => []];
+                if (isset($response['retry'])) {
+                    $teamStats[$teamId]['retry'] = true;
+                    $teamStats[$teamId]['retrySeconds'] = $response['retrySeconds'];
+                    $teamStats[$teamId]['nextAttempt'] = $response['nextAttempt'];
+                }
                 return $teamStats[$teamId];
             }
             $results = $response['data'];
 
-            // Fetch standings with infinite retry until success
+            // Fetch standings with retry until success
             $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
             $attempt = 0;
-            $maxDelay = 32; // Cap delay at 32 seconds to avoid excessive waiting
+            $maxDelay = 32;
             while ($standingsResponse['error']) {
                 $attempt++;
-                $delay = min(pow(2, $attempt), $maxDelay); // Exponential backoff: 2, 4, 8, 16, 32...
+                $delay = min(pow(2, $attempt), $maxDelay);
                 error_log("Standings fetch failed for $competition (attempt $attempt): " . $standingsResponse['message'] . ". Retrying in $delay seconds...");
                 sleep($delay);
                 $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
 
-                // Optional: Check for retry-after header if available
                 if (isset($standingsResponse['retrySeconds'])) {
                     $delay = max($delay, $standingsResponse['retrySeconds']);
                     error_log("Using Retry-After delay of $delay seconds from API header.");
-                    sleep($delay - $delay); // Adjust if already slept
+                    sleep($delay - $delay);
                     $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
                 }
             }
-            $standings = $standingsResponse['data']; // Guaranteed to have data here
+            $standings = $standingsResponse['data'];
             $stats = [
                 'wins' => 0, 'draws' => 0, 'goalsScored' => 0, 
                 'goalsConceded' => 0, 'games' => 0, 'results' => [],
@@ -252,7 +264,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $competition);
 
         if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
-            return ["Loading...", "N/A", "", "N/A", "", $homeStats['form'], $awayStats['form']];
+            $retryInfo = [];
+            if ($homeStats['retry']) $retryInfo['home'] = ['retrySeconds' => $homeStats['retrySeconds'], 'nextAttempt' => $homeStats['nextAttempt']];
+            if ($awayStats['retry']) $retryInfo['away'] = ['retrySeconds' => $awayStats['retrySeconds'], 'nextAttempt' => $awayStats['nextAttempt']];
+            return ["Loading...", "N/A", "", "N/A", "", $homeStats['form'], $awayStats['form'], $retryInfo];
         }
 
         $homeWinRate = $homeStats['games'] ? $homeStats['wins'] / $homeStats['games'] : 0;
@@ -298,46 +313,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
         }
 
-        return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form']];
+        return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form'], []];
     } catch (Exception $e) {
-        return ["Error", "N/A", "", "N/A", "", "", ""];
+        return ["Error", "N/A", "", "N/A", "", "", "", []];
     }
-}
-
-// Progress stream for incomplete data
-if (isset($_GET['action']) && $_GET['action'] === 'progress_stream') {
-    header('Content-Type: text/event-stream');
-    header('Cache-Control: no-cache');
-    header('Connection: keep-alive');
-
-    $teamIds = json_decode($_GET['teamIds'] ?? '[]', true);
-    $progress = 0;
-    $totalTeams = count($teamIds);
-
-    foreach ($teamIds as $index => $teamId) {
-        $progress = ($index + 1) / $totalTeams * 100;
-        $stats = calculateTeamStrength($teamId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
-
-        echo "data: " . json_encode([
-            'teamId' => $teamId,
-            'progress' => $progress,
-            'status' => $stats['needsRetry'] ? 'retrying' : 'complete',
-            'form' => $stats['form'],
-            'results' => $stats['results'],
-            'standings' => $stats['standings']
-        ]) . "\n\n";
-        ob_flush();
-        flush();
-
-        if ($stats['needsRetry']) {
-            sleep(1);
-        }
-    }
-
-    echo "data: " . json_encode(['complete' => true]) . "\n\n";
-    ob_flush();
-    flush();
-    exit;
 }
 
 // Handle AJAX requests
@@ -398,18 +377,6 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 handleJsonError('Invalid team IDs');
             }
             
-            $homeStats = calculateTeamStrength($homeId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
-            $awayStats = calculateTeamStrength($awayId, $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
-            
-            if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
-                echo json_encode(['success' => false, 'retry' => true]);
-                exit;
-            }
-            
-            if (empty($homeStats['results']) || empty($awayStats['results'])) {
-                handleJsonError('Team stats not loaded');
-            }
-            
             $predictionData = predictMatch([
                 'homeTeam' => ['id' => $homeId],
                 'awayTeam' => ['id' => $awayId],
@@ -421,6 +388,11 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                     ]
                 ]
             ], $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
+            
+            if (!empty($predictionData[7])) {
+                echo json_encode(['success' => false, 'retry' => true, 'retryInfo' => $predictionData[7]]);
+                exit;
+            }
             
             echo json_encode([
                 'success' => true,
@@ -1077,48 +1049,48 @@ try {
         }
 
         .retry-message {
-    text-align: center;
-    margin: 2rem 0;
-    font-size: 1.25rem;
-    color: #dc3545;
-    line-height: 1.5;
-}
+            text-align: center;
+            margin: 2rem 0;
+            font-size: 1.25rem;
+            color: #dc3545;
+            line-height: 1.5;
+        }
 
-.countdown-box {
-    background-color: rgba(220, 53, 69, 0.1);
-    border: 2px solid #dc3545;
-    border-radius: 0.625rem;
-    padding: 1.25rem;
-    margin: 2rem auto;
-    max-width: 31.25rem; /* 500px */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 0.625rem; /* 10px */
-}
+        .countdown-box {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 2px solid #dc3545;
+            border-radius: 0.625rem;
+            padding: 1.25rem;
+            margin: 2rem auto;
+            max-width: 31.25rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 0.625rem;
+        }
 
-.retry-text {
-    color: #dc3545;
-    font-weight: 600;
-    flex: 0 1 auto;
-}
+        .retry-text {
+            color: #dc3545;
+            font-weight: 600;
+            flex: 0 1 auto;
+        }
 
-.countdown-timer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #dc3545;
-    color: #ffffff;
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.3125rem;
-    margin: 0 0.3125rem;
-    font-size: 1.5rem;
-    min-width: 2.5rem;
-    text-align: center;
-    flex: 0 0 auto;
-}
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #dc3545;
+            color: #ffffff;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.3125rem;
+            margin: 0 0.3125rem;
+            font-size: 1.5rem;
+            min-width: 2.5rem;
+            text-align: center;
+            flex: 0 0 auto;
+        }
 
         [data-theme="dark"] .countdown-box {
             background-color: rgba(220, 53, 69, 0.2);
@@ -1328,7 +1300,7 @@ try {
                         $status = $match['status'];
                         $homeGoals = $match['score']['fullTime']['home'] ?? null;
                         $awayGoals = $match['score']['fullTime']['away'] ?? null;
-                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm, $retryInfo] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
                         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
                         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
 
@@ -1355,7 +1327,7 @@ try {
                             for ($i = 0; $i < 6; $i++) {
                                 $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
                                 if ($i === 5 && $homeFormDisplay[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) $class .= ' latest';
-                                echo "<span class='$class'>" . $homeFormDisplay[$i] . "</span>";
+                                echo "<span class='$class'>$homeFormDisplay[$i]</span>";
                             }
                         }
                         echo "</div>
@@ -1373,7 +1345,7 @@ try {
                             for ($i = 0; $i < 6; $i++) {
                                 $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
                                 if ($i === 5 && $awayFormDisplay[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) $class .= ' latest';
-                                echo "<span class='$class'>" . $awayFormDisplay[$i] . "</span>";
+                                echo "<span class='$class'>$awayFormDisplay[$i]</span>";
                             }
                         }
                         echo "</div>
@@ -1496,82 +1468,99 @@ try {
             }
         });
 
-        function fetchTeamData(teamId, index, isHome) {
-            fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true`, {
+        function fetchTeamData(teamId, index, isHome, attempt = 0, maxAttempts = 5) {
+            const delay = Math.min(Math.pow(2, attempt) * 1000, 32000);
+            const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
+            const historyElement = document.getElementById(`history-${index}`);
+            const predictionElement = document.getElementById(`prediction-${index}`);
+            const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
+
+            if (!progressBar.classList.contains('progress-fill')) {
+                progressBar.classList.add('progress-fill');
+                const progressContainer = document.createElement('div');
+                progressContainer.classList.add('progress-bar');
+                progressContainer.appendChild(progressBar);
+                predictionElement.appendChild(progressContainer);
+            }
+
+            fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
-                    const historyElement = document.getElementById(`history-${index}`);
-                    const predictionElement = document.getElementById(`prediction-${index}`);
-
-                    let formHtml = '';
-                    const form = data.form.slice(-6).padStart(6, '-');
-                    const reversedForm = form.split('').reverse().join('');
-                    for (let i = 0; i < 6; i++) {
-                        let className = reversedForm[i] === 'W' ? 'win' : (reversedForm[i] === 'D' ? 'draw' : (reversedForm[i] === 'L' ? 'loss' : 'empty'));
-                        if (i === 5 && reversedForm[i] !== '-' && form.trim('-').length > 0) className += ' latest';
-                        formHtml += `<span class="${className}">${reversedForm[i]}</span>`;
-                    }
-                    formElement.innerHTML = formHtml;
-
-                    let historyHtml = '';
-                    if (isHome) {
-                        historyHtml += `<p><strong>${data.teamName} Recent Results:</strong></p><ul>`;
-                        data.results.forEach(result => historyHtml += `<li>${result}</li>`);
-                        historyHtml += `</ul><div class='standings'>
-                            <span>POS: ${data.standings.position || 'N/A'}</span>
-                            <span>GS: ${data.standings.goalsScored || 'N/A'}</span>
-                            <span>GD: ${data.standings.goalDifference || 'N/A'}</span>
-                            <span>PTS: ${data.standings.points || 'N/A'}</span>
-                        </div>`;
-                        historyElement.innerHTML = historyHtml + historyElement.innerHTML;
-                    } else {
-                        historyHtml = historyElement.innerHTML.replace('Loading history...', '');
-                        historyHtml += `<p><strong>${data.teamName} Recent Results:</strong></p><ul>`;
-                        data.results.forEach(result => historyHtml += `<li>${result}</li>`);
-                        historyHtml += `</ul><div class='standings'>
-                            <span>POS: ${data.standings.position || 'N/A'}</span>
-                            <span>GS: ${data.standings.goalsScored || 'N/A'}</span>
-                            <span>GD: ${data.standings.goalDifference || 'N/A'}</span>
-                            <span>PTS: ${data.standings.points || 'N/A'}</span>
-                        </div>`;
-                        historyElement.innerHTML = historyHtml;
-                    }
+                    updateTeamUI(data, index, isHome, formElement, historyElement, predictionElement);
+                    progressBar.parentElement.remove();
 
                     const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
-                    const otherTeamLoaded = isHome ? 
-                        !document.getElementById(`form-away-${index}`).innerHTML.includes('-') : 
-                        !document.getElementById(`form-home-${index}`).innerHTML.includes('-');
-                    if (otherTeamLoaded) fetchPrediction(index, matchCard.dataset.homeId, matchCard.dataset.awayId);
-                } else if (data.retry) {
-                    const retryDiv = document.createElement('div');
-                    retryDiv.className = 'retry-message countdown-box';
-                    let timeLeft = data.retrySeconds;
-                    retryDiv.innerHTML = `<span class="retry-text">Rate limit exceeded. Retry attempt ${data.nextAttempt}. Retrying in </span><span id="countdown-${teamId}" class="countdown-timer">${timeLeft}</span><span class="retry-text"> seconds...</span>`;
-                    document.querySelector('.container').prepend(retryDiv);
-                    
-                    const timer = setInterval(() => {
-                        timeLeft--;
-                        document.getElementById(`countdown-${teamId}`).textContent = timeLeft;
-                        if (timeLeft <= 0) {
-                            clearInterval(timer);
-                            retryDiv.remove();
-                            fetchTeamData(teamId, index, isHome);
-                        }
-                    }, 1000);
+                    const otherTeamLoaded = isHome ?
+                        !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
+                        !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
+                    if (otherTeamLoaded) {
+                        fetchPrediction(index, matchCard.dataset.homeId, matchCard.dataset.awayId);
+                    }
+                } else if (data.retry && attempt < maxAttempts) {
+                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+                    setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+                } else {
+                    console.error(`Max retries reached for team ${teamId}`);
+                    formElement.innerHTML = '<p>Error loading data</p>';
+                    progressBar.parentElement.remove();
                 }
             })
             .catch(error => {
                 console.error('Error fetching team data:', error);
-                setTimeout(() => fetchTeamData(teamId, index, isHome), 5000);
+                if (attempt < maxAttempts) {
+                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+                    setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+                } else {
+                    formElement.innerHTML = '<p>Failed to load data</p>';
+                    progressBar.parentElement.remove();
+                }
             });
         }
 
-        function fetchPrediction(index, homeId, awayId) {
-            fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`, {
+        function updateTeamUI(data, index, isHome, formElement, historyElement, predictionElement) {
+            let formHtml = '';
+            const form = data.form.slice(-6).padStart(6, '-');
+            const reversedForm = form.split('').reverse().join('');
+            for (let i = 0; i < 6; i++) {
+                let className = reversedForm[i] === 'W' ? 'win' : (reversedForm[i] === 'D' ? 'draw' : (reversedForm[i] === 'L' ? 'loss' : 'empty'));
+                if (i === 5 && reversedForm[i] !== '-' && data.form.trim('-').length > 0) className += ' latest';
+                formHtml += `<span class="${className}">${reversedForm[i]}</span>`;
+            }
+            formElement.innerHTML = formHtml;
+            formElement.classList.add('updated');
+            setTimeout(() => formElement.classList.remove('updated'), 2000);
+
+            let historyHtml = '';
+            if (isHome) {
+                historyHtml += `<p><strong>${data.teamName} Recent Results:</strong></p><ul>`;
+                data.results.forEach(result => historyHtml += `<li>${result}</li>`);
+                historyHtml += `</ul><div class='standings'>
+                    <span>POS: ${data.standings.position || 'N/A'}</span>
+                    <span>GS: ${data.standings.goalsScored || 'N/A'}</span>
+                    <span>GD: ${data.standings.goalDifference || 'N/A'}</span>
+                    <span>PTS: ${data.standings.points || 'N/A'}</span>
+                </div>`;
+                historyElement.innerHTML = historyHtml + historyElement.innerHTML;
+            } else {
+                historyHtml = historyElement.innerHTML.replace('Loading history...', '');
+                historyHtml += `<p><strong>${data.teamName} Recent Results:</strong></p><ul>`;
+                data.results.forEach(result => historyHtml += `<li>${result}</li>`);
+                historyHtml += `</ul><div class='standings'>
+                    <span>POS: ${data.standings.position || 'N/A'}</span>
+                    <span>GS: ${data.standings.goalsScored || 'N/A'}</span>
+                    <span>GD: ${data.standings.goalDifference || 'N/A'}</span>
+                    <span>PTS: ${data.standings.points || 'N/A'}</span>
+                </div>`;
+                historyElement.innerHTML = historyHtml;
+            }
+        }
+
+        function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 5) {
+            const delay = Math.min(Math.pow(2, attempt) * 1000, 32000);
+            fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
@@ -1586,18 +1575,25 @@ try {
                     `;
                     const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
                     applyAdvantageHighlight(matchCard, data.advantage);
-
-                    if (data.resultIndicator) {
-                        fetchTeamData(homeId, index, true);
-                        fetchTeamData(awayId, index, false);
+                } else if (data.retry && attempt < maxAttempts) {
+                    const predictionElement = document.getElementById(`prediction-${index}`);
+                    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
+                    if (!progressBar.classList.contains('progress-fill')) {
+                        progressBar.classList.add('progress-fill');
+                        const progressContainer = document.createElement('div');
+                        progressContainer.classList.add('progress-bar');
+                        progressContainer.appendChild(progressBar);
+                        predictionElement.appendChild(progressContainer);
                     }
-                } else if (data.retry) {
-                    setTimeout(() => fetchPrediction(index, homeId, awayId), 5000);
+                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+                    setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
                 }
             })
             .catch(error => {
                 console.error('Error fetching prediction:', error);
-                setTimeout(() => fetchPrediction(index, homeId, awayId), 5000);
+                if (attempt < maxAttempts) {
+                    setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
+                }
             });
         }
 
@@ -1796,69 +1792,16 @@ try {
             startMatchPolling();
 
             if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
-                const eventSource = new EventSource(`?action=progress_stream&teamIds=${encodeURIComponent(JSON.stringify(incompleteTeams))}&competition=<?php echo $selectedComp; ?>`);
-                const processedTeams = new Set();
-
-                eventSource.onmessage = function(event) {
-                    const data = JSON.parse(event.data);
-                    
-                    if (data.complete) {
-                        eventSource.close();
-                        adjustTeamSpacing();
-                        return;
-                    }
-
-                    const teamId = data.teamId;
-                    if (processedTeams.has(teamId)) return;
-                    processedTeams.add(teamId);
-
-                    document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
+                incompleteTeams.forEach(teamId => {
+                    document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${                    teamId}"]`).forEach(card => {
                         const index = card.dataset.index;
-                        const isHome = card.dataset.homeId == teamId;
-                        const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
-                        const historyElement = document.getElementById(`history-${index}`);
-                        const predictionElement = document.getElementById(`prediction-${index}`);
-                        const progressBar = predictionElement.querySelector('.progress-fill');
+                        const homeId = card.dataset.homeId;
+                        const awayId = card.dataset.awayId;
 
-                        if (data.status === 'retrying') {
-                            progressBar.style.width = `${data.progress}%`;
-                            return;
-                        }
-
-                        let formHtml = '';
-                        const form = data.form.slice(-6).padStart(6, '-');
-                        const reversedForm = form.split('').reverse().join('');
-                        for (let i = 0; i < 6; i++) {
-                            let className = reversedForm[i] === 'W' ? 'win' : (reversedForm[i] === 'D' ? 'draw' : (reversedForm[i] === 'L' ? 'loss' : 'empty'));
-                            if (i === 5 && reversedForm[i] !== '-' && form.trim('-').length > 0) className += ' latest';
-                            formHtml += `<span class="${className}">${reversedForm[i]}</span>`;
-                        }
-                        formElement.innerHTML = formHtml;
-
-                                                let historyHtml = isHome ? `<p><strong>Team Recent Results:</strong></p><ul>` : historyElement.innerHTML;
-                        data.results.forEach(result => historyHtml += `<li>${result}</li>`);
-                        historyHtml += `</ul><div class='standings'>
-                            <span>POS: ${data.standings.position || 'N/A'}</span>
-                            <span>GS: ${data.standings.goalsScored || 'N/A'}</span>
-                            <span>GD: ${data.standings.goalDifference || 'N/A'}</span>
-                            <span>PTS: ${data.standings.points || 'N/A'}</span>
-                        </div>`;
-                        historyElement.innerHTML = isHome ? historyHtml + historyElement.innerHTML : historyHtml;
-
-                        const otherTeamId = isHome ? card.dataset.awayId : card.dataset.homeId;
-                        if (processedTeams.has(otherTeamId)) {
-                            fetchPrediction(index, card.dataset.homeId, card.dataset.awayId);
-                        }
-
-                        progressBar.parentElement.remove();
+                        if (homeId == teamId) fetchTeamData(homeId, index, true);
+                        if (awayId == teamId) fetchTeamData(awayId, index, false);
                     });
-                };
-
-                eventSource.onerror = function() {
-                    console.error('SSE error, retrying...');
-                    eventSource.close();
-                    setTimeout(() => window.location.reload(), 5000);
-                };
+                });
             }
         }
     </script>
