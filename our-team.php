@@ -230,5 +230,20 @@ $team_members = [
             Contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a></p>
         </footer>
     </div>
+
+    <!-- JavaScript to change tab title when focus is lost -->
+    <script>
+        const originalTitle = document.title; // Store the original title
+        
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // When tab loses focus, change title
+                document.title = "Come back! | Creative Pulse";
+            } else {
+                // When tab regains focus, restore original title
+                document.title = originalTitle;
+            }
+        });
+    </script>
 </body>
 </html>
