@@ -1500,7 +1500,8 @@ try {
                 ?>
             </div>
 
-<div class="match-table" id="match-table" style="display: none;">
+
+            <div class="match-table" id="match-table" style="display: none;">
     <table>
         <thead>
             <tr>
@@ -1531,22 +1532,26 @@ try {
                         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
                         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
 
-                        // Process home form
+                        // Process home form - latest on right
                         $homeFormDisplay = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
                         $homeFormHtml = '';
+                        $formLength = strlen(trim($homeStats['form'], '-'));
                         for ($i = 0; $i < 6; $i++) {
                             $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                            if ($i === 5 && $homeFormDisplay[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) $class .= ' latest';
-                            $homeFormHtml = "<span class='$class'>{$homeFormDisplay[$i]}</span>" . $homeFormHtml; // Prepend to reverse order
+                            // Check if this is the last non-dash character from the right
+                            if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
+                            $homeFormHtml .= "<span class='$class'>{$homeFormDisplay[$i]}</span>";
                         }
 
-                        // Process away form
+                        // Process away form - latest on right
                         $awayFormDisplay = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
                         $awayFormHtml = '';
+                        $formLength = strlen(trim($awayStats['form'], '-'));
                         for ($i = 0; $i < 6; $i++) {
                             $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                            if ($i === 5 && $awayFormDisplay[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) $class .= ' latest';
-                            $awayFormHtml = "<span class='$class'>{$awayFormDisplay[$i]}</span>" . $awayFormHtml; // Prepend to reverse order
+                            // Check if this is the last non-dash character from the right
+                            if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
+                            $awayFormHtml .= "<span class='$class'>{$awayFormDisplay[$i]}</span>";
                         }
 
                         echo "<tr data-index='$index' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-status='$status'>
@@ -1859,8 +1864,7 @@ try {
             }
         }
 
-         
-  function startMatchPolling() {
+         function startMatchPolling() {
     setInterval(() => {
         document.querySelectorAll('.match-card, .match-table tr').forEach(element => {
             const homeId = element.dataset.homeId;
@@ -1943,22 +1947,24 @@ try {
                                 element.dataset.status = 'FINISHED';
                                 element.cells[2].textContent = `${data.homeGoals || 'N/A'} - ${data.awayGoals || 'N/A'}`;
 
-                                // Updated table form display
+                                // Updated table form display - latest on right
                                 const homeForm = data.homeForm.slice(-6).padStart(6, '-');
                                 let homeFormHtml = '';
+                                const homeFormLength = data.homeForm.trim('-').length;
                                 for (let i = 0; i < 6; i++) {
                                     let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (i === 5 && homeForm[i] !== '-' && data.homeForm.trim('-').length > 0) className += ' latest';
-                                    homeFormHtml = `<span class="${className}">${homeForm[i]}</span>` + homeFormHtml; // Prepend to reverse
+                                    if (homeFormLength > 0 && i === (5 - (6 - homeFormLength))) className += ' latest';
+                                    homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
                                 }
                                 tableHomeForm.innerHTML = homeFormHtml;
 
                                 const awayForm = data.awayForm.slice(-6).padStart(6, '-');
                                 let awayFormHtml = '';
+                                const awayFormLength = data.awayForm.trim('-').length;
                                 for (let i = 0; i < 6; i++) {
                                     let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (i === 5 && awayForm[i] !== '-' && data.awayForm.trim('-').length > 0) className += ' latest';
-                                    awayFormHtml = `<span class="${className}">${awayForm[i]}</span>` + awayFormHtml; // Prepend to reverse
+                                    if (awayFormLength > 0 && i === (5 - (6 - awayFormLength))) className += ' latest';
+                                    awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
                                 }
                                 tableAwayForm.innerHTML = awayFormHtml;
 
@@ -1971,7 +1977,8 @@ try {
         });
     }, 60000);
 }
-
+  
+                                
         const searchInput = document.querySelector('.search-input');
         const autocompleteDropdown = document.querySelector('.autocomplete-dropdown');
         const searchContainer = document.querySelector('.search-container');
