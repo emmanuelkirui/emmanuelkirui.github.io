@@ -61,7 +61,8 @@ $team_members = [
             letter-spacing: 0.5px;
         }
         .back-button {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             padding: 10px 20px;
             background: #f39c12;
             color: #fff;
@@ -73,6 +74,9 @@ $team_members = [
         }
         .back-button:hover {
             background: #e67e22;
+        }
+        .back-button i {
+            margin-right: 8px;
         }
         .team-container {
             display: flex;
@@ -188,6 +192,7 @@ $team_members = [
             .back-button {
                 width: 100%;
                 text-align: center;
+                justify-content: center;
             }
         }
     </style>
