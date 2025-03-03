@@ -554,6 +554,9 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CPS Football Predictions</title>
+    <!-- Preconnect to external API domain -->
+    <link rel="preconnect" href="http://api.football-data.org">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <style>
         :root {
             --primary-color: #2ecc71;
