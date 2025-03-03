@@ -293,7 +293,7 @@ $year = date("Y");
 
         <section>
             <h2>11. Governing Law and Dispute Resolution</h2>
-            <p>These Terms shall be governed by and construed in accordance with the laws of [Insert Jurisdiction, e.g., "Kenya" or "the State of California, United States"], without regard to its conflict of law principles. Any disputes arising out of or relating to these Terms or the Services shall be resolved exclusively in the courts located in [Insert Location, e.g., "Nairobi, Kenya" or "Los Angeles, California"]. You agree to submit to the personal jurisdiction of such courts.</p>
+            <p>These Terms shall be governed by and construed in accordance with the laws of "Kenya" (or the relevant jurisdiction where you are), without regard to its conflict of law principles. Any disputes arising out of or relating to these Terms or the Services shall be resolved exclusively in the courts located in [Insert Location, e.g., "Nairobi, Kenya" or "Los Angeles, California"]. You agree to submit to the personal jurisdiction of such courts.</p>
             <p>We encourage informal resolution of disputes. Please contact us before initiating formal proceedings.</p>
         </section>
 
