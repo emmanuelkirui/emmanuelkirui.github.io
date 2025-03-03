@@ -155,9 +155,9 @@ $year = date("Y");
             <h2>Available Documents</h2>
             <p>Below is a list of essential documents related to our Website and services:</p>
             <ul>
-                <li><strong>Terms & Conditions:</strong> Rules and guidelines for using our Website and services. <a href="/terms-and-conditions" class="contact-link">Read more</a>.</li>
-                <li><strong>Privacy Policy:</strong> Details on how we collect, use, and protect your personal information. <a href="/privacy-policy" class="contact-link">Read more</a>.</li>
-                <li><strong>Third-Party Services:</strong> Information about external services we use and their privacy practices. <a href="/third-party-services" class="contact-link">Read more</a>.</li>
+                <li><strong>Terms & Conditions:</strong> Rules and guidelines for using our Website and services. <a href="/terms-conditions.php" class="contact-link">Read more</a>.</li>
+                <li><strong>Privacy Policy:</strong> Details on how we collect, use, and protect your personal information. <a href="/privacy-policy.php" class="contact-link">Read more</a>.</li>
+                <li><strong>Third-Party Services:</strong> Information about external services we use and their privacy practices. <a href="/third-party.php" class="contact-link">Read more</a>.</li>
             </ul>
             <p>These documents are updated periodically to reflect changes in our operations or legal requirements. We encourage you to check back regularly.</p>
         </section>
@@ -169,7 +169,7 @@ $year = date("Y");
 
         <section>
             <h2>Contact Us</h2>
-            <p>If you have questions about any of these documents or need further clarification, feel free to reach out at <a href="mailto:docs@emmanuelkirui.com" class="contact-link">docs@emmanuelkirui.com</a>.</p>
+            <p>If you have questions about any of these documents or need further clarification, feel free to reach out at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
         </section>
 
         <button class="back-button" onclick="history.back()" aria-label="Return to Previous Page">
@@ -177,7 +177,7 @@ $year = date("Y");
         </button>
 
         <footer class="footer">
-            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>Contact us at <a href="mailto:info@emmanuelkirui.com" class="contact-link">info@emmanuelkirui.com</a> for inquiries.</p>
+            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>Contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a> for inquiries.</p>
         </footer>
     </main>
 </body>
