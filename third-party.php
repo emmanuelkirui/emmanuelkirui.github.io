@@ -218,7 +218,7 @@ $year = date("Y");
                 <li>Data shared is strictly limited to what is necessary for each service to function effectively.</li>
                 <li>Third-party providers are bound by contractual agreements to safeguard your data and comply with relevant data protection regulations, such as GDPR or CCPA, where applicable.</li>
             </ul>
-            <p>For a comprehensive overview of our data practices, please review our <a href="/privacy-policy.php" class="contact-link">Privacy Policy</a>.</p>
+            <p>For a comprehensive overview of our data practices, please review our <a href="privacy-policy" class="contact-link">Privacy Policy</a>.</p>
         </section>
 
         <section>
