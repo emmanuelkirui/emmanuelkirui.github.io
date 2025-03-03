@@ -153,7 +153,12 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
             $results = $response['data'];
 
+            // Fetch standings with retry on error
             $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
+            if ($standingsResponse['error']) {
+                sleep(2); // Respect rate limits
+                $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl); // Retry
+            }
             $standings = $standingsResponse['error'] ? [] : $standingsResponse['data'];
 
             $stats = [
