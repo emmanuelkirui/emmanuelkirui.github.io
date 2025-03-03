@@ -28,9 +28,9 @@ $year = date("Y"); // Auto-updating year
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between; /* Distribute space nicely */
+            justify-content: space-between;
             width: 100%;
-            gap: 15px; /* Add consistent spacing between sections */
+            gap: 15px;
         }
 
         /* Footer Links */
@@ -56,7 +56,7 @@ $year = date("Y"); // Auto-updating year
             transition: color 0.3s ease-in-out;
             display: flex;
             align-items: center;
-            gap: 5px; /* Space between icon and text */
+            gap: 5px;
         }
 
         .footer-links a:hover {
@@ -71,7 +71,7 @@ $year = date("Y"); // Auto-updating year
             gap: 15px;
             padding-top: 10px;
             border-top: 2px solid #f39c12;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            flex-wrap: wrap;
         }
 
         .social-icons a {
@@ -93,9 +93,12 @@ $year = date("Y"); // Auto-updating year
             border-radius: 5px;
             margin: 0;
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 5px; /* Space between icon and text */
+            align-items: center;
+            gap: 5px;
+            width: 100%; /* Stretch to match container width */
+            box-sizing: border-box; /* Include padding in width */
         }
 
         /* Disclaimer */
@@ -111,6 +114,8 @@ $year = date("Y"); // Auto-updating year
             justify-content: center;
             align-items: center;
             gap: 5px;
+            width: 100%; /* Stretch to match container width */
+            box-sizing: border-box; /* Include padding in width */
         }
 
         .disclaimer a {
@@ -176,7 +181,6 @@ $year = date("Y"); // Auto-updating year
             .disclaimer, .gambling-disclaimer {
                 font-size: 12px;
                 padding: 8px;
-                max-width: 90%;
             }
 
             .social-icons {
@@ -237,7 +241,6 @@ $year = date("Y"); // Auto-updating year
 
             .disclaimer, .gambling-disclaimer {
                 font-size: 13px;
-                max-width: 85%;
             }
 
             #cookieConsent {
@@ -285,7 +288,6 @@ $year = date("Y"); // Auto-updating year
             .disclaimer, .gambling-disclaimer {
                 font-size: 16px;
                 padding: 15px;
-                max-width: 80%;
             }
 
             #cookieConsent {
