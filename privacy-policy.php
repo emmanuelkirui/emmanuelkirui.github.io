@@ -269,7 +269,7 @@ $year = date("Y");
             <p>We retain your personal information only as long as necessary to fulfill the purposes outlined in this Policy, comply with legal obligations, or resolve disputes. For example:</p>
             <ul>
                 <li>Contact information is kept until you unsubscribe or request deletion.</li>
-                <li>Usage data may be retained for analysis purposes, typically up to [Insert Period, e.g., "24 months"], then anonymized or deleted.</li>
+                <li>Usage data may be retained for analysis purposes, typically up to 24 months, then anonymized or deleted.</li>
             </ul>
             <p>Once retention periods expire, we securely delete or anonymize your data in accordance with applicable laws.</p>
         </section>
@@ -285,12 +285,12 @@ $year = date("Y");
                 <li><strong>Portability:</strong> Receive your data in a structured, machine-readable format.</li>
                 <li><strong>Opt-Out:</strong> Unsubscribe from marketing communications or object to processing based on legitimate interests.</li>
             </ul>
-            <p>To exercise these rights, contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>. We will respond within [Insert Timeframe, e.g., "30 days"] and may require identity verification for security.</p>
+            <p>To exercise these rights, contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>. We will respond within 72 hours and may require identity verification for security.</p>
         </section>
 
         <section>
             <h2>9. International Data Transfers</h2>
-            <p>If you access our Services from outside Kenya, your data may be transferred to and processed in [Country/Region]. We ensure such transfers comply with applicable data protection laws, using mechanisms like Standard Contractual Clauses where required.</p>
+            <p>If you access our Services from outside Kenya, your data may be transferred to and processed in "Kenya" (or the relevant [Country/Region] where you are). We ensure such transfers comply with applicable data protection laws, using mechanisms like Standard Contractual Clauses where required.</p>
         </section>
 
         <section>
