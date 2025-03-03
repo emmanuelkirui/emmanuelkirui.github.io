@@ -214,8 +214,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <section>
             <h2>Alternative Contact Methods</h2>
-            <p>Email: <a href="mailto:info@emmanuelkirui.com" class="contact-link">info@emmanuelkirui.com</a><br>
-            [Optional: Add phone number, social media links, or physical address here]</p>
+            <p>Email: <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a><br>
+            City: Nairobi Kenya</p>
         </section>
 
         <button class="back-button" onclick="history.back()" aria-label="Return to Previous Page">
@@ -223,7 +223,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </button>
 
         <footer class="footer">
-            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>Contact us at <a href="mailto:info@emmanuelkirui.com" class="contact-link">info@emmanuelkirui.com</a> for inquiries.</p>
+            <p>© <?php echo $year; ?> Emmanuel Kirui. All rights reserved.<br>Contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a> for inquiries.</p>
         </footer>
     </main>
 </body>
