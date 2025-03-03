@@ -60,6 +60,20 @@ $team_members = [
             font-weight: 700;
             letter-spacing: 0.5px;
         }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #f39c12;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 700;
+            transition: background 0.3s ease;
+            margin-bottom: 2rem;
+        }
+        .back-button:hover {
+            background: #e67e22;
+        }
         .team-container {
             display: flex;
             flex-wrap: wrap;
@@ -171,11 +185,19 @@ $team_members = [
             .member-role {
                 font-size: 1rem;
             }
+            .back-button {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to History
+        </a>
+        
         <h1><i class="fas fa-users"></i> Our Team</h1>
         
         <div class="team-container">
