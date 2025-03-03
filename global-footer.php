@@ -18,7 +18,7 @@ $year = date("Y"); // Auto-updating year
             color: white;
             text-align: center;
             padding: 20px;
-            margin: 20px; /* Kept original margin */
+            margin: 20px;
             border-top: 3px solid #f39c12;
             font-family: Arial, sans-serif;
         }
@@ -28,17 +28,19 @@ $year = date("Y"); // Auto-updating year
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%; /* Allow dynamic width adjustment */
+            justify-content: space-between; /* Distribute space nicely */
+            width: 100%;
+            gap: 15px; /* Add consistent spacing between sections */
         }
 
         /* Footer Links */
         .footer-links {
             list-style: none;
             padding: 0;
-            margin: 15px 0;
+            margin: 0;
             display: flex;
-            justify-content: center;
             flex-wrap: wrap;
+            justify-content: center;
             gap: 15px;
         }
 
@@ -52,6 +54,9 @@ $year = date("Y"); // Auto-updating year
             font-size: 16px;
             font-weight: bold;
             transition: color 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 5px; /* Space between icon and text */
         }
 
         .footer-links a:hover {
@@ -64,9 +69,9 @@ $year = date("Y"); // Auto-updating year
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 20px;
             padding-top: 10px;
             border-top: 2px solid #f39c12;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
         }
 
         .social-icons a {
@@ -86,7 +91,11 @@ $year = date("Y"); // Auto-updating year
             color: #ffcc00;
             padding: 10px;
             border-radius: 5px;
-            margin-top: 15px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px; /* Space between icon and text */
         }
 
         /* Disclaimer */
@@ -96,8 +105,12 @@ $year = date("Y"); // Auto-updating year
             background-color: #f9f9f9;
             padding: 10px;
             border-radius: 5px;
-            text-align: center;
-            font-family: inherit;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
         }
 
         .disclaimer a {
@@ -147,12 +160,12 @@ $year = date("Y"); // Auto-updating year
 
             .footer-container {
                 max-width: 100%;
-                padding: 0 10px; /* Add slight padding for content */
+                padding: 0 10px;
+                gap: 10px;
             }
 
             .footer-links {
                 flex-direction: column;
-                align-items: center;
                 gap: 10px;
             }
 
@@ -163,7 +176,7 @@ $year = date("Y"); // Auto-updating year
             .disclaimer, .gambling-disclaimer {
                 font-size: 12px;
                 padding: 8px;
-                max-width: 90%; /* Prevent overflow */
+                max-width: 90%;
             }
 
             .social-icons {
@@ -199,14 +212,15 @@ $year = date("Y"); // Auto-updating year
             }
 
             .footer-container {
-                max-width: 90%; /* Dynamic width adjustment */
+                max-width: 90%;
                 padding: 0 15px;
+                gap: 12px;
             }
 
             .footer-links {
                 gap: 20px;
-                flex-direction: row; /* Keep horizontal layout */
-                flex-wrap: wrap; /* Allow wrapping if needed */
+                flex-direction: row;
+                flex-wrap: wrap;
             }
 
             .footer-links a {
@@ -223,7 +237,7 @@ $year = date("Y"); // Auto-updating year
 
             .disclaimer, .gambling-disclaimer {
                 font-size: 13px;
-                max-width: 85%; /* Slightly narrower than mobile */
+                max-width: 85%;
             }
 
             #cookieConsent {
@@ -246,8 +260,9 @@ $year = date("Y"); // Auto-updating year
             }
 
             .footer-container {
-                max-width: 1200px; /* Fixed max-width like cookie consent */
+                max-width: 1200px;
                 padding: 0 20px;
+                gap: 15px;
             }
 
             .footer-links {
@@ -270,7 +285,7 @@ $year = date("Y"); // Auto-updating year
             .disclaimer, .gambling-disclaimer {
                 font-size: 16px;
                 padding: 15px;
-                max-width: 80%; /* Comfortable width for desktops */
+                max-width: 80%;
             }
 
             #cookieConsent {
@@ -333,7 +348,7 @@ $year = date("Y"); // Auto-updating year
 <!-- Cookie Consent -->
 <div id="cookieConsent">
     <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience.
-        <a href="privacy-policy.php">Manage</a>.
+        <a href="privacy-policy.php">Learn</a>.
     </p>
     <button id="acceptCookies">Accept</button>
 </div>
