@@ -1500,7 +1500,6 @@ try {
                 ?>
             </div>
 
-            // Replace the existing match-table section in the HTML with this:
 <div class="match-table" id="match-table" style="display: none;">
     <table>
         <thead>
