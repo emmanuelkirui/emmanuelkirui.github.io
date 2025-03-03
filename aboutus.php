@@ -152,7 +152,7 @@ $year = date("Y");
 
         <section>
             <h2>Our Mission</h2>
-            <p>My mission is to [insert mission, e.g., "empower individuals with accessible tools, resources, and insights that inspire growth and creativity"]. Through this website, I aim to deliver value by [e.g., "providing high-quality content, fostering collaboration, and promoting transparency"].</p>
+            <p>My mission is to empower individuals with accessible tools, resources, and insights that inspire growth and creativity. Through this website, I aim to deliver value by providing high-quality content, fostering collaboration, and promoting transparency.</p>
         </section>
 
         <section>
@@ -168,7 +168,7 @@ $year = date("Y");
 
         <section>
             <h2>What We Offer</h2>
-            <p>This website serves as a hub for [insert offerings, e.g., "educational content, professional services, or personal projects"]. Whether you’re here to learn, collaborate, or explore, I’m dedicated to ensuring your experience is both enriching and seamless.</p>
+            <p>This website serves as a hub for educational content(Projects), professional services, personal projects, Football Predictions. Whether you’re here to learn, collaborate, or explore, I’m dedicated to ensuring your experience is both enriching and seamless.</p>
         </section>
 
         <section>
