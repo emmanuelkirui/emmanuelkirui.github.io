@@ -1869,4 +1869,5 @@ try {
 ?>
 <?php include 'back-to-top.php'; ?>
 <script src="network-status.js"></script>
+<script src="tab-title-switcher.js"></script>
 <?php include 'global-footer.php'; ?>
