@@ -190,7 +190,7 @@ $year = date("Y");
         </header>
 
         <section>
-            <p>At Emmanuel Kirui's website (<a href="http://creativepulse.42web.io" class="contact-link">creativepulse.42web.io</a>) ("Website"), we are committed to protecting your privacy and ensuring transparency in how we handle your personal information. This Privacy Policy ("Policy") explains how we collect, use, disclose, and safeguard your data when you access our Website or interact with our services (collectively, "Services"). By using our Services, you consent to the practices outlined in this Policy, which is designed to comply with applicable data protection laws, including [Insert Applicable Laws, e.g., "GDPR," "CCPA"].</p>
+            <p>At Emmanuel Kirui's website (<a href="http://creativepulse.42web.io" class="contact-link">creativepulse.42web.io</a>) ("Website"), we are committed to protecting your privacy and ensuring transparency in how we handle your personal information. This Privacy Policy ("Policy") explains how we collect, use, disclose, and safeguard your data when you access our Website or interact with our services (collectively, "Services"). By using our Services, you consent to the practices outlined in this Policy, which is designed to comply with applicable data protection laws, including  GDPR,CCPA.</p>
             <p>If you have any questions or concerns about this Policy, please contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
         </section>
 
