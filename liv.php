@@ -1151,3 +1151,4 @@ function toggleCustomRange(value) {
 </script>
 <script src="network-status.js"></script>
 <?php include 'back-to-top.php'; ?>
+<?php include 'global-footer.php'; ?>
