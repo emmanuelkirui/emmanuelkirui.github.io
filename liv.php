@@ -597,6 +597,7 @@ if ($selected_competition) {
 echo "<h1>Football Match Predictions</h1>";
 
 // Add link to external CSS file
+echo '<link rel="preconnect" href="https://api.football-data.org">';
 echo '<link rel="stylesheet" type="text/css" href="css/liv.css">';
 echo '<link rel="stylesheet" type="text/css" href="css/network-status.css">';
 
