@@ -271,6 +271,7 @@ $year = date("Y"); // Auto-updating year
             <li><a href="docs.php"><i class="fas fa-folder-open"></i> Documentation</a></li>
             <li><a href="aboutus.php"><i class="fas fa-info-circle"></i> About Us</a></li>
             <li><a href="contactus.php"><i class="fas fa-envelope"></i> Contact Us</a></li>
+            <li><a href="global-blog.php"><i class="fas fa-blog"></i> Blog</a></li>
         </ul>
 
         <p class="gambling-disclaimer">
