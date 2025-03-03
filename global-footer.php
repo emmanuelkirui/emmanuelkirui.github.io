@@ -20,27 +20,25 @@ $year = date("Y"); // Auto-updating year
             padding: 20px;
             margin: 20px;
             border-top: 3px solid #f39c12;
-            font-family: Arial, sans-serif;
+            font-family: Arial, sans-serif; /* Ensures font consistency */
         }
 
         .footer-container {
+            max-width: 1200px;
             margin: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            gap: 15px;
         }
 
         /* Footer Links */
         .footer-links {
             list-style: none;
             padding: 0;
-            margin: 0;
+            margin: 15px 0;
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 15px;
         }
 
@@ -54,9 +52,6 @@ $year = date("Y"); // Auto-updating year
             font-size: 16px;
             font-weight: bold;
             transition: color 0.3s ease-in-out;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
 
         .footer-links a:hover {
@@ -69,9 +64,9 @@ $year = date("Y"); // Auto-updating year
             display: flex;
             justify-content: center;
             gap: 15px;
+            margin-top: 20px;
             padding-top: 10px;
             border-top: 2px solid #f39c12;
-            flex-wrap: wrap;
         }
 
         .social-icons a {
@@ -91,14 +86,7 @@ $year = date("Y"); // Auto-updating year
             color: #ffcc00;
             padding: 10px;
             border-radius: 5px;
-            margin: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            width: 100%; /* Stretch to match container width */
-            box-sizing: border-box; /* Include padding in width */
+            margin-top: 15px;
         }
 
         /* Disclaimer */
@@ -108,14 +96,8 @@ $year = date("Y"); // Auto-updating year
             background-color: #f9f9f9;
             padding: 10px;
             border-radius: 5px;
-            margin: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 5px;
-            width: 100%; /* Stretch to match container width */
-            box-sizing: border-box; /* Include padding in width */
+            text-align: center;
+            font-family: inherit;
         }
 
         .disclaimer a {
@@ -158,20 +140,9 @@ $year = date("Y"); // Auto-updating year
 
         /* Mobile Devices (up to 768px) */
         @media (max-width: 768px) {
-            .footer {
-                padding: 10px;
-                margin: 10px;
-            }
-
-            .footer-container {
-                max-width: 100%;
-                padding: 0 10px;
-                gap: 10px;
-            }
-
             .footer-links {
                 flex-direction: column;
-                gap: 10px;
+                align-items: center;
             }
 
             .footer-links a {
@@ -180,7 +151,6 @@ $year = date("Y"); // Auto-updating year
 
             .disclaimer, .gambling-disclaimer {
                 font-size: 12px;
-                padding: 8px;
             }
 
             .social-icons {
@@ -210,29 +180,12 @@ $year = date("Y"); // Auto-updating year
 
         /* Tablets (769px to 1024px) */
         @media (min-width: 769px) and (max-width: 1024px) {
-            .footer {
-                padding: 15px;
-                margin: 15px;
-            }
-
-            .footer-container {
-                max-width: 90%;
-                padding: 0 15px;
-                gap: 12px;
-            }
-
             .footer-links {
                 gap: 20px;
-                flex-direction: row;
-                flex-wrap: wrap;
             }
 
             .footer-links a {
                 font-size: 15px;
-            }
-
-            .social-icons {
-                gap: 15px;
             }
 
             .social-icons a {
@@ -245,8 +198,6 @@ $year = date("Y"); // Auto-updating year
 
             #cookieConsent {
                 bottom: 15px;
-                left: 15px;
-                right: 15px;
                 padding: 12px;
             }
 
@@ -258,19 +209,15 @@ $year = date("Y"); // Auto-updating year
         /* Desktops (1025px and above) */
         @media (min-width: 1025px) {
             .footer {
-                padding: 20px;
-                margin: 20px;
+                padding: 30px;
             }
 
             .footer-container {
-                max-width: 1200px;
-                padding: 0 20px;
-                gap: 15px;
+                max-width: 1400px;
             }
 
             .footer-links {
                 gap: 25px;
-                flex-direction: row;
             }
 
             .footer-links a {
