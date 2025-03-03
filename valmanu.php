@@ -10,7 +10,7 @@ if (!isset($_SESSION['teamStats'])) {
     $_SESSION['teamStats'] = [];
 }
 
-$apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
+$apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c'; // Replace with your valid API key if needed
 $baseUrl = 'http://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
@@ -143,6 +143,7 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
     $url = $baseUrl . "competitions/$competition/teams";
     $response = fetchWithRetry($url, $apiKey, true);
     if ($response['error']) {
+        error_log("Failed to fetch teams for $competition: " . ($response['message'] ?? 'Unknown error'));
         return [];
     }
     return $response['data']['teams'] ?? [];
@@ -406,15 +407,33 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
             exit;
 
         case 'search_teams':
-            $query = strtolower($_GET['query'] ?? '');
+            $query = trim(strtolower($_GET['query'] ?? ''));
             $competition = $_GET['competition'] ?? 'PL';
             $teams = fetchTeams($competition, $apiKey, $baseUrl);
+            
+            if (empty($teams)) {
+                echo json_encode(['success' => false, 'message' => 'No teams available for this competition']);
+                exit;
+            }
+
             $filteredTeams = array_filter($teams, function($team) use ($query) {
-                return stripos($team['name'], $query) !== false || stripos($team['shortName'] ?? '', $query) !== false;
+                $name = strtolower($team['name'] ?? '');
+                $shortName = strtolower($team['shortName'] ?? '');
+                return $query === '' || stripos($name, $query) !== false || stripos($shortName, $query) !== false;
             });
-            echo json_encode(array_values(array_map(function($team) {
-                return ['id' => $team['id'], 'name' => $team['name'], 'crest' => $team['crest'] ?? ''];
-            }, $filteredTeams)));
+
+            if (empty($filteredTeams)) {
+                echo json_encode(['success' => true, 'teams' => [], 'message' => 'No teams found matching query']);
+            } else {
+                $result = array_values(array_map(function($team) {
+                    return [
+                        'id' => $team['id'],
+                        'name' => $team['name'],
+                        'crest' => $team['crest'] ?? ''
+                    ];
+                }, $filteredTeams));
+                echo json_encode(['success' => true, 'teams' => $result]);
+            }
             exit;
     }
 }
@@ -1765,41 +1784,45 @@ try {
             clearTimeout(debounceTimeout);
             debounceTimeout = setTimeout(() => {
                 const query = this.value.trim();
-                if (query.length < 2) {
+                if (query.length < 1) { // Allow shorter queries for testing
                     autocompleteDropdown.innerHTML = '';
                     searchContainer.classList.remove('active');
                     return;
                 }
 
                 fetch(`?action=search_teams&query=${encodeURIComponent(query)}&competition=<?php echo $selectedComp; ?>`)
-                    .then(response => response.json())
-                    .then(teams => {
-                        if (teams.length === 0) {
-                            autocompleteDropdown.innerHTML = '<div class="autocomplete-item">No teams found</div>';
-                        } else {
-                            autocompleteDropdown.innerHTML = teams.map(team => `
-                                <div class="autocomplete-item" data-team-id="${team.id}" data-team-name="${team.name}">
-                                    ${team.crest ? `<img src="${team.crest}" alt="${team.name}">` : ''}
-                                    <span>${team.name}</span>
-                                </div>
-                            `).join('');
-                        }
-                        searchContainer.classList.add('active');
-                    })
-                    .catch(error => {
-                        console.error('Error fetching teams:', error);
-                        autocompleteDropdown.innerHTML = '<div class="autocomplete-item">Error loading teams</div>';
-                        searchContainer.classList.add('active');
-                    });
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status                    });
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Search response:', data); // Debug log to check response
+                    if (!data.success || !data.teams || data.teams.length === 0) {
+                        autocompleteDropdown.innerHTML = '<div class="autocomplete-item">No teams found</div>';
+                    } else {
+                        autocompleteDropdown.innerHTML = data.teams.map(team => `
+                            <div class="autocomplete-item" data-team-id="${team.id}" data-team-name="${team.name}">
+                                ${team.crest ? `<img src="${team.crest}" alt="${team.name}">` : ''}
+                                <span>${team.name}</span>
+                            </div>
+                        `).join('');
+                    }
+                    searchContainer.classList.add('active');
+                })
+                .catch(error => {
+                    console.error('Error fetching teams:', error);
+                    autocompleteDropdown.innerHTML = '<div class="autocomplete-item">Error loading teams</div>';
+                    searchContainer.classList.add('active');
+                });
             }, 300);
         });
 
-                autocompleteDropdown.addEventListener('click', function(e) {
+        autocompleteDropdown.addEventListener('click', function(e) {
             const item = e.target.closest('.autocomplete-item');
             if (item && item.dataset.teamName) {
                 searchInput.value = item.dataset.teamName;
                 searchContainer.classList.remove('active');
-                window.location.href = `?team=${encodeURIComponent(item.dataset.teamName)}`; // Only team param for search
+                window.location.href = `?team=${encodeURIComponent(item.dataset.teamName)}`;
             }
         });
 
