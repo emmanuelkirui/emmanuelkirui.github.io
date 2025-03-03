@@ -155,9 +155,9 @@ $year = date("Y");
             <h2>Available Documents</h2>
             <p>Below is a list of essential documents related to our Website and services:</p>
             <ul>
-                <li><strong>Terms & Conditions:</strong> Rules and guidelines for using our Website and services. <a href="/terms-conditions.php" class="contact-link">Read more</a>.</li>
-                <li><strong>Privacy Policy:</strong> Details on how we collect, use, and protect your personal information. <a href="/privacy-policy.php" class="contact-link">Read more</a>.</li>
-                <li><strong>Third-Party Services:</strong> Information about external services we use and their privacy practices. <a href="/third-party.php" class="contact-link">Read more</a>.</li>
+                <li><strong>Terms & Conditions:</strong> Rules and guidelines for using our Website and services. <a href="terms-conditions" class="contact-link">Read more</a>.</li>
+                <li><strong>Privacy Policy:</strong> Details on how we collect, use, and protect your personal information. <a href="privacy-policy" class="contact-link">Read more</a>.</li>
+                <li><strong>Third-Party Services:</strong> Information about external services we use and their privacy practices. <a href="third-party" class="contact-link">Read more</a>.</li>
             </ul>
             <p>These documents are updated periodically to reflect changes in our operations or legal requirements. We encourage you to check back regularly.</p>
         </section>
