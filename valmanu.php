@@ -483,6 +483,7 @@ if (!isset($_GET['ajax'])) {
     });
     </script>";
 }
+
 // Main page logic
 try {
     $competitionsUrl = $baseUrl . 'competitions';
@@ -500,7 +501,7 @@ try {
     $filter = $_GET['filter'] ?? 'upcoming';
     $customStart = $_GET['start'] ?? '';
     $customEnd = $_GET['end'] ?? '';
-    $searchTeam = trim($_GET['team'] ?? '');
+    $searchTeam = $_GET['team'] ?? '';
 
     $dateOptions = [
         'yesterday' => ['label' => 'Yesterday', 'date' => date('Y-m-d', strtotime('-1 day'))],
@@ -516,7 +517,7 @@ try {
         : ($dateOptions[$filter]['label'] ?? 'Select Date');
 
     $fromDate = $toDate = date('Y-m-d');
-    if (isset($dateOptions[$filter]) && empty($searchTeam)) { // Apply date filter only if no team search
+    if (isset($dateOptions[$filter])) {
         if (isset($dateOptions[$filter]['date'])) {
             $fromDate = $toDate = $dateOptions[$filter]['date'];
         } elseif (isset($dateOptions[$filter]['from']) && isset($dateOptions[$filter]['to'])) {
@@ -526,48 +527,25 @@ try {
             $fromDate = $customStart;
             $toDate = $customEnd;
         }
-    } else {
-        // When searching by team, use a broader default range (e.g., past 60 days to next 7 days)
-        $fromDate = date('Y-m-d', strtotime('-60 days'));
-        $toDate = date('Y-m-d', strtotime('+7 days'));
     }
+
+    $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
+    $matchResponse = fetchWithRetry($matchesUrl, $apiKey);
+    if ($matchResponse['error']) {
+        if (isset($matchResponse['retry'])) {
+            echo "</body></html>";
+            exit;
+        }
+        handleError($matchResponse['message']);
+    }
+    $allMatches = $matchResponse['data']['matches'] ?? [];
 
     if ($searchTeam) {
-        // Fetch matches across all competitions for the searched team
-        $allMatches = [];
-        foreach ($competitions as $comp) {
-            $compCode = $comp['code'];
-            $matchesUrl = $baseUrl . "competitions/$compCode/matches?dateFrom=$fromDate&dateTo=$toDate";
-            $matchResponse = fetchWithRetry($matchesUrl, $apiKey);
-            if (!$matchResponse['error']) {
-                $matches = $matchResponse['data']['matches'] ?? [];
-                // Filter matches by team name
-                $filteredMatches = array_filter($matches, function($match) use ($searchTeam) {
-                    return stripos($match['homeTeam']['name'] ?? '', $searchTeam) !== false ||
-                           stripos($match['awayTeam']['name'] ?? '', $searchTeam) !== false;
-                });
-                $allMatches = array_merge($allMatches, $filteredMatches);
-            }
-        }
-        // Remove duplicates based on match ID
-        $allMatches = array_values(array_reduce($allMatches, function($carry, $match) {
-            $carry[$match['id']] = $match;
-            return $carry;
-        }, []));
-    } else {
-        // Fetch matches for the selected competition and date range
-        $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
-        $matchResponse = fetchWithRetry($matchesUrl, $apiKey);
-        if ($matchResponse['error']) {
-            if (isset($matchResponse['retry'])) {
-                echo "</body></html>";
-                exit;
-            }
-            handleError($matchResponse['message']);
-        }
-        $allMatches = $matchResponse['data']['matches'] ?? [];
+        $allMatches = array_filter($allMatches, function($match) use ($searchTeam) {
+            return stripos($match['homeTeam']['name'] ?? '', $searchTeam) !== false ||
+                   stripos($match['awayTeam']['name'] ?? '', $searchTeam) !== false;
+        });
     }
-
 ?>
 
 <!DOCTYPE html>
