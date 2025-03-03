@@ -199,16 +199,21 @@ $year = date("Y");
         </section>
 
         <section>
-            <h2>2. Third-Party Services We Utilize</h2>
-            <p>The following is a detailed list of key third-party services we may integrate, along with their intended purposes:</p>
-            <ul>
-                <li><strong>Google Analytics:</strong> A web analytics tool that tracks and reports website traffic, user interactions, and behavioral patterns to help us improve our content and services. Learn more in their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
-                <li><strong>Cloudflare:</strong> A service that enhances website security, accelerates load times, and protects against cyber threats. Refer to their <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.cloudflare.com/terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
-                <li><strong>Font Awesome:</strong> A library providing scalable vector icons to enhance the visual appeal and usability of our website. See their <a href="https://fontawesome.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://fontawesome.com/terms" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</li>
-                <li><strong>Hosting Providers (e.g., AWS, SiteGround):</strong> Infrastructure services that host our website, store data, and ensure uptime and reliability. Policies depend on the specific provider; please contact us for details on our current hosting partner.</li>
-            </ul>
-            <p><em>Note:</em> This list is representative and subject to change as we adopt new tools or discontinue others. We aim to keep this page updated to reflect our current third-party ecosystem.</p>
-        </section>
+           <h2>2. Third-Party Services We Utilize</h2>
+           <p>The following is a detailed list of key third-party services we may integrate, along with their intended purposes:</p>
+         <ul>
+           <li><strong>Google Analytics:</strong> A web analytics tool that tracks and reports website traffic, user interactions, and behavioral patterns to help us improve our content and services. Learn more in their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+           <li><strong>Google AdSense:</strong> An advertising platform that displays targeted ads on our website, enabling us to monetize content while providing relevant promotions to users. See their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.google.com/adsense/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+           <li><strong>Google reCAPTCHA:</strong> A security service that protects our website from bots and spam by verifying user interactions. Refer to their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+           <li><strong>YouTube:</strong> A video-sharing platform we may embed to provide multimedia content, such as tutorials or promotional videos. Learn more in their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+           <li><strong>Adsterra:</strong> An advertising network that helps us deliver and monetize ads, offering an alternative to traditional ad platforms. Check their <a href="https://adsterra.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://adsterra.com/terms-and-conditions/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+           <li><strong>Monetag:</strong> A monetization platform that enables us to generate revenue through ads tailored to user preferences. See their <a href="https://monetag.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://monetag.com/terms-of-service/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+           <li><strong>Cloudflare:</strong> A service that enhances website security, accelerates load times, and protects against cyber threats. Refer to their <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.cloudflare.com/terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+           <li><strong>Font Awesome:</strong> A library providing scalable vector icons to enhance the visual appeal and usability of our website. See their <a href="https://fontawesome.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://fontawesome.com/terms" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</li>
+           <li><strong>Hosting Providers (e.g., AWS, SiteGround):</strong> Infrastructure services that host our website, store data, and ensure uptime and reliability. Policies depend on the specific provider; please contact us for details on our current hosting partner.</li>
+        </ul>
+         <p><em>Note:</em> This list is representative and subject to change as we adopt new tools or discontinue others. We aim to keep this page updated to reflect our current third-party ecosystem.</p>
+       </section>
 
         <section>
             <h2>3. Data Handling and Third-Party Integration</h2>
