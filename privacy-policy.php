@@ -249,7 +249,7 @@ $year = date("Y");
                 <li><strong>Performance Cookies:</strong> To analyze site usage and improve performance (e.g., Google Analytics).</li>
                 <li><strong>Preference Cookies:</strong> To remember your settings and personalize your experience.</li>
             </ul>
-            <p>You can manage cookie preferences via your browser settings or opt-out tools provided by third-party services. Disabling cookies may impact some features of the Website. For more details, review our <a href="/third-party-services" class="contact-link">Third-Party Services</a> page.</p>
+            <p>You can manage cookie preferences via your browser settings or opt-out tools provided by third-party services. Disabling cookies may impact some features of the Website. For more details, review our <a href="third-party" class="contact-link">Third-Party Services</a> page.</p>
         </section>
 
         <section>
