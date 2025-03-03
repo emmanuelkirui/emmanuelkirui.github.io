@@ -1468,57 +1468,80 @@ try {
             }
         });
 
-        function fetchTeamData(teamId, index, isHome, attempt = 0, maxAttempts = 5) {
-            const delay = Math.min(Math.pow(2, attempt) * 1000, 32000);
-            const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
-            const historyElement = document.getElementById(`history-${index}`);
-            const predictionElement = document.getElementById(`prediction-${index}`);
-            const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
+        
+            function fetchTeamData(teamId, index, isHome, attempt = 0, maxAttempts = 10) {
+    const delay = Math.min(Math.pow(2, attempt) * 1000, 10000); // Max delay reduced to 10s
+    const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
+    const historyElement = document.getElementById(`history-${index}`);
+    const predictionElement = document.getElementById(`prediction-${index}`);
+    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
 
-            if (!progressBar.classList.contains('progress-fill')) {
-                progressBar.classList.add('progress-fill');
-                const progressContainer = document.createElement('div');
-                progressContainer.classList.add('progress-bar');
-                progressContainer.appendChild(progressBar);
-                predictionElement.appendChild(progressContainer);
+    // Add progress bar if not already present
+    if (!progressBar.classList.contains('progress-fill')) {
+        progressBar.classList.add('progress-fill');
+        const progressContainer = document.createElement('div');
+        progressContainer.classList.add('progress-bar');
+        progressContainer.appendChild(progressBar);
+        predictionElement.appendChild(progressContainer);
+    }
+
+    // Notify user after 5 attempts
+    if (attempt === 5) {
+        const retryNotice = document.createElement('div');
+        retryNotice.className = 'retry-notice';
+        retryNotice.innerHTML = 'Still trying to load data for this team. Please wait...';
+        retryNotice.style.cssText = `
+            background-color: #fff3cd; 
+            border: 1px solid #ffeeba; 
+            color: #856404; 
+            padding: 10px; 
+            margin-top: 10px; 
+            border-radius: 5px; 
+            text-align: center;
+            font-size: 0.9em;
+        `;
+        predictionElement.appendChild(retryNotice);
+        setTimeout(() => retryNotice.remove(), 5000); // Remove notice after 5 seconds
+    }
+
+    fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
+        headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateTeamUI(data, index, isHome, formElement, historyElement, predictionElement);
+            progressBar.parentElement.remove();
+
+            const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
+            const otherTeamLoaded = isHome ?
+                !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
+                !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
+            if (otherTeamLoaded) {
+                fetchPrediction(index, matchCard.dataset.homeId, matchCard.dataset.awayId);
             }
-
-            fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
-                headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    updateTeamUI(data, index, isHome, formElement, historyElement, predictionElement);
-                    progressBar.parentElement.remove();
-
-                    const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
-                    const otherTeamLoaded = isHome ?
-                        !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
-                        !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
-                    if (otherTeamLoaded) {
-                        fetchPrediction(index, matchCard.dataset.homeId, matchCard.dataset.awayId);
-                    }
-                } else if (data.retry && attempt < maxAttempts) {
-                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-                    setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
-                } else {
-                    console.error(`Max retries reached for team ${teamId}`);
-                    formElement.innerHTML = '<p>Error loading data</p>';
-                    progressBar.parentElement.remove();
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching team data:', error);
-                if (attempt < maxAttempts) {
-                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-                    setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
-                } else {
-                    formElement.innerHTML = '<p>Failed to load data</p>';
-                    progressBar.parentElement.remove();
-                }
-            });
+        } else if (data.retry && attempt < maxAttempts) {
+            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+            setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+        } else {
+            console.error(`Max retries reached for team ${teamId}`);
+            formElement.innerHTML = '<p>Error loading data</p>';
+            progressBar.parentElement.remove();
+            predictionElement.querySelector('.retry-notice')?.remove();
         }
+    })
+    .catch(error => {
+        console.error('Error fetching team data:', error);
+        if (attempt < maxAttempts) {
+            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+            setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+        } else {
+            formElement.innerHTML = '<p>Failed to load data</p>';
+            progressBar.parentElement.remove();
+            predictionElement.querySelector('.retry-notice')?.remove();
+        }
+    });
+}
 
         function updateTeamUI(data, index, isHome, formElement, historyElement, predictionElement) {
             let formHtml = '';
@@ -1558,44 +1581,76 @@ try {
             }
         }
 
-        function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 5) {
-            const delay = Math.min(Math.pow(2, attempt) * 1000, 32000);
-            fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
-                headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const predictionElement = document.getElementById(`prediction-${index}`);
-                    predictionElement.innerHTML = `
-                        <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
-                        <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
-                        <p class="confidence">Confidence: ${data.confidence}</p>
-                        <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
-                    `;
-                    const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
-                    applyAdvantageHighlight(matchCard, data.advantage);
-                } else if (data.retry && attempt < maxAttempts) {
-                    const predictionElement = document.getElementById(`prediction-${index}`);
-                    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
-                    if (!progressBar.classList.contains('progress-fill')) {
-                        progressBar.classList.add('progress-fill');
-                        const progressContainer = document.createElement('div');
-                        progressContainer.classList.add('progress-bar');
-                        progressContainer.appendChild(progressBar);
-                        predictionElement.appendChild(progressContainer);
-                    }
-                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-                    setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching prediction:', error);
-                if (attempt < maxAttempts) {
-                    setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
-                }
-            });
+        
+            function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 10) {
+    const delay = Math.min(Math.pow(2, attempt) * 1000, 10000); // Max delay reduced to 10s
+    const predictionElement = document.getElementById(`prediction-${index}`);
+    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
+
+    // Add progress bar if not already present
+    if (!progressBar.classList.contains('progress-fill')) {
+        progressBar.classList.add('progress-fill');
+        const progressContainer = document.createElement('div');
+        progressContainer.classList.add('progress-bar');
+        progressContainer.appendChild(progressBar);
+        predictionElement.appendChild(progressContainer);
+    }
+
+    // Notify user after 5 attempts
+    if (attempt === 5) {
+        const retryNotice = document.createElement('div');
+        retryNotice.className = 'retry-notice';
+        retryNotice.innerHTML = 'Still predicting match outcome. Please wait...';
+        retryNotice.style.cssText = `
+            background-color: #fff3cd; 
+            border: 1px solid #ffeeba; 
+            color: #856404; 
+            padding: 10px; 
+            margin-top: 10px; 
+            border-radius: 5px; 
+            text-align: center;
+            font-size: 0.9em;
+        `;
+        predictionElement.appendChild(retryNotice);
+        setTimeout(() => retryNotice.remove(), 5000); // Remove notice after 5 seconds
+    }
+
+    fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
+        headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            predictionElement.innerHTML = `
+                <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
+                <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
+                <p class="confidence">Confidence: ${data.confidence}</p>
+                <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
+            `;
+            const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
+            applyAdvantageHighlight(matchCard, data.advantage);
+            progressBar.parentElement.remove();
+            predictionElement.querySelector('.retry-notice')?.remove();
+        } else if (data.retry && attempt < maxAttempts) {
+            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+            setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
+        } else {
+            console.error(`Max retries reached for prediction ${index}`);
+            progressBar.parentElement.remove();
+            predictionElement.querySelector('.retry-notice')?.remove();
         }
+    })
+    .catch(error => {
+        console.error('Error fetching prediction:', error);
+        if (attempt < maxAttempts) {
+            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+            setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
+        } else {
+            progressBar.parentElement.remove();
+            predictionElement.querySelector('.retry-notice')?.remove();
+        }
+    });
+}
 
         function applyAdvantageHighlight(matchCard, advantage) {
             const homeTeam = matchCard.querySelector('.teams .team:first-child');
