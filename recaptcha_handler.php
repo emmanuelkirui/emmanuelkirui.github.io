@@ -248,7 +248,6 @@ class RecaptchaHandler {
                     <div class="info-section">
                         <p><span class="highlight">creativepulse.42web.io</span> needs to review the security of your connection before proceeding</p>
                         <p>Powered By: <span class="highlight">Google reCAPTCHA</span></p>
-                        <p>Secured By: <span class="highlight">xAI Security Team</span></p>
                         <p>Your IP: <span class="highlight">' . $clientIp . '</span></p>
                     </div>
                 </div>
