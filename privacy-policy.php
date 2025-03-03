@@ -201,7 +201,7 @@ $year = date("Y");
                 <li><strong>Personal Information:</strong> Data you voluntarily provide, such as your name, email address, phone number, or other identifiers, when you contact us, subscribe to newsletters, or submit inquiries.</li>
                 <li><strong>Usage Data:</strong> Automatically collected information about your interaction with our Services, including IP address, browser type, operating system, referral URLs, pages visited, timestamps, and device identifiers.</li>
                 <li><strong>Cookies and Tracking Technologies:</strong> Small data files or similar technologies (e.g., pixels, web beacons) stored on your device to personalize your experience, analyze usage, and enhance functionality (see Section 5 for details).</li>
-                <li><strong>Third-Party Data:</strong> Information obtained from third-party services we integrate, such as analytics providers, subject to their privacy policies (see our <a href="/third-party-services" class="contact-link">Third-Party Services</a> page).</li>
+                <li><strong>Third-Party Data:</strong> Information obtained from third-party services we integrate, such as analytics providers, subject to their privacy policies (see our <a href="/third-party.php" class="contact-link">Third-Party Services</a> page).</li>
             </ul>
             <p>You may choose not to provide certain information, but this could limit your ability to use some features of our Services.</p>
         </section>
@@ -214,14 +214,14 @@ $year = date("Y");
                 <li>Communicate with you, including responding to inquiries, providing customer support, or sending updates, newsletters, or promotional materials (with your consent where required).</li>
                 <li>Monitor and analyze usage trends, site performance, and security to optimize our Services.</li>
                 <li>Fulfill legal or regulatory obligations, such as responding to lawful requests from authorities.</li>
-                <li>Prevent fraud, enforce our <a href="/terms-and-conditions" class="contact-link">Terms & Conditions</a>, and protect the rights, property, or safety of ourselves and others.</li>
+                <li>Prevent fraud, enforce our <a href="/terms-conditions.php" class="contact-link">Terms & Conditions</a>, and protect the rights, property, or safety of ourselves and others.</li>
             </ul>
             <p>We do not sell, rent, or trade your personal information to third parties for marketing purposes.</p>
         </section>
 
         <section>
             <h2>3. Legal Basis for Processing</h2>
-            <p>Where applicable (e.g., under GDPR), we process your personal information based on the following legal grounds:</p>
+            <p>Where applicable (e.g, under GDPR), we process your personal information based on the following legal grounds:</p>
             <ul>
                 <li><strong>Consent:</strong> When you voluntarily provide information or opt-in to communications.</li>
                 <li><strong>Legitimate Interests:</strong> To improve our Services, ensure security, or manage our operations, provided your rights are not overridden.</li>
@@ -290,7 +290,7 @@ $year = date("Y");
 
         <section>
             <h2>9. International Data Transfers</h2>
-            <p>If you access our Services from outside [Insert Jurisdiction, e.g., "Kenya" or "the United States"], your data may be transferred to and processed in [Insert Country/Region]. We ensure such transfers comply with applicable data protection laws, using mechanisms like Standard Contractual Clauses where required.</p>
+            <p>If you access our Services from outside Kenya, your data may be transferred to and processed in [Country/Region]. We ensure such transfers comply with applicable data protection laws, using mechanisms like Standard Contractual Clauses where required.</p>
         </section>
 
         <section>
@@ -308,7 +308,7 @@ $year = date("Y");
             <p>For questions, requests, or complaints about this Privacy Policy or our data practices, please reach out to:</p>
             <ul>
                 <li><strong>Email:</strong> <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a></li>
-                <li><strong>Mail:</strong> [Insert Physical Address, if applicable]</li>
+                <li><strong>City:</strong> Nairobi Kenya </li>
             </ul>
             <p>We are dedicated to resolving your concerns promptly and transparently.</p>
         </section>
