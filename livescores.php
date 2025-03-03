@@ -153,6 +153,8 @@ $paginatedMatches = array_slice($matches, $offset, $itemsPerPage);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Scores</title>
+    <!-- Preconnect to Football Data API -->
+    <link rel="preconnect" href="https://api.football-data.org">
     <link rel="stylesheet" href="css/bulma.min.css"> <!-- Bulma CSS -->
     <link rel="stylesheet" href="css/styles.css"> <!-- Custom Styles -->
     <link rel="stylesheet" href="../css/network-status.css">
