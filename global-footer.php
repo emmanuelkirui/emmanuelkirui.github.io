@@ -299,7 +299,7 @@ $year = date("Y"); // Auto-updating year
 <!-- Cookie Consent -->
 <div id="cookieConsent">
     <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience.
-        <a href="privacy-policy.php">Learn</a>.
+        <a href="privacy-policy.php">Learn More</a>.
     </p>
     <button id="acceptCookies">Accept</button>
 </div>
