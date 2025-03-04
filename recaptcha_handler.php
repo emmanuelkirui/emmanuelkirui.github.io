@@ -155,16 +155,19 @@ class RecaptchaHandler {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.3); /* Slightly more transparent */
-                    backdrop-filter: blur(5px); /* Adds blur effect to background */
-                    -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
+                    background: rgba(0, 0, 0, 0.3); /* Transparent overlay */
+                    backdrop-filter: blur(5px); /* Blur effect for background */
+                    -webkit-backdrop-filter: blur(5px); /* Safari support */
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     z-index: 10000;
                 }
                 .recaptcha-box {
-                    background: rgba(255, 255, 255, 0.95); /* Slightly transparent white for contrast */
+                    background: rgba(255, 255, 255, 0.1); /* Glassmorphism: transparent white */
+                    backdrop-filter: blur(10px); /* Slight blur for glass effect */
+                    -webkit-backdrop-filter: blur(10px); /* Safari support */
+                    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
                     padding: 40px;
                     border-radius: 16px;
                     max-width: 450px;
@@ -173,6 +176,7 @@ class RecaptchaHandler {
                     position: relative;
                     overflow: hidden;
                     animation: pulseIn 0.5s ease-out;
+                    color: #fff; /* White text for contrast */
                 }
                 @keyframes pulseIn {
                     0% { transform: scale(0.95); opacity: 0; }
@@ -180,7 +184,7 @@ class RecaptchaHandler {
                     100% { transform: scale(1); opacity: 1; }
                 }
                 h2 {
-                    color: #1e3c72;
+                    color: #fff; /* White for glass effect */
                     font-size: 28px;
                     margin-bottom: 10px;
                     font-weight: 700;
@@ -203,17 +207,17 @@ class RecaptchaHandler {
                     100% { transform: scale(1); }
                 }
                 .verify-text {
-                    color: #777;
+                    color: #ddd; /* Lighter gray for readability */
                     font-size: 14px;
                     margin-bottom: 20px;
                     font-style: italic;
                 }
                 .info-section {
-                    color: #555;
+                    color: #eee; /* Light text for contrast */
                     font-size: 13px;
                     margin-top: 25px;
                     line-height: 1.8;
-                    background: #f5f7fa;
+                    background: rgba(245, 247, 250, 0.1); /* Transparent info box */
                     padding: 15px;
                     border-radius: 10px;
                     border-left: 4px solid #2a5298;
