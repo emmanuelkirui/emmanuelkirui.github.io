@@ -1,5 +1,7 @@
 <?php
-session_start();
+// Include authentication logic at the top
+require_once 'auth_user.php'; // This starts the session and handles auth logic
+
 require_once 'recaptcha_handler.php';
 
 // Set timezone to East Africa Time (Nairobi, Kenya, UTC+3)
@@ -14,7 +16,7 @@ $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
-// Error handling functions remain unchanged
+// Error handling functions
 function handleError($message) {
     if (!headers_sent()) {
         header('Content-Type: text/html; charset=UTF-8');
@@ -33,7 +35,7 @@ function handleJsonError($message) {
     exit;
 }
 
-// fetchWithRetry, fetchTeamResults, fetchStandings, fetchTeams, calculateTeamStrength, predictMatch functions remain unchanged
+// Fetch functions (unchanged)
 function fetchWithRetry($url, $apiKey, $isAjax = false) {
     $attempt = isset($_GET['attempt']) ? (int)$_GET['attempt'] : 0;
     
@@ -312,7 +314,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     }
 }
 
-// AJAX handling remains unchanged
+// AJAX handling
 $action = $_GET['action'] ?? 'main';
 if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match', 'search_teams'])) {
     header('Content-Type: application/json');
@@ -413,71 +415,23 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
     }
 }
 
-// Navigation bar remains unchanged
+// Navigation bar
 if (!isset($_GET['ajax'])) {
     echo "<nav class='navbar'>";
     echo "<div class='navbar-container'>";
     echo "<div class='navbar-brand'>CPS Football</div>";
     echo "<div class='hamburger' onclick='toggleMenu()'><span></span><span></span><span></span></div>";
     echo "<div class='nav-menu' id='navMenu'>";
-    echo "<a href='valmanu' class='nav-link'>Home</a>";
+    echo "<a href='valmanu.php' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
     echo "</nav>";
-
-    echo "<script>
-    function toggleMenu() {
-        const menu = document.getElementById('navMenu');
-        const hamburger = document.querySelector('.hamburger');
-        const container = document.querySelector('.container');
-        menu.classList.toggle('active');
-        hamburger.classList.toggle('active');
-        
-        if (window.innerWidth <= 768) {
-            if (menu.classList.contains('active')) {
-                const menuHeight = menu.scrollHeight + 20;
-                container.style.paddingTop = (60 + menuHeight) + 'px';
-            } else {
-                container.style.paddingTop = '80px';
-            }
-        }
-    }
-
-    window.addEventListener('resize', function() {
-        const menu = document.getElementById('navMenu');
-        const hamburger = document.querySelector('.hamburger');
-        const container = document.querySelector('.container');
-        if (window.innerWidth > 768) {
-            menu.classList.remove('active');
-            hamburger.classList.remove('active');
-            container.style.paddingTop = '80px';
-        } else {
-            if (menu.classList.contains('active')) {
-                const menuHeight = menu.scrollHeight + 20;
-                container.style.paddingTop = (60 + menuHeight) + 'px';
-            } else {
-                container.style.paddingTop = '80px';
-            }
-        }
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const menu = document.getElementById('navMenu');
-        const container = document.querySelector('.container');
-        if (window.innerWidth > 768) {
-            menu.classList.remove('active');
-            container.style.paddingTop = '80px';
-        } else {
-            container.style.paddingTop = '80px';
-        }
-    });
-    </script>";
 }
 
-// Main page logic remains largely unchanged
+// Main page logic
 try {
     $competitionsUrl = $baseUrl . 'competitions';
     $compResponse = fetchWithRetry($competitionsUrl, $apiKey);
@@ -577,7 +531,6 @@ try {
             transition: all 0.3s ease;
         }
 
-        /* Existing navbar styles remain unchanged */
         .navbar {
             width: 100%;
             background-color: var(--card-bg);
@@ -681,7 +634,7 @@ try {
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 80px 20px 20px;
+            padding: 80px 20px 20px; /* Adjusted to account for auth UI */
             transition: padding-top 0.3s ease;
         }
 
@@ -881,7 +834,6 @@ try {
             transform: translateY(-5px);
         }
 
-        /* New table view styles */
         .view-toggle {
             margin: 5px;
         }
@@ -944,24 +896,12 @@ try {
         [data-theme="dark"] .match-table tr:hover {
             background-color: rgba(255, 255, 255, 0.05);
         }
-        /* Add these to your existing CSS in the <style> section */
-.match-table .form-display span.win {
-    color: #28a745; /* Green */
-}
 
-.match-table .form-display span.draw {
-    color: #fd7e14; /* Orange */
-}
+        .match-table .form-display span.win { color: #28a745; }
+        .match-table .form-display span.draw { color: #fd7e14; }
+        .match-table .form-display span.loss { color: #dc3545; }
+        .match-table .form-display span.latest { text-decoration: underline; }
 
-.match-table .form-display span.loss {
-    color: #dc3545; /* Red */
-}
-
-.match-table .form-display span.latest {
-    text-decoration: underline;
-}
-
-        /* Existing match card styles */
         .teams {
             display: flex;
             justify-content: center;
@@ -1099,25 +1039,11 @@ try {
             background-color: rgba(52, 152, 219, 0.1);
         }
 
-        .form-display .win {
-            color: #28a745;
-        }
-
-        .form-display .draw {
-            color: #fd7e14;
-        }
-
-        .form-display .loss {
-            color: #dc3545;
-        }
-
-        .form-display .empty {
-            color: #6c757d;
-        }
-
-        .form-display.updated {
-            animation: pulse 0.5s ease-in-out 2;
-        }
+        .form-display .win { color: #28a745; }
+        .form-display .draw { color: #fd7e14; }
+        .form-display .loss { color: #dc3545; }
+        .form-display .empty { color: #6c757d; }
+        .form-display.updated { animation: pulse 0.5s ease-in-out 2; }
 
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -1125,7 +1051,6 @@ try {
             100% { transform: scale(1); }
         }
 
-        /* Rest of your existing styles remain unchanged */
         .retry-message {
             text-align: center;
             margin: 2rem 0;
@@ -1258,23 +1183,12 @@ try {
             margin-top: 5px;
         }
 
-        .advantage-home-advantage {
-            color: var(--primary-color);
-        }
-
-        .advantage-away-advantage {
-            color: #e74c3c;
-        }
-
-        .advantage-likely-draw {
-            color: #f1c40f;
-        }
+        .advantage-home-advantage { color: var(--primary-color); }
+        .advantage-away-advantage { color: #e74c3c; }
+        .advantage-likely-draw { color: #f1c40f; }
 
         @media (max-width: 768px) {
-            .hamburger {
-                display: flex;
-            }
-
+            .hamburger { display: flex; }
             .nav-menu {
                 position: absolute;
                 top: 60px;
@@ -1289,44 +1203,23 @@ try {
                 padding: 0 20px;
                 gap: 10px;
             }
-
-            .nav-menu.active {
-                max-height: 500px;
-            }
-
+            .nav-menu.active { max-height: 500px; }
             .nav-link {
                 width: 100%;
                 text-align: left;
                 padding: 12px 20px;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             }
-
-            .nav-link:last-child {
-                border-bottom: none;
-            }
-
-            .theme-toggle {
-                width: 40px;
-                height: 40px;
-                margin: 10px 0;
-            }
-
-            .search-container {
-                max-width: 100%;
-            }
-
-            .match-table table {
-                font-size: 0.9em;
-            }
-            
-            .match-table th,
-            .match-table td {
-                padding: 10px;
-            }
+            .nav-link:last-child { border-bottom: none; }
+            .theme-toggle { width: 40px; height: 40px; margin: 10px 0; }
+            .search-container { max-width: 100%; }
+            .match-table table { font-size: 0.9em; }
+            .match-table th, .match-table td { padding: 10px; }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation bar is already output above -->
     <div class="container">
         <div class="header">
             <h1>CPS Football Predictions</h1>
@@ -1500,81 +1393,124 @@ try {
                 ?>
             </div>
 
-
             <div class="match-table" id="match-table" style="display: none;">
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Home Team</th>
-                <th>Score</th>
-                <th>Away Team</th>
-                <th>Prediction</th>
-                <th>Confidence</th>
-                <th>Predicted Score</th>
-                <th>Form (H/A)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            if (!empty($allMatches)) {
-                foreach ($allMatches as $index => $match) {
-                    if (isset($match['status'])) {
-                        $homeTeamId = $match['homeTeam']['id'] ?? 0;
-                        $awayTeamId = $match['awayTeam']['id'] ?? 0;
-                        $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
-                        $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
-                        $date = $match['utcDate'] ?? 'TBD' ? date('M d, H:i', strtotime($match['utcDate'])) : 'TBD';
-                        $status = $match['status'];
-                        $homeGoals = $match['score']['fullTime']['home'] ?? null;
-                        $awayGoals = $match['score']['fullTime']['away'] ?? null;
-                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
-                        $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
-                        $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Home Team</th>
+                            <th>Score</th>
+                            <th>Away Team</th>
+                            <th>Prediction</th>
+                            <th>Confidence</th>
+                            <th>Predicted Score</th>
+                            <th>Form (H/A)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (!empty($allMatches)) {
+                            foreach ($allMatches as $index => $match) {
+                                if (isset($match['status'])) {
+                                    $homeTeamId = $match['homeTeam']['id'] ?? 0;
+                                    $awayTeamId = $match['awayTeam']['id'] ?? 0;
+                                    $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
+                                    $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
+                                    $date = $match['utcDate'] ?? 'TBD' ? date('M d, H:i', strtotime($match['utcDate'])) : 'TBD';
+                                    $status = $match['status'];
+                                    $homeGoals = $match['score']['fullTime']['home'] ?? null;
+                                    $awayGoals = $match['score']['fullTime']['away'] ?? null;
+                                    [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                                    $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                                    $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
 
-                        // Process home form - latest on right
-                        $homeFormDisplay = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
-                        $homeFormHtml = '';
-                        $formLength = strlen(trim($homeStats['form'], '-'));
-                        for ($i = 0; $i < 6; $i++) {
-                            $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                            // Check if this is the last non-dash character from the right
-                            if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
-                            $homeFormHtml .= "<span class='$class'>{$homeFormDisplay[$i]}</span>";
+                                    // Process home form - latest on right
+                                    $homeFormDisplay = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                                    $homeFormHtml = '';
+                                    $formLength = strlen(trim($homeStats['form'], '-'));
+                                    for ($i = 0; $i < 6; $i++) {
+                                        $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
+                                        if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
+                                        $homeFormHtml .= "<span class='$class'>{$homeFormDisplay[$i]}</span>";
+                                    }
+
+                                    // Process away form - latest on right
+                                    $awayFormDisplay = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                                    $awayFormHtml = '';
+                                    $formLength = strlen(trim($awayStats['form'], '-'));
+                                    for ($i = 0; $i < 6; $i++) {
+                                        $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
+                                        if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
+                                        $awayFormHtml .= "<span class='$class'>{$awayFormDisplay[$i]}</span>";
+                                    }
+
+                                    echo "<tr data-index='$index' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-status='$status'>
+                                        <td>$date</td>
+                                        <td>$homeTeam<div class='form-display' id='table-form-home-$index'>$homeFormHtml</div></td>
+                                        <td>" . ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null ? "$homeGoals - $awayGoals" : "-") . "</td>
+                                        <td>$awayTeam<div class='form-display' id='table-form-away-$index'>$awayFormHtml</div></td>
+                                        <td id='table-prediction-$index'>$prediction $resultIndicator</td>
+                                        <td id='table-confidence-$index'>$confidence</td>
+                                        <td id='table-predicted-score-$index'>$predictedScore</td>
+                                        <td>$homeForm / $awayForm</td>
+                                    </tr>";
+                                }
+                            }
                         }
-
-                        // Process away form - latest on right
-                        $awayFormDisplay = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
-                        $awayFormHtml = '';
-                        $formLength = strlen(trim($awayStats['form'], '-'));
-                        for ($i = 0; $i < 6; $i++) {
-                            $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                            // Check if this is the last non-dash character from the right
-                            if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
-                            $awayFormHtml .= "<span class='$class'>{$awayFormDisplay[$i]}</span>";
-                        }
-
-                        echo "<tr data-index='$index' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-status='$status'>
-                            <td>$date</td>
-                            <td>$homeTeam<div class='form-display' id='table-form-home-$index'>$homeFormHtml</div></td>
-                            <td>" . ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null ? "$homeGoals - $awayGoals" : "-") . "</td>
-                            <td>$awayTeam<div class='form-display' id='table-form-away-$index'>$awayFormHtml</div></td>
-                            <td id='table-prediction-$index'>$prediction $resultIndicator</td>
-                            <td id='table-confidence-$index'>$confidence</td>
-                            <td id='table-predicted-score-$index'>$predictedScore</td>
-                            <td>$homeForm / $awayForm</td>
-                        </tr>";
-                    }
-                }
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            const hamburger = document.querySelector('.hamburger');
+            const container = document.querySelector('.container');
+            menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            
+            if (window.innerWidth <= 768) {
+                if (menu.classList.contains('active')) {
+                    const menuHeight = menu.scrollHeight + 20;
+                    container.style.paddingTop = (60 + menuHeight) + 'px';
+                } else {
+                    container.style.paddingTop = '80px';
+                }
+            }
+        }
+
+        window.addEventListener('resize', function() {
+            const menu = document.getElementById('navMenu');
+            const hamburger = document.querySelector('.hamburger');
+            const container = document.querySelector('.container');
+            if (window.innerWidth > 768) {
+                menu.classList.remove('active');
+                hamburger.classList.remove('active');
+                container.style.paddingTop = '80px';
+            } else {
+                if (menu.classList.contains('active')) {
+                    const menuHeight = menu.scrollHeight + 20;
+                    container.style.paddingTop = (60 + menuHeight) + 'px';
+                } else {
+                    container.style.paddingTop = '80px';
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const menu = document.getElementById('navMenu');
+            const container = document.querySelector('.container');
+            if (window.innerWidth > 768) {
+                menu.classList.remove('active');
+                container.style.paddingTop = '80px';
+            } else {
+                container.style.paddingTop = '80px';
+            }
+        });
+
         function switchView(view) {
             const gridView = document.getElementById('match-grid');
             const tableView = document.getElementById('match-table');
@@ -1617,7 +1553,7 @@ try {
         }
 
         function updateUrl(comp, filter) {
-            let url = `?competition=${comp}&filter=${filter}`;
+            let url = `valmanu.php?competition=${comp}&filter=${filter}`;
             if (filter === 'custom') {
                 const start = document.querySelector('input[name="start"]').value;
                 const end = document.querySelector('input[name="end"]').value;
@@ -1689,7 +1625,7 @@ try {
                 setTimeout(() => retryNotice.remove(), 5000);
             }
 
-            fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
+            fetch(`valmanu.php?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
@@ -1807,7 +1743,7 @@ try {
                 setTimeout(() => retryNotice.remove(), 5000);
             }
 
-            fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
+            fetch(`valmanu.php?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
                 headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
             })
             .then(response => response.json())
@@ -1864,121 +1800,118 @@ try {
             }
         }
 
-         function startMatchPolling() {
-    setInterval(() => {
-        document.querySelectorAll('.match-card, .match-table tr').forEach(element => {
-            const homeId = element.dataset.homeId;
-            const awayId = element.dataset.awayId;
-            const index = element.dataset.index;
-            const status = element.dataset.status;
-            const matchInfo = element.classList.contains('match-card') 
-                ? element.querySelector('.match-info p').textContent 
-                : element.cells[0].textContent;
+        function startMatchPolling() {
+            setInterval(() => {
+                document.querySelectorAll('.match-card, .match-table tr').forEach(element => {
+                    const homeId = element.dataset.homeId;
+                    const awayId = element.dataset.awayId;
+                    const index = element.dataset.index;
+                    const status = element.dataset.status;
+                    const matchInfo = element.classList.contains('match-card') 
+                        ? element.querySelector('.match-info p').textContent 
+                        : element.cells[0].textContent;
 
-            if (matchInfo.includes('FINISHED') && element.querySelector('.result-indicator')) return;
+                    if (matchInfo.includes('FINISHED') && element.querySelector('.result-indicator')) return;
 
-            fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        if (element.classList.contains('match-card')) {
-                            // Existing match-card update code remains unchanged
-                            const predictionElement = document.getElementById(`prediction-${index}`);
-                            const homeFormElement = document.getElementById(`form-home-${index}`);
-                            const awayFormElement = document.getElementById(`form-away-${index}`);
-                            const matchInfoElement = element.querySelector('.match-info p');
+                    fetch(`valmanu.php?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                if (element.classList.contains('match-card')) {
+                                    const predictionElement = document.getElementById(`prediction-${index}`);
+                                    const homeFormElement = document.getElementById(`form-home-${index}`);
+                                    const awayFormElement = document.getElementById(`form-away-${index}`);
+                                    const matchInfoElement = element.querySelector('.match-info p');
 
-                            predictionElement.innerHTML = `
-                                <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
-                                <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
-                                <p class="confidence">Confidence: ${data.confidence}</p>
-                                <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
-                            `;
-                            applyAdvantageHighlight(element, data.advantage);
+                                    predictionElement.innerHTML = `
+                                        <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
+                                        <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
+                                        <p class="confidence">Confidence: ${data.confidence}</p>
+                                        <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
+                                    `;
+                                    applyAdvantageHighlight(element, data.advantage);
 
-                            if (data.resultIndicator) {
-                                element.dataset.status = 'FINISHED';
-                                const currentText = matchInfoElement.textContent.split(' - ')[0];
-                                fetch(`?action=fetch_team_data&teamId=${homeId}&competition=<?php echo $selectedComp; ?>&force_refresh=true`)
-                                    .then(res => res.json())
-                                    .then(homeData => {
-                                        const homeGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[1] || 'N/A';
-                                        const awayGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[2] || 'N/A';
-                                        matchInfoElement.textContent = `${currentText} - ${homeGoals} : ${awayGoals}`;
-                                    });
+                                    if (data.resultIndicator) {
+                                        element.dataset.status = 'FINISHED';
+                                        const currentText = matchInfoElement.textContent.split(' - ')[0];
+                                        fetch(`valmanu.php?action=fetch_team_data&teamId=${homeId}&competition=<?php echo $selectedComp; ?>&force_refresh=true`)
+                                            .then(res => res.json())
+                                            .then(homeData => {
+                                                const homeGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[1] || 'N/A';
+                                                const awayGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[2] || 'N/A';
+                                                matchInfoElement.textContent = `${currentText} - ${homeGoals} : ${awayGoals}`;
+                                            });
 
-                                const homeForm = data.homeForm.slice(-6).padStart(6, '-').split('').reverse().join('');
-                                let homeFormHtml = '';
-                                for (let i = 0; i < 6; i++) {
-                                    let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (i === 5 && homeForm[i] !== '-' && data.homeForm.trim('-').length > 0) className += ' latest';
-                                    homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
+                                        const homeForm = data.homeForm.slice(-6).padStart(6, '-').split('').reverse().join('');
+                                        let homeFormHtml = '';
+                                        for (let i = 0; i < 6; i++) {
+                                            let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
+                                            if (i === 5 && homeForm[i] !== '-' && data.homeForm.trim('-').length > 0) className += ' latest';
+                                            homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
+                                        }
+                                        homeFormElement.innerHTML = homeFormHtml;
+                                        homeFormElement.dataset.form = data.homeForm;
+
+                                        const awayForm = data.awayForm.slice(-6).padStart(6, '-').split('').reverse().join('');
+                                        let awayFormHtml = '';
+                                        for (let i = 0; i < 6; i++) {
+                                            let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
+                                            if (i === 5 && awayForm[i] !== '-' && data.awayForm.trim('-').length > 0) className += ' latest';
+                                            awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
+                                        }
+                                        awayFormElement.innerHTML = awayFormHtml;
+                                        awayFormElement.dataset.form = data.awayForm;
+
+                                        [homeFormElement, awayFormElement].forEach(el => {
+                                            el.classList.add('updated');
+                                            setTimeout(() => el.classList.remove('updated'), 2000);
+                                        });
+                                    }
+                                } else {
+                                    const tablePrediction = document.getElementById(`table-prediction-${index}`);
+                                    const tableConfidence = document.getElementById(`table-confidence-${index}`);
+                                    const tablePredictedScore = document.getElementById(`table-predicted-score-${index}`);
+                                    const tableHomeForm = document.getElementById(`table-form-home-${index}`);
+                                    const tableAwayForm = document.getElementById(`table-form-away-${index}`);
+
+                                    tablePrediction.innerHTML = `${data.prediction} ${data.resultIndicator}`;
+                                    tableConfidence.innerHTML = data.confidence;
+                                    tablePredictedScore.innerHTML = data.predictedScore;
+
+                                    if (data.resultIndicator) {
+                                        element.dataset.status = 'FINISHED';
+                                        element.cells[2].textContent = `${data.homeGoals || 'N/A'} - ${data.awayGoals || 'N/A'}`;
+
+                                        const homeForm = data.homeForm.slice(-6).padStart(6, '-');
+                                        let homeFormHtml = '';
+                                        const homeFormLength = data.homeForm.trim('-').length;
+                                        for (let i = 0; i < 6; i++) {
+                                            let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
+                                            if (homeFormLength > 0 && i === (5 - (6 - $homeFormLength))) className += ' latest';
+                                            homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
+                                        }
+                                        tableHomeForm.innerHTML = homeFormHtml;
+
+                                        const awayForm = data.awayForm.slice(-6).padStart(6, '-');
+                                        let awayFormHtml = '';
+                                        const awayFormLength = data.awayForm.trim('-').length;
+                                        for (let i = 0; i < 6; i++) {
+                                            let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
+                                            if (awayFormLength > 0 && i === (5 - (6 - $awayFormLength))) className += ' latest';
+                                            awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
+                                        }
+                                        tableAwayForm.innerHTML = awayFormHtml;
+
+                                        element.cells[7].textContent = `${data.homeForm} / ${data.awayForm}`;
+                                    }
                                 }
-                                homeFormElement.innerHTML = homeFormHtml;
-                                homeFormElement.dataset.form = data.homeForm;
-
-                                const awayForm = data.awayForm.slice(-6).padStart(6, '-').split('').reverse().join('');
-                                let awayFormHtml = '';
-                                for (let i = 0; i < 6; i++) {
-                                    let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (i === 5 && awayForm[i] !== '-' && data.awayForm.trim('-').length > 0) className += ' latest';
-                                    awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
-                                }
-                                awayFormElement.innerHTML = awayFormHtml;
-                                awayFormElement.dataset.form = data.awayForm;
-
-                                [homeFormElement, awayFormElement].forEach(el => {
-                                    el.classList.add('updated');
-                                    setTimeout(() => el.classList.remove('updated'), 2000);
-                                });
                             }
-                        } else {
-                            const tablePrediction = document.getElementById(`table-prediction-${index}`);
-                            const tableConfidence = document.getElementById(`table-confidence-${index}`);
-                            const tablePredictedScore = document.getElementById(`table-predicted-score-${index}`);
-                            const tableHomeForm = document.getElementById(`table-form-home-${index}`);
-                            const tableAwayForm = document.getElementById(`table-form-away-${index}`);
+                        })
+                        .catch(error => console.error('Polling error:', error));
+                });
+            }, 60000);
+        }
 
-                            tablePrediction.innerHTML = `${data.prediction} ${data.resultIndicator}`;
-                            tableConfidence.innerHTML = data.confidence;
-                            tablePredictedScore.innerHTML = data.predictedScore;
-
-                            if (data.resultIndicator) {
-                                element.dataset.status = 'FINISHED';
-                                element.cells[2].textContent = `${data.homeGoals || 'N/A'} - ${data.awayGoals || 'N/A'}`;
-
-                                // Updated table form display - latest on right
-                                const homeForm = data.homeForm.slice(-6).padStart(6, '-');
-                                let homeFormHtml = '';
-                                const homeFormLength = data.homeForm.trim('-').length;
-                                for (let i = 0; i < 6; i++) {
-                                    let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (homeFormLength > 0 && i === (5 - (6 - homeFormLength))) className += ' latest';
-                                    homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
-                                }
-                                tableHomeForm.innerHTML = homeFormHtml;
-
-                                const awayForm = data.awayForm.slice(-6).padStart(6, '-');
-                                let awayFormHtml = '';
-                                const awayFormLength = data.awayForm.trim('-').length;
-                                for (let i = 0; i < 6; i++) {
-                                    let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (awayFormLength > 0 && i === (5 - (6 - awayFormLength))) className += ' latest';
-                                    awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
-                                }
-                                tableAwayForm.innerHTML = awayFormHtml;
-
-                                element.cells[7].textContent = `${data.homeForm} / ${data.awayForm}`;
-                            }
-                        }
-                    }
-                })
-                .catch(error => console.error('Polling error:', error));
-        });
-    }, 60000);
-}
-  
-                                
         const searchInput = document.querySelector('.search-input');
         const autocompleteDropdown = document.querySelector('.autocomplete-dropdown');
         const searchContainer = document.querySelector('.search-container');
@@ -1994,7 +1927,7 @@ try {
                     return;
                 }
 
-                fetch(`?action=search_teams&query=${encodeURIComponent(query)}&competition=<?php echo $selectedComp; ?>`)
+                fetch(`valmanu.php?action=search_teams&query=${encodeURIComponent(query)}&competition=<?php echo $selectedComp; ?>`)
                     .then(response => response.json())
                     .then(teams => {
                         if (teams.length === 0) {
@@ -2022,7 +1955,7 @@ try {
             if (item && item.dataset.teamName) {
                 searchInput.value = item.dataset.teamName;
                 searchContainer.classList.remove('active');
-                window.location.href = `?competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>&team=${encodeURIComponent(item.dataset.teamName)}`;
+                window.location.href = `valmanu.php?competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>&team=${encodeURIComponent(item.dataset.teamName)}`;
             }
         });
 
@@ -2113,4 +2046,3 @@ try {
 <script src="network-status.js"></script>
 <script src="tab-title-switcher.js"></script>
 <?php include 'global-footer.php'; ?>
-    
