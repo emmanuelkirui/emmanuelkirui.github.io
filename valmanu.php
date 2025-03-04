@@ -2063,7 +2063,15 @@ try {
             }
         });
 
-        // Function to convert table to image and share
+        // Function to generate a unique filename
+function generateUniqueFilename() {
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[-:T]/g, '').split('.')[0]; // e.g., 20250304_123456
+    const randomStr = Math.random().toString(36).substring(2, 6); // 4-char random string, e.g., "ab4x"
+    return `CPS#manu_${timestamp}_${randomStr}.png`;
+}
+
+// Function to convert table to image and share
 function shareTableAsImage() {
     const tableElement = document.querySelector('#match-table table');
     const shareBtn = document.getElementById('share-table-btn');
@@ -2077,7 +2085,7 @@ function shareTableAsImage() {
         scale: 2 // Increase resolution
     }).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
-        const fileName = `CPS_Football_Predictions_${new Date().toISOString().split('T')[0]}.png`;
+        const fileName = generateUniqueFilename(); // Use unique filename
 
         // Web Share API
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
@@ -2131,7 +2139,7 @@ document.getElementById('table-view-btn').addEventListener('click', function() {
         }
     }, 100);
 });
-
+        
         function adjustTeamSpacing() {
             document.querySelectorAll('.match-card').forEach(card => {
                 const teamsContainer = card.querySelector('.teams');
