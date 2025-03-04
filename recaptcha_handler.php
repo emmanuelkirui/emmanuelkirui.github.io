@@ -155,14 +155,16 @@ class RecaptchaHandler {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.6);
+                    background: rgba(0, 0, 0, 0.3); /* Slightly more transparent */
+                    backdrop-filter: blur(5px); /* Adds blur effect to background */
+                    -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     z-index: 10000;
                 }
                 .recaptcha-box {
-                    background: #fff;
+                    background: rgba(255, 255, 255, 0.95); /* Slightly transparent white for contrast */
                     padding: 40px;
                     border-radius: 16px;
                     max-width: 450px;
