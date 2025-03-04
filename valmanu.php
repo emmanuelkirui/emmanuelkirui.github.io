@@ -549,6 +549,7 @@ try {
     <title>CPS Football Predictions</title>
     <link rel="preconnect" href="http://api.football-data.org">
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #2ecc71;
@@ -1124,6 +1125,33 @@ try {
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        .table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.share-btn {
+    padding: 8px 16px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.share-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.share-icon {
+    font-size: 1.2em;
+}
 
         /* Rest of your existing styles remain unchanged */
         .retry-message {
@@ -1500,8 +1528,13 @@ try {
                 ?>
             </div>
 
-
-            <div class="match-table" id="match-table" style="display: none;">
+              <div class="match-table" id="match-table" style="display: none;">
+    <div class="table-header">
+        <h3>Match Predictions</h3>
+        <button id="share-table-btn" class="share-btn" title="Share Table">
+            <span class="share-icon">📤</span> Share
+        </button>
+    </div>
     <table>
         <thead>
             <tr>
@@ -1538,7 +1571,6 @@ try {
                         $formLength = strlen(trim($homeStats['form'], '-'));
                         for ($i = 0; $i < 6; $i++) {
                             $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                            // Check if this is the last non-dash character from the right
                             if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
                             $homeFormHtml .= "<span class='$class'>{$homeFormDisplay[$i]}</span>";
                         }
@@ -1549,7 +1581,6 @@ try {
                         $formLength = strlen(trim($awayStats['form'], '-'));
                         for ($i = 0; $i < 6; $i++) {
                             $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                            // Check if this is the last non-dash character from the right
                             if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
                             $awayFormHtml .= "<span class='$class'>{$awayFormDisplay[$i]}</span>";
                         }
@@ -1570,7 +1601,7 @@ try {
             ?>
         </tbody>
     </table>
-</div>
+</div                   
         </div>
     </div>
 
@@ -2031,6 +2062,75 @@ try {
                 searchContainer.classList.remove('active');
             }
         });
+
+        // Function to convert table to image and share
+function shareTableAsImage() {
+    const tableElement = document.querySelector('#match-table table');
+    const shareBtn = document.getElementById('share-table-btn');
+    
+    // Disable button during processing
+    shareBtn.disabled = true;
+    shareBtn.innerHTML = '<span class="share-icon">⏳</span> Processing...';
+
+    html2canvas(tableElement, {
+        backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg'), // Match theme
+        scale: 2 // Increase resolution
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const fileName = `CPS_Football_Predictions_${new Date().toISOString().split('T')[0]}.png`;
+
+        // Web Share API
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
+            canvas.toBlob(blob => {
+                const file = new File([blob], fileName, { type: 'image/png' });
+                navigator.share({
+                    title: 'CPS Football Predictions',
+                    text: 'Check out these football match predictions!',
+                    files: [file]
+                }).then(() => {
+                    console.log('Table shared successfully');
+                }).catch(err => {
+                    console.error('Share failed:', err);
+                    fallbackDownload(imgData, fileName);
+                });
+            });
+        } else {
+            // Fallback: Download the image
+            fallbackDownload(imgData, fileName);
+        }
+    }).catch(error => {
+        console.error('Error generating image:', error);
+        alert('Failed to generate table image. Please try again.');
+    }).finally(() => {
+        // Re-enable button
+        shareBtn.disabled = false;
+        shareBtn.innerHTML = '<span class="share-icon">📤</span> Share';
+    });
+}
+
+// Fallback function to download image
+function fallbackDownload(imgData, fileName) {
+    const link = document.createElement('a');
+    link.href = imgData;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Event listener for share button
+document.getElementById('share-table-btn').addEventListener('click', shareTableAsImage);
+
+// Ensure table view is visible when sharing
+document.getElementById('table-view-btn').addEventListener('click', function() {
+    switchView('table');
+    setTimeout(() => {
+        const table = document.getElementById('match-table');
+        if (table.style.display !== 'none') {
+            table.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, 100);
+});
 
         function adjustTeamSpacing() {
             document.querySelectorAll('.match-card').forEach(card => {
