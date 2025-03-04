@@ -159,52 +159,19 @@ class RecaptchaHandler {
                     backdrop-filter: blur(5px); /* Blur effect for background */
                     -webkit-backdrop-filter: blur(5px); /* Safari support */
                     display: flex;
+                    flex-direction: column; /* Stack content vertically */
                     align-items: center;
                     justify-content: center;
-                    z-index: 10000;
-                }
-                .recaptcha-box {
-                    background: rgba(255, 255, 255, 0.1); /* Glassmorphism: transparent white */
-                    backdrop-filter: blur(10px); /* Slight blur for glass effect */
-                    -webkit-backdrop-filter: blur(10px); /* Safari support */
-                    border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
-                    padding: 40px;
-                    border-radius: 16px;
-                    max-width: 450px;
-                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
                     text-align: center;
-                    position: relative;
-                    overflow: hidden;
-                    animation: pulseIn 0.5s ease-out;
+                    z-index: 10000;
                     color: #fff; /* White text for contrast */
                 }
-                @keyframes pulseIn {
-                    0% { transform: scale(0.95); opacity: 0; }
-                    50% { transform: scale(1.05); }
-                    100% { transform: scale(1); opacity: 1; }
-                }
                 h2 {
-                    color: #fff; /* White for glass effect */
+                    color: #fff;
                     font-size: 28px;
                     margin-bottom: 10px;
                     font-weight: 700;
                     letter-spacing: 1px;
-                }
-                .recaptcha-box::before {
-                    content: "";
-                    position: absolute;
-                    top: -50%;
-                    left: -50%;
-                    width: 200%;
-                    height: 200%;
-                    background: radial-gradient(circle, rgba(42, 82, 152, 0.1), transparent);
-                    animation: pulseBg 6s infinite;
-                    z-index: -1;
-                }
-                @keyframes pulseBg {
-                    0% { transform: scale(1); }
-                    50% { transform: scale(1.1); }
-                    100% { transform: scale(1); }
                 }
                 .verify-text {
                     color: #ddd; /* Lighter gray for readability */
@@ -221,6 +188,7 @@ class RecaptchaHandler {
                     padding: 15px;
                     border-radius: 10px;
                     border-left: 4px solid #2a5298;
+                    max-width: 450px; /* Match previous box width */
                 }
                 .info-section p {
                     margin: 5px 0;
@@ -243,19 +211,17 @@ class RecaptchaHandler {
         </head>
         <body>
             <div id="recaptcha-overlay">
-                <div class="recaptcha-box">
-                    <h2>creativepulse.42web.io</h2>
-                    <p class="verify-text">Verifying you are human. This may take a few seconds.</p>
-                    <div id="recaptcha-container">
-                        <input type="hidden" name="nonce" value="' . $nonce . '">
-                        <div class="g-recaptcha" data-sitekey="' . $this->siteKey . '" data-callback="onRecaptchaSuccess"></div>
-                    </div>
-                    <div id="recaptcha-message"></div>
-                    <div class="info-section">
-                        <p><span class="highlight">creativepulse.42web.io</span> needs to review the security of your connection before proceeding</p>
-                        <p>Powered By: <span class="highlight">Google reCAPTCHA</span></p>
-                        <p>Your IP: <span class="highlight">' . $clientIp . '</span></p>
-                    </div>
+                <h2>creativepulse.42web.io</h2>
+                <p class="verify-text">Verifying you are human. This may take a few seconds.</p>
+                <div id="recaptcha-container">
+                    <input type="hidden" name="nonce" value="' . $nonce . '">
+                    <div class="g-recaptcha" data-sitekey="' . $this->siteKey . '" data-callback="onRecaptchaSuccess"></div>
+                </div>
+                <div id="recaptcha-message"></div>
+                <div class="info-section">
+                    <p><span class="highlight">creativepulse.42web.io</span> needs to review the security of your connection before proceeding</p>
+                    <p>Powered By: <span class="highlight">Google reCAPTCHA</span></p>
+                    <p>Your IP: <span class="highlight">' . $clientIp . '</span></p>
                 </div>
             </div>
             <script nonce="' . $nonce . '" src="https://www.google.com/recaptcha/api.js" async defer></script>
