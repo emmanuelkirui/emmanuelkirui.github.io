@@ -155,16 +155,16 @@ class RecaptchaHandler {
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.3); /* Transparent overlay */
-                    backdrop-filter: blur(5px); /* Blur effect for background */
-                    -webkit-backdrop-filter: blur(5px); /* Safari support */
+                    background: rgba(0, 0, 0, 0.3);
+                    backdrop-filter: blur(5px);
+                    -webkit-backdrop-filter: blur(5px);
                     display: flex;
-                    flex-direction: column; /* Stack content vertically */
+                    flex-direction: column;
                     align-items: center;
                     justify-content: center;
                     text-align: center;
                     z-index: 10000;
-                    color: #fff; /* White text for contrast */
+                    color: #fff;
                 }
                 h2 {
                     color: #fff;
@@ -174,21 +174,21 @@ class RecaptchaHandler {
                     letter-spacing: 1px;
                 }
                 .verify-text {
-                    color: #ddd; /* Lighter gray for readability */
+                    color: #ddd;
                     font-size: 14px;
                     margin-bottom: 20px;
                     font-style: italic;
                 }
                 .info-section {
-                    color: #eee; /* Light text for contrast */
+                    color: #eee;
                     font-size: 13px;
                     margin-top: 25px;
                     line-height: 1.8;
-                    background: rgba(245, 247, 250, 0.1); /* Transparent info box */
+                    background: rgba(245, 247, 250, 0.1);
                     padding: 15px;
                     border-radius: 10px;
                     border-left: 4px solid #2a5298;
-                    max-width: 450px; /* Match previous box width */
+                    max-width: 450px;
                 }
                 .info-section p {
                     margin: 5px 0;
@@ -207,6 +207,20 @@ class RecaptchaHandler {
                     transform: scale(1.05);
                     transform-origin: center;
                 }
+                #reload-message {
+                    display: none;
+                    margin-top: 20px;
+                    font-size: 14px;
+                    color: #f1c40f;
+                }
+                #reload-message a {
+                    color: #3498db;
+                    text-decoration: none;
+                    font-weight: 600;
+                }
+                #reload-message a:hover {
+                    text-decoration: underline;
+                }
             </style>
         </head>
         <body>
@@ -218,6 +232,9 @@ class RecaptchaHandler {
                     <div class="g-recaptcha" data-sitekey="' . $this->siteKey . '" data-callback="onRecaptchaSuccess"></div>
                 </div>
                 <div id="recaptcha-message"></div>
+                <div id="reload-message">
+                    Taking too long? <a href="' . htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8') . '">Reload the page</a>
+                </div>
                 <div class="info-section">
                     <p><span class="highlight">creativepulse.42web.io</span> needs to review the security of your connection before proceeding</p>
                     <p>Powered By: <span class="highlight">Google reCAPTCHA</span></p>
@@ -252,6 +269,15 @@ class RecaptchaHandler {
                         grecaptcha.reset();
                     });
                 }
+
+                // Show reload message if verification takes too long
+                setTimeout(() => {
+                    const reloadMessage = document.getElementById("reload-message");
+                    const recaptchaMessage = document.getElementById("recaptcha-message");
+                    if (!recaptchaMessage.innerHTML) { // Only show if no success/error message yet
+                        reloadMessage.style.display = "block";
+                    }
+                }, 10000); // 10 seconds delay
             </script>
         </body>
         </html>';
