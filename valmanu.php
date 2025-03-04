@@ -413,21 +413,25 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
     }
 }
 
-// Navigation bar remains unchanged
+// Navigation bar updated with auth_user.php inclusion
 if (!isset($_GET['ajax'])) {
     echo "<nav class='navbar'>";
     echo "<div class='navbar-container'>";
     echo "<div class='navbar-brand'>CPS Football</div>";
     echo "<div class='hamburger' onclick='toggleMenu()'><span></span><span></span><span></span></div>";
     echo "<div class='nav-menu' id='navMenu'>";
-    echo "<a href='valmanu' class='nav-link'>Home</a>";
+    echo "<a href='valmanu.php' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+
+    // Include auth_user.php output inline
+    require_once 'auth_user.php'; // This will output either trigger buttons or dashboard
+
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
     echo "</nav>";
-
+}
     echo "<script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
