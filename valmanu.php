@@ -123,7 +123,11 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     }
     $data = $response['data'];
     error_log("Team $teamId last updated: " . ($data['lastUpdated'] ?? 'unknown'));
-    return ['error' => false, 'data' => $data['matches'] ?? []];
+    return [
+        'error' => false,
+        'data' => $data['matches'] ?? [],
+        'lastUpdated' => $data['lastUpdated'] ?? date('Y-m-d H:i:s') // Fallback to current time if API doesn't provide it
+    ];
 }
 
 function fetchStandings($competition, $apiKey, $baseUrl) {
@@ -237,13 +241,13 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
 
             $teamStats[$teamId] = $stats;
+            
         }
         return $teamStats[$teamId];
     } catch (Exception $e) {
         return ['error' => true, 'message' => "Error calculating team strength: " . $e->getMessage()];
     }
 }
-
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
@@ -253,9 +257,41 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             return ["N/A", "0%", "", "0-0", "", "", ""];
         }
 
+        // Create a unique match ID
+        $matchId = $homeTeamId . "_" . $awayTeamId . "_" . ($match['utcDate'] ?? 'unknown');
+
+        // Initialize arrays in session if not set
+        if (!isset($teamStats['predictions'])) {
+            $teamStats['predictions'] = [];
+        }
+        if (!isset($teamStats['randomFactors'])) {
+            $teamStats['randomFactors'] = [];
+        }
+
+        // Check for cached prediction and conditions to reuse it
+        $forceRefresh = isset($_GET['force_refresh']) && $_GET['force_refresh'] === 'true';
+        if (isset($teamStats['predictions'][$matchId]) && $match['status'] !== 'FINISHED' && !$forceRefresh) {
+            return $teamStats['predictions'][$matchId];
+        }
+
+        // Fetch team stats
         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $competition);
         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $competition);
 
+        // Check if stats have updated since last prediction
+        if (isset($teamStats['predictions'][$matchId])) {
+            $lastHomeUpdate = $teamStats[$homeTeamId]['lastUpdated'] ?? 'unknown';
+            $lastAwayUpdate = $teamStats[$awayTeamId]['lastUpdated'] ?? 'unknown';
+            $currentHomeUpdate = $homeStats['lastUpdated'] ?? 'unknown';
+            $currentAwayUpdate = $awayStats['lastUpdated'] ?? 'unknown';
+
+            if ($lastHomeUpdate !== $currentHomeUpdate || $lastAwayUpdate !== $currentAwayUpdate) {
+                unset($teamStats['predictions'][$matchId]); // Clear cache if stats changed
+                unset($teamStats['randomFactors'][$matchId]);
+            }
+        }
+
+        // Handle retry cases
         if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
             $retryInfo = [];
             if ($homeStats['retry']) $retryInfo['home'] = ['retrySeconds' => $homeStats['retrySeconds'], 'nextAttempt' => $homeStats['nextAttempt']];
@@ -291,20 +327,17 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
 
         // Dynamic Competition Factor
         $competitionBase = match ($competition) {
-            'UEFA Champions League' => 1.1, // Higher scoring, more variance
-            'English Championship' => 0.95, // Tighter, lower scoring
-            default => 1.0 // Neutral for unknown competitions
+            'UEFA Champions League' => 1.1,
+            'English Championship' => 0.95,
+            default => 1.0
         };
-        // Average goals per game for this matchup as a proxy
         $matchGoalAvg = ($homeGoalAvg + $awayGoalAvg + $homeConcededAvg + $awayConcededAvg) / 4;
-        // Variance factor from form streakiness and GD
         $homeFormArray = str_split(str_pad($homeStats['form'], 6, '-', STR_PAD_LEFT));
         $awayFormArray = str_split(str_pad($awayStats['form'], 6, '-', STR_PAD_LEFT));
         $homeStreak = abs(calculateStreak($homeFormArray));
         $awayStreak = abs(calculateStreak($awayFormArray));
-        $formVariance = 1 + ($homeStreak + $awayStreak) * 0.02; // More streaky = more variance
-        $gdVariance = 1 + (abs($homeGD) + abs($awayGD)) * 0.005 / max($homeGames, $awayGames); // Big GD = more blowout potential
-        // Dynamic factor: base + goal avg adjustment + variance
+        $formVariance = 1 + ($homeStreak + $awayStreak) * 0.02;
+        $gdVariance = 1 + (abs($homeGD) + abs($awayGD)) * 0.005 / max($homeGames, $awayGames);
         $competitionFactor = min(1.3, max(0.8, $competitionBase * (1 + ($matchGoalAvg - 2.5) / 5) * $formVariance * $gdVariance));
 
         // Dynamic Weight Calculation
@@ -354,8 +387,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $awayPointsPerGame * $standingsWeight
         ) * $awayStrengthAdjustment * $competitionFactor;
 
-        // Controlled randomness (±2%)
-        $randomFactor = (rand(-20, 20) / 1000);
+        // Controlled randomness (±2%), applied once and cached
+        $randomFactor = isset($teamStats['randomFactors'][$matchId]) ? $teamStats['randomFactors'][$matchId] : (rand(-20, 20) / 1000);
+        $teamStats['randomFactors'][$matchId] = $randomFactor;
         $homeStrength *= (1 + $randomFactor);
         $awayStrength *= (1 - $randomFactor);
 
@@ -377,13 +411,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
 
         // Match details
-        // With this more robust check:
-        $homeTeam = $match['homeTeam']['name'] ?? 
-           ($match['homeTeam']['shortName'] ?? 
-           'Home Team'); // Fallback to shortName first, then a generic name
-        $awayTeam = $match['awayTeam']['name'] ?? 
-           ($match['awayTeam']['shortName'] ?? 
-           'Away Team');
+        $homeTeam = $match['homeTeam']['name'] ?? ($match['homeTeam']['shortName'] ?? 'Home Team');
+        $awayTeam = $match['awayTeam']['name'] ?? ($match['awayTeam']['shortName'] ?? 'Away Team');
         $status = $match['status'] ?? 'SCHEDULED';
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
@@ -408,11 +437,20 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
         }
 
-        return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form'], []];
+        // Cache and return prediction
+        $predictionData = [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form'], []];
+        $teamStats['predictions'][$matchId] = $predictionData;
+
+        return $predictionData;
     } catch (Exception $e) {
         return ["Error", "N/A", "", "N/A", "", "", "", []];
     }
 }
+
+
+
+
+        
 
 function calculateStreak($formArray) {
     $streak = 0;
