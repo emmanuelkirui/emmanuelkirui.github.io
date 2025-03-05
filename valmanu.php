@@ -241,7 +241,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
 
             $teamStats[$teamId] = $stats;
-            
+            $teamStats[$teamId]['lastUpdated'] = $response['lastUpdated']; // Store last updated time
         }
         return $teamStats[$teamId];
     } catch (Exception $e) {
