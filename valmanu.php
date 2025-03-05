@@ -2092,20 +2092,26 @@ try {
                                 element.cells[2].textContent = `${data.homeGoals || 'N/A'} - ${data.awayGoals || 'N/A'}`;
 
                                 // Updated table form display - latest on right
-                                const homeForm = data.homeForm.slice(-6).padStart(6, '-');
+                                // For home team (Cardiff City FC)
+const homeForm = data.homeForm.slice(-6).padStart(6, '-');
 let homeFormHtml = '';
+const homeFormLength = data.homeForm.trim('-').length;
 for (let i = 0; i < 6; i++) {
     let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
-    if (i === data.homeForm.trim('-').length - 1 && data.homeForm.trim('-').length > 0) className += ' latest';
+    // Mark the latest result (rightmost non-dash) as 'latest'
+    if (i === homeFormLength - 1 && homeForm[i] !== '-' && homeFormLength > 0) className += ' latest';
     homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
 }
 tableHomeForm.innerHTML = homeFormHtml;
 
+// For away team (Burnley FC)
 const awayForm = data.awayForm.slice(-6).padStart(6, '-');
 let awayFormHtml = '';
+const awayFormLength = data.awayForm.trim('-').length;
 for (let i = 0; i < 6; i++) {
     let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
-    if (i === data.awayForm.trim('-').length - 1 && data.awayForm.trim('-').length > 0) className += ' latest';
+    // Mark the latest result (rightmost non-dash) as 'latest'
+    if (i === awayFormLength - 1 && awayForm[i] !== '-' && awayFormLength > 0) className += ' latest';
     awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
 }
                                 tableAwayForm.innerHTML = awayFormHtml;
