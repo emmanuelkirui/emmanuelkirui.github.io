@@ -2092,24 +2092,22 @@ try {
                                 element.cells[2].textContent = `${data.homeGoals || 'N/A'} - ${data.awayGoals || 'N/A'}`;
 
                                 // Updated table form display - latest on right
-                                const homeForm = data.homeForm.slice(-6).padStart(6, '-');
-                                let homeFormHtml = '';
-                                const homeFormLength = data.homeForm.trim('-').length;
-                                for (let i = 0; i < 6; i++) {
-                                    let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (homeFormLength > 0 && i === (5 - (6 - homeFormLength))) className += ' latest';
-                                    homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
-                                }
-                                tableHomeForm.innerHTML = homeFormHtml;
+                                const homeForm = data.homeForm.slice(-6).padStart(6, '-').split('').reverse().join('');
+                                 let homeFormHtml = '';
+                                   for (let i = 0; i < 6; i++) {
+                                      let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
+                                      if (i === 5 && homeForm[i] !== '-' && data.homeForm.trim('-').length > 0) className += ' latest';
+                                      homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
+                                  }
+                               tableHomeForm.innerHTML = homeFormHtml;
 
-                                const awayForm = data.awayForm.slice(-6).padStart(6, '-');
-                                let awayFormHtml = '';
-                                const awayFormLength = data.awayForm.trim('-').length;
-                                for (let i = 0; i < 6; i++) {
-                                    let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (awayFormLength > 0 && i === (5 - (6 - awayFormLength))) className += ' latest';
-                                    awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
-                                }
+                           const awayForm = data.awayForm.slice(-6).padStart(6, '-').split('').reverse().join('');
+                             let awayFormHtml = '';
+                               for (let i = 0; i < 6; i++) {
+                                 let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
+                                  if (i === 5 && awayForm[i] !== '-' && data.awayForm.trim('-').length > 0) className += ' latest';
+                                 awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
+                             }
                                 tableAwayForm.innerHTML = awayFormHtml;
 
                                 element.cells[7].textContent = `${data.homeForm} / ${data.awayForm}`;
