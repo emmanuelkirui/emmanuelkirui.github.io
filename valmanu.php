@@ -1010,31 +1010,32 @@ try {
 
         /* New table view styles */
         .view-toggle {
-            display: flex;
-            gap: 10px; /* Adds space between buttons */
-            justify-content: center; /* Centers buttons horizontally */
-            padding: 10px; /* Adds some breathing room around the button group */
-          /* margin: 5px;*/
-        }
+    display: flex;
+    flex-wrap: wrap; /* Allows buttons to wrap to next line */
+    gap: 10px;
+    justify-content: center; /* Centers buttons when there's space */
+    padding: 10px;
+}
 
-        .view-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            background-color: var(--secondary-color);
-            color: white;
-            transition: background-color 0.3s ease;
-        }
+.view-btn {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex: 0 0 auto; /* Prevents buttons from stretching */
+}
 
-        .view-btn.active {
-            background-color: var(--primary-color);
-        }
+.view-btn:hover {
+    background-color: #f5f5f5;
+}
 
-        .view-btn:hover {
-            background-color: var(--primary-color);
-        }
-
+.view-btn.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
         .match-table {
             width: 100%;
             overflow-x: auto;
