@@ -1680,23 +1680,23 @@ try {
 
                         // Process home form - latest on right
                          $homeFormDisplay = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                         $homeFormDisplay = strrev($homeFormDisplay); // Reverse to show oldest on left, newest on right
                          $homeFormHtml = '';
-                         $formLength = strlen(trim($homeStats['form'], '-'));
-                          for ($i = 0; $i < 6; $i++) {
+                         for ($i = 0; $i < 6; $i++) {
                             $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                          if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
+                            if ($i === 5 && $homeFormDisplay[$i] !== '-' && strlen(trim($homeStats['form'], '-')) > 0) $class .= ' latest';
                             $homeFormHtml .= "<span class='$class'>{$homeFormDisplay[$i]}</span>";
-                         }
+                        }
 
                         // Process away form - latest on right
-                         $awayFormDisplay = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
-                         $awayFormHtml = '';
-                         $formLength = strlen(trim($awayStats['form'], '-'));
-                          for ($i = 0; $i < 6; $i++) {
+                        $awayFormDisplay = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                        $awayFormDisplay = strrev($awayFormDisplay); // Reverse to show oldest on left, newest on right
+                        $awayFormHtml = '';
+                        for ($i = 0; $i < 6; $i++) {
                            $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                          if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
+                           if ($i === 5 && $awayFormDisplay[$i] !== '-' && strlen(trim($awayStats['form'], '-')) > 0) $class .= ' latest';
                            $awayFormHtml .= "<span class='$class'>{$awayFormDisplay[$i]}</span>";
-                          }
+                        }
 
                         echo "<tr data-index='$index' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-status='$status'>
                             <td>$date</td>
