@@ -1270,6 +1270,52 @@ try {
 .share-icon {
     font-size: 1.2em;
 }
+        .standings-table {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.standings-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--card-bg);
+    box-shadow: var(--shadow);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.standings-table th,
+.standings-table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.standings-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+.standings-table tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .standings-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 768px) {
+    .standings-table table {
+        font-size: 0.9em;
+    }
+    
+    .standings-table th,
+    .standings-table td {
+        padding: 10px;
+    }
+}
 
         /* Rest of your existing styles remain unchanged */
         .retry-message {
@@ -1520,6 +1566,7 @@ try {
             <div class="view-toggle">
                 <button id="grid-view-btn" class="view-btn active" onclick="switchView('grid')">Grid View</button>
                 <button id="table-view-btn" class="view-btn" onclick="switchView('table')">Table View</button>
+                <button id="standings-view-btn" class="view-btn" onclick="switchView('standings')">Standings</button>
             </div>
         </div>
 
@@ -1730,28 +1777,130 @@ try {
 </div                   
         </div>
     </div>
-
+<div class="standings-table" id="standings-table" style="display: none;">
+    <div class="table-header">
+        <h3><?php echo $selectedComp; ?> Standings</h3>
+        <button id="share-standings-btn" class="share-btn" title="Share Standings">
+            <span class="share-icon">📤</span> Share
+        </button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>POS</th>
+                <th>Team</th>
+                <th>P</th>
+                <th>W</th>
+                <th>D</th>
+                <th>L</th>
+                <th>GS</th>
+                <th>GC</th>
+                <th>GD</th>
+                <th>PTS</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $standings = fetchStandings($selectedComp, $apiKey, $baseUrl);
+            if (!$standings['error'] && !empty($standings['data'])) {
+                foreach ($standings['data'] as $team) {
+                    echo "<tr>";
+                    echo "<td>" . $team['position'] . "</td>";
+                    echo "<td>" . ($team['team']['name'] ?? 'Unknown') . "</td>";
+                    echo "<td>" . $team['playedGames'] . "</td>";
+                    echo "<td>" . $team['won'] . "</td>";
+                    echo "<td>" . $team['draw'] . "</td>";
+                    echo "<td>" . $team['lost'] . "</td>";
+                    echo "<td>" . $team['goalsFor'] . "</td>";
+                    echo "<td>" . $team['goalsAgainst'] . "</td>";
+                    echo "<td>" . $team['goalDifference'] . "</td>";
+                    echo "<td>" . $team['points'] . "</td>";
+                    echo "</tr>";
+                }
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
     <script>
         function switchView(view) {
-            const gridView = document.getElementById('match-grid');
-            const tableView = document.getElementById('match-table');
-            const gridBtn = document.getElementById('grid-view-btn');
-            const tableBtn = document.getElementById('table-view-btn');
+    const gridView = document.getElementById('match-grid');
+    const tableView = document.getElementById('match-table');
+    const standingsView = document.getElementById('standings-table');
+    const gridBtn = document.getElementById('grid-view-btn');
+    const tableBtn = document.getElementById('table-view-btn');
+    const standingsBtn = document.getElementById('standings-view-btn');
 
-            if (view === 'grid') {
-                gridView.style.display = 'grid';
-                tableView.style.display = 'none';
-                gridBtn.classList.add('active');
-                tableBtn.classList.remove('active');
-            } else {
-                gridView.style.display = 'none';
-                tableView.style.display = 'block';
-                gridBtn.classList.remove('active');
-                tableBtn.classList.add('active');
-            }
-            
-            localStorage.setItem('matchView', view);
+    gridView.style.display = 'none';
+    tableView.style.display = 'none';
+    standingsView.style.display = 'none';
+    gridBtn.classList.remove('active');
+    tableBtn.classList.remove('active');
+    standingsBtn.classList.remove('active');
+
+    if (view === 'grid') {
+        gridView.style.display = 'grid';
+        gridBtn.classList.add('active');
+    } else if (view === 'table') {
+        tableView.style.display = 'block';
+        tableBtn.classList.add('active');
+    } else if (view === 'standings') {
+        standingsView.style.display = 'block';
+        standingsBtn.classList.add('active');
+    }
+    
+    localStorage.setItem('matchView', view);
+}
+        function shareStandingsAsImage() {
+    const tableElement = document.querySelector('#standings-table table');
+    const shareBtn = document.getElementById('share-standings-btn');
+    
+    shareBtn.disabled = true;
+    shareBtn.innerHTML = '<span class="share-icon">⏳</span> Processing...';
+
+    html2canvas(tableElement, {
+        backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg'),
+        scale: 2
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const fileName = `CPS_Standings_${new Date().toISOString().replace(/[-:T]/g, '').split('.')[0]}_${Math.random().toString(36).substring(2, 6)}.png`;
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
+            canvas.toBlob(blob => {
+                const file = new File([blob], fileName, { type: 'image/png' });
+                navigator.share({
+                    title: `${ '<?php echo $selectedComp; ?>' } Standings`,
+                    text: 'Check out the latest standings!',
+                    files: [file]
+                }).then(() => console.log('Standings shared successfully'))
+                  .catch(err => {
+                      console.error('Share failed:', err);
+                      fallbackDownload(imgData, fileName);
+                  });
+            });
+        } else {
+            fallbackDownload(imgData, fileName);
         }
+    }).catch(error => {
+        console.error('Error generating image:', error);
+        alert('Failed to generate standings image. Please try again.');
+    }).finally(() => {
+        shareBtn.disabled = false;
+        shareBtn.innerHTML = '<span class="share-icon">📤</span> Share';
+    });
+}
+
+document.getElementById('share-standings-btn').addEventListener('click', shareStandingsAsImage);
+
+document.getElementById('standings-view-btn').addEventListener('click', function() {
+    switchView('standings');
+    setTimeout(() => {
+        const table = document.getElementById('standings-table');
+        if (table.style.display !== 'none') {
+            table.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, 100);
+});
 
         function toggleTheme() {
             const body = document.body;
