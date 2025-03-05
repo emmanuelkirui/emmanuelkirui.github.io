@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'recaptcha_handler.php';
+require_once 'auth.php';
 
 // Set timezone to East Africa Time (Nairobi, Kenya, UTC+3)
 date_default_timezone_set('Africa/Nairobi');
@@ -541,6 +542,12 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+    if ($auth->isLoggedIn()) {
+    echo "<span class='nav-link user-info'>Welcome, " . htmlspecialchars($auth->getCurrentUser()) . "</span>";
+    echo "<button class='nav-link logout-btn'>Logout</button>";
+} else {
+    echo "<button class='nav-link login-btn'>Login/Signup</button>";
+}
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -1079,7 +1086,22 @@ try {
 .match-table .form-display span.latest {
     text-decoration: underline;
 }
+.user-info {
+    padding: 12px 20px;
+    color: var(--primary-colordecline;
+}
 
+.logout-btn, .login-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.logout-btn:hover, .login-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+        
         /* Existing match card styles */
         .teams {
             display: flex;
@@ -2488,7 +2510,101 @@ document.getElementById('table-view-btn').addEventListener('click', function() {
                 });
             }
         }
+
+    // Auth handling
+const loginBtn = document.querySelector('.login-btn');
+const logoutBtn = document.querySelector('.logout-btn');
+const modal = document.getElementById('auth-modal');
+const closeModal = document.querySelector('.close-modal');
+const tabBtns = document.querySelectorAll('.tab-btn');
+const loginForm = document.getElementById('loginForm');
+const signupForm = document.getElementById('signupForm');
+
+if (loginBtn) {
+    loginBtn.addEventListener('click', () => {
+        modal.style.display = 'block';
+    });
+}
+
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        fetch('auth.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=logout'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    });
+}
+
+closeModal.addEventListener('click', () => {
+    modal.style.display = 'none';
+});
+
+tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        document.querySelectorAll('.auth-form').forEach(form => {
+            form.style.display = form.id === `${btn.dataset.tab}-form` ? 'block' : 'none';
+        });
+    });
+});
+
+loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    
+    fetch('auth.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=login&username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messageDiv = document.getElementById('login-message');
+        messageDiv.textContent = data.message;
+        if (data.success) {
+            setTimeout(() => location.reload(), 1000);
+        }
+    });
+});
+
+signupForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = document.getElementById('signup-username').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    
+    fetch('auth.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=signup&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        const messageDiv = document.getElementById('signup-message');
+        messageDiv.textContent = data.message;
+        if (data.success) {
+            setTimeout(() => location.reload(), 1000);
+        }
+    });
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.style.display = 'none';
+    }
+});
     </script>
+    <?php include 'auth-modal.php'; ?>
 </body>
 </html>
 <?php
