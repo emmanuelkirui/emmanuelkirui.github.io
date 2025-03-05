@@ -17,29 +17,31 @@ $year = date("Y"); // Auto-updating year
             background: #333;
             color: white;
             text-align: center;
-            padding: 20px;
-            margin: 20px;
+            padding: 20px 10px; /* Reduced side padding */
             border-top: 3px solid #f39c12;
-            font-family: Arial, sans-serif; /* Ensures font consistency */
+            font-family: Arial, sans-serif;
+            width: 100%; /* Ensure footer spans full width */
+            box-sizing: border-box; /* Include padding in width */
         }
 
         .footer-container {
-            max-width: 1200px;
-            margin: auto;
+            max-width: 1200px; /* Adjusted for better fit */
+            margin: 0 auto; /* Centered with no extra top/bottom margin */
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 15px; /* Consistent spacing between elements */
         }
 
         /* Footer Links */
         .footer-links {
             list-style: none;
             padding: 0;
-            margin: 15px 0;
+            margin: 0; /* Removed unnecessary margin */
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 15px; /* Controlled spacing */
         }
 
         .footer-links li {
@@ -64,7 +66,7 @@ $year = date("Y"); // Auto-updating year
             display: flex;
             justify-content: center;
             gap: 15px;
-            margin-top: 20px;
+            margin-top: 10px;
             padding-top: 10px;
             border-top: 2px solid #f39c12;
         }
@@ -86,7 +88,9 @@ $year = date("Y"); // Auto-updating year
             color: #ffcc00;
             padding: 10px;
             border-radius: 5px;
-            margin-top: 15px;
+            margin: 0; /* Removed top margin */
+            width: 100%; /* Full width within container */
+            box-sizing: border-box;
         }
 
         /* Disclaimer */
@@ -96,13 +100,11 @@ $year = date("Y"); // Auto-updating year
             background-color: #f9f9f9;
             padding: 10px;
             border-radius: 5px;
-            text-align: center;
-            font-family: inherit;
+            width: 100%; /* Full width within container */
+            box-sizing: border-box;
         }
 
         .disclaimer a {
-            font-size: inherit;
-            font-family: inherit;
             color: #007bff;
             text-decoration: none;
             font-weight: normal;
@@ -140,9 +142,19 @@ $year = date("Y"); // Auto-updating year
 
         /* Mobile Devices (up to 768px) */
         @media (max-width: 768px) {
+            .footer {
+                padding: 15px 5px; /* Further reduced padding */
+            }
+
+            .footer-container {
+                max-width: 100%; /* Full width on mobile */
+                padding: 0 10px; /* Controlled padding */
+            }
+
             .footer-links {
                 flex-direction: column;
                 align-items: center;
+                gap: 10px;
             }
 
             .footer-links a {
@@ -180,6 +192,10 @@ $year = date("Y"); // Auto-updating year
 
         /* Tablets (769px to 1024px) */
         @media (min-width: 769px) and (max-width: 1024px) {
+            .footer-container {
+                max-width: 90%; /* Slightly reduced width */
+            }
+
             .footer-links {
                 gap: 20px;
             }
@@ -195,25 +211,16 @@ $year = date("Y"); // Auto-updating year
             .disclaimer, .gambling-disclaimer {
                 font-size: 13px;
             }
-
-            #cookieConsent {
-                bottom: 15px;
-                padding: 12px;
-            }
-
-            #cookieConsent p {
-                font-size: 14px;
-            }
         }
 
         /* Desktops (1025px and above) */
         @media (min-width: 1025px) {
             .footer {
-                padding: 30px;
+                padding: 25px 15px; /* Adjusted padding */
             }
 
             .footer-container {
-                max-width: 1400px;
+                max-width: 1200px; /* Consistent max-width */
             }
 
             .footer-links {
@@ -234,7 +241,6 @@ $year = date("Y"); // Auto-updating year
 
             .disclaimer, .gambling-disclaimer {
                 font-size: 16px;
-                padding: 15px;
             }
 
             #cookieConsent {
@@ -310,36 +316,30 @@ document.addEventListener("DOMContentLoaded", function () {
     const cookieConsent = document.getElementById("cookieConsent");
     const acceptCookiesButton = document.getElementById("acceptCookies");
     const cookieKey = "cookiesAccepted";
-    const expirationDays = 30; // Set expiration to 30 days (adjust as needed)
+    const expirationDays = 30;
 
-    // Function to check if cookie consent is still valid
     function isCookieConsentValid() {
         const consentData = JSON.parse(localStorage.getItem(cookieKey));
         if (!consentData) return false;
 
         const expirationDate = new Date(consentData.expires);
-        return new Date() < expirationDate; // Check if current date is before expiration
+        return new Date() < expirationDate;
     }
 
-    // Show cookie consent popup if not accepted or expired
     if (!isCookieConsentValid()) {
         cookieConsent.style.display = "block";
     }
 
-    // Handle the "Accept" button click
     acceptCookiesButton.addEventListener("click", function () {
-        // Calculate expiration date
         const expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + expirationDays);
 
-        // Store consent with expiration in localStorage
         const consentData = {
             accepted: true,
             expires: expirationDate.toISOString()
         };
         localStorage.setItem(cookieKey, JSON.stringify(consentData));
 
-        // Hide the popup
         cookieConsent.style.display = "none";
     });
 });
