@@ -429,6 +429,14 @@ function calculateStreak($formArray) {
     return $streak;
 }
             
+function fetchTopScorers($competition, $apiKey, $baseUrl) {
+    $url = $baseUrl . "competitions/$competition/scorers";
+    $response = fetchWithRetry($url, $apiKey, true);
+    if ($response['error']) {
+        return $response;
+    }
+    return ['error' => false, 'data' => $response['data']['scorers'] ?? []];
+}
 
 // AJAX handling remains unchanged
 $action = $_GET['action'] ?? 'main';
@@ -1079,6 +1087,52 @@ try {
 .match-table .form-display span.latest {
     text-decoration: underline;
 }
+        .top-scorers-table {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.top-scorers-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--card-bg);
+    box-shadow: var(--shadow);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.top-scorers-table th,
+.top-scorers-table td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.top-scorers-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+}
+
+.top-scorers-table tr:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .top-scorers-table tr:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+@media (max-width: 768px) {
+    .top-scorers-table table {
+        font-size: 0.9em;
+    }
+    
+    .top-scorers-table th,
+    .top-scorers-table td {
+        padding: 10px;
+    }
+}
 
         /* Existing match card styles */
         .teams {
@@ -1567,6 +1621,7 @@ try {
                 <button id="grid-view-btn" class="view-btn active" onclick="switchView('grid')">Grid View</button>
                 <button id="table-view-btn" class="view-btn" onclick="switchView('table')">Table View</button>
                 <button id="standings-view-btn" class="view-btn" onclick="switchView('standings')">Standings</button>
+                <button id="scorers-view-btn" class="view-btn" onclick="switchView('scorers')" title="Top Scorers">⚽</button>
             </div>
         </div>
 
@@ -1822,21 +1877,62 @@ try {
         </tbody>
     </table>
 </div>
+          <div class="top-scorers-table" id="top-scorers-table" style="display: none;">
+    <div class="table-header">
+        <h3><?php echo $selectedComp; ?> Top Scorers</h3>
+        <button id="share-scorers-btn" class="share-btn" title="Share Top Scorers">
+            <span class="share-icon">📤</span> Share
+        </button>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Team</th>
+                <th>Goals</th>
+                <th>Assists</th>
+                <th>Matches</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $scorers = fetchTopScorers($selectedComp, $apiKey, $baseUrl);
+            if (!$scorers['error'] && !empty($scorers['data'])) {
+                foreach ($scorers['data'] as $index => $scorer) {
+                    echo "<tr>";
+                    echo "<td>" . ($index + 1) . "</td>";
+                    echo "<td>" . ($scorer['player']['name'] ?? 'Unknown') . "</td>";
+                    echo "<td>" . ($scorer['team']['name'] ?? 'Unknown') . "</td>";
+                    echo "<td>" . ($scorer['goals'] ?? 'N/A') . "</td>";
+                    echo "<td>" . ($scorer['assists'] ?? 'N/A') . "</td>";
+                    echo "<td>" . ($scorer['playedMatches'] ?? 'N/A') . "</td>";
+                    echo "</tr>";
+                }
+            }
+            ?>
+        </tbody>
+    </table>
+</div>      
     <script>
         function switchView(view) {
     const gridView = document.getElementById('match-grid');
     const tableView = document.getElementById('match-table');
     const standingsView = document.getElementById('standings-table');
+    const scorersView = document.getElementById('top-scorers-table');
     const gridBtn = document.getElementById('grid-view-btn');
     const tableBtn = document.getElementById('table-view-btn');
     const standingsBtn = document.getElementById('standings-view-btn');
+    const scorersBtn = document.getElementById('scorers-view-btn');
 
     gridView.style.display = 'none';
     tableView.style.display = 'none';
     standingsView.style.display = 'none';
+    scorersView.style.display = 'none';
     gridBtn.classList.remove('active');
     tableBtn.classList.remove('active');
     standingsBtn.classList.remove('active');
+    scorersBtn.classList.remove('active');
 
     if (view === 'grid') {
         gridView.style.display = 'grid';
@@ -1847,10 +1943,64 @@ try {
     } else if (view === 'standings') {
         standingsView.style.display = 'block';
         standingsBtn.classList.add('active');
+    } else if (view === 'scorers') {
+        scorersView.style.display = 'block';
+        scorersBtn.classList.add('active');
     }
     
     localStorage.setItem('matchView', view);
 }
+
+        function shareScorersAsImage() {
+    const tableElement = document.querySelector('#top-scorers-table table');
+    const shareBtn = document.getElementById('share-scorers-btn');
+    
+    shareBtn.disabled = true;
+    shareBtn.innerHTML = '<span class="share-icon">⏳</span> Processing...';
+
+    html2canvas(tableElement, {
+        backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg'),
+        scale: 2
+    }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const fileName = `CPS_TopScorers_${new Date().toISOString().replace(/[-:T]/g, '').split('.')[0]}_${Math.random().toString(36).substring(2, 6)}.png`;
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
+            canvas.toBlob(blob => {
+                const file = new File([blob], fileName, { type: 'image/png' });
+                navigator.share({
+                    title: `${ '<?php echo $selectedComp; ?>' } Top Scorers`,
+                    text: 'Check out the top scorers!',
+                    files: [file]
+                }).then(() => console.log('Top Scorers shared successfully'))
+                  .catch(err => {
+                      console.error('Share failed:', err);
+                      fallbackDownload(imgData, fileName);
+                  });
+            });
+        } else {
+            fallbackDownload(imgData, fileName);
+        }
+    }).catch(error => {
+        console.error('Error generating image:', error);
+        alert('Failed to generate top scorers image. Please try again.');
+    }).finally(() => {
+        shareBtn.disabled = false;
+        shareBtn.innerHTML = '<span class="share-icon">📤</span> Share';
+    });
+}
+
+document.getElementById('share-scorers-btn').addEventListener('click', shareScorersAsImage);
+
+document.getElementById('scorers-view-btn').addEventListener('click', function() {
+    switchView('scorers');
+    setTimeout(() => {
+        const table = document.getElementById('top-scorers-table');
+        if (table.style.display !== 'none') {
+            table.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, 100);
+});
         function shareStandingsAsImage() {
     const tableElement = document.querySelector('#standings-table table');
     const shareBtn = document.getElementById('share-standings-btn');
