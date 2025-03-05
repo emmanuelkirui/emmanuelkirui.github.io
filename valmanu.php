@@ -103,40 +103,6 @@ function fetchWithRetry($url, $apiKey, $isAjax = false) {
         return ['error' => true, 'message' => "API Error: HTTP $httpCode"];
     }
 }
-function fetchTopScorers($competition, $teamId, $apiKey, $baseUrl) {
-    $url = $baseUrl . "competitions/$competition/scorers";
-    $response = fetchWithRetry($url, $apiKey, true);
-    
-    if ($response['error']) {
-        if (isset($response['retry'])) {
-            return [
-                'error' => true,
-                'retry' => true,
-                'retrySeconds' => $response['retrySeconds'],
-                'nextAttempt' => $response['nextAttempt']
-            ];
-        }
-        return ['error' => true, 'message' => $response['message']];
-    }
-    
-    $scorers = $response['data']['scorers'] ?? [];
-    $teamScorers = array_filter($scorers, function($scorer) use ($teamId) {
-        return ($scorer['team']['id'] ?? 0) == $teamId;
-    });
-    
-    // Limit to top 3 scorers per team
-    $topScorers = array_slice(array_values($teamScorers), 0, 3);
-    return [
-        'error' => false,
-        'data' => array_map(function($scorer) {
-            return [
-                'name' => $scorer['player']['name'] ?? 'Unknown',
-                'goals' => $scorer['goals'] ?? 0,
-                'assists' => $scorer['assists'] ?? 0
-            ];
-        }, $topScorers)
-    ];
-}
 
 function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     $pastDate = date('Y-m-d', strtotime('-60 days'));
@@ -178,14 +144,14 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
     return $response['data']['teams'] ?? [];
 }
 
- function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
+function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $forceRefresh = isset($_GET['force_refresh']) && $_GET['force_refresh'] === 'true';
 
         if (!isset($teamStats[$teamId]) || empty($teamStats[$teamId]['results']) || empty($teamStats[$teamId]['form']) || $forceRefresh) {
             $response = fetchTeamResults($teamId, $apiKey, $baseUrl);
             if ($response['error']) {
-                $teamStats[$teamId] = ['results' => [], 'form' => '', 'needsRetry' => true, 'standings' => [], 'topScorers' => []];
+                $teamStats[$teamId] = ['results' => [], 'form' => '', 'needsRetry' => true, 'standings' => []];
                 if (isset($response['retry'])) {
                     $teamStats[$teamId]['retry'] = true;
                     $teamStats[$teamId]['retrySeconds'] = $response['retrySeconds'];
@@ -201,24 +167,22 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
             while ($standingsResponse['error']) {
                 $attempt++;
                 $delay = min(pow(2, $attempt), $maxDelay);
+                error_log("Standings fetch failed for $competition (attempt $attempt): " . $standingsResponse['message'] . ". Retrying in $delay seconds...");
                 sleep($delay);
                 $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
+
                 if (isset($standingsResponse['retrySeconds'])) {
                     $delay = max($delay, $standingsResponse['retrySeconds']);
+                    error_log("Using Retry-After delay of $delay seconds from API header.");
                     sleep($delay - $delay);
                     $standingsResponse = fetchStandings($competition, $apiKey, $baseUrl);
                 }
             }
             $standings = $standingsResponse['data'];
-
-            // Fetch top scorers
-            $scorersResponse = fetchTopScorers($competition, $teamId, $apiKey, $baseUrl);
-            $topScorers = $scorersResponse['error'] ? [] : $scorersResponse['data'];
-
             $stats = [
                 'wins' => 0, 'draws' => 0, 'goalsScored' => 0, 
                 'goalsConceded' => 0, 'games' => 0, 'results' => [],
-                'form' => '', 'needsRetry' => false, 'standings' => [], 'topScorers' => $topScorers
+                'form' => '', 'needsRetry' => false, 'standings' => []
             ];
 
             foreach ($results as $match) {
@@ -279,8 +243,6 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
         return ['error' => true, 'message' => "Error calculating team strength: " . $e->getMessage()];
     }
 }
-
-                
 
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
@@ -1117,27 +1079,7 @@ try {
 .match-table .form-display span.latest {
     text-decoration: underline;
 }
-        
-.top-scorers {
-    margin-top: 10px;
-    font-size: 0.9em;
-    color: var(--text-color);
-}
 
-.top-scorers ul {
-    list-style: none;
-    padding: 0;
-    margin: 5px 0 0 0;
-}
-
-.top-scorers li {
-    margin: 2px 0;
-}
-
-.match-table th:nth-child(9), /* Adjust column index if needed */
-.match-table td:nth-child(9) {
-    min-width: 150px;
-}
         /* Existing match card styles */
         .teams {
             display: flex;
@@ -1715,47 +1657,38 @@ try {
                             echo "</div>
                                 <button class='view-history-btn' onclick='toggleHistory(this)'>👁️ View History</button>
                                 <div class='past-results' id='history-$index' style='display: none;'>";
-if (!empty($homeStats['results']) && !empty($awayStats['results']) && !$needsRetry) {
-    echo "<p><strong>$homeTeam Recent Results:</strong></p><ul>";
-    foreach ($homeStats['results'] as $result) {
-        echo "<li>$result</li>";
-    }
-    echo "</ul>
-        <div class='standings'>
-            <span>POS: " . ($homeStats['standings']['position'] ?? 'N/A') . "</span>
-            <span>GS: " . ($homeStats['standings']['goalsScored'] ?? 'N/A') . "</span>
-            <span>GD: " . ($homeStats['standings']['goalDifference'] ?? 'N/A') . "</span>
-            <span>PTS: " . ($homeStats['standings']['points'] ?? 'N/A') . "</span>
-        </div>
-        <div class='top-scorers'>
-            <p><strong>Top Scorers:</strong></p>
-            <ul>";
-    foreach ($homeStats['topScorers'] as $scorer) {
-        echo "<li>{$scorer['name']} - {$scorer['goals']} goals" . ($scorer['assists'] ? ", {$scorer['assists']} assists" : "") . "</li>";
-    }
-    echo "</ul></div>
-        <p><strong>$awayTeam Recent Results:</strong></p><ul>";
-    foreach ($awayStats['results'] as $result) {
-        echo "<li>$result</li>";
-    }
-    echo "</ul>
-        <div class='standings'>
-            <span>POS: " . ($awayStats['standings']['position'] ?? 'N/A') . "</span>
-            <span>GS: " . ($awayStats['standings']['goalsScored'] ?? 'N/A') . "</span>
-            <span>GD: " . ($awayStats['standings']['goalDifference'] ?? 'N/A') . "</span>
-            <span>PTS: " . ($awayStats['standings']['points'] ?? 'N/A') . "</span>
-        </div>
-        <div class='top-scorers'>
-            <p><strong>Top Scorers:</strong></p>
-            <ul>";
-    foreach ($awayStats['topScorers'] as $scorer) {
-        echo "<li>{$scorer['name']} - {$scorer['goals']} goals" . ($scorer['assists'] ? ", {$scorer['assists']} assists" : "") . "</li>";
-    }
-    echo "</ul></div>";
-} else {
-    echo "<p>Loading history...</p>";
-}
-echo "</div></div>";
+                            
+                            if (!empty($homeStats['results']) && !empty($awayStats['results']) && !$needsRetry) {
+                                echo "
+                                    <p><strong>$homeTeam Recent Results:</strong></p>
+                                    <ul>";
+                                foreach ($homeStats['results'] as $result) {
+                                    echo "<li>$result</li>";
+                                }
+                                echo "</ul>
+                                    <div class='standings'>
+                                        <span>POS: " . ($homeStats['standings']['position'] ?? 'N/A') . "</span>
+                                        <span>GS: " . ($homeStats['standings']['goalsScored'] ?? 'N/A') . "</span>
+                                        <span>GD: " . ($homeStats['standings']['goalDifference'] ?? 'N/A') . "</span>
+                                        <span>PTS: " . ($homeStats['standings']['points'] ?? 'N/A') . "</span>
+                                    </div>
+                                    <p><strong>$awayTeam Recent Results:</strong></p>
+                                    <ul>";
+                                foreach ($awayStats['results'] as $result) {
+                                    echo "<li>$result</li>";
+                                }
+                                echo "</ul>
+                                    <div class='standings'>
+                                        <span>POS: " . ($awayStats['standings']['position'] ?? 'N/A') . "</span>
+                                        <span>GS: " . ($awayStats['standings']['goalsScored'] ?? 'N/A') . "</span>
+                                        <span>GD: " . ($awayStats['standings']['goalDifference'] ?? 'N/A') . "</span>
+                                        <span>PTS: " . ($awayStats['standings']['points'] ?? 'N/A') . "</span>
+                                    </div>";
+                            } else {
+                                echo "<p>Loading history...</p>";
+                            }
+                            
+                            echo "</div></div>";
                         }
                     }
                 } else {
@@ -1782,7 +1715,6 @@ echo "</div></div>";
                 <th>Confidence</th>
                 <th>Predicted Score</th>
                 <th>Form (H/A)</th>
-                <th>Top Scorers (H/A)</th>
             </tr>
         </thead>
         <tbody>
@@ -1790,8 +1722,6 @@ echo "</div></div>";
             if (!empty($allMatches)) {
                 foreach ($allMatches as $index => $match) {
                     if (isset($match['status'])) {
-                        $homeTopScorers = implode(', ', array_map(function($s) { return "{$s['name']} ({$s['goals']})"; }, $homeStats['topScorers']));
-                        $awayTopScorers = implode(', ', array_map(function($s) { return "{$s['name']} ({$s['goals']})"; }, $awayStats['topScorers']));
                         $homeTeamId = $match['homeTeam']['id'] ?? 0;
                         $awayTeamId = $match['awayTeam']['id'] ?? 0;
                         $homeTeam = $match['homeTeam']['name'] ?? 
@@ -1837,7 +1767,6 @@ echo "</div></div>";
                             <td id='table-confidence-$index'>$confidence</td>
                             <td id='table-predicted-score-$index'>$predictedScore</td>
                             <td>$homeForm / $awayForm</td>
-                            <td>$homeTopScorers / $awayTopScorers</td>
                         </tr>";
                     }
                 }
