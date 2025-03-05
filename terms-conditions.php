@@ -10,6 +10,15 @@ $year = date("Y");
     <meta name="author" content="Emmanuel Kirui">
     <meta name="keywords" content="terms and conditions, Emmanuel Kirui, website usage, legal agreement, user responsibilities">
     <meta name="robots" content="index, follow">
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ND6PGCMQD9"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ND6PGCMQD9');
+</script>
     <title>Terms & Conditions | Emmanuel Kirui</title>
 
     <!-- Preconnect for Performance -->
