@@ -243,13 +243,14 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
         return ['error' => true, 'message' => "Error calculating team strength: " . $e->getMessage()];
     }
 }
-function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
+
+     function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
         $awayTeamId = $match['awayTeam']['id'] ?? 0;
 
         if (!$homeTeamId || !$awayTeamId) {
-            return ["N/A", "0%", "", "0-0", "", "", ""];
+            return ["N/A", "0%", "", "0-0", "", "", "", []];
         }
 
         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $competition);
@@ -257,12 +258,12 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
 
         if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
             $retryInfo = [];
-            if ($homeStats['retry']) $retryInfo['home'] = ['retrySeconds' => $homeStats['retrySeconds'], 'nextAttempt' => $homeStats['nextAttempt']];
-            if ($awayStats['retry']) $retryInfo['away'] = ['retrySeconds' => $awayStats['retrySeconds'], 'nextAttempt' => $awayStats['nextAttempt']];
+            if ($homeStats['retry'] ?? false) $retryInfo['home'] = ['retrySeconds' => $homeStats['retrySeconds'], 'nextAttempt' => $homeStats['nextAttempt']];
+            if ($awayStats['retry'] ?? false) $retryInfo['away'] = ['retrySeconds' => $awayStats['retrySeconds'], 'nextAttempt' => $awayStats['nextAttempt']];
             return ["Loading...", "N/A", "", "N/A", "", $homeStats['form'], $awayStats['form'], $retryInfo];
         }
 
-        // Enhanced metrics
+        // Enhanced metrics (unchanged)
         $homeWinRate = $homeStats['games'] ? $homeStats['wins'] / $homeStats['games'] : 0;
         $homeDrawRate = $homeStats['games'] ? $homeStats['draws'] / $homeStats['games'] : 0;
         $awayWinRate = $awayStats['games'] ? $awayStats['wins'] / $awayStats['games'] : 0;
@@ -272,31 +273,31 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeDefenseAvg = $homeStats['games'] ? $homeStats['goalsConceded'] / $homeStats['games'] : 0;
         $awayDefenseAvg = $awayStats['games'] ? $awayStats['goalsConceded'] / $awayStats['games'] : 0;
 
-        // Incorporate standings (position, points per game)
-        $homePositionFactor = $homeStats['standings']['position'] ? (1 - ($homeStats['standings']['position'] - 1) / 24) : 0.5; // Normalize for 24-team league
+        // Incorporate standings (unchanged)
+        $homePositionFactor = $homeStats['standings']['position'] ? (1 - ($homeStats['standings']['position'] - 1) / 24) : 0.5;
         $awayPositionFactor = $awayStats['standings']['position'] ? (1 - ($awayStats['standings']['position'] - 1) / 24) : 0.5;
         $homePointsPerGame = $homeStats['standings']['points'] ? $homeStats['standings']['points'] / $homeStats['games'] : 1;
         $awayPointsPerGame = $awayStats['standings']['points'] ? $awayStats['standings']['points'] / $awayStats['games'] : 1;
 
-        // Form momentum (weight recent results more)
+        // Form momentum (unchanged)
         $homeFormScore = array_reduce(str_split(substr($homeStats['form'], -5)), function($carry, $result) {
             return $carry + ($result === 'W' ? 3 : ($result === 'D' ? 1 : 0));
-        }, 0) / 15; // Max 15 points over 5 games
+        }, 0) / 15;
         $awayFormScore = array_reduce(str_split(substr($awayStats['form'], -5)), function($carry, $result) {
             return $carry + ($result === 'W' ? 3 : ($result === 'D' ? 1 : 0));
         }, 0) / 15;
 
-        // Dynamic home advantage based on team strength
+        // Dynamic home advantage (unchanged)
         $homeAdvantage = 1 + (0.1 * $homePositionFactor + 0.05 * $homeFormScore);
 
-        // Calculate team strength with more factors
+        // Calculate team strength (unchanged)
         $homeStrength = (
-            $homeWinRate * 40 +          // Reduced weight on win rate
-            $homeDrawRate * 15 +         // Reduced weight on draw rate
-            $homeGoalAvg * 20 +          // Offensive strength
-            (2 - $homeDefenseAvg) * 15 + // Defensive strength (lower conceded = better)
-            $homePointsPerGame * 10 +    // League performance
-            $homeFormScore * 15          // Recent momentum
+            $homeWinRate * 40 +
+            $homeDrawRate * 15 +
+            $homeGoalAvg * 20 +
+            (2 - $homeDefenseAvg) * 15 +
+            $homePointsPerGame * 10 +
+            $homeFormScore * 15
         ) * $homeAdvantage;
 
         $awayStrength = (
@@ -310,9 +311,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
 
         $diff = $homeStrength - $awayStrength;
         $totalStrength = $homeStrength + $awayStrength + 1;
-        $confidence = min(95, abs($diff) / $totalStrength * 150); // Adjusted scaling for higher confidence
+        $confidence = min(95, abs($diff) / $totalStrength * 150);
 
-        // Enhanced goal prediction
+        // Enhanced goal prediction (unchanged)
         $baseHomeGoals = $homeGoalAvg * (1 + $diff / 100) * $homeAdvantage;
         $baseAwayGoals = $awayGoalAvg * (1 - $diff / 100) * (1 / $homeAdvantage);
         $homeDefenseImpact = $awayGoalAvg * (1 - (2 - $homeDefenseAvg) / 2);
@@ -327,8 +328,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
 
-        // Adjusted prediction thresholds
-        if ($diff > 25) { // Increased threshold for win
+        // Adjusted prediction thresholds (unchanged)
+        if ($diff > 25) {
             $prediction = "$homeTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
             $advantage = "Home Advantage";
@@ -338,7 +339,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $advantage = "Away Advantage";
         } else {
             $prediction = "Draw";
-            $confidence = sprintf("%.1f%%", min(75, $confidence * 0.8)); // Reduced confidence for draws
+            $confidence = sprintf("%.1f%%", min(75, $confidence * 0.8));
             $advantage = "Likely Draw";
         }
 
@@ -348,6 +349,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
         }
 
+        // Return 8 elements consistently
         return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form'], []];
     } catch (Exception $e) {
         return ["Error", "N/A", "", "N/A", "", "", "", []];
@@ -1451,9 +1453,10 @@ try {
         <div class="match-container">
             <div class="match-grid" id="match-grid">
                 <?php
-                if (!empty($allMatches)) {
+                // In the match grid section
+                 if (!empty($allMatches)) {
                     foreach ($allMatches as $index => $match) {
-                        if (isset($match['status'])) {
+                       if (isset($match['status'])) {
                             $homeTeamId = $match['homeTeam']['id'] ?? 0;
                             $awayTeamId = $match['awayTeam']['id'] ?? 0;
                             $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
@@ -1467,7 +1470,6 @@ try {
                             [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm, $retryInfo] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
                             $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
                             $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
-
                             $needsRetry = $homeStats['needsRetry'] || $awayStats['needsRetry'];
                             if ($needsRetry) {
                                 echo "<script>incompleteTeams = incompleteTeams || [];";
@@ -1593,21 +1595,21 @@ try {
         </thead>
         <tbody>
             <?php
+            // In the match table section
             if (!empty($allMatches)) {
-                foreach ($allMatches as $index => $match) {
-                    if (isset($match['status'])) {
-                        $homeTeamId = $match['homeTeam']['id'] ?? 0;
-                        $awayTeamId = $match['awayTeam']['id'] ?? 0;
-                        $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
-                        $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
-                        $date = $match['utcDate'] ?? 'TBD' ? date('M d, H:i', strtotime($match['utcDate'])) : 'TBD';
-                        $status = $match['status'];
-                        $homeGoals = $match['score']['fullTime']['home'] ?? null;
-                        $awayGoals = $match['score']['fullTime']['away'] ?? null;
-                        [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
-                        $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
-                        $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
-
+               foreach ($allMatches as $index => $match) {
+                 if (isset($match['status'])) {
+                    $homeTeamId = $match['homeTeam']['id'] ?? 0;
+                    $awayTeamId = $match['awayTeam']['id'] ?? 0;
+                    $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
+                    $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
+                    $date = $match['utcDate'] ?? 'TBD' ? date('M d, H:i', strtotime($match['utcDate'])) : 'TBD';
+                    $status = $match['status'];
+                    $homeGoals = $match['score']['fullTime']['home'] ?? null;
+                    $awayGoals = $match['score']['fullTime']['away'] ?? null;
+                    [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm, $retryInfo] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                    $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                   $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
                         // Process home form - latest on right
                         homeFormDisplay = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
                         $homeFormHtml = '';
