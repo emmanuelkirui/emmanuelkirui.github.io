@@ -1011,10 +1011,11 @@ try {
         /* New table view styles */
         .view-toggle {
     display: flex;
-    flex-wrap: wrap; /* Allows buttons to wrap to next line */
-    gap: 10px;
-    justify-content: center; /* Centers buttons when there's space */
+    flex-wrap: wrap; /* Wraps only when there's not enough space */
+    gap: 10px; /* Consistent spacing between buttons */
+    justify-content: center; /* Centers buttons when on one line */
     padding: 10px;
+    width: 100%; /* Ensures it respects container width */
 }
 
 .view-btn {
@@ -1024,7 +1025,8 @@ try {
     background-color: #fff;
     cursor: pointer;
     transition: background-color 0.2s;
-    flex: 0 0 auto; /* Prevents buttons from stretching */
+    flex: 0 0 auto; /* Keeps buttons at their natural width */
+    white-space: nowrap; /* Prevents button text from wrapping */
 }
 
 .view-btn:hover {
