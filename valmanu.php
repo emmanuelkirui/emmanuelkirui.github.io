@@ -1010,7 +1010,11 @@ try {
 
         /* New table view styles */
         .view-toggle {
-            margin: 5px;
+            display: flex;
+            gap: 10px; /* Adds space between buttons */
+            justify-content: center; /* Centers buttons horizontally */
+            padding: 10px; /* Adds some breathing room around the button group */
+          /* margin: 5px;*/
         }
 
         .view-btn {
