@@ -243,7 +243,6 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
         return ['error' => true, 'message' => "Error calculating team strength: " . $e->getMessage()];
     }
 }
-
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
@@ -263,21 +262,63 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             return ["Loading...", "N/A", "", "N/A", "", $homeStats['form'], $awayStats['form'], $retryInfo];
         }
 
+        // Enhanced metrics
         $homeWinRate = $homeStats['games'] ? $homeStats['wins'] / $homeStats['games'] : 0;
         $homeDrawRate = $homeStats['games'] ? $homeStats['draws'] / $homeStats['games'] : 0;
         $awayWinRate = $awayStats['games'] ? $awayStats['wins'] / $awayStats['games'] : 0;
         $awayDrawRate = $awayStats['games'] ? $awayStats['draws'] / $awayStats['games'] : 0;
         $homeGoalAvg = $homeStats['games'] ? $homeStats['goalsScored'] / $homeStats['games'] : 0;
         $awayGoalAvg = $awayStats['games'] ? $awayStats['goalsScored'] / $awayStats['games'] : 0;
+        $homeDefenseAvg = $homeStats['games'] ? $homeStats['goalsConceded'] / $homeStats['games'] : 0;
+        $awayDefenseAvg = $awayStats['games'] ? $awayStats['goalsConceded'] / $awayStats['games'] : 0;
 
-        $homeStrength = ($homeWinRate * 50 + $homeDrawRate * 20 + $homeGoalAvg * 20) * 1.1;
-        $awayStrength = $awayWinRate * 50 + $awayDrawRate * 20 + $awayGoalAvg * 20;
+        // Incorporate standings (position, points per game)
+        $homePositionFactor = $homeStats['standings']['position'] ? (1 - ($homeStats['standings']['position'] - 1) / 24) : 0.5; // Normalize for 24-team league
+        $awayPositionFactor = $awayStats['standings']['position'] ? (1 - ($awayStats['standings']['position'] - 1) / 24) : 0.5;
+        $homePointsPerGame = $homeStats['standings']['points'] ? $homeStats['standings']['points'] / $homeStats['games'] : 1;
+        $awayPointsPerGame = $awayStats['standings']['points'] ? $awayStats['standings']['points'] / $awayStats['games'] : 1;
+
+        // Form momentum (weight recent results more)
+        $homeFormScore = array_reduce(str_split(substr($homeStats['form'], -5)), function($carry, $result) {
+            return $carry + ($result === 'W' ? 3 : ($result === 'D' ? 1 : 0));
+        }, 0) / 15; // Max 15 points over 5 games
+        $awayFormScore = array_reduce(str_split(substr($awayStats['form'], -5)), function($carry, $result) {
+            return $carry + ($result === 'W' ? 3 : ($result === 'D' ? 1 : 0));
+        }, 0) / 15;
+
+        // Dynamic home advantage based on team strength
+        $homeAdvantage = 1 + (0.1 * $homePositionFactor + 0.05 * $homeFormScore);
+
+        // Calculate team strength with more factors
+        $homeStrength = (
+            $homeWinRate * 40 +          // Reduced weight on win rate
+            $homeDrawRate * 15 +         // Reduced weight on draw rate
+            $homeGoalAvg * 20 +          // Offensive strength
+            (2 - $homeDefenseAvg) * 15 + // Defensive strength (lower conceded = better)
+            $homePointsPerGame * 10 +    // League performance
+            $homeFormScore * 15          // Recent momentum
+        ) * $homeAdvantage;
+
+        $awayStrength = (
+            $awayWinRate * 40 +
+            $awayDrawRate * 15 +
+            $awayGoalAvg * 20 +
+            (2 - $awayDefenseAvg) * 15 +
+            $awayPointsPerGame * 10 +
+            $awayFormScore * 15
+        );
 
         $diff = $homeStrength - $awayStrength;
-        $confidence = min(90, abs($diff) / ($homeStrength + $awayStrength + 1) * 100);
+        $totalStrength = $homeStrength + $awayStrength + 1;
+        $confidence = min(95, abs($diff) / $totalStrength * 150); // Adjusted scaling for higher confidence
 
-        $predictedHomeGoals = round($homeGoalAvg * (1 + $diff/100));
-        $predictedAwayGoals = round($awayGoalAvg * (1 - $diff/100));
+        // Enhanced goal prediction
+        $baseHomeGoals = $homeGoalAvg * (1 + $diff / 100) * $homeAdvantage;
+        $baseAwayGoals = $awayGoalAvg * (1 - $diff / 100) * (1 / $homeAdvantage);
+        $homeDefenseImpact = $awayGoalAvg * (1 - (2 - $homeDefenseAvg) / 2);
+        $awayDefenseImpact = $homeGoalAvg * (1 - (2 - $awayDefenseAvg) / 2);
+        $predictedHomeGoals = round(max(0, ($baseHomeGoals + $awayDefenseImpact) / 2));
+        $predictedAwayGoals = round(max(0, ($baseAwayGoals + $homeDefenseImpact) / 2));
         $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
 
         $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
@@ -286,17 +327,18 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
 
-        if ($diff > 15) {
+        // Adjusted prediction thresholds
+        if ($diff > 25) { // Increased threshold for win
             $prediction = "$homeTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
             $advantage = "Home Advantage";
-        } elseif ($diff < -15) {
+        } elseif ($diff < -25) {
             $prediction = "$awayTeam to win";
             $confidence = sprintf("%.1f%%", $confidence);
             $advantage = "Away Advantage";
         } else {
             $prediction = "Draw";
-            $confidence = sprintf("%.1f%%", min(70, $confidence));
+            $confidence = sprintf("%.1f%%", min(75, $confidence * 0.8)); // Reduced confidence for draws
             $advantage = "Likely Draw";
         }
 
@@ -312,6 +354,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     }
 }
 
+        
 // AJAX handling remains unchanged
 $action = $_GET['action'] ?? 'main';
 if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match', 'search_teams'])) {
@@ -1566,24 +1609,23 @@ try {
                         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
 
                         // Process home form - latest on right
-                        $homeFormDisplay = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
+                        homeFormDisplay = str_pad(substr($homeStats['form'], -6), 6, '-', STR_PAD_LEFT);
                         $homeFormHtml = '';
                         $formLength = strlen(trim($homeStats['form'], '-'));
-                        for ($i = 0; $i < 6; $i++) {
-                            $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                            if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
-                            $homeFormHtml .= "<span class='$class'>{$homeFormDisplay[$i]}</span>";
-                        }
-
-                        // Process away form - latest on right
+                         for ($i = 0; $i < 6; $i++) {
+                        $class = $homeFormDisplay[$i] === 'W' ? 'win' : ($homeFormDisplay[$i] === 'D' ? 'draw' : ($homeFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
+                         if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
+                        $homeFormHtml .= "<span class='$class'>{$homeFormDisplay[$i]}</span>";
+                       }
+                       // Process away form - latest on right
                         $awayFormDisplay = str_pad(substr($awayStats['form'], -6), 6, '-', STR_PAD_LEFT);
                         $awayFormHtml = '';
                         $formLength = strlen(trim($awayStats['form'], '-'));
-                        for ($i = 0; $i < 6; $i++) {
-                            $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
-                            if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
-                            $awayFormHtml .= "<span class='$class'>{$awayFormDisplay[$i]}</span>";
-                        }
+                         for ($i = 0; $i < 6; $i++) {
+                        $class = $awayFormDisplay[$i] === 'W' ? 'win' : ($awayFormDisplay[$i] === 'D' ? 'draw' : ($awayFormDisplay[$i] === 'L' ? 'loss' : 'empty'));
+                         if ($formLength > 0 && $i === (5 - (6 - $formLength))) $class .= ' latest';
+                        $awayFormHtml .= "<span class='$class'>{$awayFormDisplay[$i]}</span>";
+                       }
 
                         echo "<tr data-index='$index' data-home-id='$homeTeamId' data-away-id='$awayTeamId' data-status='$status'>
                             <td>$date</td>
