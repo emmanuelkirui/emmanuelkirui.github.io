@@ -211,7 +211,7 @@ class RecaptchaHandler {
                     display: none;
                     margin-top: 20px;
                     font-size: 14px;
-                    color: #f1c40f;
+                    color: #27ae60; /* Changed from #f1c40f (yellow) to #27ae60 (light green) */
                 }
                 #reload-message a {
                     color: #3498db;
