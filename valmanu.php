@@ -377,8 +377,13 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
 
         // Match details
-        $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
-        $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
+        // With this more robust check:
+        $homeTeam = $match['homeTeam']['name'] ?? 
+           ($match['homeTeam']['shortName'] ?? 
+           'Home Team'); // Fallback to shortName first, then a generic name
+        $awayTeam = $match['awayTeam']['name'] ?? 
+           ($match['awayTeam']['shortName'] ?? 
+           'Away Team');
         $status = $match['status'] ?? 'SCHEDULED';
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
@@ -1526,8 +1531,12 @@ try {
                         if (isset($match['status'])) {
                             $homeTeamId = $match['homeTeam']['id'] ?? 0;
                             $awayTeamId = $match['awayTeam']['id'] ?? 0;
-                            $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
-                            $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
+                            $homeTeam = $match['homeTeam']['name'] ?? 
+                                ($match['homeTeam']['shortName'] ?? 
+                                "Home Team {$match['homeTeam']['id']}");
+                            $awayTeam = $match['awayTeam']['name'] ?? 
+                                ($match['awayTeam']['shortName'] ?? 
+                                "Away Team {$match['awayTeam']['id']}");
                             $date = $match['utcDate'] ?? 'TBD' ? date('M d, Y H:i', strtotime($match['utcDate'])) : 'TBD';
                             $homeCrest = $match['homeTeam']['crest'] ?? '';
                             $awayCrest = $match['awayTeam']['crest'] ?? '';
@@ -1668,8 +1677,12 @@ try {
                     if (isset($match['status'])) {
                         $homeTeamId = $match['homeTeam']['id'] ?? 0;
                         $awayTeamId = $match['awayTeam']['id'] ?? 0;
-                        $homeTeam = $match['homeTeam']['name'] ?? 'TBD';
-                        $awayTeam = $match['awayTeam']['name'] ?? 'TBD';
+                        $homeTeam = $match['homeTeam']['name'] ?? 
+                         ($match['homeTeam']['shortName'] ?? 
+                         "Home Team {$match['homeTeam']['id']}");
+                        $awayTeam = $match['awayTeam']['name'] ?? 
+                          ($match['awayTeam']['shortName'] ?? 
+                          "Away Team {$match['awayTeam']['id']}");
                         $date = $match['utcDate'] ?? 'TBD' ? date('M d, H:i', strtotime($match['utcDate'])) : 'TBD';
                         $status = $match['status'];
                         $homeGoals = $match['score']['fullTime']['home'] ?? null;
