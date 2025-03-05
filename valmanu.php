@@ -1,8 +1,6 @@
 <?php
 session_start();
 require_once 'recaptcha_handler.php';
-require_once 'auth.php';  // This includes the Auth class definition
-$auth = new Auth();
 
 // Set timezone to East Africa Time (Nairobi, Kenya, UTC+3)
 date_default_timezone_set('Africa/Nairobi');
@@ -543,12 +541,6 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
-    if ($auth->isLoggedIn()) {
-    echo "<span class='nav-link user-info'>Welcome, " . htmlspecialchars($auth->getCurrentUser()) . "</span>";
-    echo "<form method='POST' action='login.php' style='display:inline;'><input type='hidden' name='action' value='logout'><input type='hidden' name='ajax' value='true'><button type='submit' class='nav-link logout-btn'>Logout</button></form>";
-} else {
-    echo "<a href='login.php' class='nav-link'>Login/Signup</a>";
-}
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
