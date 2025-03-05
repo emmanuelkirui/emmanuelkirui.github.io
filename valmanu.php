@@ -286,31 +286,45 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         // Dynamic Home/Away Adjustments
         $homeHomeWins = $homeStats['standings']['home']['won'] ?? $homeStats['wins'] / 2;
         $awayAwayWins = $awayStats['standings']['away']['won'] ?? $awayStats['wins'] / 2;
-        $homeStrengthAdjustment = 1.0 + ($homeHomeWins / max($homeGames / 2, 1)) * 0.15; // Max +15%
-        $awayStrengthAdjustment = 1.0 - ($awayAwayWins / max($awayGames / 2, 1)) * 0.10; // Max -10%
+        $homeStrengthAdjustment = 1.0 + ($homeHomeWins / max($homeGames / 2, 1)) * 0.15;
+        $awayStrengthAdjustment = 1.0 - ($awayAwayWins / max($awayGames / 2, 1)) * 0.10;
+
+        // Dynamic Competition Factor
+        $competitionBase = match ($competition) {
+            'UEFA Champions League' => 1.1, // Higher scoring, more variance
+            'English Championship' => 0.95, // Tighter, lower scoring
+            default => 1.0 // Neutral for unknown competitions
+        };
+        // Average goals per game for this matchup as a proxy
+        $matchGoalAvg = ($homeGoalAvg + $awayGoalAvg + $homeConcededAvg + $awayConcededAvg) / 4;
+        // Variance factor from form streakiness and GD
+        $homeFormArray = str_split(str_pad($homeStats['form'], 6, '-', STR_PAD_LEFT));
+        $awayFormArray = str_split(str_pad($awayStats['form'], 6, '-', STR_PAD_LEFT));
+        $homeStreak = abs(calculateStreak($homeFormArray));
+        $awayStreak = abs(calculateStreak($awayFormArray));
+        $formVariance = 1 + ($homeStreak + $awayStreak) * 0.02; // More streaky = more variance
+        $gdVariance = 1 + (abs($homeGD) + abs($awayGD)) * 0.005 / max($homeGames, $awayGames); // Big GD = more blowout potential
+        // Dynamic factor: base + goal avg adjustment + variance
+        $competitionFactor = min(1.3, max(0.8, $competitionBase * (1 + ($matchGoalAvg - 2.5) / 5) * $formVariance * $gdVariance));
 
         // Dynamic Weight Calculation
         $maxWeight = 100;
         $winWeight = min(25, 10 + ($homeGames + $awayGames) * 0.2);
         $drawWeight = min(15, 5 + ($homeGames + $awayGames) * 0.1);
-        $goalWeight = min(25, 10 + (abs($homeGD) + abs($awayGD)) * 0.03 / max($homeGames, $awayGames));
+        $goalWeight = min(25, 10 + (abs($homeGD) + abs($awayGD)) * 0.02 / max($homeGames, $awayGames));
         $standingsWeight = min(25, 10 + ($homeGames + $awayGames) * 0.25);
 
-        // Form with streak multiplier
-        $homeFormArray = str_split(str_pad($homeStats['form'], 6, '-', STR_PAD_LEFT));
-        $awayFormArray = str_split(str_pad($awayStats['form'], 6, '-', STR_PAD_LEFT));
-        $formWeightBase = [0.1, 0.15, 0.2, 0.25, 0.3, 0.4]; // More weight to recent games
+        // Form with emphasis on recent games
+        $formWeightBase = [0.05, 0.1, 0.15, 0.2, 0.25, 0.35];
         $homeFormScore = 0;
         $awayFormScore = 0;
-        $homeStreak = calculateStreak($homeFormArray);
-        $awayStreak = calculateStreak($awayFormArray);
         foreach (array_reverse($homeFormArray) as $i => $result) {
             $homeFormScore += ($result === 'W' ? 3 : ($result === 'D' ? 1 : 0)) * $formWeightBase[$i];
         }
         foreach (array_reverse($awayFormArray) as $i => $result) {
             $awayFormScore += ($result === 'W' ? 3 : ($result === 'D' ? 1 : 0)) * $formWeightBase[$i];
         }
-        $formConsistency = min(1.5, 1 + (abs($homeStreak) + abs($awayStreak)) * 0.05); // Boost for streaks
+        $formConsistency = min(1.4, 1 + ($homeStreak + $awayStreak) * 0.05);
         $formWeight = min(30, 15 + (strlen(trim($homeStats['form'], '-')) + strlen(trim($awayStats['form'], '-'))) * 0.5) * $formConsistency;
 
         // Normalize weights
@@ -331,16 +345,16 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             ($homeGoalAvg + $homeGD / $homeGames) * $goalWeight +
             $homeFormScore * $formWeight +
             $homePointsPerGame * $standingsWeight
-        ) * $homeStrengthAdjustment;
+        ) * $homeStrengthAdjustment * $competitionFactor;
         $awayStrength = (
             $awayWinRate * $winWeight +
             $awayDrawRate * $drawWeight +
             ($awayGoalAvg + $awayGD / $awayGames) * $goalWeight +
             $awayFormScore * $formWeight +
             $awayPointsPerGame * $standingsWeight
-        ) * $awayStrengthAdjustment;
+        ) * $awayStrengthAdjustment * $competitionFactor;
 
-        // Add controlled randomness (±2%)
+        // Controlled randomness (±2%)
         $randomFactor = (rand(-20, 20) / 1000);
         $homeStrength *= (1 + $randomFactor);
         $awayStrength *= (1 - $randomFactor);
@@ -348,15 +362,18 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         // Strength difference and confidence
         $diff = $homeStrength - $awayStrength + (20 - $homePosition) * 0.03 - (20 - $awayPosition) * 0.03;
         $totalStrength = $homeStrength + $awayStrength + 1;
-        $confidence = min(90, max(55, 50 + abs($diff) / $totalStrength * 100 * $formConsistency)); // Dynamic range
+        $confidenceBase = 50 + (abs($diff) / $totalStrength * 100 * $formConsistency);
+        $confidence = min(85, max(55, $confidenceBase));
 
-        // Goal prediction
-        $homeAttackStrength = min(3, $homeGoalAvg + $homeGD / $homeGames); // Cap at 3
-        $awayAttackStrength = min(3, $awayGoalAvg + $awayGD / $awayGames); // Cap at 3
-        $expectedHomeGoals = max(0, min(5, $homeAttackStrength * ($awayConcededAvg / 2) * (1 + $diff / 50)));
-        $expectedAwayGoals = max(0, min(5, $awayAttackStrength * ($homeConcededAvg / 2) * (1 - $diff / 50)));
-        $predictedHomeGoals = round($expectedHomeGoals + $randomFactor);
-        $predictedAwayGoals = round($expectedAwayGoals - $randomFactor);
+        // Goal prediction with defensive adjustment
+        $homeAttackStrength = min(2.5, $homeGoalAvg + $homeGD / $homeGames);
+        $awayAttackStrength = min(2.5, $awayGoalAvg + $awayGD / $awayGames);
+        $homeDefStrength = min(2, $homeConcededAvg);
+        $awayDefStrength = min(2, $awayConcededAvg);
+        $expectedHomeGoals = max(0, min(4, $homeAttackStrength * (1 + $diff / 50) / ($awayDefStrength + 1) * $competitionFactor));
+        $expectedAwayGoals = max(0, min(4, $awayAttackStrength * (1 - $diff / 50) / ($homeDefStrength + 1) * $competitionFactor));
+        $predictedHomeGoals = max(0, round($expectedHomeGoals + $randomFactor));
+        $predictedAwayGoals = max(0, round($expectedAwayGoals - $randomFactor));
         $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
 
         // Match details
@@ -366,17 +383,17 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
 
-        // Prediction logic aligned with score
-        if ($predictedHomeGoals > $predictedAwayGoals && $diff > 5) {
+        // Prediction aligned with score
+        if ($predictedHomeGoals > $predictedAwayGoals) {
             $prediction = "$homeTeam to win";
             $advantage = "Home Advantage";
-        } elseif ($predictedHomeGoals < $predictedAwayGoals && $diff < -5) {
+        } elseif ($predictedHomeGoals < $predictedAwayGoals) {
             $prediction = "$awayTeam to win";
             $advantage = "Away Advantage";
         } else {
             $prediction = "Draw";
             $advantage = "Likely Draw";
-            $confidence = min($confidence, 75); // Cap draw confidence
+            $confidence = min($confidence, 70);
         }
 
         $confidence = sprintf("%.1f%%", $confidence);
@@ -406,7 +423,6 @@ function calculateStreak($formArray) {
     }
     return $streak;
 }
-
             
 
 // AJAX handling remains unchanged
