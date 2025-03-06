@@ -1,380 +1,180 @@
 <?php
-// login.php
 session_start();
+include 'config.php'; // Include your database configuration
 
-class Auth {
-    private $dbFile = 'users.json';
-    
-    private function loadUsers() {
-        if (!file_exists($this->dbFile)) {
-            file_put_contents($this->dbFile, json_encode([]));
-        }
-        return json_decode(file_get_contents($this->dbFile), true);
-    }
-    
-    private function saveUsers($users) {
-        file_put_contents($this->dbFile, json_encode($users, JSON_PRETTY_PRINT));
-    }
-    
-    public function signup($username, $email, $password) {
-        $users = $this->loadUsers();
-        
-        if (isset($users[$username])) {
-            return ['success' => false, 'message' => 'Username already exists'];
-        }
-        
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['success' => false, 'message' => 'Invalid email format'];
-        }
-        
-        $users[$username] = [
-            'email' => $email,
-            'password' => password_hash($password, PASSWORD_DEFAULT),
-            'created_at' => date('Y-m-d H:i:s')
-        ];
-        
-        $this->saveUsers($users);
-        $_SESSION['user'] = $username;
-        return ['success' => true, 'message' => 'Registration successful'];
-    }
-    
-    public function login($username, $password) {
-        $users = $this->loadUsers();
-        
-        if (!isset($users[$username]) || !password_verify($password, $users[$username]['password'])) {
-            return ['success' => false, 'message' => 'Invalid credentials'];
-        }
-        
-        $_SESSION['user'] = $username;
-        return ['success' => true, 'message' => 'Login successful'];
-    }
-    
-    public function logout() {
-        unset($_SESSION['user']);
-        session_destroy();
-    }
-    
-    public function isLoggedIn() {
-        return isset($_SESSION['user']);
-    }
-    
-    public function getCurrentUser() {
-        return $_SESSION['user'] ?? null;
-    }
+// Helper function to sanitize input
+function sanitize($data) {
+    global $connect;
+    return mysqli_real_escape_string($connect, trim($data));
 }
 
-$auth = new Auth();
+// Create cps_users table if it doesn’t exist
+$create_table_query = "
+    CREATE TABLE IF NOT EXISTS cps_users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        email VARCHAR(100) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        reset_token VARCHAR(100) DEFAULT NULL,
+        reset_expiry DATETIME DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax'])) {
-    header('Content-Type: application/json');
-    
-    $action = $_POST['action'] ?? '';
-    $username = trim($_POST['username'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    
-    switch ($action) {
-        case 'signup':
-            echo json_encode($auth->signup($username, $email, $password));
-            break;
-        case 'login':
-            echo json_encode($auth->login($username, $password));
-            break;
-        case 'logout':
-            $auth->logout();
-            echo json_encode(['success' => true, 'message' => 'Logged out successfully']);
-            break;
+if (!mysqli_query($connect, $create_table_query)) {
+    die("Error creating table: " . mysqli_error($connect));
+}
+
+// Login Handler
+if (isset($_POST['login'])) {
+    $username = sanitize($_POST['username']);
+    $password = sanitize($_POST['password']);
+
+    if (empty($username) || empty($password)) {
+        echo json_encode(['success' => false, 'message' => 'Please fill in all fields']);
+        exit;
+    }
+
+    $query = "SELECT * FROM cps_users WHERE username = '$username'";
+    $result = mysqli_query($connect, $query);
+
+    if (mysqli_num_rows($result) === 1) {
+        $user = mysqli_fetch_assoc($result);
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['user_id'] = $user['id'];
+            echo json_encode(['success' => true, 'message' => 'Login successful']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid password']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Username not found']);
     }
     exit;
 }
 
-// Handle direct form submission (non-AJAX fallback)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['ajax'])) {
-    $action = $_POST['action'] ?? '';
-    $username = trim($_POST['username'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-    
-    $result = $action === 'signup' 
-        ? $auth->signup($username, $email, $password)
-        : $auth->login($username, $password);
-    
-    if ($result['success']) {
-        header('Location: ' . $_SERVER['PHP_SELF']);
+// Signup Handler
+if (isset($_POST['signup'])) {
+    $username = sanitize($_POST['username']);
+    $email = sanitize($_POST['email']);
+    $password = sanitize($_POST['password']);
+    $confirm_password = sanitize($_POST['confirm_password']);
+
+    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+        echo json_encode(['success' => false, 'message' => 'Please fill in all fields']);
         exit;
     }
-    $error_message = $result['message'];
+
+    if ($password !== $confirm_password) {
+        echo json_encode(['success' => false, 'message' => 'Passwords do not match']);
+        exit;
+    }
+
+    // Check if username or email already exists
+    $check_query = "SELECT * FROM cps_users WHERE username = '$username' OR email = '$email'";
+    $check_result = mysqli_query($connect, $check_query);
+
+    if (mysqli_num_rows($check_result) > 0) {
+        echo json_encode(['success' => false, 'message' => 'Username or email already taken']);
+        exit;
+    }
+
+    // Hash the password
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    // Insert new user
+    $insert_query = "INSERT INTO cps_users (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
+    if (mysqli_query($connect, $insert_query)) {
+        $_SESSION['username'] = $username;
+        $_SESSION['user_id'] = mysqli_insert_id($connect);
+        echo json_encode(['success' => true, 'message' => 'Signup successful']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Signup failed: ' . mysqli_error($connect)]);
+    }
+    exit;
 }
-?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CPS Football</title>
-    <style>
-        :root {
-            --primary-color: #2ecc71;
-            --secondary-color: #3498db;
-            --text-color: #333;
-            --bg-color: #f4f4f4;
-            --card-bg: #fff;
-            --shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+// Password Reset Request Handler
+if (isset($_POST['reset_request'])) {
+    $email = sanitize($_POST['email']);
 
-        [data-theme="dark"] {
-            --primary-color: #27ae60;
-            --secondary-color: #2980b9;
-            --text-color: #ecf0f1;
-            --bg-color: #2c3e50;
-            --card-bg: #34495e;
-            --shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
+    if (empty($email)) {
+        echo json_encode(['success' => false, 'message' => 'Please enter your email']);
+        exit;
+    }
 
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
+    $query = "SELECT * FROM cps_users WHERE email = '$email'";
+    $result = mysqli_query($connect, $query);
 
-        .login-container {
-            background-color: var(--card-bg);
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 400px;
-            margin: 20px;
-        }
+    if (mysqli_num_rows($result) === 1) {
+        $user = mysqli_fetch_assoc($result);
+        $token = bin2hex(random_bytes(32)); // Generate a secure token
+        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour')); // Token expires in 1 hour
 
-        .login-container h1 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 30px;
-        }
+        // Update user with reset token and expiry
+        $update_query = "UPDATE cps_users SET reset_token = '$token', reset_expiry = '$expiry' WHERE email = '$email'";
+        if (mysqli_query($connect, $update_query)) {
+            // Send reset email (basic example - configure SMTP for production)
+            $reset_link = "http://yourdomain.com/reset_password.php?token=$token";
+            $subject = "Password Reset Request";
+            $message = "Click this link to reset your password: $reset_link\nThis link expires in 1 hour.";
+            $headers = "From: no-reply@yourdomain.com";
 
-        .auth-tabs {
-            display: flex;
-            border-bottom: 2px solid var(--primary-color);
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 10px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-color);
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .tab-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 5px 5px 0 0;
-        }
-
-        .auth-form {
-            display: none;
-        }
-
-        .auth-form.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-color);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid var(--text-color);
-            border-radius: 5px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            box-sizing: border-box;
-        }
-
-        button[type="submit"] {
-            width: 100%;
-            padding: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button[type="submit"]:hover {
-            background-color: var(--secondary-color);
-        }
-
-        .auth-message {
-            margin-top: 10px;
-            text-align: center;
-            color: var(--text-color);
-        }
-
-        .error-message {
-            color: #dc3545;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .back-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h1>CPS Football</h1>
-        
-        <?php if (isset($error_message)): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error_message); ?></div>
-        <?php endif; ?>
-
-        <div class="auth-tabs">
-            <button class="tab-btn active" data-tab="login">Login</button>
-            <button class="tab-btn" data-tab="signup">Sign Up</button>
-        </div>
-
-        <form id="loginForm" class="auth-form active" method="POST">
-            <input type="hidden" name="action" value="login">
-            <div class="form-group">
-                <label for="login-username">Username</label>
-                <input type="text" id="login-username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="login-password">Password</label>
-                <input type="password" id="login-password" name="password" required>
-            </div>
-            <button type="submit">Login</button>
-            <div id="login-message" class="auth-message"></div>
-        </form>
-
-        <form id="signupForm" class="auth-form" method="POST">
-            <input type="hidden" name="action" value="signup">
-            <div class="form-group">
-                <label for="signup-username">Username</label>
-                <input type="text" id="signup-username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="signup-email">Email</label>
-                <input type="email" id="signup-email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="signup-password">Password</label>
-                <input type="password" id="signup-password" name="password" required>
-            </div>
-            <button type="submit">Sign Up</button>
-            <div id="signup-message" class="auth-message"></div>
-        </form>
-
-        <a href="javascript:history.back()" class="back-link">Back to Predictions</a>
-    </div>
-
-    <script>
-        // Tab switching
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        const forms = document.querySelectorAll('.auth-form');
-
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                tabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                forms.forEach(form => {
-                    form.classList.toggle('active', form.id === `${btn.dataset.tab}Form`);
-                });
-            });
-        });
-
-        // AJAX form handling
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            formData.append('ajax', 'true');
-
-            fetch('<?php echo $_SERVER['PHP_SELF']; ?>', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const messageDiv = document.getElementById('login-message');
-                messageDiv.textContent = data.message;
-                if (data.success) {
-                    setTimeout(() => window.location.href = '<?php echo dirname($_SERVER['PHP_SELF']); ?>/index.php', 1000);
-                }
-            })
-            .catch(error => {
-                document.getElementById('login-message').textContent = 'An error occurred. Please try again.';
-                console.error('Login error:', error);
-            });
-        });
-
-        signupForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            formData.append('ajax', 'true');
-
-            fetch('<?php echo $_SERVER['PHP_SELF']; ?>', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const messageDiv = document.getElementById('signup-message');
-                messageDiv.textContent = data.message;
-                if (data.success) {
-                    setTimeout(() => window.location.href = '<?php echo dirname($_SERVER['PHP_SELF']); ?>/index.php', 1000);
-                }
-            })
-            .catch(error => {
-                document.getElementById('signup-message').textContent = 'An error occurred. Please try again.';
-                console.error('Signup error:', error);
-            });
-        });
-
-        // Theme handling
-        window.onload = function() {
-            const theme = document.cookie.split('; ')
-                .find(row => row.startsWith('theme='))
-                ?.split('=')[1];
-            if (theme) {
-                document.body.setAttribute('data-theme', theme);
+            if (mail($email, $subject, $message, $headers)) {
+                echo json_encode(['success' => true, 'message' => 'Reset link sent to your email']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to send reset email']);
             }
-        };
-    </script>
-</body>
-</html>
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error generating reset token']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Email not found']);
+    }
+    exit;
+}
+
+// Password Reset Confirmation Handler (for reset_password.php)
+if (isset($_POST['reset_password'])) {
+    $token = sanitize($_POST['token']);
+    $new_password = sanitize($_POST['new_password']);
+    $confirm_password = sanitize($_POST['confirm_password']);
+
+    if (empty($token) || empty($new_password) || empty($confirm_password)) {
+        echo json_encode(['success' => false, 'message' => 'Please fill in all fields']);
+        exit;
+    }
+
+    if ($new_password !== $confirm_password) {
+        echo json_encode(['success' => false, 'message' => 'Passwords do not match']);
+        exit;
+    }
+
+    $query = "SELECT * FROM cps_users WHERE reset_token = '$token' AND reset_expiry > NOW()";
+    $result = mysqli_query($connect, $query);
+
+    if (mysqli_num_rows($result) === 1) {
+        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
+        $update_query = "UPDATE cps_users SET password = '$hashed_password', reset_token = NULL, reset_expiry = NULL WHERE reset_token = '$token'";
+        
+        if (mysqli_query($connect, $update_query)) {
+            echo json_encode(['success' => true, 'message' => 'Password reset successful']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error resetting password']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid or expired token']);
+    }
+    exit;
+}
+
+// Logout Handler (can be moved to main file if preferred)
+if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
+    session_unset();
+    session_destroy();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+mysqli_close($connect);
+?>
