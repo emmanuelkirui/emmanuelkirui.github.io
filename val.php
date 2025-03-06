@@ -45,13 +45,13 @@ if (isset($leagueData['data']) && !empty($leagueData['data'])) {
         $leagueId = $league['id'];
         $seasonId = $league['current_season_id'];
 
-        // Fetch teams for the league
+        // Fetch teams for the league (assumed endpoint)
         $teamsUrl = "$baseUrl/teams/?user=$user&token=$token&t=list&league_id=$leagueId";
         $teamsData = getSoccerData($teamsUrl);
         $teams = isset($teamsData['data']) ? $teamsData['data'] : [];
 
-        // Fetch fixtures for the selected date
-        $fixturesUrl = "$baseUrl/fixtures/?user=$user&token=$token&t=schedule&league_id=$leagueId&season_id=$seasonId&date=$selectedDate";
+        // Fetch fixtures for the selected date (using provided endpoint format)
+        $fixturesUrl = "$baseUrl/fixtures/?user=$user&token=$token&t=schedule&d=$selectedDate&season_id=$seasonId";
         $fixturesData = getSoccerData($fixturesUrl);
         $fixtures = isset($fixturesData['data']) ? $fixturesData['data'] : [];
 
@@ -173,11 +173,12 @@ if (isset($leagueData['data']) && !empty($leagueData['data'])) {
                                         <?php foreach ($item['fixtures'] as $fixture): ?>
                                             <li>
                                                 <?php 
-                                                $homeTeam = htmlspecialchars($fixture['home']['name']);
-                                                $awayTeam = htmlspecialchars($fixture['away']['name']);
-                                                $score = isset($fixture['score']) ? htmlspecialchars($fixture['score']['ft']) : 'N/A';
-                                                $status = htmlspecialchars($fixture['status']);
-                                                $time = date('H:i', strtotime($fixture['date'] . ' UTC')); // Convert to EAT
+                                                // Adjust these fields based on actual API response
+                                                $homeTeam = htmlspecialchars($fixture['home']['name'] ?? 'Unknown');
+                                                $awayTeam = htmlspecialchars($fixture['away']['name'] ?? 'Unknown');
+                                                $score = isset($fixture['score']['ft']) ? htmlspecialchars($fixture['score']['ft']) : 'N/A';
+                                                $status = htmlspecialchars($fixture['status'] ?? 'Unknown');
+                                                $time = isset($fixture['date']) ? date('H:i', strtotime($fixture['date'] . ' UTC')) : 'N/A'; // Convert UTC to EAT
                                                 echo "$homeTeam vs $awayTeam - Score: $score - Status: $status - Time: $time (EAT)";
                                                 ?>
                                             </li>
