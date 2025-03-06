@@ -549,7 +549,18 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+    // Static approach: Comment/uncomment to switch states
+    // Logged-out state (uncomment this to test logged-out UI)
     echo "<button class='nav-link auth-btn' onclick='openModal()'>Login/Signup</button>";
+
+    // Logged-in state (uncomment this to test logged-in UI, comment the above line)
+    // echo "<div class='user-menu'>";
+    // echo "<button class='nav-link user-btn' onclick='toggleUserMenu()'>Username ▼</button>";
+    // echo "<div class='user-dropdown' id='userDropdown'>";
+    // echo "<a href='#settings' class='dropdown-item'>Settings</a>";
+    // echo "<a href='#logout' class='dropdown-item'>Logout</a>";
+    // echo "</div>";
+    // echo "</div>";
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -1701,6 +1712,63 @@ try {
     color: white; /* White text on hover */
     transform: translateY(-2px); /* Matches nav-link hover effect */
 }
+      /* Append to existing <style> section, after .auth-btn styles */
+
+/* User menu styles (for logged-in state) */
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-btn {
+    padding: 8px 15px;
+    min-width: 0;
+    width: auto;
+    display: inline-block;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.user-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    min-width: 150px;
+    z-index: 100;
+    margin-top: 5px;
+}
+
+.user-dropdown.active {
+    display: block;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 15px;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
         
 /* Hide/show forms */
 .auth-form {
@@ -1733,6 +1801,25 @@ try {
         width: auto; /* Prevents full-width stretch on mobile */
         padding: 8px 15px; /* Consistent padding */
         text-align: center; /* Centers text */
+                }
+        .nav-menu .user-btn {
+        width: auto;
+        padding: 8px 15px;
+        text-align: center;
+    }
+
+    .user-menu {
+        width: 100%;
+    }
+
+    .user-btn {
+        width: 100%;
+        text-align: left;
+    }
+
+    .user-dropdown {
+        width: 100%;
+        right: 0;
     }
 }
     </style>
@@ -2155,7 +2242,19 @@ try {
     localStorage.setItem('matchView', view);
 }
 
-            // Append to existing <script> section
+function toggleUserMenu() {
+    const dropdown = document.getElementById('userDropdown');
+    dropdown.classList.toggle('active');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const userMenu = document.querySelector('.user-menu');
+    if (userMenu && !userMenu.contains(e.target)) {
+        document.getElementById('userDropdown').classList.remove('active');
+    }
+});
+            
 
     function openModal() {
         document.getElementById("auth-modal").classList.add("active");
