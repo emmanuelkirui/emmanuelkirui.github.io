@@ -11,7 +11,7 @@ if (!isset($_SESSION['teamStats'])) {
 }
 
 $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
-$baseUrl = 'http://api.football-data.org/v4/';
+$baseUrl = 'https://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
 // Error handling functions remain unchanged
