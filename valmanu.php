@@ -587,6 +587,8 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+    // Add the Force Refresh button
+    echo "<button class='nav-link force-refresh-btn' onclick='forceRefreshModels()' title='Force refresh predictions'><span class='refresh-icon'>🔄</span> Refresh Models</button>";
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -1027,7 +1029,32 @@ try {
         .search-container.active .autocomplete-dropdown {
             display: block;
         }
+        
+.force-refresh-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--primary-color);
+    border: none;
+    cursor: pointer;
+}
 
+.force-refresh-btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.force-refresh-btn.refreshing {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.refresh-icon {
+    font-size: 1.1em;
+}
+
+[data-theme="dark"] .force-refresh-btn {
+    background-color: var(--primary-color);
+}
         .match-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -2109,6 +2136,57 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             const themeIcon = document.querySelector('.theme-icon');
             themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
+
+         function forceRefreshModels() {
+    const refreshBtn = document.querySelector('.force-refresh-btn');
+    if (refreshBtn.classList.contains('refreshing')) return;
+
+    refreshBtn.classList.add('refreshing');
+    refreshBtn.innerHTML = '<span class="refresh-icon">⏳</span> Refreshing...';
+    
+    // Clear existing predictions and team stats
+    fetch(`?force_refresh=true&competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>`, {
+        method: 'GET',
+        headers: {
+            'X-Auth-Token': '<?php echo $apiKey; ?>'
+        }
+    })
+    .then(() => {
+        // Refresh all match cards
+        document.querySelectorAll('.match-card').forEach(card => {
+            const index = card.dataset.index;
+            const homeId = card.dataset.homeId;
+            const awayId = card.dataset.awayId;
+            
+            // Reset UI elements
+            const predictionElement = document.getElementById(`prediction-${index}`);
+            predictionElement.innerHTML = '<p>Loading prediction...</p><div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>';
+            
+            // Fetch fresh data
+            fetchTeamData(homeId, index, true);
+            fetchTeamData(awayId, index, false);
+        });
+
+        // Refresh table view
+        document.querySelectorAll('.match-table tr').forEach(row => {
+            const index = row.dataset.index;
+            const homeId = row.dataset.homeId;
+            const awayId = row.dataset.awayId;
+            
+            fetchPrediction(index, homeId, awayId);
+        });
+    })
+    .catch(error => {
+        console.error('Error refreshing models:', error);
+        alert('Failed to refresh models. Please try again.');
+    })
+    .finally(() => {
+        setTimeout(() => {
+            refreshBtn.classList.remove('refreshing');
+            refreshBtn.innerHTML = '<span class="refresh-icon">🔄</span> Refresh Models';
+        }, 1000);
+    });
+}
 
         function toggleHistory(button) {
             const historyDiv = button.nextElementSibling;
