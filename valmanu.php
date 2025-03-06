@@ -550,17 +550,17 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
     // Static approach: Comment/uncomment to switch states
-    // Logged-out state (uncomment this to test logged-out UI)
-    echo "<button class='nav-link auth-btn' onclick='openModal()'>Login/Signup</button>";
-
-    // Logged-in state (uncomment this to test logged-in UI, comment the above line)
-    // echo "<div class='user-menu'>";
-    // echo "<button class='nav-link user-btn' onclick='toggleUserMenu()'>Username ▼</button>";
-    // echo "<div class='user-dropdown' id='userDropdown'>";
-    // echo "<a href='#settings' class='dropdown-item'>Settings</a>";
-    // echo "<a href='#logout' class='dropdown-item'>Logout</a>";
-    // echo "</div>";
-    // echo "</div>";
+    if (isset($_SESSION['username']) && !empty($_SESSION['username'])) {
+    echo "<div class='user-menu'>";
+    echo "<button class='nav-link user-btn' onclick='toggleUserMenu()'>" . htmlspecialchars($_SESSION['username']) . " ▼</button>";
+    echo "<div class='user-dropdown' id='userDropdown'>";
+    echo "<a href='#settings' class='dropdown-item'>Settings</a>";
+    echo "<a href='?logout=true' class='dropdown-item'>Logout</a>";
+    echo "</div>";
+    echo "</div>";
+    } else {
+      echo "<button class='nav-link auth-btn' onclick='openModal()'>Login/Signup</button>";
+   }
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -2169,41 +2169,48 @@ try {
         </div> <!-- Closing .container -->
 
     <!-- Trigger button for opening the modal is already in navbar -->
-    <!-- Modal Overlay -->
+        <!-- Modal Overlay -->
     <div class="modal-overlay" id="auth-modal">
         <div class="modal-container">
-            <!-- Close Button -->
             <button class="modal-close" onclick="closeModal()">×</button>
-
-            <!-- Tab buttons to toggle Login and Signup forms -->
             <div class="tab-buttons">
                 <button id="login-tab" onclick="showForm('login')" class="active">Login</button>
                 <button id="signup-tab" onclick="showForm('signup')">Sign Up</button>
+                <button id="reset-tab" onclick="showForm('reset')">Reset Password</button>
             </div>
 
-            <!-- Login Form -->
             <div id="login-form" class="auth-form active">
                 <h2>Login</h2>
-                <form>
-                    <input type="text" placeholder="Username" required>
-                    <input type="password" placeholder="Password" required>
-                    <button type="submit" class="submit-btn">Log In</button>
+                <form id="loginForm" action="auth.php" method="POST">
+                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <button type="submit" name="login" class="submit-btn">Log In</button>
+                    <div class="message" id="loginMessage"></div>
                 </form>
             </div>
 
-            <!-- Signup Form -->
             <div id="signup-form" class="auth-form">
                 <h2>Sign Up</h2>
-                <form>
-                    <input type="text" placeholder="Username" required>
-                    <input type="password" placeholder="Password" required>
-                    <input type="password" placeholder="Confirm Password" required>
-                    <button type="submit" class="submit-btn">Sign Up</button>
+                <form id="signupForm" action="auth.php" method="POST">
+                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+                    <button type="submit" name="signup" class="submit-btn">Sign Up</button>
+                    <div class="message" id="signupMessage"></div>
+                </form>
+            </div>
+
+            <div id="reset-form" class="auth-form">
+                <h2>Reset Password</h2>
+                <form id="resetRequestForm" action="auth.php" method="POST">
+                    <input type="email" name="email" placeholder="Email" required>
+                    <button type="submit" name="reset_request" class="submit-btn">Send Reset Link</button>
+                    <div class="message" id="resetMessage"></div>
                 </form>
             </div>
         </div>
     </div>
-
     
     <script>
         function switchView(view) {
@@ -2242,6 +2249,7 @@ try {
     localStorage.setItem('matchView', view);
 }
 
+// User menu toggle
 function toggleUserMenu() {
     const dropdown = document.getElementById('userDropdown');
     dropdown.classList.toggle('active');
@@ -2254,27 +2262,85 @@ document.addEventListener('click', function(e) {
         document.getElementById('userDropdown').classList.remove('active');
     }
 });
-            
 
-    function openModal() {
-        document.getElementById("auth-modal").classList.add("active");
-    }
+// Modal functions
+function openModal() {
+    document.getElementById("auth-modal").classList.add("active");
+}
 
-    function closeModal() {
-        document.getElementById("auth-modal").classList.remove("active");
-    }
+function closeModal() {
+    document.getElementById("auth-modal").classList.remove("active");
+    // Clear all form fields and messages when closing
+    document.querySelectorAll('.auth-form input').forEach(input => input.value = '');
+    document.querySelectorAll('.message').forEach(msg => msg.textContent = '');
+}
 
-    function showForm(formType) {
-        // Toggle active class for forms
-        document.getElementById("login-form").classList.remove("active");
-        document.getElementById("signup-form").classList.remove("active");
-        document.getElementById(formType + "-form").classList.add("active");
+function showForm(formType) {
+    // Toggle active class for forms
+    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+    document.getElementById(formType + "-form").classList.add("active");
 
-        // Toggle active class for tabs
-        document.getElementById("login-tab").classList.remove("active");
-        document.getElementById("signup-tab").classList.remove("active");
-        document.getElementById(formType + "-tab").classList.add("active");
-    }
+    // Toggle active class for tabs
+    document.querySelectorAll('.tab-buttons button').forEach(tab => tab.classList.remove('active'));
+    document.getElementById(formType + "-tab").classList.add("active");
+
+    // Clear messages when switching forms
+    document.querySelectorAll('.message').forEach(msg => msg.textContent = '');
+}
+
+// Form submission handlers
+document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    formData.append('login', true);
+    submitForm(formData, 'loginMessage', () => window.location.reload());
+});
+
+document.getElementById('signupForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    formData.append('signup', true);
+    submitForm(formData, 'signupMessage', () => window.location.reload());
+});
+
+document.getElementById('resetRequestForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    formData.append('reset_request', true);
+    submitForm(formData, 'resetMessage', () => closeModal());
+});
+
+// Generic form submission function
+function submitForm(formData, messageId, callback) {
+    const messageDiv = document.getElementById(messageId);
+    messageDiv.textContent = 'Processing...';
+
+    fetch('auth.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        messageDiv.textContent = data.message;
+        if (data.success) {
+            // Clear form fields on success
+            formData.forEach((value, key) => {
+                if (key !== 'login' && key !== 'signup' && key !== 'reset_request') {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) input.value = '';
+                }
+            });
+            // Execute callback after a delay (e.g., reload or close modal)
+            setTimeout(() => {
+                if (callback) callback();
+            }, 2000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        messageDiv.textContent = 'An error occurred. Please try again.';
+    });
+}
         
         function shareScorersAsImage() {
     const tableElement = document.querySelector('#top-scorers-table table');
