@@ -10,6 +10,10 @@ if (!isset($_SESSION['teamStats'])) {
     $_SESSION['teamStats'] = [];
 }
 
+if (!isset($_SESSION['randomnessRange'])) {
+    $_SESSION['randomnessRange'] = 20; // Default to ±2% (20/1000)
+}
+
 $apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 $baseUrl = 'http://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
@@ -354,8 +358,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $awayPointsPerGame * $standingsWeight
         ) * $awayStrengthAdjustment * $competitionFactor;
 
-        // Controlled randomness (±2%)
-        $randomFactor = (rand(-20, 20) / 1000);
+        // Controlled randomness based on slider value (0 to 50 maps to 0% to ±5%)
+        $maxRandomness = $_SESSION['randomnessRange'];
+        $randomFactor = $maxRandomness ? (rand(-$maxRandomness, $maxRandomness) / 1000) : 0;
         $homeStrength *= (1 + $randomFactor);
         $awayStrength *= (1 - $randomFactor);
 
@@ -511,6 +516,16 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
             if (!empty($predictionData[7])) {
                 echo json_encode(['success' => false, 'retry' => true, 'retryInfo' => $predictionData[7]]);
                 exit;
+
+                case 'update_stability':
+            $randomnessRange = filter_input(INPUT_GET, 'value', FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 50]]);
+            if ($randomnessRange !== false) {
+                $_SESSION['randomnessRange'] = $randomnessRange;
+                echo json_encode(['success' => true, 'value' => $randomnessRange / 10]); // Return as percentage
+            } else {
+                echo json_encode(['success' => false, 'error' => 'Invalid stability value']);
+            }
+            exit;
             }
             
             echo json_encode([
@@ -549,6 +564,14 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+    // Add Stability Control Button with Slider
+    echo "<div class='stability-container'>";
+    echo "<button class='stability-toggle' onclick='toggleStabilitySlider()' title='Stability: Medium (±2%)'><span class='stability-icon'>🎲</span></button>";
+    echo "<div class='stability-dropdown' id='stabilityDropdown'>";
+    echo "<input type='range' min='0' max='50' value='" . ($_SESSION['randomnessRange'] ?? 20) . "' id='stabilitySlider' oninput='updateStability(this.value)'>";
+    echo "<div class='stability-value' id='stabilityValue'>" . (isset($_SESSION['randomnessRange']) ? ($_SESSION['randomnessRange'] / 10) : 2) . "%</div>";
+    echo "</div>";
+    echo "</div>";
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -1037,6 +1060,68 @@ try {
     background-color: #007bff;
     color: white;
     border-color: #007bff;
+}
+        .stability-container {
+    position: relative;
+    display: inline-block;
+}
+
+.stability-toggle {
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    font-size: 1.3em;
+}
+
+.stability-toggle:hover {
+    background-color: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+.stability-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 10px;
+    width: 150px;
+    display: none;
+    z-index: 1000;
+    margin-top: 5px;
+}
+
+.stability-dropdown.active {
+    display: block;
+}
+
+.stability-dropdown input[type="range"] {
+    width: 100%;
+    margin: 10px 0;
+    accent-color: var(--primary-color);
+}
+
+.stability-value {
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+@media (max-width: 768px) {
+    .stability-dropdown {
+        right: auto;
+        left: 0;
+        width: 120px;
+    }
 }
         .match-table {
             width: 100%;
@@ -2327,6 +2412,45 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             }
         }
 
+        // Add this before the closing </script> tag
+function toggleStabilitySlider() {
+    const dropdown = document.getElementById('stabilityDropdown');
+    dropdown.classList.toggle('active');
+}
+
+function updateStability(value) {
+    const stabilityValue = document.getElementById('stabilityValue');
+    const percentage = (value / 10).toFixed(1); // Convert to percentage (0 to 5.0%)
+    stabilityValue.textContent = `${percentage}%`;
+    document.querySelector('.stability-toggle').title = `Stability: ±${percentage}%`;
+
+    // Update session via AJAX
+    fetch(`?action=update_stability&value=${value}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Refresh all predictions
+            document.querySelectorAll('.match-card, .match-table tr').forEach(element => {
+                const index = element.dataset.index;
+                const homeId = element.dataset.homeId;
+                const awayId = element.dataset.awayId;
+                fetchPrediction(index, homeId, awayId, 0, 10); // Reset attempt count
+            });
+        }
+    })
+    .catch(error => console.error('Error updating stability:', error));
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const container = document.querySelector('.stability-container');
+    if (!container.contains(e.target)) {
+        document.getElementById('stabilityDropdown').classList.remove('active');
+    }
+});
          function startMatchPolling() {
     setInterval(() => {
         document.querySelectorAll('.match-card, .match-table tr').forEach(element => {
@@ -2595,8 +2719,10 @@ document.getElementById('table-view-btn').addEventListener('click', function() {
                 awayTeam.style.paddingLeft = `${0.5 + extraPadding / 16}em`;
             });
         }
-
         window.onload = function() {
+            const slider = document.getElementById('stabilitySlider');
+            const initialValue = slider.value;
+            document.querySelector('.stability-toggle').title = `Stability: ±${(initialValue / 10).toFixed(1)}%`;
             const theme = document.cookie.split('; ')
                 .find(row => row.startsWith('theme='))
                 ?.split('=')[1];
