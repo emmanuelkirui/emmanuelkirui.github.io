@@ -2322,49 +2322,59 @@ try {
         });
 
         function submitForm(formData, messageId, callback) {
-            const messageDiv = document.getElementById(messageId);
-            if (!messageDiv) {
-                console.error(`Message div with ID '${messageId}' not found`);
-                return;
-            }
-            messageDiv.textContent = 'Processing...';
+    const messageDiv = document.getElementById(messageId);
+    if (!messageDiv) {
+        console.error(`Message div with ID '${messageId}' not found`);
+        return;
+    }
+    messageDiv.textContent = 'Processing...';
 
-            fetch('auth.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status} (${response.statusText})`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                console.log('Raw response from auth.php:', text);
-                try {
-                    const data = JSON.parse(text);
-                    messageDiv.textContent = data.message || 'No message returned';
-                    if (data.success) {
-                        formData.forEach((value, key) => {
-                            if (key !== 'login' && key !== 'signup' && key !== 'reset_request') {
-                                const input = document.querySelector(`[name="${key}"]`);
-                                if (input) input.value = '';
-                            }
-                        });
-                        setTimeout(() => {
-                            if (callback) callback();
-                        }, 2000);
-                    }
-                } catch (e) {
-                    console.error('JSON parse error:', e, 'Raw text:', text);
-                    messageDiv.textContent = 'Invalid server response. Check console for details.';
-                }
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-                messageDiv.textContent = `An error occurred: ${error.message}`;
-            });
+    fetch('auth.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        // Check if response is ok (status 200-299)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status} (${response.statusText})`);
         }
+        return response.json(); // Parse JSON directly since PHP returns application/json
+    })
+    .then(data => {
+        console.log('Response from auth.php:', data);
+        
+        // Update message div with response message
+        messageDiv.textContent = data.message || 'No message returned';
+        
+        if (data.success) {
+            // Clear form fields except for action buttons
+            formData.forEach((value, key) => {
+                if (key !== 'login' && key !== 'signup' && key !== 'reset_request') {
+                    const input = document.querySelector(`[name="${key}"]`);
+                    if (input) input.value = '';
+                }
+            });
+            
+            // Execute callback after delay if provided
+            if (callback) {
+                setTimeout(() => {
+                    callback(data); // Pass response data to callback
+                }, 2000);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle specific error cases
+        if (error.message.includes('HTTP error')) {
+            messageDiv.textContent = `Server error: ${error.message}`;
+        } else if (error instanceof SyntaxError) {
+            messageDiv.textContent = 'Invalid server response format';
+        } else {
+            messageDiv.textContent = `An error occurred: ${error.message}`;
+        }
+    });
+}
         
         function shareScorersAsImage() {
     const tableElement = document.querySelector('#top-scorers-table table');
