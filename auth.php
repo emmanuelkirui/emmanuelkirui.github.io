@@ -1,14 +1,19 @@
 <?php
 session_start();
-ob_start();
+ob_start(); // Start output buffering
 header('Content-Type: application/json');
+
+// Error handling for development (log errors instead of displaying)
 error_reporting(E_ALL);
-ini_set('display_errors', 1); // Remove in production
+ini_set('display_errors', 0); // Disable display in production
+ini_set('log_errors', 1);     // Log errors to file
+ini_set('error_log', 'php_errors.log'); // Specify log file
 
 include 'config.php';
 
 if ($connect->connect_error) {
-    die(json_encode(['success' => false, 'message' => 'DB Error: ' . $connect->connect_error]));
+    send_json_response(false, 'Database connection failed: ' . $connect->connect_error);
+    exit;
 }
 
 // Create table
@@ -25,52 +30,55 @@ $create_table_query = "
 ";
 
 if (!$connect->query($create_table_query)) {
-    die(json_encode(['success' => false, 'message' => 'Table Error: ' . $connect->error]));
+    send_json_response(false, 'Table creation failed: ' . $connect->error);
+    exit;
+}
+
+// Helper function to standardize JSON responses
+function send_json_response($success, $message, $data = []) {
+    $response = ['success' => $success, 'message' => $message];
+    if (!empty($data)) {
+        $response = array_merge($response, $data);
+    }
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    ob_end_flush();
+    exit;
 }
 
 // Signup Logic
 if (isset($_POST['signup'])) {
-    // Collect and sanitize input data
     $username = trim($_POST['username'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 
-    // Validate inputs
     if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
-        echo json_encode(['success' => false, 'message' => 'All fields are required']);
-        exit;
+        send_json_response(false, 'All fields are required');
     }
 
     if ($password !== $confirm_password) {
-        echo json_encode(['success' => false, 'message' => 'Passwords do not match']);
-        exit;
+        send_json_response(false, 'Passwords do not match');
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        echo json_encode(['success' => false, 'message' => 'Invalid email address']);
-        exit;
+        send_json_response(false, 'Invalid email address');
     }
 
     if (!preg_match("/^[a-zA-Z0-9_]{3,50}$/", $username)) {
-        echo json_encode(['success' => false, 'message' => 'Username must be 3-50 characters (letters, numbers, underscore)']);
-        exit;
+        send_json_response(false, 'Username must be 3-50 characters (letters, numbers, underscore)');
     }
 
-    // Check if username or email already exists
     $check_stmt = $connect->prepare("SELECT id FROM cps_users WHERE username = ? OR email = ?");
     $check_stmt->bind_param("ss", $username, $email);
     $check_stmt->execute();
     $check_result = $check_stmt->get_result();
     
     if ($check_result->num_rows > 0) {
-        echo json_encode(['success' => false, 'message' => 'Username or email already exists']);
         $check_stmt->close();
-        exit;
+        send_json_response(false, 'Username or email already exists');
     }
     $check_stmt->close();
 
-    // Hash password and insert user
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $stmt = $connect->prepare("INSERT INTO cps_users (username, email, password) VALUES (?, ?, ?)");
     $stmt->bind_param("sss", $username, $email, $hashed_password);
@@ -78,11 +86,10 @@ if (isset($_POST['signup'])) {
     if ($stmt->execute()) {
         $_SESSION['username'] = $username;
         $_SESSION['user_id'] = $connect->insert_id;
-        // Regenerate session ID for security
         session_regenerate_id(true);
-        echo json_encode(['success' => true, 'message' => 'Signup successful']);
+        send_json_response(true, 'Signup successful');
     } else {
-        echo json_encode(['success' => false, 'message' => 'Registration failed: ' . $connect->error]);
+        send_json_response(false, 'Registration failed: ' . $connect->error);
     }
     $stmt->close();
 } 
@@ -93,8 +100,7 @@ elseif (isset($_POST['login'])) {
     $password = $_POST['password'] ?? '';
 
     if (empty($username) || empty($password)) {
-        echo json_encode(['success' => false, 'message' => 'All fields are required']);
-        exit;
+        send_json_response(false, 'All fields are required');
     }
 
     $stmt = $connect->prepare("SELECT id, username, password FROM cps_users WHERE username = ?");
@@ -107,20 +113,23 @@ elseif (isset($_POST['login'])) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['id'];
             session_regenerate_id(true);
-            echo json_encode(['success' => true, 'message' => 'Login successful']);
+            send_json_response(true, 'Login successful');
         } else {
-            echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+            send_json_response(false, 'Invalid credentials');
         }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+        send_json_response(false, 'Invalid credentials');
     }
     $stmt->close();
 }
 
 else {
-    echo json_encode(['success' => false, 'message' => 'No action specified']);
+    send_json_response(false, 'No action specified');
 }
 
-ob_end_flush();
 $connect->close();
+
+// Ensure no output after this point
+ob_end_flush();
+exit;
 ?>
