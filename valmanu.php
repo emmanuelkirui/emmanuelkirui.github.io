@@ -354,10 +354,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $awayPointsPerGame * $standingsWeight
         ) * $awayStrengthAdjustment * $competitionFactor;
 
-        // Controlled randomness (±2%)
-        $randomFactor = (rand(-20, 20) / 1000);
-        $homeStrength *= (1 + $randomFactor);
-        $awayStrength *= (1 - $randomFactor);
+        // Use neutral randomness for all predictions
+         $randomFactor = 0; // No randomness for upcoming or finished matches
+         $homeStrength *= (1 + $randomFactor); // No change: 1 + 0 = 1
+         $awayStrength *= (1 - $randomFactor); // No change: 1 - 0 = 1
 
         // Strength difference and confidence
         $diff = $homeStrength - $awayStrength + (20 - $homePosition) * 0.03 - (20 - $awayPosition) * 0.03;
