@@ -549,6 +549,8 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+    // Add the Login/Signup button here
+    echo "<button class='nav-link' onclick='openModal()'>Login/Signup</button>";
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -1577,6 +1579,139 @@ try {
                 padding: 10px;
             }
         }
+        /* Append to existing <style> section */
+
+/* Overlay background */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 10;
+}
+
+/* Modal container */
+.modal-container {
+    width: 350px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.15); /* Frosted glass effect */
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: #333;
+    font-size: 1rem;
+    text-align: center;
+    position: relative;
+}
+
+/* Close button */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tab-buttons button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.tab-buttons button.active {
+    font-weight: bold;
+    color: #4caf50;
+    border-bottom: 2px solid #4caf50;
+}
+
+/* Form elements */
+.modal-container input[type="text"],
+.modal-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.3);
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.modal-container button.submit-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 8px;
+    border: none;
+    background: #4caf50;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.modal-container button.submit-btn:hover {
+    background: #45a049;
+}
+
+/* Show modal when active */
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hide/show forms */
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .modal-container {
+    background: rgba(52, 73, 94, 0.9); /* Darker frosted glass effect */
+    color: #ecf0f1;
+}
+
+[data-theme="dark"] .modal-container input[type="text"],
+[data-theme="dark"] .modal-container input[type="password"] {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ecf0f1;
+}
+
+/* Ensure modal works with mobile navbar */
+@media (max-width: 768px) {
+    .modal-container {
+        width: 90%;
+        max-width: 350px;
+    }
+}
     </style>
 </head>
 <body>
@@ -1920,7 +2055,46 @@ try {
             ?>
         </tbody>
     </table>
-</div>      
+</div>     
+        </div> <!-- Closing .container -->
+
+    <!-- Trigger button for opening the modal is already in navbar -->
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-container">
+            <!-- Close Button -->
+            <button class="modal-close" onclick="closeModal()">×</button>
+
+            <!-- Tab buttons to toggle Login and Signup forms -->
+            <div class="tab-buttons">
+                <button id="login-tab" onclick="showForm('login')" class="active">Login</button>
+                <button id="signup-tab" onclick="showForm('signup')">Sign Up</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <h2>Login</h2>
+                <form>
+                    <input type="text" placeholder="Username" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit" class="submit-btn">Log In</button>
+                </form>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="auth-form">
+                <h2>Sign Up</h2>
+                <form>
+                    <input type="text" placeholder="Username" required>
+                    <input type="password" placeholder="Password" required>
+                    <input type="password" placeholder="Confirm Password" required>
+                    <button type="submit" class="submit-btn">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    
     <script>
         function switchView(view) {
     const gridView = document.getElementById('match-grid');
@@ -1958,6 +2132,28 @@ try {
     localStorage.setItem('matchView', view);
 }
 
+            // Append to existing <script> section
+
+    function openModal() {
+        document.getElementById("auth-modal").classList.add("active");
+    }
+
+    function closeModal() {
+        document.getElementById("auth-modal").classList.remove("active");
+    }
+
+    function showForm(formType) {
+        // Toggle active class for forms
+        document.getElementById("login-form").classList.remove("active");
+        document.getElementById("signup-form").classList.remove("active");
+        document.getElementById(formType + "-form").classList.add("active");
+
+        // Toggle active class for tabs
+        document.getElementById("login-tab").classList.remove("active");
+        document.getElementById("signup-tab").classList.remove("active");
+        document.getElementById(formType + "-tab").classList.add("active");
+    }
+        
         function shareScorersAsImage() {
     const tableElement = document.querySelector('#top-scorers-table table');
     const shareBtn = document.getElementById('share-scorers-btn');
