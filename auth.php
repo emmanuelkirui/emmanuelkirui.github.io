@@ -3,11 +3,11 @@ session_start();
 ob_start(); // Start output buffering
 header('Content-Type: application/json');
 
-// Error handling for development (log errors instead of displaying)
+// Error handling for development
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Disable display in production
-ini_set('log_errors', 1);     // Log errors to file
-ini_set('error_log', 'php_errors.log'); // Specify log file
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', 'php_errors.log');
 
 include 'config.php';
 
@@ -93,7 +93,6 @@ if (isset($_POST['signup'])) {
     }
     $stmt->close();
 } 
-
 // Login Logic
 elseif (isset($_POST['login'])) {
     $username = trim($_POST['username'] ?? '');
@@ -121,15 +120,8 @@ elseif (isset($_POST['login'])) {
         send_json_response(false, 'Invalid credentials');
     }
     $stmt->close();
-}
-
-else {
+} else {
     send_json_response(false, 'No action specified');
 }
 
 $connect->close();
-
-// Ensure no output after this point
-ob_end_flush();
-exit;
-?>
