@@ -1,0 +1,114 @@
+<?php
+session_start();
+include('db.php');
+
+// Generate CSRF token if not already generated
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// Signup Logic
+if (isset($_POST['signup'])) {
+    // Collect input data
+    $fullname = trim($_POST['fullname']);
+    $email = trim($_POST['email']);
+    $phone_number = trim($_POST['phone_number']);
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    $profile_picture = $_FILES['profile_picture'];
+
+    // Validate CSRF token
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Invalid CSRF token!");
+    }
+
+    // Validate inputs
+    if ($password !== $confirm_password) {
+        die("Passwords do not match!");
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        die("Invalid email address!");
+    }
+
+    if (!preg_match("/^\+?\d{10,15}$/", $phone_number)) {
+        die("Invalid phone number! Use international format (+123456789).");
+    }
+
+    // Hash the password
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+    // Handle profile picture upload
+    $profile_picture_path = null;
+    if ($profile_picture['error'] === UPLOAD_ERR_OK) {
+        $upload_dir = 'uploads/';
+        $profile_picture_path = $upload_dir . basename($profile_picture['name']);
+        move_uploaded_file($profile_picture['tmp_name'], $profile_picture_path);
+    }
+
+    // Check if email or phone already exists
+    $sql = "SELECT * FROM users WHERE email = :email OR phone_number = :phone_number";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':email', $email);
+    $query->bindParam(':phone_number', $phone_number);
+    $query->execute();
+
+    if ($query->rowCount() > 0) {
+        die("Email or phone number already exists!");
+    }
+
+    // Insert user into database
+    $sql = "INSERT INTO users (fullname, email, phone_number, username, password, profile_picture) 
+            VALUES (:fullname, :email, :phone_number, :username, :password, :profile_picture)";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':fullname', $fullname);
+    $query->bindParam(':email', $email);
+    $query->bindParam(':phone_number', $phone_number);
+    $query->bindParam(':username', $username);
+    $query->bindParam(':password', $hashed_password);
+    $query->bindParam(':profile_picture', $profile_picture_path);
+
+    if ($query->execute()) {
+        echo "<script type='text/javascript'> document.location = 'index.php'; </script>";
+        
+    } else {
+        echo "Error: " . $query->errorInfo()[2];
+    }
+}
+
+// Login Logic
+if (isset($_POST['login'])) {
+    // Collect login data
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+
+    // Validate CSRF token
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Invalid CSRF token!");
+    }
+
+    // Check username in database
+    $sql = "SELECT * FROM users WHERE username = :username";
+    $query = $dbh->prepare($sql);
+    $query->bindParam(':username', $username);
+    $query->execute();
+    $user = $query->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && password_verify($password, $user['password'])) {
+        // Set session variables
+        $_SESSION['sec-user-id'] = $user['id'];
+        $_SESSION['fullname'] = $user['fullname'];
+        $_SESSION['email'] = $user['email'];
+
+        // Regenerate session ID for security
+        session_regenerate_id(true);
+
+        echo "<script type='text/javascript'> document.location = 'index.php'; </script>";
+
+    } else {
+        echo "<script type='text/javascript'> document.location = '404.html'; </script>";
+        
+    }
+}
+?>
