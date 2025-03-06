@@ -9,28 +9,25 @@ ini_set('display_errors', 0); // Set to 1 temporarily for debugging if needed
 ini_set('log_errors', 1);
 ini_set('error_log', 'php_errors.log');
 
-include 'config.php';
+include 'db.php'; // Changed from config.php to use your db.php with PDO
 
-if ($connect->connect_error) {
-    send_json_response(false, 'Database connection failed: ' . $connect->connect_error);
-    exit;
-}
-
-// Create table if it doesn’t exist
-$create_table_query = "
-    CREATE TABLE IF NOT EXISTS cps_users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(50) NOT NULL UNIQUE,
-        email VARCHAR(100) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        reset_token VARCHAR(100) DEFAULT NULL,
-        reset_expiry DATETIME DEFAULT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-";
-
-if (!$connect->query($create_table_query)) {
-    error_log('Table creation failed: ' . $connect->error);
+try {
+    // Create table if it doesn’t exist
+    $create_table_query = "
+        CREATE TABLE IF NOT EXISTS cps_users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            email VARCHAR(100) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            reset_token VARCHAR(100) DEFAULT NULL,
+            reset_expiry DATETIME DEFAULT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    ";
+    
+    $dbh->exec($create_table_query);
+} catch (PDOException $e) {
+    error_log('Table creation failed: ' . $e->getMessage());
     send_json_response(false, 'Table creation failed');
     exit;
 }
@@ -69,36 +66,33 @@ if (isset($_POST['signup'])) {
         send_json_response(false, 'Username must be 3-50 characters (letters, numbers, underscore)');
     }
 
-    $check_stmt = $connect->prepare("SELECT id FROM cps_users WHERE username = ? OR email = ?");
-    if (!$check_stmt) {
-        send_json_response(false, 'Database prepare error: ' . $connect->error);
-    }
-    $check_stmt->bind_param("ss", $username, $email);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
+    try {
+        $check_stmt = $dbh->prepare("SELECT id FROM cps_users WHERE username = :username OR email = :email");
+        $check_stmt->execute([':username' => $username, ':email' => $email]);
+        
+        if ($check_stmt->rowCount() > 0) {
+            send_json_response(false, 'Username or email already exists');
+        }
 
-    if ($check_result->num_rows > 0) {
-        $check_stmt->close();
-        send_json_response(false, 'Username or email already exists');
-    }
-    $check_stmt->close();
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $dbh->prepare("INSERT INTO cps_users (username, email, password) VALUES (:username, :email, :password)");
+        $result = $stmt->execute([
+            ':username' => $username,
+            ':email' => $email,
+            ':password' => $hashed_password
+        ]);
 
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    $stmt = $connect->prepare("INSERT INTO cps_users (username, email, password) VALUES (?, ?, ?)");
-    if (!$stmt) {
-        send_json_response(false, 'Database prepare error: ' . $connect->error);
+        if ($result) {
+            $_SESSION['username'] = $username;
+            $_SESSION['user_id'] = $dbh->lastInsertId();
+            session_regenerate_id(true);
+            send_json_response(true, 'Signup successful');
+        } else {
+            send_json_response(false, 'Registration failed');
+        }
+    } catch (PDOException $e) {
+        send_json_response(false, 'Database error: ' . $e->getMessage());
     }
-    $stmt->bind_param("sss", $username, $email, $hashed_password);
-
-    if ($stmt->execute()) {
-        $_SESSION['username'] = $username;
-        $_SESSION['user_id'] = $connect->insert_id;
-        session_regenerate_id(true);
-        send_json_response(true, 'Signup successful');
-    } else {
-        send_json_response(false, 'Registration failed: ' . $stmt->error);
-    }
-    $stmt->close();
 }
 
 // Login Logic
@@ -110,16 +104,12 @@ elseif (isset($_POST['login'])) {
         send_json_response(false, 'All fields are required');
     }
 
-    $stmt = $connect->prepare("SELECT id, username, password FROM cps_users WHERE username = ?");
-    if (!$stmt) {
-        send_json_response(false, 'Database prepare error: ' . $connect->error);
-    }
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    try {
+        $stmt = $dbh->prepare("SELECT id, username, password FROM cps_users WHERE username = :username");
+        $stmt->execute([':username' => $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user = $result->fetch_assoc()) {
-        if (password_verify($password, $user['password'])) {
+        if ($user && password_verify($password, $user['password'])) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['id'];
             session_regenerate_id(true);
@@ -127,12 +117,10 @@ elseif (isset($_POST['login'])) {
         } else {
             send_json_response(false, 'Invalid credentials');
         }
-    } else {
-        send_json_response(false, 'Invalid credentials');
+    } catch (PDOException $e) {
+        send_json_response(false, 'Database error: ' . $e->getMessage());
     }
-    $stmt->close();
 } else {
     send_json_response(false, 'No action specified');
 }
-
-$connect->close();
+?>
