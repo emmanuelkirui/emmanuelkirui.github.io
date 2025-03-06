@@ -2329,16 +2329,21 @@ try {
     }
     messageDiv.textContent = 'Processing...';
 
+    // Log FormData for debugging
+    console.log('FormData:', Object.fromEntries(formData));
+
     fetch('auth.php', {
         method: 'POST',
         body: formData
     })
     .then(response => {
-        // Check if response is ok (status 200-299)
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status} (${response.statusText})`);
+            // Get raw text on error for better debugging
+            return response.text().then(text => {
+                throw new Error(`HTTP error! Status: ${response.status} (${response.statusText}) - ${text}`);
+            });
         }
-        return response.json(); // Parse JSON directly since PHP returns application/json
+        return response.json(); // Parse JSON on success
     })
     .then(data => {
         console.log('Response from auth.php:', data);
@@ -2365,17 +2370,10 @@ try {
     })
     .catch(error => {
         console.error('Error:', error);
-        // Handle specific error cases
-        if (error.message.includes('HTTP error')) {
-            messageDiv.textContent = `Server error: ${error.message}`;
-        } else if (error instanceof SyntaxError) {
-            messageDiv.textContent = 'Invalid server response format';
-        } else {
-            messageDiv.textContent = `An error occurred: ${error.message}`;
-        }
+        // Display full error message including server response
+        messageDiv.textContent = error.message;
     });
-}
-        
+}        
         function shareScorersAsImage() {
     const tableElement = document.querySelector('#top-scorers-table table');
     const shareBtn = document.getElementById('share-scorers-btn');
