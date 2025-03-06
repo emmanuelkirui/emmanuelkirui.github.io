@@ -34,38 +34,66 @@ function handleJsonError($message) {
 }
 
 // fetchWithRetry, fetchTeamResults, fetchStandings, fetchTeams, calculateTeamStrength, predictMatch functions remain unchanged
-function fetchWithRetry($url, $apiKey, $isAjax = false) {
-    $attempt = isset($_GET['attempt']) ? (int)$_GET['attempt'] : 0;
-    
+function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
+    $maxAttempts = 3; // Maximum retry attempts for timeouts
+    $baseTimeout = 15; // Base timeout in seconds (increased from 10)
+
+    // Initialize cURL
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
     curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-    
+    curl_setopt($ch, CURLOPT_TIMEOUT, $baseTimeout); // Set timeout to 15 seconds
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5); // Separate connection timeout (5 seconds)
+
+    // Execute the request
     $response = curl_exec($ch);
+
+    // Handle cURL errors (e.g., timeouts)
     if (curl_errno($ch)) {
+        $errorCode = curl_errno($ch);
+        $errorMessage = curl_error($ch);
+        error_log("Attempt $attempt/$maxAttempts - Failed fetching URL: $url - Error: $errorMessage (Code: $errorCode)");
+
         curl_close($ch);
-        return ['error' => true, 'message' => 'Connection error: ' . curl_error($ch)];
+
+        // Retry on timeout-specific errors
+        if ($errorCode == CURLE_OPERATION_TIMEDOUT && $attempt < $maxAttempts) {
+            $retrySeconds = min(pow(2, $attempt), 8); // Exponential backoff: 1s, 2s, 4s, max 8s
+            error_log("Retrying in $retrySeconds seconds due to timeout...");
+            sleep($retrySeconds);
+            return fetchWithRetry($url, $apiKey, $isAjax, $attempt + 1);
+        }
+
+        return [
+            'error' => true,
+            'message' => "Connection error: $errorMessage",
+            'attempts' => $attempt + 1
+        ];
     }
-    
+
+    // Get HTTP status and response details
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     $headers = substr($response, 0, $headerSize);
     $body = substr($response, $headerSize);
-    
+
     curl_close($ch);
 
+    // Handle rate limiting (HTTP 429)
     if ($httpCode == 429) {
-        $retrySeconds = min(pow(2, $attempt), 32);
+        $retrySeconds = min(pow(2, $attempt), 32); // Exponential backoff, max 32s
         $nextAttempt = $attempt + 1;
-        
+
+        // Check for Retry-After header
         preg_match('/Retry-After: (\d+)/i', $headers, $matches);
         if (!empty($matches[1])) {
             $retrySeconds = max($retrySeconds, (int)$matches[1]);
         }
-        
+
+        error_log("Rate limit exceeded for URL: $url - HTTP 429 - Retrying in $retrySeconds seconds (Attempt $nextAttempt)");
+
         if ($isAjax) {
             return [
                 'error' => true,
@@ -74,6 +102,7 @@ function fetchWithRetry($url, $apiKey, $isAjax = false) {
                 'nextAttempt' => $nextAttempt
             ];
         } else {
+            // Display retry countdown for non-AJAX requests
             echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
                     let timeLeft = $retrySeconds;
@@ -98,8 +127,12 @@ function fetchWithRetry($url, $apiKey, $isAjax = false) {
             return ['error' => true, 'retry' => true];
         }
     } elseif ($httpCode == 200) {
+        // Successful response
+        error_log("Successfully fetched URL: $url - HTTP 200 (Attempt $attempt)");
         return ['error' => false, 'data' => json_decode($body, true)];
     } else {
+        // Other HTTP errors
+        error_log("Failed fetching URL: $url - HTTP $httpCode (Attempt $attempt)");
         return ['error' => true, 'message' => "API Error: HTTP $httpCode"];
     }
 }
