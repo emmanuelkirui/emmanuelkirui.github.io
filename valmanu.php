@@ -10,7 +10,7 @@ if (!isset($_SESSION['teamStats'])) {
     $_SESSION['teamStats'] = [];
 }
 
-$apiKey = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
+$apiKey = 'd4c9fea41bf94bb29cade8f12952b3d8';
 $baseUrl = 'https://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
