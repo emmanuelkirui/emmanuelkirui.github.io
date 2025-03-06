@@ -549,6 +549,7 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
+    echo"<button onclick="openModal()">Login/Signup</button>";
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -1038,6 +1039,172 @@ try {
     color: white;
     border-color: #007bff;
 }
+
+/* Overlay background */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 10;
+}
+
+/* Modal container */
+.modal-container {
+    width: 350px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.15); /* Frosted glass effect */
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: #333;
+    font-size: 1rem;
+    text-align: center;
+    position: relative;
+}
+
+/* Close button */
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Tab buttons */
+.tab-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tab-buttons button {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #fff;
+    padding: 10px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.tab-buttons button.active {
+    font-weight: bold;
+    color: #4caf50;
+    border-bottom: 2px solid #4caf50;
+}
+
+/* Form elements */
+.modal-container input[type="text"],
+.modal-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255, 255, 255, 0.3);
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.modal-container button.submit-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 8px;
+    border: none;
+    background: #4caf50;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.modal-container button.submit-btn:hover {
+    background: #45a049;
+}
+
+/* Show modal when active */
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Hide/show forms */
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+/* Section Styling */
+.section {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background: rgba(0, 0, 0, 0.85);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+}
+
+/* Headings */
+.title {
+    color: #f8e71c;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    margin-bottom: 20px;
+}
+
+
+/* Forms */
+form {
+    margin-top: 20px;
+    text-align: center;
+}
+
+form .field {
+    margin-bottom: 20px;
+}
+
+form label {
+    font-size: 1.2rem;
+    color: #f8e71c;
+}
+
+form .select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 1rem;
+    width: auto;
+}
+
+form .select:hover,
+form .select:focus {
+    border-color: #f8e71c;
+    outline: none;
+    cursor: pointer;
+}   
         .match-table {
             width: 100%;
             overflow-x: auto;
@@ -1920,7 +2087,67 @@ try {
             ?>
         </tbody>
     </table>
-</div>      
+</div>    
+
+
+<!-- Modal Overlay -->
+<div class="modal-overlay" id="auth-modal">
+    <div class="modal-container">
+        <!-- Close Button -->
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+
+        <!-- Tab buttons to toggle Login and Signup forms -->
+        <div class="tab-buttons">
+            <button id="login-tab" onclick="showForm('login')" class="active">Login</button>
+            <button id="signup-tab" onclick="showForm('signup')">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form" class="auth-form active">
+            <h2>Login</h2>
+            <form>
+                <input type="text" placeholder="Username" required>
+                <input type="password" placeholder="Password" required>
+                <button type="submit" class="submit-btn">Log In</button>
+            </form>
+        </div>
+
+        <!-- Signup Form -->
+        <div id="signup-form" class="auth-form">
+            <h2>Sign Up</h2>
+            <form>
+                <input type="text" placeholder="Username" required>
+                <input type="password" placeholder="Password" required>
+                <input type="password" placeholder="Confirm Password" required>
+                <button type="submit" class="submit-btn">Sign Up</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function openModal() {
+    document.getElementById("auth-modal").classList.add("active");
+}
+
+function closeModal() {
+    document.getElementById("auth-modal").classList.remove("active");
+}
+
+function showForm(formType) {
+    // Toggle active class for forms
+    document.getElementById("login-form").classList.remove("active");
+    document.getElementById("signup-form").classList.remove("active");
+    document.getElementById(formType + "-form").classList.add("active");
+
+    // Toggle active class for tabs
+    document.getElementById("login-tab").classList.remove("active");
+    document.getElementById("signup-tab").classList.remove("active");
+    document.getElementById(formType + "-tab").classList.add("active");
+}
+
+</script>
+
+                
     <script>
         function switchView(view) {
     const gridView = document.getElementById('match-grid');
