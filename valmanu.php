@@ -2250,98 +2250,121 @@ try {
     localStorage.setItem('matchView', view);
 }
 
-// User menu toggle
-function toggleUserMenu() {
-    const dropdown = document.getElementById('userDropdown');
-    dropdown.classList.toggle('active');
-}
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(e) {
-    const userMenu = document.querySelector('.user-menu');
-    if (userMenu && !userMenu.contains(e.target)) {
-        document.getElementById('userDropdown').classList.remove('active');
-    }
-});
-
-// Modal functions
-function openModal() {
-    document.getElementById("auth-modal").classList.add("active");
-}
-
-function closeModal() {
-    document.getElementById("auth-modal").classList.remove("active");
-    // Clear all form fields and messages when closing
-    document.querySelectorAll('.auth-form input').forEach(input => input.value = '');
-    document.querySelectorAll('.message').forEach(msg => msg.textContent = '');
-}
-
-function showForm(formType) {
-    // Toggle active class for forms
-    document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
-    document.getElementById(formType + "-form").classList.add("active");
-
-    // Toggle active class for tabs
-    document.querySelectorAll('.tab-buttons button').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(formType + "-tab").classList.add("active");
-
-    // Clear messages when switching forms
-    document.querySelectorAll('.message').forEach(msg => msg.textContent = '');
-}
-
-// Form submission handlers
-document.getElementById('loginForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    formData.append('login', true);
-    submitForm(formData, 'loginMessage', () => window.location.reload());
-});
-
-document.getElementById('signupForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    formData.append('signup', true);
-    submitForm(formData, 'signupMessage', () => window.location.reload());
-});
-
-document.getElementById('resetRequestForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    formData.append('reset_request', true);
-    submitForm(formData, 'resetMessage', () => closeModal());
-});
-
-// Generic form submission function
-function submitForm(formData, messageId, callback) {
-    const messageDiv = document.getElementById(messageId);
-    messageDiv.textContent = 'Processing...';
-
-    fetch('auth.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        messageDiv.textContent = data.message;
-        if (data.success) {
-            // Clear form fields on success
-            formData.forEach((value, key) => {
-                if (key !== 'login' && key !== 'signup' && key !== 'reset_request') {
-                    const input = document.querySelector(`[name="${key}"]`);
-                    if (input) input.value = '';
-                }
-            });
-            // Execute callback after a delay (e.g., reload or close modal)
-            setTimeout(() => {
-                if (callback) callback();
-            }, 2000);
+        // Updated modal and user menu JS
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('active');
+            }
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        messageDiv.textContent = 'An error occurred. Please try again.';
-    });
-}
+
+        document.addEventListener('click', function(e) {
+            const userMenu = document.querySelector('.user-menu');
+            if (userMenu && !userMenu.contains(e.target)) {
+                const dropdown = document.getElementById('userDropdown');
+                if (dropdown) {
+                    dropdown.classList.remove('active');
+                }
+            }
+        });
+
+        function openModal() {
+            const modal = document.getElementById("auth-modal");
+            if (modal) {
+                modal.classList.add("active");
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("auth-modal");
+            if (modal) {
+                modal.classList.remove("active");
+                document.querySelectorAll('.auth-form input').forEach(input => input.value = '');
+                document.querySelectorAll('.message').forEach(msg => msg.textContent = '');
+            }
+        }
+
+        function showForm(formType) {
+            const forms = document.querySelectorAll('.auth-form');
+            forms.forEach(form => form.classList.remove('active'));
+            const targetForm = document.getElementById(formType + "-form");
+            if (targetForm) {
+                targetForm.classList.add("active");
+            }
+            const tabs = document.querySelectorAll('.tab-buttons button');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            const targetTab = document.getElementById(formType + "-tab");
+            if (targetTab) {
+                targetTab.classList.add("active");
+            }
+            document.querySelectorAll('.message').forEach(msg => msg.textContent = '');
+        }
+
+        document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('login', true);
+            submitForm(formData, 'loginMessage', () => window.location.reload());
+        });
+
+        document.getElementById('signupForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('signup', true);
+            submitForm(formData, 'signupMessage', () => window.location.reload());
+        });
+
+        document.getElementById('resetRequestForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            formData.append('reset_request', true);
+            submitForm(formData, 'resetMessage', () => closeModal());
+        });
+
+        function submitForm(formData, messageId, callback) {
+            const messageDiv = document.getElementById(messageId);
+            if (!messageDiv) {
+                console.error(`Message div with ID '${messageId}' not found`);
+                return;
+            }
+            messageDiv.textContent = 'Processing...';
+
+            fetch('auth.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status} (${response.statusText})`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                console.log('Raw response from auth.php:', text);
+                try {
+                    const data = JSON.parse(text);
+                    messageDiv.textContent = data.message || 'No message returned';
+                    if (data.success) {
+                        formData.forEach((value, key) => {
+                            if (key !== 'login' && key !== 'signup' && key !== 'reset_request') {
+                                const input = document.querySelector(`[name="${key}"]`);
+                                if (input) input.value = '';
+                            }
+                        });
+                        setTimeout(() => {
+                            if (callback) callback();
+                        }, 2000);
+                    }
+                } catch (e) {
+                    console.error('JSON parse error:', e, 'Raw text:', text);
+                    messageDiv.textContent = 'Invalid server response. Check console for details.';
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                messageDiv.textContent = `An error occurred: ${error.message}`;
+            });
+        }
         
         function shareScorersAsImage() {
     const tableElement = document.querySelector('#top-scorers-table table');
