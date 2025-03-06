@@ -1,31 +1,22 @@
 <?php
 session_start();
+ob_start();
+header('Content-Type: application/json');
+error_reporting(E_ALL);
+ini_set('display_errors', 1); // Remove in production
 
-// Prevent any output before JSON
-ob_start(); // Start output buffering
+include 'config.php';
 
-include 'config.php'; // Include your database configuration
-
-// Enable error reporting for debugging (remove in production)
-// ini_set('display_errors', 1);
-// ini_set('display_startup_errors', 1);
-// error_reporting(E_ALL);
-
-// Log errors to a file instead of displaying them
-ini_set('display_errors', 0);
-ini_set('log_errors', 1);
-ini_set('error_log', 'php_errors.log'); // Ensure this file is writable
-
-// Helper function to sanitize input
-function sanitize($data) {
-    global $connect;
-    return mysqli_real_escape_string($connect, trim($data));
+if ($connect->connect_error) {
+    die(json_encode(['success' => false, 'message' => 'DB Error: ' . $connect->connect_error]));
 }
 
-// Ensure JSON content type
-header('Content-Type: application/json');
+// Generate CSRF token if not already generated
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
-// Create cps_users table if it doesn’t exist
+// Create table
 $create_table_query = "
     CREATE TABLE IF NOT EXISTS cps_users (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,209 +29,115 @@ $create_table_query = "
     ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ";
 
-if (!mysqli_query($connect, $create_table_query)) {
-    echo json_encode(['success' => false, 'message' => 'Error creating table: ' . mysqli_error($connect)]);
-    ob_end_flush();
-    exit;
+if (!$connect->query($create_table_query)) {
+    die(json_encode(['success' => false, 'message' => 'Table Error: ' . $connect->error]));
 }
 
-// Signup Handler
+// Signup Logic
 if (isset($_POST['signup'])) {
-    $username = sanitize($_POST['username'] ?? '');
-    $email = sanitize($_POST['email'] ?? '');
-    $password = sanitize($_POST['password'] ?? '');
-    $confirm_password = sanitize($_POST['confirm_password'] ?? '');
+    // Collect and sanitize input data
+    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
+    // Validate CSRF token
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+        exit;
+    }
+
+    // Validate inputs
     if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
-        echo json_encode(['success' => false, 'message' => 'Please fill in all fields']);
-        ob_end_flush();
+        echo json_encode(['success' => false, 'message' => 'All fields are required']);
         exit;
     }
 
     if ($password !== $confirm_password) {
         echo json_encode(['success' => false, 'message' => 'Passwords do not match']);
-        ob_end_flush();
+        exit;
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid email address']);
+        exit;
+    }
+
+    if (!preg_match("/^[a-zA-Z0-9_]{3,50}$/", $username)) {
+        echo json_encode(['success' => false, 'message' => 'Username must be 3-50 characters (letters, numbers, underscore)']);
         exit;
     }
 
     // Check if username or email already exists
-    $check_query = "SELECT * FROM cps_users WHERE username = '$username' OR email = '$email'";
-    $check_result = mysqli_query($connect, $check_query);
-
-    if (!$check_result) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($connect)]);
-        ob_end_flush();
+    $check_stmt = $connect->prepare("SELECT id FROM cps_users WHERE username = ? OR email = ?");
+    $check_stmt->bind_param("ss", $username, $email);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
+    
+    if ($check_result->num_rows > 0) {
+        echo json_encode(['success' => false, 'message' => 'Username or email already exists']);
+        $check_stmt->close();
         exit;
     }
+    $check_stmt->close();
 
-    if (mysqli_num_rows($check_result) > 0) {
-        echo json_encode(['success' => false, 'message' => 'Username or email already taken']);
-        ob_end_flush();
-        exit;
-    }
-
-    // Hash the password
+    // Hash password and insert user
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-    if (!$hashed_password) {
-        echo json_encode(['success' => false, 'message' => 'Error hashing password']);
-        ob_end_flush();
-        exit;
-    }
+    $stmt = $connect->prepare("INSERT INTO cps_users (username, email, password) VALUES (?, ?, ?)");
+    $stmt->bind_param("sss", $username, $email, $hashed_password);
 
-    // Insert new user
-    $insert_query = "INSERT INTO cps_users (username, email, password) VALUES ('$username', '$email', '$hashed_password')";
-    if (mysqli_query($connect, $insert_query)) {
+    if ($stmt->execute()) {
         $_SESSION['username'] = $username;
-        $_SESSION['user_id'] = mysqli_insert_id($connect);
+        $_SESSION['user_id'] = $connect->insert_id;
+        // Regenerate session ID for security
+        session_regenerate_id(true);
         echo json_encode(['success' => true, 'message' => 'Signup successful']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Signup failed: ' . mysqli_error($connect)]);
+        echo json_encode(['success' => false, 'message' => 'Registration failed: ' . $connect->error]);
     }
-    ob_end_flush();
-    exit;
-}
+    $stmt->close();
+} 
 
-// Login Handler
-if (isset($_POST['login'])) {
-    $username = sanitize($_POST['username'] ?? '');
-    $password = sanitize($_POST['password'] ?? '');
+// Login Logic
+elseif (isset($_POST['login'])) {
+    $username = trim($_POST['username'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    // Validate CSRF token
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+        exit;
+    }
 
     if (empty($username) || empty($password)) {
-        echo json_encode(['success' => false, 'message' => 'Please fill in all fields']);
-        ob_end_flush();
+        echo json_encode(['success' => false, 'message' => 'All fields are required']);
         exit;
     }
 
-    $query = "SELECT * FROM cps_users WHERE username = '$username'";
-    $result = mysqli_query($connect, $query);
-
-    if (!$result) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($connect)]);
-        ob_end_flush();
-        exit;
-    }
-
-    if (mysqli_num_rows($result) === 1) {
-        $user = mysqli_fetch_assoc($result);
+    $stmt = $connect->prepare("SELECT id, username, password FROM cps_users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($user = $result->fetch_assoc()) {
         if (password_verify($password, $user['password'])) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['id'];
+            session_regenerate_id(true);
             echo json_encode(['success' => true, 'message' => 'Login successful']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Invalid password']);
+            echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
         }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Username not found']);
+        echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
     }
-    ob_end_flush();
-    exit;
+    $stmt->close();
 }
 
-// Password Reset Request Handler
-if (isset($_POST['reset_request'])) {
-    $email = sanitize($_POST['email'] ?? '');
-
-    if (empty($email)) {
-        echo json_encode(['success' => false, 'message' => 'Please enter your email']);
-        ob_end_flush();
-        exit;
-    }
-
-    $query = "SELECT * FROM cps_users WHERE email = '$email'";
-    $result = mysqli_query($connect, $query);
-
-    if (!$result) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($connect)]);
-        ob_end_flush();
-        exit;
-    }
-
-    if (mysqli_num_rows($result) === 1) {
-        $user = mysqli_fetch_assoc($result);
-        $token = bin2hex(random_bytes(32));
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
-
-        $update_query = "UPDATE cps_users SET reset_token = '$token', reset_expiry = '$expiry' WHERE email = '$email'";
-        if (mysqli_query($connect, $update_query)) {
-            $reset_link = "http://yourdomain.com/reset_password.php?token=$token";
-            $subject = "Password Reset Request";
-            $message = "Click this link to reset your password: $reset_link\nThis link expires in 1 hour.";
-            $headers = "From: no-reply@yourdomain.com";
-
-            if (mail($email, $subject, $message, $headers)) {
-                echo json_encode(['success' => true, 'message' => 'Reset link sent to your email']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Failed to send reset email']);
-            }
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error generating reset token: ' . mysqli_error($connect)]);
-        }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Email not found']);
-    }
-    ob_end_flush();
-    exit;
+else {
+    echo json_encode(['success' => false, 'message' => 'No action specified']);
 }
 
-// Password Reset Confirmation Handler
-if (isset($_POST['reset_password'])) {
-    $token = sanitize($_POST['token'] ?? '');
-    $new_password = sanitize($_POST['new_password'] ?? '');
-    $confirm_password = sanitize($_POST['confirm_password'] ?? '');
-
-    if (empty($token) || empty($new_password) || empty($confirm_password)) {
-        echo json_encode(['success' => false, 'message' => 'Please fill in all fields']);
-        ob_end_flush();
-        exit;
-    }
-
-    if ($new_password !== $confirm_password) {
-        echo json_encode(['success' => false, 'message' => 'Passwords do not match']);
-        ob_end_flush();
-        exit;
-    }
-
-    $query = "SELECT * FROM cps_users WHERE reset_token = '$token' AND reset_expiry > NOW()";
-    $result = mysqli_query($connect, $query);
-
-    if (!$result) {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . mysqli_error($connect)]);
-        ob_end_flush();
-        exit;
-    }
-
-    if (mysqli_num_rows($result) === 1) {
-        $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-        if (!$hashed_password) {
-            echo json_encode(['success' => false, 'message' => 'Error hashing password']);
-            ob_end_flush();
-            exit;
-        }
-
-        $update_query = "UPDATE cps_users SET password = '$hashed_password', reset_token = NULL, reset_expiry = NULL WHERE reset_token = '$token'";
-        if (mysqli_query($connect, $update_query)) {
-            echo json_encode(['success' => true, 'message' => 'Password reset successful']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Error resetting password: ' . mysqli_error($connect)]);
-        }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid or expired token']);
-    }
-    ob_end_flush();
-    exit;
-}
-
-// Logout Handler (optional: keep in main file if preferred)
-if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
-    session_unset();
-    session_destroy();
-    echo json_encode(['success' => true, 'message' => 'Logout successful']);
-    ob_end_flush();
-    exit;
-}
-
-// If no valid action is provided
-echo json_encode(['success' => false, 'message' => 'Invalid request']);
 ob_end_flush();
-mysqli_close($connect);
+$connect->close();
 ?>
