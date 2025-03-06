@@ -3,9 +3,9 @@ session_start();
 ob_start(); // Start output buffering
 header('Content-Type: application/json');
 
-// Error handling for development
+// Error handling for development (log errors, don’t display in production)
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 0); // Set to 1 temporarily for debugging if needed
 ini_set('log_errors', 1);
 ini_set('error_log', 'php_errors.log');
 
@@ -16,7 +16,7 @@ if ($connect->connect_error) {
     exit;
 }
 
-// Create table
+// Create table if it doesn’t exist
 $create_table_query = "
     CREATE TABLE IF NOT EXISTS cps_users (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,7 +30,8 @@ $create_table_query = "
 ";
 
 if (!$connect->query($create_table_query)) {
-    send_json_response(false, 'Table creation failed: ' . $connect->error);
+    error_log('Table creation failed: ' . $connect->error);
+    send_json_response(false, 'Table creation failed');
     exit;
 }
 
@@ -69,10 +70,13 @@ if (isset($_POST['signup'])) {
     }
 
     $check_stmt = $connect->prepare("SELECT id FROM cps_users WHERE username = ? OR email = ?");
+    if (!$check_stmt) {
+        send_json_response(false, 'Database prepare error: ' . $connect->error);
+    }
     $check_stmt->bind_param("ss", $username, $email);
     $check_stmt->execute();
     $check_result = $check_stmt->get_result();
-    
+
     if ($check_result->num_rows > 0) {
         $check_stmt->close();
         send_json_response(false, 'Username or email already exists');
@@ -81,6 +85,9 @@ if (isset($_POST['signup'])) {
 
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $stmt = $connect->prepare("INSERT INTO cps_users (username, email, password) VALUES (?, ?, ?)");
+    if (!$stmt) {
+        send_json_response(false, 'Database prepare error: ' . $connect->error);
+    }
     $stmt->bind_param("sss", $username, $email, $hashed_password);
 
     if ($stmt->execute()) {
@@ -89,10 +96,11 @@ if (isset($_POST['signup'])) {
         session_regenerate_id(true);
         send_json_response(true, 'Signup successful');
     } else {
-        send_json_response(false, 'Registration failed: ' . $connect->error);
+        send_json_response(false, 'Registration failed: ' . $stmt->error);
     }
     $stmt->close();
-} 
+}
+
 // Login Logic
 elseif (isset($_POST['login'])) {
     $username = trim($_POST['username'] ?? '');
@@ -103,10 +111,13 @@ elseif (isset($_POST['login'])) {
     }
 
     $stmt = $connect->prepare("SELECT id, username, password FROM cps_users WHERE username = ?");
+    if (!$stmt) {
+        send_json_response(false, 'Database prepare error: ' . $connect->error);
+    }
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($user = $result->fetch_assoc()) {
         if (password_verify($password, $user['password'])) {
             $_SESSION['username'] = $user['username'];
