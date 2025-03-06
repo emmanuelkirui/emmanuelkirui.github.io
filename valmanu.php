@@ -549,8 +549,7 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
-    // Add the Login/Signup button here
-    echo "<button class='nav-link' onclick='openModal()'>Login/Signup</button>";
+    echo "<button class='nav-link auth-btn' onclick='openModal()'>Login/Signup</button>";
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -1673,7 +1672,6 @@ try {
     cursor: pointer;
     transition: background 0.3s;
 }
-
 .modal-container button.submit-btn:hover {
     background: #45a049;
 }
@@ -1683,7 +1681,13 @@ try {
     opacity: 1;
     visibility: visible;
 }
-
+.auth-btn {
+    padding: 8px 15px; /* Reduced padding compared to nav-link's 12px 20px */
+    min-width: 0; /* Prevents it from stretching too wide */
+    width: auto; /* Allows it to fit content */
+    display: inline-block; /* Ensures it doesn’t take full width */
+}
+        
 /* Hide/show forms */
 .auth-form {
     display: none;
@@ -1704,13 +1708,18 @@ try {
     background: rgba(255, 255, 255, 0.1);
     color: #ecf0f1;
 }
-
+        
 /* Ensure modal works with mobile navbar */
 @media (max-width: 768px) {
     .modal-container {
         width: 90%;
         max-width: 350px;
     }
+            .nav-menu .auth-btn {
+        width: auto; /* Prevents it from stretching to 100% on mobile */
+        padding: 8px 15px; /* Consistent padding on mobile */
+        text-align: center; /* Center the text */
+                }
 }
     </style>
 </head>
