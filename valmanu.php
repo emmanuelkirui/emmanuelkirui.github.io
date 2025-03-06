@@ -1660,6 +1660,7 @@ try {
 
 /* Form elements */
 .modal-container input[type="text"],
+.modal-container input[type="email"],     
 .modal-container input[type="password"] {
     width: 100%;
     padding: 10px;
