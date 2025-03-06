@@ -1681,11 +1681,25 @@ try {
     opacity: 1;
     visibility: visible;
 }
+/* Style for the Login/Signup button */
 .auth-btn {
-    padding: 8px 15px; /* Reduced padding compared to nav-link's 12px 20px */
-    min-width: 0; /* Prevents it from stretching too wide */
-    width: auto; /* Allows it to fit content */
-    display: inline-block; /* Ensures it doesn’t take full width */
+    padding: 8px 15px; /* Compact padding */
+    min-width: 0; /* Prevents stretching */
+    width: auto; /* Fits content */
+    display: inline-block; /* Ensures proper sizing */
+    background-color: var(--card-bg); /* Matches navbar background */
+    color: var(--text-color); /* Matches navbar text color */
+    border: 1px solid var(--primary-color); /* Subtle border for definition */
+    border-radius: 8px; /* Matches nav-link border-radius */
+    cursor: pointer; /* Indicates it’s clickable */
+    transition: all 0.3s ease; /* Matches nav-link transition */
+}
+
+/* Hover effect to match .nav-link */
+.auth-btn:hover {
+    background-color: var(--primary-color); /* Green background on hover */
+    color: white; /* White text on hover */
+    transform: translateY(-2px); /* Matches nav-link hover effect */
 }
         
 /* Hide/show forms */
@@ -1716,10 +1730,10 @@ try {
         max-width: 350px;
     }
             .nav-menu .auth-btn {
-        width: auto; /* Prevents it from stretching to 100% on mobile */
-        padding: 8px 15px; /* Consistent padding on mobile */
-        text-align: center; /* Center the text */
-                }
+        width: auto; /* Prevents full-width stretch on mobile */
+        padding: 8px 15px; /* Consistent padding */
+        text-align: center; /* Centers text */
+    }
 }
     </style>
 </head>
