@@ -123,11 +123,7 @@ function fetchTeamResults($teamId, $apiKey, $baseUrl) {
     }
     $data = $response['data'];
     error_log("Team $teamId last updated: " . ($data['lastUpdated'] ?? 'unknown'));
-    return [
-        'error' => false,
-        'data' => $data['matches'] ?? [],
-        'lastUpdated' => $data['lastUpdated'] ?? date('Y-m-d H:i:s') // Fallback to current time if API doesn't provide it
-    ];
+    return ['error' => false, 'data' => $data['matches'] ?? []];
 }
 
 function fetchStandings($competition, $apiKey, $baseUrl) {
@@ -241,13 +237,13 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
             }
 
             $teamStats[$teamId] = $stats;
-            $teamStats[$teamId]['lastUpdated'] = $response['lastUpdated']; // Store last updated time
         }
         return $teamStats[$teamId];
     } catch (Exception $e) {
         return ['error' => true, 'message' => "Error calculating team strength: " . $e->getMessage()];
     }
 }
+
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
@@ -257,41 +253,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             return ["N/A", "0%", "", "0-0", "", "", ""];
         }
 
-        // Create a unique match ID
-        $matchId = $homeTeamId . "_" . $awayTeamId . "_" . ($match['utcDate'] ?? 'unknown');
-
-        // Initialize arrays in session if not set
-        if (!isset($teamStats['predictions'])) {
-            $teamStats['predictions'] = [];
-        }
-        if (!isset($teamStats['randomFactors'])) {
-            $teamStats['randomFactors'] = [];
-        }
-
-        // Check for cached prediction and conditions to reuse it
-        $forceRefresh = isset($_GET['force_refresh']) && $_GET['force_refresh'] === 'true';
-        if (isset($teamStats['predictions'][$matchId]) && $match['status'] !== 'FINISHED' && !$forceRefresh) {
-            return $teamStats['predictions'][$matchId];
-        }
-
-        // Fetch team stats
         $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $competition);
         $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $competition);
 
-        // Check if stats have updated since last prediction
-        if (isset($teamStats['predictions'][$matchId])) {
-            $lastHomeUpdate = $teamStats[$homeTeamId]['lastUpdated'] ?? 'unknown';
-            $lastAwayUpdate = $teamStats[$awayTeamId]['lastUpdated'] ?? 'unknown';
-            $currentHomeUpdate = $homeStats['lastUpdated'] ?? 'unknown';
-            $currentAwayUpdate = $awayStats['lastUpdated'] ?? 'unknown';
-
-            if ($lastHomeUpdate !== $currentHomeUpdate || $lastAwayUpdate !== $currentAwayUpdate) {
-                unset($teamStats['predictions'][$matchId]); // Clear cache if stats changed
-                unset($teamStats['randomFactors'][$matchId]);
-            }
-        }
-
-        // Handle retry cases
         if ($homeStats['needsRetry'] || $awayStats['needsRetry']) {
             $retryInfo = [];
             if ($homeStats['retry']) $retryInfo['home'] = ['retrySeconds' => $homeStats['retrySeconds'], 'nextAttempt' => $homeStats['nextAttempt']];
@@ -327,17 +291,20 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
 
         // Dynamic Competition Factor
         $competitionBase = match ($competition) {
-            'UEFA Champions League' => 1.1,
-            'English Championship' => 0.95,
-            default => 1.0
+            'UEFA Champions League' => 1.1, // Higher scoring, more variance
+            'English Championship' => 0.95, // Tighter, lower scoring
+            default => 1.0 // Neutral for unknown competitions
         };
+        // Average goals per game for this matchup as a proxy
         $matchGoalAvg = ($homeGoalAvg + $awayGoalAvg + $homeConcededAvg + $awayConcededAvg) / 4;
+        // Variance factor from form streakiness and GD
         $homeFormArray = str_split(str_pad($homeStats['form'], 6, '-', STR_PAD_LEFT));
         $awayFormArray = str_split(str_pad($awayStats['form'], 6, '-', STR_PAD_LEFT));
         $homeStreak = abs(calculateStreak($homeFormArray));
         $awayStreak = abs(calculateStreak($awayFormArray));
-        $formVariance = 1 + ($homeStreak + $awayStreak) * 0.02;
-        $gdVariance = 1 + (abs($homeGD) + abs($awayGD)) * 0.005 / max($homeGames, $awayGames);
+        $formVariance = 1 + ($homeStreak + $awayStreak) * 0.02; // More streaky = more variance
+        $gdVariance = 1 + (abs($homeGD) + abs($awayGD)) * 0.005 / max($homeGames, $awayGames); // Big GD = more blowout potential
+        // Dynamic factor: base + goal avg adjustment + variance
         $competitionFactor = min(1.3, max(0.8, $competitionBase * (1 + ($matchGoalAvg - 2.5) / 5) * $formVariance * $gdVariance));
 
         // Dynamic Weight Calculation
@@ -387,9 +354,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $awayPointsPerGame * $standingsWeight
         ) * $awayStrengthAdjustment * $competitionFactor;
 
-        // Controlled randomness (±2%), applied once and cached
-        $randomFactor = isset($teamStats['randomFactors'][$matchId]) ? $teamStats['randomFactors'][$matchId] : (rand(-20, 20) / 1000);
-        $teamStats['randomFactors'][$matchId] = $randomFactor;
+        // Controlled randomness (±2%)
+        $randomFactor = (rand(-20, 20) / 1000);
         $homeStrength *= (1 + $randomFactor);
         $awayStrength *= (1 - $randomFactor);
 
@@ -411,8 +377,13 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
 
         // Match details
-        $homeTeam = $match['homeTeam']['name'] ?? ($match['homeTeam']['shortName'] ?? 'Home Team');
-        $awayTeam = $match['awayTeam']['name'] ?? ($match['awayTeam']['shortName'] ?? 'Away Team');
+        // With this more robust check:
+        $homeTeam = $match['homeTeam']['name'] ?? 
+           ($match['homeTeam']['shortName'] ?? 
+           'Home Team'); // Fallback to shortName first, then a generic name
+        $awayTeam = $match['awayTeam']['name'] ?? 
+           ($match['awayTeam']['shortName'] ?? 
+           'Away Team');
         $status = $match['status'] ?? 'SCHEDULED';
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
@@ -437,20 +408,11 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
         }
 
-        // Cache and return prediction
-        $predictionData = [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form'], []];
-        $teamStats['predictions'][$matchId] = $predictionData;
-
-        return $predictionData;
+        return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form'], []];
     } catch (Exception $e) {
         return ["Error", "N/A", "", "N/A", "", "", "", []];
     }
 }
-
-
-
-
-        
 
 function calculateStreak($formArray) {
     $streak = 0;
@@ -587,8 +549,6 @@ if (!isset($_GET['ajax'])) {
     echo "<a href='valmanu' class='nav-link'>Home</a>";
     echo "<a href='liv' class='nav-link'>Predictions</a>";
     echo "<a href='javascript:history.back()' class='nav-link'>Back</a>";
-    // Add the Force Refresh button
-    echo "<button class='nav-link force-refresh-btn' onclick='forceRefreshModels()' title='Force refresh predictions'><span class='refresh-icon'>🔄</span> Refresh Models</button>";
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
@@ -1029,32 +989,7 @@ try {
         .search-container.active .autocomplete-dropdown {
             display: block;
         }
-        
-.force-refresh-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background-color: var(--primary-color);
-    border: none;
-    cursor: pointer;
-}
 
-.force-refresh-btn:hover {
-    background-color: var(--secondary-color);
-}
-
-.force-refresh-btn.refreshing {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-.refresh-icon {
-    font-size: 1.1em;
-}
-
-[data-theme="dark"] .force-refresh-btn {
-    background-color: var(--primary-color);
-}
         .match-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -2136,57 +2071,6 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             const themeIcon = document.querySelector('.theme-icon');
             themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         }
-
-         function forceRefreshModels() {
-    const refreshBtn = document.querySelector('.force-refresh-btn');
-    if (refreshBtn.classList.contains('refreshing')) return;
-
-    refreshBtn.classList.add('refreshing');
-    refreshBtn.innerHTML = '<span class="refresh-icon">⏳</span> Refreshing...';
-    
-    // Clear existing predictions and team stats
-    fetch(`?force_refresh=true&competition=<?php echo $selectedComp; ?>&filter=<?php echo $filter; ?>`, {
-        method: 'GET',
-        headers: {
-            'X-Auth-Token': '<?php echo $apiKey; ?>'
-        }
-    })
-    .then(() => {
-        // Refresh all match cards
-        document.querySelectorAll('.match-card').forEach(card => {
-            const index = card.dataset.index;
-            const homeId = card.dataset.homeId;
-            const awayId = card.dataset.awayId;
-            
-            // Reset UI elements
-            const predictionElement = document.getElementById(`prediction-${index}`);
-            predictionElement.innerHTML = '<p>Loading prediction...</p><div class="progress-bar"><div class="progress-fill" style="width: 0%;"></div></div>';
-            
-            // Fetch fresh data
-            fetchTeamData(homeId, index, true);
-            fetchTeamData(awayId, index, false);
-        });
-
-        // Refresh table view
-        document.querySelectorAll('.match-table tr').forEach(row => {
-            const index = row.dataset.index;
-            const homeId = row.dataset.homeId;
-            const awayId = row.dataset.awayId;
-            
-            fetchPrediction(index, homeId, awayId);
-        });
-    })
-    .catch(error => {
-        console.error('Error refreshing models:', error);
-        alert('Failed to refresh models. Please try again.');
-    })
-    .finally(() => {
-        setTimeout(() => {
-            refreshBtn.classList.remove('refreshing');
-            refreshBtn.innerHTML = '<span class="refresh-icon">🔄</span> Refresh Models';
-        }, 1000);
-    });
-}
 
         function toggleHistory(button) {
             const historyDiv = button.nextElementSibling;
