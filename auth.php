@@ -11,11 +11,6 @@ if ($connect->connect_error) {
     die(json_encode(['success' => false, 'message' => 'DB Error: ' . $connect->connect_error]));
 }
 
-// Generate CSRF token if not already generated
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 // Create table
 $create_table_query = "
     CREATE TABLE IF NOT EXISTS cps_users (
@@ -40,12 +35,6 @@ if (isset($_POST['signup'])) {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-
-    // Validate CSRF token
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-        exit;
-    }
 
     // Validate inputs
     if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
@@ -102,12 +91,6 @@ if (isset($_POST['signup'])) {
 elseif (isset($_POST['login'])) {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
-
-    // Validate CSRF token
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
-        exit;
-    }
 
     if (empty($username) || empty($password)) {
         echo json_encode(['success' => false, 'message' => 'All fields are required']);
