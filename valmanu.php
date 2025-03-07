@@ -5,7 +5,10 @@ require_once 'recaptcha_handler.php';
 // Set timezone to East Africa Time (Nairobi, Kenya, UTC+3)
 date_default_timezone_set('Africa/Nairobi');
 
-// Initialize session data with error handling
+// Initialize session data for rate limiting
+if (!isset($_SESSION['api_requests'])) {
+    $_SESSION['api_requests'] = []; // Array to store timestamps of requests
+}
 if (!isset($_SESSION['teamStats'])) {
     $_SESSION['teamStats'] = [];
 }
@@ -13,6 +16,46 @@ if (!isset($_SESSION['teamStats'])) {
 $apiKey = 'd4c9fea41bf94bb29cade8f12952b3d8';
 $baseUrl = 'https://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
+
+// Rate limit constants
+const REQUESTS_PER_MINUTE = 10;
+const MINUTE_IN_SECONDS = 60;
+
+// Function to enforce rate limiting
+function enforceRateLimit() {
+    $currentTime = time();
+    $requests = &$_SESSION['api_requests'];
+
+    // Filter out requests older than 1 minute
+    $requests = array_filter($requests, function($timestamp) use ($currentTime) {
+        return ($currentTime - $timestamp) < MINUTE_IN_SECONDS;
+    });
+
+    // Re-index the array
+    $requests = array_values($requests);
+
+    // Check if we've hit the limit
+    if (count($requests) >= REQUESTS_PER_MINUTE) {
+        $oldestRequestTime = $requests[0];
+        $timeToWait = MINUTE_IN_SECONDS - ($currentTime - $oldestRequestTime);
+        
+        if ($timeToWait > 0) {
+            // Log the delay for debugging
+            error_log("Rate limit reached. Waiting $timeToWait seconds before next request.");
+            sleep($timeToWait); // Wait until the oldest request falls out of the 1-minute window
+        }
+        
+        // Refresh the request list after waiting
+        $requests = array_filter($requests, function($timestamp) use ($currentTime) {
+            return ($currentTime - $timestamp) < MINUTE_IN_SECONDS;
+        });
+        $requests = array_values($requests);
+    }
+    
+    // Add the current request timestamp
+    $requests[] = time();
+    $_SESSION['api_requests'] = $requests;
+}
 
 // Error handling functions remain unchanged
 function handleError($message) {
@@ -34,9 +77,13 @@ function handleJsonError($message) {
 }
 
 // fetchWithRetry, fetchTeamResults, fetchStandings, fetchTeams, calculateTeamStrength, predictMatch functions remain unchanged
+// Modified fetchWithRetry with rate limiting
 function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
     $maxAttempts = 3; // Maximum retry attempts for timeouts
-    $baseTimeout = 15; // Base timeout in seconds (increased from 10)
+    $baseTimeout = 15; // Base timeout in seconds
+
+    // Enforce rate limit before making the request
+    enforceRateLimit();
 
     // Initialize cURL
     $ch = curl_init();
@@ -44,13 +91,13 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-Auth-Token: $apiKey"]);
     curl_setopt($ch, CURLOPT_HEADER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $baseTimeout); // Set timeout to 15 seconds
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5); // Separate connection timeout (5 seconds)
+    curl_setopt($ch, CURLOPT_TIMEOUT, $baseTimeout);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
     // Execute the request
     $response = curl_exec($ch);
 
-    // Handle cURL errors (e.g., timeouts)
+// Handle cURL errors (e.g., timeouts)
     if (curl_errno($ch)) {
         $errorCode = curl_errno($ch);
         $errorMessage = curl_error($ch);
@@ -58,9 +105,8 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
 
         curl_close($ch);
 
-        // Retry on timeout-specific errors
         if ($errorCode == CURLE_OPERATION_TIMEDOUT && $attempt < $maxAttempts) {
-            $retrySeconds = min(pow(2, $attempt), 8); // Exponential backoff: 1s, 2s, 4s, max 8s
+            $retrySeconds = min(pow(2, $attempt), 8);
             error_log("Retrying in $retrySeconds seconds due to timeout...");
             sleep($retrySeconds);
             return fetchWithRetry($url, $apiKey, $isAjax, $attempt + 1);
@@ -81,25 +127,22 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
 
     curl_close($ch);
 
-    // Handle rate limiting (HTTP 429)
+    // Handle rate limiting from API (HTTP 429)
     if ($httpCode == 429) {
-        $retrySeconds = min(pow(2, $attempt), 32); // Exponential backoff, max 32s
-        $nextAttempt = $attempt + 1;
-
-        // Check for Retry-After header
+        $retrySeconds = min(pow(2, $attempt), 32);
         preg_match('/Retry-After: (\d+)/i', $headers, $matches);
         if (!empty($matches[1])) {
             $retrySeconds = max($retrySeconds, (int)$matches[1]);
         }
 
-        error_log("Rate limit exceeded for URL: $url - HTTP 429 - Retrying in $retrySeconds seconds (Attempt $nextAttempt)");
+        error_log("Rate limit exceeded for URL: $url - HTTP 429 - Retrying in $retrySeconds seconds (Attempt " . ($attempt + 1) . ")");
 
         if ($isAjax) {
             return [
                 'error' => true,
                 'retry' => true,
                 'retrySeconds' => $retrySeconds,
-                'nextAttempt' => $nextAttempt
+                'nextAttempt' => $attempt + 1
             ];
         } else {
             // Display retry countdown for non-AJAX requests
@@ -109,7 +152,7 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
                     const retryDiv = document.createElement('div');
                     retryDiv.id = 'retry-message';
                     retryDiv.className = 'retry-message countdown-box';
-                    retryDiv.innerHTML = '<span class=\"retry-text\">Rate limit exceeded. Retry attempt ' + $nextAttempt + '. Retrying in </span><span id=\"countdown\" class=\"countdown-timer\">' + timeLeft + '</span><span class=\"retry-text\"> seconds...</span>';
+                    retryDiv.innerHTML = '<span class=\"retry-text\">Rate limit exceeded. Retry attempt ' + " . ($attempt + 1) . " + '. Retrying in </span><span id=\"countdown\" class=\"countdown-timer\">' + timeLeft + '</span><span class=\"retry-text\"> seconds...</span>';
                     document.body.insertBefore(retryDiv, document.body.firstChild.nextSibling);
                     
                     const timer = setInterval(() => {
@@ -118,7 +161,7 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
                         if (timeLeft <= 0) {
                             clearInterval(timer);
                             let url = window.location.pathname + window.location.search;
-                            url += (window.location.search ? '&' : '?') + 'attempt=' + $nextAttempt;
+                            url += (window.location.search ? '&' : '?') + 'attempt=' + " . ($attempt + 1) . ";
                             window.location.href = url;
                         }
                     }, 1000);
@@ -127,11 +170,9 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
             return ['error' => true, 'retry' => true];
         }
     } elseif ($httpCode == 200) {
-        // Successful response
         error_log("Successfully fetched URL: $url - HTTP 200 (Attempt $attempt)");
         return ['error' => false, 'data' => json_decode($body, true)];
     } else {
-        // Other HTTP errors
         error_log("Failed fetching URL: $url - HTTP $httpCode (Attempt $attempt)");
         return ['error' => true, 'message' => "API Error: HTTP $httpCode"];
     }
