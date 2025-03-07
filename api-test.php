@@ -9,6 +9,13 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $token]);
 curl_setopt($ch, CURLOPT_HEADER, true);
 curl_setopt($ch, CURLOPT_FAILONERROR, true);
+// Enable verbose output for debugging
+curl_setopt($ch, CURLOPT_VERBOSE, true);
+$verbose = fopen('php://temp', 'w+');
+curl_setopt($ch, CURLOPT_STDERR, $verbose);
+// Temporary SSL bypass (for testing only)
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -18,6 +25,11 @@ $errno = curl_errno($ch);  // Capture cURL error number
 $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 $headers = substr($response, 0, $headerSize);
 $body = substr($response, $headerSize);
+
+// Get verbose log
+rewind($verbose);
+$verboseLog = stream_get_contents($verbose);
+fclose($verbose);
 
 curl_close($ch);
 ?>
@@ -39,5 +51,7 @@ curl_close($ch);
         <p><strong>Headers:</strong></p>
         <pre><?php echo htmlspecialchars($headers); ?></pre>
     <?php endif; ?>
+    <h2>Verbose Log:</h2>
+    <pre><?php echo htmlspecialchars($verboseLog); ?></pre>
 </body>
 </html>
