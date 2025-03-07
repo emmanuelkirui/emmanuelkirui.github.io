@@ -1,5 +1,5 @@
 <?php
-$url = 'https://api.football-data.org/v4/competitions/SA/scorers';
+$url = 'https://www.google.com';
 $token = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 
 $ch = curl_init($url);
