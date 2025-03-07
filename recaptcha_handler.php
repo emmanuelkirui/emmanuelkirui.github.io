@@ -28,10 +28,10 @@ class RecaptchaHandler {
             }
         }
         
-        // Check for explicit redirect parameter, then fall back to HTTP_REFERER
+        // When included via require_once, use REQUEST_URI as the redirect target
         $redirectUrl = filter_input(INPUT_GET, 'redirect', FILTER_SANITIZE_URL) 
             ?? filter_input(INPUT_POST, 'redirect', FILTER_SANITIZE_URL) 
-            ?? $_SERVER['HTTP_REFERER'] 
+            ?? $_SERVER['REQUEST_URI'] // Use the calling page's URI
             ?? '/';
         
         // Sanitize and store redirect URL if not already set
@@ -254,7 +254,7 @@ class RecaptchaHandler {
                 </div>
                 <div id="recaptcha-message"></div>
                 <div id="reload-message">
-                    Taking too long? <a href="' . htmlspecialchars($_SERVER['REQUEST_URI'], ENT_QUOTES, 'UTF-8') . '">Reload the page</a>
+                    Taking too long? <a href="' . htmlspecialchars($_SESSION['redirect_url'], ENT_QUOTES, 'UTF-8') . '">Reload the page</a>
                 </div>
                 <div class="info-section">
                     <p><span class="highlight">creativepulse.42web.io</span> needs to review the security of your connection before proceeding</p>
@@ -278,7 +278,7 @@ class RecaptchaHandler {
                         let container = document.getElementById("recaptcha-message");
                         if (data.success) {
                             container.innerHTML = "<div style=\'color: #27ae60; font-size: 14px;\'>Success! Redirecting...</div>";
-                            setTimeout(() => window.location.href = data.redirect_url || "/", 1000);
+                            setTimeout(() => window.location.href = data.redirect_url, 1000); // No fallback to "/"
                         } else {
                             container.innerHTML = "<div style=\'color: #e74c3c; font-size: 14px;\'>" + data.message + "</div>";
                             grecaptcha.reset();
