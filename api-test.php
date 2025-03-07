@@ -1,32 +1,27 @@
 <?php
-$url = 'https://www.google.com';
+$url = 'https://api.football-data.org/v4/competitions/SA/scorers';
 $token = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 
 $ch = curl_init($url);
-curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 sec connection timeout
-curl_setopt($ch, CURLOPT_TIMEOUT, 30);        // 30 sec total timeout
+curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 20); // Increased to 20 sec
+curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $token]);
 curl_setopt($ch, CURLOPT_HEADER, true);
 curl_setopt($ch, CURLOPT_FAILONERROR, true);
-// Enable verbose output for debugging
 curl_setopt($ch, CURLOPT_VERBOSE, true);
 $verbose = fopen('php://temp', 'w+');
 curl_setopt($ch, CURLOPT_STDERR, $verbose);
-// Temporary SSL bypass (for testing only)
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$error = curl_error($ch);  // Capture cURL error
-$errno = curl_errno($ch);  // Capture cURL error number
+$error = curl_error($ch);
+$errno = curl_errno($ch);
 
 $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 $headers = substr($response, 0, $headerSize);
 $body = substr($response, $headerSize);
 
-// Get verbose log
 rewind($verbose);
 $verboseLog = stream_get_contents($verbose);
 fclose($verbose);
