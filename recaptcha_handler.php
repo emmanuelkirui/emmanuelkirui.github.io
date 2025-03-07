@@ -28,9 +28,16 @@ class RecaptchaHandler {
             }
         }
         
-        // Store redirect URL if not already set
+        // Check for explicit redirect parameter, then fall back to HTTP_REFERER
+        $redirectUrl = filter_input(INPUT_GET, 'redirect', FILTER_SANITIZE_URL) 
+            ?? filter_input(INPUT_POST, 'redirect', FILTER_SANITIZE_URL) 
+            ?? $_SERVER['HTTP_REFERER'] 
+            ?? '/';
+        
+        // Sanitize and store redirect URL if not already set
         if (!isset($_SESSION['redirect_url'])) {
-            $_SESSION['redirect_url'] = $_SERVER['HTTP_REFERER'] ?? '/';
+            $_SESSION['redirect_url'] = $this->sanitizeRedirectUrl($redirectUrl);
+            error_log("Redirect URL set to: " . $_SESSION['redirect_url']);
         }
         
         $this->handleRequest();
@@ -61,11 +68,13 @@ class RecaptchaHandler {
         
         if (!$this->checkRateLimit()) {
             $result['message'] = 'Rate limit exceeded (5 attempts/hour). Please try again later.';
+            $result['redirect_url'] = $_SESSION['redirect_url'];
             return $result;
         }
         
         if (empty($recaptcha_response)) {
             $result['message'] = 'Please complete the CAPTCHA verification';
+            $result['redirect_url'] = $_SESSION['redirect_url'];
             return $result;
         }
         
@@ -92,15 +101,18 @@ class RecaptchaHandler {
             if ($responseData && $responseData->success) {
                 $result['success'] = true;
                 $result['message'] = 'Verification completed successfully';
-                $result['redirect_url'] = $_SESSION['redirect_url']; // Include redirect URL
+                $result['redirect_url'] = $_SESSION['redirect_url'];
                 $_SESSION['recaptcha_verified'] = true;
                 $_SESSION['recaptcha_verified_time'] = time();
+                unset($_SESSION['redirect_url']); // Clean up after success
             } else {
                 $result['message'] = 'CAPTCHA verification failed. Please try again';
+                $result['redirect_url'] = $_SESSION['redirect_url'];
             }
         } catch (Exception $e) {
             error_log('reCAPTCHA error: ' . $e->getMessage());
             $result['message'] = 'Temporary verification error. Please try again';
+            $result['redirect_url'] = $_SESSION['redirect_url'];
         }
         return $result;
     }
@@ -121,6 +133,15 @@ class RecaptchaHandler {
             return $_SERVER['HTTP_CLIENT_IP'];
         }
         return $_SERVER['REMOTE_ADDR'] ?? 'Unknown';
+    }
+    
+    private function sanitizeRedirectUrl($url) {
+        // Ensure the URL is relative or belongs to your domain
+        $parsed = parse_url($url);
+        if (!isset($parsed['host']) || $parsed['host'] === $_SERVER['HTTP_HOST']) {
+            return $url;
+        }
+        return '/'; // Fallback to root if invalid
     }
     
     public function displayOverlay() {
@@ -211,7 +232,7 @@ class RecaptchaHandler {
                     display: none;
                     margin-top: 20px;
                     font-size: 14px;
-                    color: #27ae60; /* Changed from #f1c40f (yellow) to #27ae60 (light green) */
+                    color: #27ae60;
                 }
                 #reload-message a {
                     color: #3498db;
@@ -274,7 +295,7 @@ class RecaptchaHandler {
                 setTimeout(() => {
                     const reloadMessage = document.getElementById("reload-message");
                     const recaptchaMessage = document.getElementById("recaptcha-message");
-                    if (!recaptchaMessage.innerHTML) { // Only show if no success/error message yet
+                    if (!recaptchaMessage.innerHTML) {
                         reloadMessage.style.display = "block";
                     }
                 }, 10000); // 10 seconds delay
