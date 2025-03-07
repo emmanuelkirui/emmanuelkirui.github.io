@@ -2,67 +2,121 @@
 // Set the timezone to East Africa Time
 date_default_timezone_set('Africa/Nairobi'); // EAT (UTC+3)
 
+// Start session to store rate-limiting data
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Initialize rate-limiting session variables
+if (!isset($_SESSION['api_request_timestamps'])) {
+    $_SESSION['api_request_timestamps'] = [];
+}
+
 // API Configuration
 $apiBaseUrl = "https://api.football-data.org/v4/competitions";
 $apiKey = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 
-// Fetch competitions dynamically from the API
-$competitionsList = [];
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $apiBaseUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "X-Auth-Token: $apiKey"
-]);
-$response = curl_exec($ch);
+// Function to enforce rate limit (10 requests per minute)
+function enforceRateLimit() {
+    $current_time = time();
+    $window = 60; // 60 seconds = 1 minute
+    $max_requests = 10;
 
+    // Clean up timestamps older than 60 seconds
+    $_SESSION['api_request_timestamps'] = array_filter(
+        $_SESSION['api_request_timestamps'],
+        function ($timestamp) use ($current_time, $window) {
+            return ($current_time - $timestamp) <= $window;
+        }
+    );
+      // Check if we've exceeded the rate limit
+    if (count($_SESSION['api_request_timestamps']) >= $max_requests) {
+        $oldest_request = min($_SESSION['api_request_timestamps']);
+        $wait_time = $window - ($current_time - $oldest_request) + 1; // Add 1 sec buffer
+
+        if ($wait_time > 0) {
+            echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>";
+            echo "<h2 style='color: orange;'>Rate Limit Reached</h2>";
+            echo "<p>Waiting <span id='countdown' style='font-weight: bold; color: blue;'>$wait_time</span> seconds...</p>";
+            echo "</div>";
+            echo "<script>
+                let timeLeft = $wait_time;
+                const countdownElement = document.getElementById('countdown');
+                const interval = setInterval(() => {
+                    timeLeft--;
+                    countdownElement.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        window.location.reload();
+                    }
+                }, 1000);
+            </script>";
+            flush();
+            sleep($wait_time);
+        }
+    }
+
+    // Add current request timestamp
+    $_SESSION['api_request_timestamps'][] = $current_time;
+}
+    
+// Function to fetch data from the API with rate limiting
+function fetchAPI($url, $apiKey) {
+    enforceRateLimit(); // Enforce rate limit before making the request
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "X-Auth-Token: $apiKey"
+    ]);
+    $response = curl_exec($ch);
+    $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 // Check for cURL errors
-if ($response === false) {
-    $error = 'Error fetching competitions from the API.';
-    header("Location: ../error.php?code=fetch_error");
-    exit;
-}
+    if ($response === false) {
+        header("Location: ../error.php?code=fetch_error");
+        exit;
+    }
 
-// Check HTTP status code
-$httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
-
-if ($httpStatusCode == 429) {
-    echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
-            <h2 style='color: red;'>Too Many Requests (429)</h2>
-            <p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>5</span> seconds...</p>
-          </div>
-          <script>
+    // Handle rate limits (HTTP 429)
+    if ($httpStatusCode == 429) {
+        echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
+                <h2 style='color: red;'>Too Many Requests (429)</h2>
+                <p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>5</span> seconds...</p>
+              </div>
+              <script>
             let timeLeft = 5;
-            let countdownTimer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('countdown').textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(countdownTimer);
-                    location.reload();
-                }
-            }, 1000);
-          </script>";
-    exit;
-}
+                let countdownTimer = setInterval(() => {
+                    timeLeft--;
+                    document.getElementById('countdown').textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownTimer);
+                        location.reload();
+                    }
+                }, 1000);
+              </script>";
+        exit;
+    }
 
 if ($httpStatusCode >= 400) {
-    // Redirect to error.php with the status code as a parameter
-    header("Location: ../error.php?code=$httpStatusCode");
-    exit;
+        header("Location: ../error.php?code=$httpStatusCode");
+        exit;
+    }
+
+    $data = json_decode($response, true);
+    if (isset($data['error'])) {
+        header("Location: ../error.php?code=api_error");
+        exit;
+    }
+
+    return $data;
 }
 
-// Decode the response and process data
-$data = json_decode($response, true);
-
-if (isset($data['error'])) {
-    $error = $data['message'] ?? 'An error occurred while fetching the competitions.';
-    header("Location: ../error.php?code=api_error");
-    exit;
-}
-
+// Fetch competitions dynamically from the API
+$competitionsList = [];
+$data = fetchAPI($apiBaseUrl, $apiKey);
 foreach ($data['competitions'] as $competition) {
-    // Add competition name and code to the list
     if (isset($competition['name'], $competition['code'])) {
         $competitionsList[$competition['name']] = $competition['code'];
     }
@@ -84,41 +138,8 @@ $itemsPerPage = 10; // Matches per page
 
 // Construct API URL
 $apiUrl = "$apiBaseUrl/$competition/matches";
-
 // Fetch matches from the API
-$matches = [];
-$matchError = '';
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $apiUrl);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "X-Auth-Token: $apiKey"
-]);
-$response = curl_exec($ch);
-
-// Check for cURL errors
-if ($response === false) {
-    header("Location: ../error.php?code=fetch_error");
-    exit;
-}
-
-// Check HTTP status code
-$httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
-
-if ($httpStatusCode >= 400) {
-    header("Location: ../error.php?code=$httpStatusCode");
-    exit;
-}
-
-// Decode the response and process data
-$data = json_decode($response, true);
-
-if (isset($data['error'])) {
-    header("Location: ../error.php?code=api_error");
-    exit;
-}
-
+$data = fetchAPI($apiUrl, $apiKey);
 // Filter matches based on date filter
 $matches = array_filter($data['matches'], function ($match) use ($dateFilter, $customDate) {
     $matchDate = date('Y-m-d', strtotime($match['utcDate']));
