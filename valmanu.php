@@ -478,10 +478,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $confidence = sprintf("%.1f%%", $confidence);
         $resultIndicator = "";
         if ($status === 'FINISHED' && $homeGoals !== null && $awayGoals !== null) {
-            $actualResult = ($homeGoals > $awayGoals) ? "$homeTeam to win" : (($homeGoals < $awayGoals) ? "$awayTeam to win" : "Draw");
-            $resultIndicator = ($prediction === $actualResult) ? "✅" : "❌";
+         $actualResult = ($homeGoals > $awayGoals) ? "$homeTeam to win" : (($homeGoals < $awayGoals) ? "$awayTeam to win" : "Draw");
+         $resultIndicator = ($prediction === $actualResult) ? "<span style='color: green;'>✓</span>" : "<span style='color: red;'>✕</span>";
         }
-
         return [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeStats['form'], $awayStats['form'], []];
     } catch (Exception $e) {
         return ["Error", "N/A", "", "N/A", "", "", "", []];
