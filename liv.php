@@ -3,6 +3,117 @@
 $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
+// Start session to store competitions and rate-limiting data
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Initialize rate-limiting session variables
+if (!isset($_SESSION['api_request_timestamps'])) {
+    $_SESSION['api_request_timestamps'] = [];
+}
+
+// Function to enforce rate limit (10 requests per minute)
+function enforceRateLimit() {
+    $current_time = time();
+    $window = 60; // 60 seconds = 1 minute
+    $max_requests = 10;
+
+    // Clean up timestamps older than 60 seconds
+    $_SESSION['api_request_timestamps'] = array_filter(
+        $_SESSION['api_request_timestamps'],
+        function ($timestamp) use ($current_time, $window) {
+            return ($current_time - $timestamp) <= $window;
+        }
+    );
+
+// Check if we've exceeded the rate limit
+    if (count($_SESSION['api_request_timestamps']) >= $max_requests) {
+        $oldest_request = min($_SESSION['api_request_timestamps']);
+        $wait_time = $window - ($current_time - $oldest_request) + 1; // Add 1 sec buffer
+
+        if ($wait_time > 0) {
+            echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>";
+            echo "<h2 style='color: orange;'>Rate Limit Reached</h2>";
+            echo "<p>Waiting <span id='countdown' style='font-weight: bold; color: blue;'>$wait_time</span> seconds...</p>";
+            echo "</div>";
+
+            echo "<script>
+                let timeLeft = $wait_time;
+                const countdownElement = document.getElementById('countdown');
+                const interval = setInterval(() => {
+                    timeLeft--;
+                    countdownElement.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        window.location.reload();
+                    }
+                }, 1000);
+            </script>";
+            flush();
+            sleep($wait_time);
+        }
+    }
+
+    // Add current request timestamp
+    $_SESSION['api_request_timestamps'][] = $current_time;
+}
+
+// Function to fetch data from the API with rate limiting
+function fetchAPI($url, $api_key, $retries = 3) {
+    enforceRateLimit(); // Enforce rate limit before making the request
+
+    $curl = curl_init();
+    curl_setopt_array($curl, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => [
+            "X-Auth-Token: $api_key"
+        ],
+    ]);
+
+    $response = curl_exec($curl);
+    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+    // Handle rate limits (HTTP 429)
+    // Handle rate limits (HTTP 429)
+    if ($http_code == 429) {
+        if ($retries > 0) {
+            $wait_time = pow(2, 4 - $retries); // Exponential backoff: 8, 4, 2 seconds
+            echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>";
+            echo "<h2 style='color: red;'>Too Many Requests (429)</h2>";
+            echo "<p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>$wait_time</span> seconds...</p>";
+            echo "</div>";
+
+            echo "<script>
+                let timeLeft = $wait_time;
+                const countdownElement = document.getElementById('countdown');
+                const interval = setInterval(() => {
+                    timeLeft--;
+                    countdownElement.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        window.location.reload();
+                    }
+                }, 1000);
+            </script>";
+            flush();
+            sleep($wait_time);
+            return fetchAPI($url, $api_key, $retries - 1);
+        } else {
+            header('Location: error');
+            exit;
+        }
+    }
+
+    if ($http_code != 200) {
+        header('Location: error');
+        exit;
+    }
+
+    return json_decode($response, true);
+}      
+
 // Only output the navigation bar and script if it's not an AJAX request
 if (!isset($_GET['ajax'])) {
     echo "<nav class='navbar'>";
@@ -18,7 +129,7 @@ if (!isset($_GET['ajax'])) {
     echo "</div>";
     echo "</nav>";
 
-    // Inline CSS for a more professional look
+        // Inline CSS for a more professional look
     echo "<style>
         /* Navbar container */
         .navbar {
@@ -47,7 +158,7 @@ if (!isset($_GET['ajax'])) {
             padding: 10px;
         }
 
-        .hamburger .bar {
+          .hamburger .bar {
             width: 100%;
             height: 4px; /* Thicker bars for visibility */
             background-color: #2c3e50; /* Dark blue for professionalism */
@@ -82,7 +193,7 @@ if (!isset($_GET['ajax'])) {
             transition: all 0.4s ease; /* Smooth toggle */
         }
 
-        /* Navigation links */
+         /* Navigation links */
         .nav-link {
             color: #ecf0f1;
             text-decoration: none;
@@ -124,7 +235,7 @@ if (!isset($_GET['ajax'])) {
         }
     </style>";
 
-    // JavaScript for toggling the menu and hamburger animation
+        // JavaScript for toggling the menu and hamburger animation
     echo "<script>
         function toggleMenu() {
             const menu = document.getElementById('navMenu');
@@ -147,80 +258,6 @@ if (!isset($_GET['ajax'])) {
     </script>";
 }
 
-
-
-
-
-
-// Start session to store competitions and their data
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-// Function to fetch data from the API
-function fetchAPI($url, $api_key, $retries = 3) {
-    $curl = curl_init();
-    curl_setopt_array($curl, [
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            "X-Auth-Token: $api_key"
-        ],
-    ]);
-
-    $response = curl_exec($curl);
-    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-    curl_close($curl);
-
-    // Handle rate limits (HTTP 429)
-    if ($http_code == 429) {
-    if ($retries > 0) {
-        // Calculate wait time using exponential backoff
-        $wait_time = pow(2, 4 - $retries); // 2^3 = 8, 2^2 = 4, 2^1 = 2
-
-        // Output the initial countdown message and embed JavaScript for dynamic countdown
-        echo "
-        <div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
-            <h2 style='color: red;'>Too Many Requests (429)</h2>
-            <p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>$wait_time</span> seconds...</p>
-        </div>";
-
-        echo "
-        <script>
-            // Initialize countdown variables
-            let timeLeft = $wait_time;
-            const countdownElement = document.getElementById('countdown');
-
-            // Update the countdown every second
-            const interval = setInterval(() => {
-                timeLeft--;
-                countdownElement.textContent = timeLeft;
-
-                // Reload the page when the countdown reaches 0
-                if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    window.location.reload(); // Reload the page to retry
-                }
-            }, 1000); // Update every second
-        </script>";
-            flush(); // Send output to the browser immediately
-            sleep($wait_time); // Wait for the countdown to finish on the server side
-
-            return fetchAPI($url, $api_key, $retries - 1); // Retry with one less retry attempt
-        } else {
-            // All retries exhausted for 429 error
-            header('Location: error'); // Redirect to an error page
-            exit;
-        }
-    }
-
-    // Handle other errors
-    if ($http_code != 200) {
-        header('Location: error'); // Redirect to an error page
-        exit;
-    }
-
-    return json_decode($response, true);
-}                       
 // Fetch all competitions only once and store in session
 if (!isset($_SESSION['competitions'])) {
     $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
