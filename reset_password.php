@@ -1,67 +1,51 @@
 <?php
 session_start();
-include 'config.php';
 
-$token = isset($_GET['token']) ? sanitize($_GET['token']) : '';
+// DB credentials
+define('DB_HOST', 'sql105.infinityfree.com');
+define('DB_USER', 'if0_37772405');
+define('DB_PASS', 'hMCWvBjYOKjDE');
+define('DB_NAME', 'if0_37772405_cps');
 
-if (empty($token)) {
-    die("Invalid token");
+try {
+    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
 }
-?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Reset Password</title>
-    <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f4; }
-        .reset-container { width: 300px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
-        button { width: 100%; padding: 10px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #45a049; }
-        .message { margin-top: 10px; text-align: center; }
-    </style>
-</head>
-<body>
-    <div class="reset-container">
-        <h2>Reset Password</h2>
-        <form id="resetForm">
-            <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
-            <input type="password" name="new_password" placeholder="New Password" required>
-            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-            <button type="submit">Reset Password</button>
-            <div class="message" id="message"></div>
-        </form>
-    </div>
+if (isset($_GET['token'])) {
+    $token = $_GET['token'];
+    $stmt = $pdo->prepare("SELECT * FROM cp_password_resets WHERE token = :token AND expires > NOW()");
+    $stmt->execute(['token' => $token]);
+    $reset = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    <script>
-        document.getElementById('resetForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            formData.append('reset_password', true);
-
-            fetch('auth.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                const messageDiv = document.getElementById('message');
-                messageDiv.textContent = data.message;
-                if (data.success) {
-                    setTimeout(() => window.location.href = '<?php echo $_SERVER['PHP_SELF']; ?>', 2000);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    </script>
-</body>
-</html>
-
-<?php
-function sanitize($data) {
-    global $connect;
-    return mysqli_real_escape_string($connect, trim($data));
+    if ($reset) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $password = $_POST['password'];
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE cp_users SET password = :password WHERE id = :user_id");
+            $stmt->execute(['password' => $hashedPassword, 'user_id' => $reset['user_id']]);
+            $pdo->prepare("DELETE FROM cp_password_resets WHERE token = :token")->execute(['token' => $token]);
+            echo "Password updated successfully! <a href='http://yourdomain.com/your_main_file.php'>Go back</a>";
+            exit;
+        }
+        // Show reset form
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <body>
+            <form method="POST">
+                <input type="password" name="password" placeholder="New Password" required>
+                <button type="submit">Reset Password</button>
+            </form>
+        </body>
+        </html>
+        <?php
+    } else {
+        echo "Invalid or expired token.";
+    }
+} else {
+    echo "No token provided.";
 }
 ?>
