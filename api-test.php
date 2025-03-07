@@ -3,24 +3,17 @@ $url = 'https://api.football-data.org/v4/competitions/SA/scorers';
 $token = 'd2ef1a157a0d4c83ba4023d1fbd28b5c';
 
 $ch = curl_init($url);
-
-// Add timeout settings
-curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 seconds connection timeout
-curl_setopt($ch, CURLOPT_TIMEOUT, 30);        // 30 seconds total timeout
-
+curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); // 10 sec connection timeout
+curl_setopt($ch, CURLOPT_TIMEOUT, 30);        // 30 sec total timeout
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'X-Auth-Token: ' . $token
-]);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ['X-Auth-Token: ' . $token]);
 curl_setopt($ch, CURLOPT_HEADER, true);
-
-// Add error capturing
 curl_setopt($ch, CURLOPT_FAILONERROR, true);
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$error = curl_error($ch);  // Get cURL error message
-$errno = curl_errno($ch);  // Get cURL error number
+$error = curl_error($ch);  // Capture cURL error
+$errno = curl_errno($ch);  // Capture cURL error number
 
 $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 $headers = substr($response, 0, $headerSize);
@@ -30,9 +23,7 @@ curl_close($ch);
 ?>
 <!DOCTYPE html>
 <html>
-<head>
-    <title>API Test</title>
-</head>
+<head><title>API Test</title></head>
 <body>
     <h1>Football-Data API Test</h1>
     <p><strong>URL:</strong> <?php echo htmlspecialchars($url); ?></p>
