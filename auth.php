@@ -8,7 +8,7 @@ define('DB_USER', 'if0_37772405');
 define('DB_PASS', 'hMCWvBjYOKjDE');
 define('DB_NAME', 'if0_37772405_cps');
 
-// Load PHPMailer
+// Include PHPMailer files
 require 'PHPMailer/src/PHPMailer.php';
 require 'PHPMailer/src/SMTP.php';
 require 'PHPMailer/src/Exception.php';
@@ -47,18 +47,18 @@ function sendResetEmail($to, $resetLink) {
     $mail = new PHPMailer(true);
 
     try {
-        // SMTP configuration (example using Gmail; adjust as needed)
+        // SMTP Settings
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com'; // Your SMTP host
+        $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'your-email@gmail.com'; // Your SMTP username
-        $mail->Password = 'your-app-password'; // Your SMTP password or App Password
+        $mail->Username = 'emmanuelkirui042@gmail.com'; // Your Gmail address
+        $mail->Password = 'unwv yswa pqaq hefc'; // Your App Password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        // Sender and recipient
-        $mail->setFrom('no-reply@yourdomain.com', 'CPS Football');
-        $mail->addAddress($to);
+        // Sender and recipient settings
+        $mail->setFrom('noreply@gmail.com', 'Creative Pulse Solutions (CEO)');
+        $mail->addAddress($to); // Recipient email from the reset request
 
         // Email content
         $mail->isHTML(true);
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         // Send reset email using PHPMailer
-        $resetLink = "http://yourdomain.com/reset_password.php?token=$resetToken";
+        $resetLink = "http://creativepulse.42web.io/reset_password.php?token=$resetToken";
         if (sendResetEmail($email, $resetLink)) {
             sendResponse(true, 'Password reset link sent to your email');
         } else {
@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Logout (though handled via GET in your main file, included here for completeness)
+    // Logout (handled via GET in your main file, included here for completeness)
     if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
         session_unset();
         session_destroy();
