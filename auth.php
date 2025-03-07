@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         // Send reset email using PHPMailer
-        $resetLink = "http://creativepulse.42web.io/reset_password.php?token=$resetToken";
+        $resetLink = "http://creativepulse.42web.io/cps/reset_password.php?token=$resetToken";
         if (sendResetEmail($email, $resetLink)) {
             sendResponse(true, 'Password reset link sent to your email');
         } else {
