@@ -2614,7 +2614,7 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         });
 
         function fetchTeamData(teamId, index, isHome, attempt = 0, maxAttempts = 10) {
-            const delay = Math.min(Math.pow(2, attempt) * 1000, 10000);
+            const delay = Math.min(Math.pow(2, attempt) * 1000, 6000); // Cap at 6 seconds (10/minute)
             const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
             const tableFormElement = document.getElementById(`table-form-${isHome ? 'home' : 'away'}-${index}`);
             const historyElement = document.getElementById(`history-${index}`);
@@ -2676,9 +2676,9 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             })
             .catch(error => {
                 console.error('Error fetching team data:', error);
-                if (attempt < maxAttempts) {
-                    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-                    setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+                if (data.retry && attempt < maxAttempts) {
+                     progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
+                     setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
                 } else {
                     formElement.innerHTML = '<p>Failed to load data</p>';
                     tableFormElement.innerHTML = '<p>Failed</p>';
