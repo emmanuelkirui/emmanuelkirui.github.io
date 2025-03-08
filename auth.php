@@ -24,18 +24,6 @@ try {
     exit;
 }
 
-// CSRF Token Validation
-function generateCsrfToken() {
-    if (empty($_SESSION['csrf_token'])) {
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-    }
-    return $_SESSION['csrf_token'];
-}
-
-function validateCsrfToken($token) {
-    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
-}
-
 // Helper function to send JSON response
 function sendResponse($success, $message, $data = []) {
     echo json_encode(array_merge(['success' => $success, 'message' => $message], $data));
@@ -76,12 +64,6 @@ function sendResetEmail($to, $resetLink) {
 
 // Handle incoming requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate CSRF token (optional, add to form as hidden input if used)
-    $csrfToken = $_POST['csrf_token'] ?? '';
-    if (!validateCsrfToken($csrfToken)) {
-        sendResponse(false, 'Invalid CSRF token');
-    }
-
     // Login
     if (isset($_POST['login'])) {
         $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
