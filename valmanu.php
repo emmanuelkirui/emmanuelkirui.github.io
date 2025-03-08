@@ -64,24 +64,23 @@ function enforceRateLimit($url = null) {
 function processQueue() {
     $currentTime = time();
     $queue = &$_SESSION['request_queue'];
-
     if (empty($queue)) return;
 
     $requests = &$_SESSION['api_requests'];
-    $requests = array_filter($requests, function($timestamp) use ($currentTime) {
-        return ($currentTime - $timestamp) < MINUTE_IN_SECONDS;
-    });
+    $requests = array_filter($requests, fn($ts) => ($currentTime - $ts) < MINUTE_IN_SECONDS);
     $requests = array_values($requests);
 
-    while (count($requests) < REQUESTS_PER_MINUTE && !empty($queue)) {
+    $processed = 0;
+    while ($processed < 1 && count($requests) < REQUESTS_PER_MINUTE && !empty($queue)) { // Process 1 at a time
         $nextRequest = array_shift($queue);
         if ($nextRequest['timestamp'] <= $currentTime) {
             $requests[] = $currentTime;
             $_SESSION['api_requests'] = $requests;
             error_log("Processing queued request: " . $nextRequest['url']);
-            // Simulate processing (actual fetch would happen here)
+            $processed++;
+            sleep(6); // Throttle to 1 request every 6 seconds
         } else {
-            array_unshift($queue, $nextRequest); // Put back if not ready
+            array_unshift($queue, $nextRequest);
             break;
         }
     }
