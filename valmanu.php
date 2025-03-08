@@ -2825,122 +2825,141 @@ document.getElementById('standings-view-btn').addEventListener('click', function
 
          function startMatchPolling() {
     setInterval(() => {
-        document.querySelectorAll('.match-card, .match-table tr').forEach(element => {
+        processQueue(); // Process any queued requests
+        const matches = document.querySelectorAll('.match-card, .match-table tr');
+        const maxRequestsPerPoll = Math.min(5, matches.length); // Cap at 5 requests per poll
+        let requestsMade = 0;
+
+        matches.forEach(element => {
+            if (requestsMade >= maxRequestsPerPoll) return;
             const homeId = element.dataset.homeId;
             const awayId = element.dataset.awayId;
             const index = element.dataset.index;
             const status = element.dataset.status;
-            const matchInfo = element.classList.contains('match-card') 
-                ? element.querySelector('.match-info p').textContent 
-                : element.cells[0].textContent;
 
-            if (matchInfo.includes('FINISHED') && element.querySelector('.result-indicator')) return;
+            if (status === 'FINISHED' && element.querySelector('.result-indicator')) return;
 
             fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        if (element.classList.contains('match-card')) {
-                            // Existing match-card update code remains unchanged
-                            const predictionElement = document.getElementById(`prediction-${index}`);
-                            const homeFormElement = document.getElementById(`form-home-${index}`);
-                            const awayFormElement = document.getElementById(`form-away-${index}`);
-                            const matchInfoElement = element.querySelector('.match-info p');
-
-                            predictionElement.innerHTML = `
-                                <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
-                                <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
-                                <p class="confidence">Confidence: ${data.confidence}</p>
-                                <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
-                            `;
-                            applyAdvantageHighlight(element, data.advantage);
-
-                            if (data.resultIndicator) {
-                                element.dataset.status = 'FINISHED';
-                                const currentText = matchInfoElement.textContent.split(' - ')[0];
-                                fetch(`?action=fetch_team_data&teamId=${homeId}&competition=<?php echo $selectedComp; ?>&force_refresh=true`)
-                                    .then(res => res.json())
-                                    .then(homeData => {
-                                        const homeGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[1] || 'N/A';
-                                        const awayGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[2] || 'N/A';
-                                        matchInfoElement.textContent = `${currentText} - ${homeGoals} : ${awayGoals}`;
-                                    });
-
-                                const homeForm = data.homeForm.slice(-6).padStart(6, '-').split('').reverse().join('');
-                                let homeFormHtml = '';
-                                for (let i = 0; i < 6; i++) {
-                                    let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (i === 5 && homeForm[i] !== '-' && data.homeForm.trim('-').length > 0) className += ' latest';
-                                    homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
-                                }
-                                homeFormElement.innerHTML = homeFormHtml;
-                                homeFormElement.dataset.form = data.homeForm;
-
-                                const awayForm = data.awayForm.slice(-6).padStart(6, '-').split('').reverse().join('');
-                                let awayFormHtml = '';
-                                for (let i = 0; i < 6; i++) {
-                                    let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
-                                    if (i === 5 && awayForm[i] !== '-' && data.awayForm.trim('-').length > 0) className += ' latest';
-                                    awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
-                                }
-                                awayFormElement.innerHTML = awayFormHtml;
-                                awayFormElement.dataset.form = data.awayForm;
-
-                                [homeFormElement, awayFormElement].forEach(el => {
-                                    el.classList.add('updated');
-                                    setTimeout(() => el.classList.remove('updated'), 2000);
-                                });
-                            }
-                        } else {
-                            const tablePrediction = document.getElementById(`table-prediction-${index}`);
-                            const tableConfidence = document.getElementById(`table-confidence-${index}`);
-                            const tablePredictedScore = document.getElementById(`table-predicted-score-${index}`);
-                            const tableHomeForm = document.getElementById(`table-form-home-${index}`);
-                            const tableAwayForm = document.getElementById(`table-form-away-${index}`);
-
-                            tablePrediction.innerHTML = `${data.prediction} ${data.resultIndicator}`;
-                            tableConfidence.innerHTML = data.confidence;
-                            tablePredictedScore.innerHTML = data.predictedScore;
-
-                            if (data.resultIndicator) {
-                                element.dataset.status = 'FINISHED';
-                                element.cells[2].textContent = `${data.homeGoals || 'N/A'} - ${data.awayGoals || 'N/A'}`;
-
-                                // Updated table form display - latest on right
-                                // For home team (Cardiff City FC)
-const homeForm = data.homeForm.slice(-6).padStart(6, '-');
-let homeFormHtml = '';
-const homeFormLength = data.homeForm.trim('-').length;
-for (let i = 0; i < 6; i++) {
-    let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
-    // Mark the latest result (rightmost non-dash) as 'latest'
-    if (i === homeFormLength - 1 && homeForm[i] !== '-' && homeFormLength > 0) className += ' latest';
-    homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
-}
-tableHomeForm.innerHTML = homeFormHtml;
-
-// For away team (Burnley FC)
-const awayForm = data.awayForm.slice(-6).padStart(6, '-');
-let awayFormHtml = '';
-const awayFormLength = data.awayForm.trim('-').length;
-for (let i = 0; i < 6; i++) {
-    let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
-    // Mark the latest result (rightmost non-dash) as 'latest'
-    if (i === awayFormLength - 1 && awayForm[i] !== '-' && awayFormLength > 0) className += ' latest';
-    awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
-}
-                                tableAwayForm.innerHTML = awayFormHtml;
-
-                                element.cells[7].textContent = `${data.homeForm} / ${data.awayForm}`;
-                            }
-                        }
+                        requestsMade++;
+                        updateMatchUI(element, index, data);
+                    } else if (data.queued) {
+                        console.log(`Request queued for match ${index}. Delay: ${data.delay}s`);
+                        setTimeout(() => fetchPrediction(index, homeId, awayId), data.delay * 1000);
+                    } else if (data.retry) {
+                        setTimeout(() => fetchPrediction(index, homeId, awayId), data.delay * 1000);
                     }
                 })
                 .catch(error => console.error('Polling error:', error));
         });
-    }, 60000);
+    }, 120000); // Poll every 2 minutes instead of 1
 }
-  
+
+function updateMatchUI(element, index, data) {
+    if (element.classList.contains('match-card')) {
+        const predictionElement = document.getElementById(`prediction-${index}`);
+        const homeFormElement = document.getElementById(`form-home-${index}`);
+        const awayFormElement = document.getElementById(`form-away-${index}`);
+        const matchInfoElement = element.querySelector('.match-info p');
+
+        predictionElement.innerHTML = `
+            <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
+            <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
+            <p class="confidence">Confidence: ${data.confidence}</p>
+            <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
+        `;
+        applyAdvantageHighlight(element, data.advantage);
+
+        if (data.resultIndicator) {
+            element.dataset.status = 'FINISHED';
+            const currentText = matchInfoElement.textContent.split(' - ')[0];
+            fetch(`?action=fetch_team_data&teamId=${element.dataset.homeId}&competition=<?php echo $selectedComp; ?>&force_refresh=true`)
+                .then(res => res.json())
+                .then(homeData => {
+                    if (homeData.success) {
+                        const homeGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[1] || 'N/A';
+                        const awayGoals = homeData.results[0]?.match(/(\d+) - (\d+)/)?.[2] || 'N/A';
+                        matchInfoElement.textContent = `${currentText} - ${homeGoals} : ${awayGoals}`;
+                    }
+                });
+
+            const homeForm = data.homeForm.slice(-6).padStart(6, '-').split('').reverse().join('');
+            let homeFormHtml = '';
+            for (let i = 0; i < 6; i++) {
+                let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
+                if (i === 5 && homeForm[i] !== '-' && data.homeForm.trim('-').length > 0) className += ' latest';
+                homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
+            }
+            homeFormElement.innerHTML = homeFormHtml;
+            homeFormElement.dataset.form = data.homeForm;
+
+            const awayForm = data.awayForm.slice(-6).padStart(6, '-').split('').reverse().join('');
+            let awayFormHtml = '';
+            for (let i = 0; i < 6; i++) {
+                let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
+                if (i === 5 && awayForm[i] !== '-' && data.awayForm.trim('-').length > 0) className += ' latest';
+                awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
+            }
+            awayFormElement.innerHTML = awayFormHtml;
+            awayFormElement.dataset.form = data.awayForm;
+
+            [homeFormElement, awayFormElement].forEach(el => {
+                el.classList.add('updated');
+                setTimeout(() => el.classList.remove('updated'), 2000);
+            });
+        }
+    } else {
+        const tablePrediction = document.getElementById(`table-prediction-${index}`);
+        const tableConfidence = document.getElementById(`table-confidence-${index}`);
+        const tablePredictedScore = document.getElementById(`table-predicted-score-${index}`);
+        const tableHomeForm = document.getElementById(`table-form-home-${index}`);
+        const tableAwayForm = document.getElementById(`table-form-away-${index}`);
+
+        tablePrediction.innerHTML = `${data.prediction} ${data.resultIndicator}`;
+        tableConfidence.innerHTML = data.confidence;
+        tablePredictedScore.innerHTML = data.predictedScore;
+
+        if (data.resultIndicator) {
+            element.dataset.status = 'FINISHED';
+            element.cells[2].textContent = `${data.homeGoals || 'N/A'} - ${data.awayGoals || 'N/A'}`;
+
+            const homeForm = data.homeForm.slice(-6).padStart(6, '-');
+            let homeFormHtml = '';
+            const homeFormLength = data.homeForm.trim('-').length;
+            for (let i = 0; i < 6; i++) {
+                let className = homeForm[i] === 'W' ? 'win' : (homeForm[i] === 'D' ? 'draw' : (homeForm[i] === 'L' ? 'loss' : 'empty'));
+                if (i === homeFormLength - 1 && homeForm[i] !== '-' && homeFormLength > 0) className += ' latest';
+                homeFormHtml += `<span class="${className}">${homeForm[i]}</span>`;
+            }
+            tableHomeForm.innerHTML = homeFormHtml;
+
+            const awayForm = data.awayForm.slice(-6).padStart(6, '-');
+            let awayFormHtml = '';
+            const awayFormLength = data.awayForm.trim('-').length;
+            for (let i = 0; i < 6; i++) {
+                let className = awayForm[i] === 'W' ? 'win' : (awayForm[i] === 'D' ? 'draw' : (awayForm[i] === 'L' ? 'loss' : 'empty'));
+                if (i === awayFormLength - 1 && awayForm[i] !== '-' && awayFormLength > 0) className += ' latest';
+                awayFormHtml += `<span class="${className}">${awayForm[i]}</span>`;
+            }
+            tableAwayForm.innerHTML = awayFormHtml;
+
+            element.cells[7].textContent = `${data.homeForm} / ${data.awayForm}`;
+        }
+    }
+}
+
+function processQueue() {
+    fetch('?action=process_queue')
+        .then(response => response.json())
+        .then(data => {
+            if (data.processed) {
+                console.log('Processed queued requests:', data.processed);
+            }
+        });
+}
+                        
                                 
         const searchInput = document.querySelector('.search-input');
         const autocompleteDropdown = document.querySelector('.autocomplete-dropdown');
