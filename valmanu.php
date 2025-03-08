@@ -1925,8 +1925,8 @@ try {
 <body>
     <div class="container">
         <div class="header">
-            <div id="last-updated" class="last-updated">Last updated: Checking...</div>
             <h1>CPS Football Predictions</h1>
+            <div id="last-updated" class="last-updated">Last updated: Checking...</div>
             <p>Select Competition, Date Range (EAT), or Search Teams</p>
         </div>
 
