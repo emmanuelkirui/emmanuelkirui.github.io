@@ -1902,10 +1902,55 @@ try {
         right: 0;
     }
 }
+        .loading-spinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    font-size: 1em;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.retry-notice {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.last-updated {
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+/* Ensure progress bar styles are present */
+.progress-bar {
+    width: 100%;
+    height: 5px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
     </style>
 </head>
 <body>
     <div class="container">
+        <div id="last-updated" class="last-updated">Last updated: Checking...</div>
         <div class="header">
             <h1>CPS Football Predictions</h1>
             <p>Select Competition, Date Range (EAT), or Search Teams</p>
@@ -2619,8 +2664,15 @@ document.getElementById('standings-view-btn').addEventListener('click', function
     const tableFormElement = document.getElementById(`table-form-${isHome ? 'home' : 'away'}-${index}`);
     const historyElement = document.getElementById(`history-${index}`);
     const predictionElement = document.getElementById(`prediction-${index}`);
-    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
 
+    // Add loading spinner immediately
+    formElement.innerHTML = '<span class="loading-spinner">⏳</span>';
+    tableFormElement.innerHTML = '<span class="loading-spinner">⏳</span>';
+    if (isHome) {
+        historyElement.innerHTML = '<p>Loading history... <span class="loading-spinner">⏳</span></p>';
+    }
+
+    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
     if (!progressBar.classList.contains('progress-fill')) {
         progressBar.classList.add('progress-fill');
         const progressContainer = document.createElement('div');
@@ -2632,30 +2684,34 @@ document.getElementById('standings-view-btn').addEventListener('click', function
     if (attempt === 5) {
         const retryNotice = document.createElement('div');
         retryNotice.className = 'retry-notice';
-        retryNotice.innerHTML = 'Still trying to load data for this team. Please wait...';
-        retryNotice.style.cssText = `
-            background-color: #fff3cd; 
-            border: 1px solid #ffeeba; 
-            color: #856404; 
-            padding: 10px; 
-            margin-top: 10px; 
-            border-radius: 5px; 
-            text-align: center;
-            font-size: 0.9em;
-        `;
+        retryNotice.innerHTML = `Still trying to load data for this team. Retrying in <span id="countdown-team-${index}-${isHome ? 'home' : 'away'}">${Math.round(delay / 1000)}</span>s...`;
         predictionElement.appendChild(retryNotice);
-        setTimeout(() => retryNotice.remove(), 5000);
+
+        let countdown = Math.round(delay / 1000);
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            const countdownSpan = document.getElementById(`countdown-team-${index}-${isHome ? 'home' : 'away'}`);
+            if (countdownSpan) countdownSpan.textContent = countdown;
+            if (countdown <= 0) clearInterval(countdownInterval);
+        }, 1000);
+
+        setTimeout(() => retryNotice.remove(), delay + 1000);
     }
 
-    console.log(`Fetching team data for ${teamId} (debounced, attempt ${attempt})`); // Debug log
+    console.log(`Fetching team data for ${teamId} (debounced, attempt ${attempt})`);
     fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
         headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.queued) {
+            formElement.innerHTML = `<p>Queued, retrying in ${data.delay}s</p>`;
+            tableFormElement.innerHTML = `<p>Queued, retrying in ${data.delay}s</p>`;
+            setTimeout(() => debouncedFetchTeamData(teamId, index, isHome, attempt), data.delay * 1000);
+        } else if (data.success) {
             updateTeamUI(data, index, isHome, formElement, tableFormElement, historyElement, predictionElement);
             progressBar.parentElement.remove();
+            predictionElement.querySelector('.retry-notice')?.remove();
         } else if (data.retry && attempt < maxAttempts) {
             progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
             setTimeout(() => debouncedFetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
@@ -2680,6 +2736,7 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         }
     });
 }
+    
             
 
         function updateTeamUI(data, index, isHome, formElement, tableFormElement, historyElement, predictionElement) {
@@ -2725,14 +2782,14 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             }
         }
 
-        function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 10) {
+                function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 10) {
     const delay = Math.min(Math.pow(2, attempt) * 1000, 10000);
     const predictionElement = document.getElementById(`prediction-${index}`);
     const tablePrediction = document.getElementById(`table-prediction-${index}`);
     const tableConfidence = document.getElementById(`table-confidence-${index}`);
     const tablePredictedScore = document.getElementById(`table-predicted-score-${index}`);
-    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
 
+    const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
     if (!progressBar.classList.contains('progress-fill')) {
         progressBar.classList.add('progress-fill');
         const progressContainer = document.createElement('div');
@@ -2744,28 +2801,33 @@ document.getElementById('standings-view-btn').addEventListener('click', function
     if (attempt === 5) {
         const retryNotice = document.createElement('div');
         retryNotice.className = 'retry-notice';
-        retryNotice.innerHTML = 'Still predicting match outcome. Please wait...';
-        retryNotice.style.cssText = `
-            background-color: #fff3cd; 
-            border: 1px solid #ffeeba; 
-            color: #856404; 
-            padding: 10px; 
-            margin-top: 10px; 
-            border-radius: 5px; 
-            text-align: center;
-            font-size: 0.9em;
-        `;
+        retryNotice.innerHTML = `Still predicting match outcome. Retrying in <span id="countdown-pred-${index}">${Math.round(delay / 1000)}</span>s...`;
         predictionElement.appendChild(retryNotice);
-        setTimeout(() => retryNotice.remove(), 5000);
+
+        let countdown = Math.round(delay / 1000);
+        const countdownInterval = setInterval(() => {
+            countdown--;
+            const countdownSpan = document.getElementById(`countdown-pred-${index}`);
+            if (countdownSpan) countdownSpan.textContent = countdown;
+            if (countdown <= 0) clearInterval(countdownInterval);
+        }, 1000);
+
+        setTimeout(() => retryNotice.remove(), delay + 1000);
     }
 
-    console.log(`Fetching prediction for match ${index} (debounced, attempt ${attempt})`); // Debug log
+    console.log(`Fetching prediction for match ${index} (debounced, attempt ${attempt})`);
     fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
         headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.queued) {
+            predictionElement.innerHTML = `<p>Prediction queued, retrying in ${data.delay}s</p>`;
+            tablePrediction.innerHTML = `Queued (${data.delay}s)`;
+            tableConfidence.innerHTML = '';
+            tablePredictedScore.innerHTML = '';
+            setTimeout(() => debouncedFetchPrediction(index, homeId, awayId, attempt), data.delay * 1000);
+        } else if (data.success) {
             predictionElement.innerHTML = `
                 <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
                 <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
@@ -2798,7 +2860,7 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             predictionElement.querySelector('.retry-notice')?.remove();
         }
     });
-}      
+}
 
         function applyAdvantageHighlight(matchCard, advantage) {
             const homeTeam = matchCard.querySelector('.teams .team:first-child');
@@ -2817,11 +2879,9 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             }
         }
 
+let pollingInterval;
 function startMatchPolling() {
-    if (pollingInterval) {
-        clearInterval(pollingInterval);
-    }
-
+    if (pollingInterval) clearInterval(pollingInterval);
     pollingInterval = setInterval(() => {
         processQueue();
         const matches = document.querySelectorAll('.match-card, .match-table tr');
@@ -2837,13 +2897,16 @@ function startMatchPolling() {
 
             if (status === 'FINISHED' && element.querySelector('.result-indicator')) return;
 
-            // Use debounced fetchPrediction instead of direct fetch
             debouncedFetchPrediction(index, homeId, awayId);
-            requestsMade++; // Increment only if we proceed (debounce will handle actual timing)
+            requestsMade++;
         });
+
+        const lastUpdated = document.getElementById('last-updated');
+        if (lastUpdated) {
+            lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
     }, 120000); // Poll every 2 minutes
 }
-            
 
 
 function updateMatchUI(element, index, data) {
@@ -3165,13 +3228,8 @@ const debouncedFetchPrediction = debounce((index, homeId, awayId, attempt = 0, m
     adjustTeamSpacing();
     window.addEventListener('resize', adjustTeamSpacing);
 
-    // Start polling after page load
-   // startMatchPolling();
-
-    // Use debounced polling instead
     debouncedStartPolling();
 
-    // Update team data fetching with debounce
     if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
         incompleteTeams.forEach(teamId => {
             document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
@@ -3179,23 +3237,28 @@ const debouncedFetchPrediction = debounce((index, homeId, awayId, attempt = 0, m
                 const homeId = card.dataset.homeId;
                 const awayId = card.dataset.awayId;
 
-                if (homeId == teamId) debouncedFetchTeamData(homeId, index, true); // Debounced call
-                if (awayId == teamId) debouncedFetchTeamData(awayId, index, false); // Debounced call
+                if (homeId == teamId) {
+                    document.getElementById(`form-home-${index}`).innerHTML = '<span class="loading-spinner">⏳</span>';
+                    debouncedFetchTeamData(homeId, index, true);
+                }
+                if (awayId == teamId) {
+                    document.getElementById(`form-away-${index}`).innerHTML = '<span class="loading-spinner">⏳</span>';
+                    debouncedFetchTeamData(awayId, index, false);
+                }
 
-                // Call debounced prediction after both teams are loaded (simplified check)
                 setTimeout(() => {
                     const otherTeamLoaded = homeId == teamId ?
                         !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
                         !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
                     if (otherTeamLoaded) {
-                        debouncedFetchPrediction(index, homeId, awayId); // Debounced call
+                        debouncedFetchPrediction(index, homeId, awayId);
                     }
-                }, 1000); // Slight delay to ensure team data is processed
+                }, 1000);
             });
         });
     }
 };
-    </script>
+</script>
 </body>
 </html>
 <?php
