@@ -81,7 +81,7 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
     error_log("User logged out: " . ($_SESSION['username'] ?? 'Unknown') . " at " . date('Y-m-d H:i:s'));
 
     // Send JSON response and redirect
-    sendResponse(true, 'Logged out successfully', ['redirect' => 'index.php']); // Adjust 'index.php' to your main file
+    sendResponse(true, 'Logged out successfully', ['redirect' => 'valmanu.php']); // Adjust 'index.php' to your main file
 }
 
 // Handle POST requests
@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         // Send reset email using PHPMailer
-        $resetLink = "http://creativepulse.42web.io/cps/reset_password.php?token=$resetToken";
+        $resetLink = "https://creativepulse.42web.io/cps/reset_password.php?token=$resetToken";
         if (sendResetEmail($email, $resetLink)) {
             sendResponse(true, 'Password reset link sent to your email');
         } else {
