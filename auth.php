@@ -30,11 +30,17 @@ function sendResponse($success, $message, $data = []) {
     exit;
 }
 
-// Function to get approximate location from IP
-function getLocationFromIP() {
+// Function to get location and timezone from IP
+function getLocationInfoFromIP() {
     $ip = $_SERVER['REMOTE_ADDR'];
+    $result = [
+        'location' => 'Unknown location',
+        'timezone' => 'UTC' // Default fallback
+    ];
+    
     if ($ip === '127.0.0.1' || $ip === '::1') {
-        return "Localhost";
+        $result['location'] = 'Localhost';
+        return $result;
     }
     
     $url = "http://ip-api.com/json/{$ip}";
@@ -42,14 +48,16 @@ function getLocationFromIP() {
     if ($response) {
         $data = json_decode($response, true);
         if ($data['status'] === 'success') {
-            return "{$data['city']}, {$data['regionName']}, {$data['country']}";
+            $result['location'] = "{$data['city']}, {$data['regionName']}, {$data['country']}";
+            $result['timezone'] = $data['timezone'] ?? 'UTC';
         }
     }
-    return "Unknown location";
+    
+    return $result;
 }
 
 // Function to send notification email
-function sendNotificationEmail($to, $type, $username, $location) {
+function sendNotificationEmail($to, $type, $username, $location, $timezone) {
     $mail = new PHPMailer(true);
 
     try {
@@ -65,12 +73,16 @@ function sendNotificationEmail($to, $type, $username, $location) {
         $mail->setFrom('noreply@gmail.com', 'Creative Pulse Solutions (CEO)');
         $mail->addAddress($to);
 
+        // Set timezone and get local time
+        date_default_timezone_set($timezone);
+        $localTime = date('Y-m-d H:i:s');
+
         $mail->isHTML(true);
         $subject = $type === 'login' ? 'Successful Login Notification' : 'Welcome to Creative Pulse Solutions';
         $body = $type === 'login' ?
-            "Hello {$username},<br><br>Your account was successfully logged into from:<br>Location: {$location}<br>Time: " . date('Y-m-d H:i:s') . "<br><br>If this wasn't you, please reset your password immediately at: <a href='https://creativepulse.42web.io/cps/reset_password.php'>Reset Password</a>"
+            "Hello {$username},<br><br>Your account was successfully logged into from:<br>Location: {$location}<br>Time: {$localTime} ({$timezone})<br><br>If this wasn't you, please reset your password immediately at: <a href='https://creativepulse.42web.io/cps/reset_password.php'>Reset Password</a>"
             :
-            "Welcome {$username},<br><br>Your account was successfully created from:<br>Location: {$location}<br>Time: " . date('Y-m-d H:i:s') . "<br><br>Enjoy our services!";
+            "Welcome {$username},<br><br>Your account was successfully created from:<br>Location: {$location}<br>Time: {$localTime} ({$timezone})<br><br>Enjoy our services!";
         
         $mail->Subject = $subject;
         $mail->Body = $body;
@@ -150,8 +162,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['id'];
             
-            $location = getLocationFromIP();
-            sendNotificationEmail($user['email'], 'login', $username, $location);
+            // Get location and timezone info
+            $locationInfo = getLocationInfoFromIP();
+            sendNotificationEmail($user['email'], 'login', $username, $locationInfo['location'], $locationInfo['timezone']);
             
             sendResponse(true, 'Login successful');
         } else {
@@ -196,8 +209,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $username;
             $_SESSION['user_id'] = $pdo->lastInsertId();
             
-            $location = getLocationFromIP();
-            sendNotificationEmail($email, 'signup', $username, $location);
+            // Get location and timezone info
+            $locationInfo = getLocationInfoFromIP();
+            sendNotificationEmail($email, 'signup', $username, $locationInfo['location'], $locationInfo['timezone']);
             
             sendResponse(true, 'Signup successful');
         } else {
