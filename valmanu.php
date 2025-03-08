@@ -633,7 +633,7 @@ if (!isset($_GET['ajax'])) {
     echo "<button class='nav-link user-btn' onclick='toggleUserMenu()'>" . htmlspecialchars($_SESSION['username']) . " ▼</button>";
     echo "<div class='user-dropdown' id='userDropdown'>";
     echo "<a href='#settings' class='dropdown-item'>Settings</a>";
-    echo "<a href='auth.php?logout=true' class='dropdown-item'>Logout</a>";
+    echo "<a href='#' class='dropdown-item' onclick='handleLogout(event)'>Logout</a>";
     echo "</div>";
     echo "</div>";
     } else {
@@ -2471,7 +2471,38 @@ try {
         // Display full error message including server response
         messageDiv.textContent = error.message;
     });
-}        
+}     
+// Add the handleLogout function here
+    function handleLogout(event) {
+        event.preventDefault();
+        
+        if (confirm('Are you sure you want to logout?')) {
+            fetch('auth.php?logout=true', {
+                method: 'GET',
+                credentials: 'include' // Ensure cookies are sent
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Logout failed: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    console.log(data.message);
+                    // Redirect to the URL provided in the response
+                    window.location.href = data.redirect || 'index.php'; // Adjust 'index.php' to your main file
+                } else {
+                    throw new Error(data.message || 'Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                alert('Failed to logout: ' + error.message);
+            });
+        }
+    }
+                
         function shareScorersAsImage() {
     const tableElement = document.querySelector('#top-scorers-table table');
     const shareBtn = document.getElementById('share-scorers-btn');
