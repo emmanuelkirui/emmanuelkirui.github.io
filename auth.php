@@ -46,7 +46,7 @@ function sendResetEmail($to, $resetLink) {
 
         // Sender and recipient settings
         $mail->setFrom('noreply@gmail.com', 'Creative Pulse Solutions (CEO)');
-        $mail->addAddress($to); // Recipient email from the reset request
+        $mail->addAddress($to);
 
         // Email content
         $mail->isHTML(true);
@@ -62,7 +62,29 @@ function sendResetEmail($to, $resetLink) {
     }
 }
 
-// Handle incoming requests
+// Handle logout (moved outside POST block to handle GET requests)
+if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
+    // Clear all session data
+    session_unset(); // Remove all session variables
+    session_destroy(); // Destroy the session
+
+    // Clear session cookie explicitly
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+
+    // Log the logout event (optional)
+    error_log("User logged out: " . ($_SESSION['username'] ?? 'Unknown') . " at " . date('Y-m-d H:i:s'));
+
+    // Send JSON response and redirect
+    sendResponse(true, 'Logged out successfully', ['redirect' => 'index.php']); // Adjust 'index.php' to your main file
+}
+
+// Handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Login
     if (isset($_POST['login'])) {
@@ -164,14 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'Failed to send reset email');
         }
     }
-
-    // Logout (handled via GET in your main file, included here for completeness)
-    if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
-        session_unset();
-        session_destroy();
-        sendResponse(true, 'Logged out successfully');
-    }
-} else {
+} else if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     sendResponse(false, 'Invalid request method');
 }
 ?>
