@@ -707,7 +707,7 @@ try {
     $competitions = $compResponse['data']['competitions'] ?? [];
 
     $selectedComp = $_GET['competition'] ?? ($competitions[0]['code'] ?? 'PL');
-    $filter = $_GET['filter'] ?? 'upcoming';
+    $filter = $_GET['filter'] ?? 'today';
     $customStart = $_GET['start'] ?? '';
     $customEnd = $_GET['end'] ?? '';
     $searchTeam = $_GET['team'] ?? '';
