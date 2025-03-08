@@ -35,7 +35,7 @@ function getLocationInfoFromIP() {
     $ip = $_SERVER['REMOTE_ADDR'];
     $result = [
         'location' => 'Unknown location',
-        'timezone' => 'UTC' // Default fallback
+        'timezone' => 'UTC'
     ];
     
     if ($ip === '127.0.0.1' || $ip === '::1') {
@@ -56,8 +56,47 @@ function getLocationInfoFromIP() {
     return $result;
 }
 
+// Function to get device and browser info from user agent
+function getDeviceBrowserInfo() {
+    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $device = 'Unknown Device';
+    $browser = 'Unknown Browser';
+
+    // Detect device
+    if (preg_match('/Mobile|Android|iPhone|iPad/', $userAgent)) {
+        $device = 'Mobile Device';
+        if (preg_match('/Android/', $userAgent)) {
+            $device = 'Android Device';
+        } elseif (preg_match('/iPhone/', $userAgent)) {
+            $device = 'iPhone';
+        } elseif (preg_match('/iPad/', $userAgent)) {
+            $device = 'iPad';
+        }
+    } elseif (preg_match('/Windows|Macintosh|Linux/', $userAgent)) {
+        $device = 'Desktop';
+    }
+
+    // Detect browser
+    if (preg_match('/Chrome/', $userAgent)) {
+        $browser = 'Google Chrome';
+    } elseif (preg_match('/Firefox/', $userAgent)) {
+        $browser = 'Mozilla Firefox';
+    } elseif (preg_match('/Safari/', $userAgent) && !preg_match('/Chrome/', $userAgent)) {
+        $browser = 'Safari';
+    } elseif (preg_match('/Edge/', $userAgent)) {
+        $browser = 'Microsoft Edge';
+    } elseif (preg_match('/MSIE|Trident/', $userAgent)) {
+        $browser = 'Internet Explorer';
+    }
+
+    return [
+        'device' => $device,
+        'browser' => $browser
+    ];
+}
+
 // Function to send notification email
-function sendNotificationEmail($to, $type, $username, $location, $timezone) {
+function sendNotificationEmail($to, $type, $username, $location, $timezone, $device, $browser) {
     $mail = new PHPMailer(true);
 
     try {
@@ -80,9 +119,9 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone) {
         $mail->isHTML(true);
         $subject = $type === 'login' ? 'Successful Login Notification' : 'Welcome to Creative Pulse Solutions';
         $body = $type === 'login' ?
-            "Hello {$username},<br><br>Your account was successfully logged into from:<br>Location: {$location}<br>Time: {$localTime} ({$timezone})<br><br>If this wasn't you, please reset your password immediately at: <a href='https://creativepulse.42web.io/cps/reset_password.php'>Reset Password</a>"
+            "Hello {$username},<br><br>Your account was successfully logged into from:<br>Location: {$location}<br>Time: {$localTime} ({$timezone})<br>Device: {$device}<br>Browser: {$browser}<br><br>If this wasn't you, please reset your password immediately at: <a href='https://creativepulse.42web.io/cps/reset_password.php'>Reset Password</a>"
             :
-            "Welcome {$username},<br><br>Your account was successfully created from:<br>Location: {$location}<br>Time: {$localTime} ({$timezone})<br><br>Enjoy our services!";
+            "Welcome {$username},<br><br>Your account was successfully created from:<br>Location: {$location}<br>Time: {$localTime} ({$timezone})<br>Device: {$device}<br>Browser: {$browser}<br><br>Enjoy our services!";
         
         $mail->Subject = $subject;
         $mail->Body = $body;
@@ -162,9 +201,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['id'];
             
-            // Get location and timezone info
             $locationInfo = getLocationInfoFromIP();
-            sendNotificationEmail($user['email'], 'login', $username, $locationInfo['location'], $locationInfo['timezone']);
+            $deviceBrowserInfo = getDeviceBrowserInfo();
+            sendNotificationEmail(
+                $user['email'],
+                'login',
+                $username,
+                $locationInfo['location'],
+                $locationInfo['timezone'],
+                $deviceBrowserInfo['device'],
+                $deviceBrowserInfo['browser']
+            );
             
             sendResponse(true, 'Login successful');
         } else {
@@ -209,9 +256,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['username'] = $username;
             $_SESSION['user_id'] = $pdo->lastInsertId();
             
-            // Get location and timezone info
             $locationInfo = getLocationInfoFromIP();
-            sendNotificationEmail($email, 'signup', $username, $locationInfo['location'], $locationInfo['timezone']);
+            $deviceBrowserInfo = getDeviceBrowserInfo();
+            sendNotificationEmail(
+                $email,
+                'signup',
+                $username,
+                $locationInfo['location'],
+                $locationInfo['timezone'],
+                $deviceBrowserInfo['device'],
+                $deviceBrowserInfo['browser']
+            );
             
             sendResponse(true, 'Signup successful');
         } else {
