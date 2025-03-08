@@ -633,12 +633,12 @@ if (!isset($_GET['ajax'])) {
     echo "<button class='nav-link user-btn' onclick='toggleUserMenu()'>" . htmlspecialchars($_SESSION['username']) . " ▼</button>";
     echo "<div class='user-dropdown' id='userDropdown'>";
     echo "<a href='#settings' class='dropdown-item'>Settings</a>";
-    echo "<a href='?logout=true' class='dropdown-item'>Logout</a>";
+    echo "<a href='auth.php?logout=true' class='dropdown-item'>Logout</a>";
     echo "</div>";
     echo "</div>";
     } else {
-      echo "<button class='nav-link auth-btn' onclick='openModal()'>Login/Signup</button>";
-   }
+    echo "<button class='nav-link auth-btn' onclick='openModal()'>Login/Signup</button>";
+    }
     echo "<button class='theme-toggle' onclick='toggleTheme()'><span class='theme-icon'>☀️</span></button>";
     echo "</div>";
     echo "</div>";
