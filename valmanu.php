@@ -2822,8 +2822,15 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             }
         }
 
-         function startMatchPolling() {
-    setInterval(() => {
+         let pollingInterval = null;
+
+function startMatchPolling() {
+    // Clear any existing interval to avoid duplicates
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+    }
+
+    pollingInterval = setInterval(() => {
         processQueue(); // Process any queued requests
         const matches = document.querySelectorAll('.match-card, .match-table tr');
         const maxRequestsPerPoll = Math.min(5, matches.length); // Cap at 5 requests per poll
@@ -2853,7 +2860,16 @@ document.getElementById('standings-view-btn').addEventListener('click', function
                 })
                 .catch(error => console.error('Polling error:', error));
         });
-    }, 120000); // Poll every 2 minutes instead of 1
+    }, 120000); // Poll every 2 minutes
+}
+
+// Function to stop polling
+function stopMatchPolling() {
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+        console.log('Polling stopped due to page refresh or unload');
+    }
 }
 
 function updateMatchUI(element, index, data) {
@@ -3110,55 +3126,80 @@ document.getElementById('table-view-btn').addEventListener('click', function() {
             });
         }
 
+    // Debounce helper function
+    function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+// Debounced version of startMatchPolling
+const debouncedStartPolling = debounce(startMatchPolling, 1000); // Wait 1 second before restarting
+
+        // Stop polling before the page unloads (e.g., refresh or close)
+        window.addEventListener('beforeunload', function() {
+         stopMatchPolling();
+       });
+
         window.onload = function() {
-            const theme = document.cookie.split('; ')
-                .find(row => row.startsWith('theme='))
-                ?.split('=')[1];
-            const themeIcon = document.querySelector('.theme-icon');
-            if (theme) {
-                document.body.setAttribute('data-theme', theme);
-                document.querySelectorAll('.match-info').forEach(el => el.classList.toggle('dark', theme === 'dark'));
-                themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-            } else {
-                themeIcon.textContent = '🌙';
-            }
+    const theme = document.cookie.split('; ')
+        .find(row => row.startsWith('theme='))
+        ?.split('=')[1];
+    const themeIcon = document.querySelector('.theme-icon');
+    if (theme) {
+        document.body.setAttribute('data-theme', theme);
+        document.querySelectorAll('.match-info').forEach(el => el.classList.toggle('dark', theme === 'dark'));
+        themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    } else {
+        themeIcon.textContent = '🌙';
+    }
 
-            const currentFilter = '<?php echo $filter; ?>';
-            document.querySelectorAll('.filter-option').forEach(option => {
-                option.classList.toggle('selected', option.getAttribute('data-filter') === currentFilter);
-            });
+    const currentFilter = '<?php echo $filter; ?>';
+    document.querySelectorAll('.filter-option').forEach(option => {
+        option.classList.toggle('selected', option.getAttribute('data-filter') === currentFilter);
+    });
 
-            if (currentFilter === 'custom') {
-                document.querySelector('.custom-date-range').classList.add('active');
-            }
+    if (currentFilter === 'custom') {
+        document.querySelector('.custom-date-range').classList.add('active');
+    }
 
-            document.querySelectorAll('.match-card').forEach(matchCard => {
-                const advantage = matchCard.dataset.advantage;
-                if (advantage && !matchCard.querySelector('.prediction').innerHTML.includes('Loading')) {
-                    applyAdvantageHighlight(matchCard, advantage);
-                }
-            });
-
-            const savedView = localStorage.getItem('matchView') || 'grid';
-            switchView(savedView);
-
-            adjustTeamSpacing();
-            window.addEventListener('resize', adjustTeamSpacing);
-            startMatchPolling();
-
-            if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
-                incompleteTeams.forEach(teamId => {
-                    document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
-                        const index = card.dataset.index;
-                        const homeId = card.dataset.homeId;
-                        const awayId = card.dataset.awayId;
-
-                        if (homeId == teamId) fetchTeamData(homeId, index, true);
-                        if (awayId == teamId) fetchTeamData(awayId, index, false);
-                    });
-                });
-            }
+    document.querySelectorAll('.match-card').forEach(matchCard => {
+        const advantage = matchCard.dataset.advantage;
+        if (advantage && !matchCard.querySelector('.prediction').innerHTML.includes('Loading')) {
+            applyAdvantageHighlight(matchCard, advantage);
         }
+    });
+
+    const savedView = localStorage.getItem('matchView') || 'grid';
+    switchView(savedView);
+
+    adjustTeamSpacing();
+    window.addEventListener('resize', adjustTeamSpacing);
+
+    // Start polling after page load
+   // startMatchPolling();
+
+    // Use debounced polling instead
+    debouncedStartPolling();
+
+    if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
+        incompleteTeams.forEach(teamId => {
+            document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
+                const index = card.dataset.index;
+                const homeId = card.dataset.homeId;
+                const awayId = card.dataset.awayId;
+
+                if (homeId == teamId) fetchTeamData(homeId, index, true);
+                if (awayId == teamId) fetchTeamData(awayId, index, false);
+            });
+        });
+    }
+};
     </script>
 </body>
 </html>
