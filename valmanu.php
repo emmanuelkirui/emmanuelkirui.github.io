@@ -1499,6 +1499,17 @@ try {
             flex: 0 1 auto;
         }
 
+        .retry-notice {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
         .countdown-timer {
             display: flex;
             justify-content: center;
@@ -1527,36 +1538,41 @@ try {
             background-color: #e74c3c;
         }
 
+        
         .loading-spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto;
-        }
+    display: inline-block;
+    animation: spin 1s linear infinite;
+    font-size: 1em;
+}
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background-color: #ddd;
-            border-radius: 5px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
+.last-updated {
+    text-align: center;
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
 
-        .progress-fill {
-            height: 100%;
-            background-color: var(--primary-color);
-            transition: width 0.5s ease;
-        }
+    
+        /* Ensure progress bar styles are present */
+.progress-bar {
+    width: 100%;
+    height: 5px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-top: 10px;
+}
 
+.progress-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
         .team.home-advantage {
             background-color: rgba(46, 204, 113, 0.2);
             border: 1px solid var(--primary-color);
@@ -1902,56 +1918,14 @@ try {
         right: 0;
     }
 }
-        .loading-spinner {
-    display: inline-block;
-    animation: spin 1s linear infinite;
-    font-size: 1em;
-}
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
 
-.retry-notice {
-    background-color: #fff3cd;
-    border: 1px solid #ffeeba;
-    color: #856404;
-    padding: 10px;
-    margin-top: 10px;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 0.9em;
-}
-
-.last-updated {
-    text-align: center;
-    font-size: 0.9em;
-    color: var(--text-color);
-    margin-bottom: 10px;
-}
-
-/* Ensure progress bar styles are present */
-.progress-bar {
-    width: 100%;
-    height: 5px;
-    background-color: #e9ecef;
-    border-radius: 5px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-
-.progress-fill {
-    height: 100%;
-    background-color: var(--primary-color);
-    transition: width 0.3s ease;
-}
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="last-updated" class="last-updated">Last updated: Checking...</div>
         <div class="header">
+            <div id="last-updated" class="last-updated">Last updated: Checking...</div>
             <h1>CPS Football Predictions</h1>
             <p>Select Competition, Date Range (EAT), or Search Teams</p>
         </div>
