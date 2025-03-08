@@ -5,12 +5,15 @@ require_once 'recaptcha_handler.php';
 // Set timezone to East Africa Time (Nairobi, Kenya, UTC+3)
 date_default_timezone_set('Africa/Nairobi');
 
-// Initialize session data for rate limiting
+// Initialize session data for rate limiting and queueing
 if (!isset($_SESSION['api_requests'])) {
     $_SESSION['api_requests'] = []; // Array to store timestamps of requests
 }
 if (!isset($_SESSION['teamStats'])) {
     $_SESSION['teamStats'] = [];
+}
+if (!isset($_SESSION['request_queue'])) {
+    $_SESSION['request_queue'] = []; // Queue for delayed requests
 }
 
 $apiKey = 'd4c9fea41bf94bb29cade8f12952b3d8';
@@ -21,8 +24,8 @@ $teamStats = &$_SESSION['teamStats'];
 const REQUESTS_PER_MINUTE = 10;
 const MINUTE_IN_SECONDS = 60;
 
-// Function to enforce rate limiting
-function enforceRateLimit() {
+// Centralized rate limiting with queueing
+function enforceRateLimit($url = null) {
     $currentTime = time();
     $requests = &$_SESSION['api_requests'];
 
@@ -30,31 +33,59 @@ function enforceRateLimit() {
     $requests = array_filter($requests, function($timestamp) use ($currentTime) {
         return ($currentTime - $timestamp) < MINUTE_IN_SECONDS;
     });
-
-    // Re-index the array
     $requests = array_values($requests);
 
-    // Check if we've hit the limit
+    // If we're at the limit, queue or delay
     if (count($requests) >= REQUESTS_PER_MINUTE) {
         $oldestRequestTime = $requests[0];
         $timeToWait = MINUTE_IN_SECONDS - ($currentTime - $oldestRequestTime);
-        
-        if ($timeToWait > 0) {
-            // Log the delay for debugging
-            error_log("Rate limit reached. Waiting $timeToWait seconds before next request.");
-            sleep($timeToWait); // Wait until the oldest request falls out of the 1-minute window
+
+        if ($url) {
+            // Queue the request if provided
+            $_SESSION['request_queue'][] = ['url' => $url, 'timestamp' => $currentTime + $timeToWait];
+            error_log("Rate limit reached. Queued request for $url. Waiting $timeToWait seconds.");
+            return ['queued' => true, 'delay' => $timeToWait];
+        } elseif ($timeToWait > 0) {
+            error_log("Rate limit reached. Delaying execution by $timeToWait seconds.");
+            sleep($timeToWait); // Delay execution for non-queued calls
         }
-        
-        // Refresh the request list after waiting
-        $requests = array_filter($requests, function($timestamp) use ($currentTime) {
-            return ($currentTime - $timestamp) < MINUTE_IN_SECONDS;
-        });
-        $requests = array_values($requests);
     }
-    
-    // Add the current request timestamp
-    $requests[] = time();
-    $_SESSION['api_requests'] = $requests;
+
+    // Add current request if not queued
+    if (!$url || !isset($_SESSION['request_queue'])) {
+        $requests[] = $currentTime;
+        $_SESSION['api_requests'] = $requests;
+    }
+
+    return ['queued' => false];
+}
+
+// Process queued requests (called periodically)
+function processQueue() {
+    $currentTime = time();
+    $queue = &$_SESSION['request_queue'];
+
+    if (empty($queue)) return;
+
+    $requests = &$_SESSION['api_requests'];
+    $requests = array_filter($requests, function($timestamp) use ($currentTime) {
+        return ($currentTime - $timestamp) < MINUTE_IN_SECONDS;
+    });
+    $requests = array_values($requests);
+
+    while (count($requests) < REQUESTS_PER_MINUTE && !empty($queue)) {
+        $nextRequest = array_shift($queue);
+        if ($nextRequest['timestamp'] <= $currentTime) {
+            $requests[] = $currentTime;
+            $_SESSION['api_requests'] = $requests;
+            error_log("Processing queued request: " . $nextRequest['url']);
+            // Simulate processing (actual fetch would happen here)
+        } else {
+            array_unshift($queue, $nextRequest); // Put back if not ready
+            break;
+        }
+    }
+    $_SESSION['request_queue'] = $queue;
 }
 
 // Error handling functions remain unchanged
@@ -77,15 +108,16 @@ function handleJsonError($message) {
 }
 
 // fetchWithRetry, fetchTeamResults, fetchStandings, fetchTeams, calculateTeamStrength, predictMatch functions remain unchanged
-// Modified fetchWithRetry with rate limiting
 function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
-    $maxAttempts = 3; // Maximum retry attempts for timeouts
-    $baseTimeout = 15; // Base timeout in seconds
+    $maxAttempts = 3;
+    $baseTimeout = 15;
 
-    // Enforce rate limit before making the request
-    enforceRateLimit();
+    // Check rate limit before proceeding
+    $rateLimitCheck = enforceRateLimit($url);
+    if ($rateLimitCheck['queued']) {
+        return ['error' => true, 'queued' => true, 'delay' => $rateLimitCheck['delay']];
+    }
 
-    // Initialize cURL
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -94,77 +126,47 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
     curl_setopt($ch, CURLOPT_TIMEOUT, $baseTimeout);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 
-    // Execute the request
     $response = curl_exec($ch);
 
-// Handle cURL errors (e.g., timeouts)
     if (curl_errno($ch)) {
         $errorCode = curl_errno($ch);
         $errorMessage = curl_error($ch);
-        error_log("Attempt $attempt/$maxAttempts - Failed fetching URL: $url - Error: $errorMessage (Code: $errorCode)");
-
+        error_log("Attempt $attempt/$maxAttempts - Failed: $url - Error: $errorMessage (Code: $errorCode)");
         curl_close($ch);
 
         if ($errorCode == CURLE_OPERATION_TIMEDOUT && $attempt < $maxAttempts) {
             $retrySeconds = min(pow(2, $attempt), 8);
-            error_log("Retrying in $retrySeconds seconds due to timeout...");
             sleep($retrySeconds);
             return fetchWithRetry($url, $apiKey, $isAjax, $attempt + 1);
         }
 
-        return [
-            'error' => true,
-            'message' => "Connection error: $errorMessage",
-            'attempts' => $attempt + 1
-        ];
+        return ['error' => true, 'message' => "Connection error: $errorMessage"];
     }
 
-    // Get HTTP status and response details
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
     $headers = substr($response, 0, $headerSize);
     $body = substr($response, $headerSize);
-
     curl_close($ch);
 
-    // Handle rate limiting from API (HTTP 429)
     if ($httpCode == 429) {
-    $retrySeconds = MINUTE_IN_SECONDS; // Set delay to 60 seconds, matching enforceRateLimit
-    preg_match('/Retry-After: (\d+)/i', $headers, $matches);
-    if (!empty($matches[1])) {
-        $retrySeconds = max($retrySeconds, (int)$matches[1]); // Respect Retry-After if longer than 60s
-    }
-
-    error_log("Rate limit exceeded for URL: $url - HTTP 429 - Waiting $retrySeconds seconds (Attempt " . ($attempt + 1) . ")");
-
-    echo "<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let timeLeft = $retrySeconds;
-            const retryDiv = document.createElement('div');
-            retryDiv.id = 'retry-message';
-            retryDiv.className = 'retry-message countdown-box';
-            retryDiv.innerHTML = '<span class=\"retry-text\">Rate limit exceeded. Retry attempt ' + " . ($attempt + 1) . " + '. Retrying in </span><span id=\"countdown\" class=\"countdown-timer\">' + timeLeft + '</span><span class=\"retry-text\"> seconds...</span>';
-            document.body.insertBefore(retryDiv, document.body.firstChild.nextSibling);
-            
-            const timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('countdown').textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    let url = window.location.pathname + window.location.search;
-                    url += (window.location.search ? '&' : '?') + 'attempt=' + " . ($attempt + 1) . ";
-                    window.location.href = url; // Auto-reload after 60 seconds
-                }
-            }, 1000);
-        });
-    </script>";
-    return ['error' => true, 'retry' => true];
-}
+        $retrySeconds = MINUTE_IN_SECONDS;
+        preg_match('/Retry-After: (\d+)/i', $headers, $matches);
+        if (!empty($matches[1])) {
+            $retrySeconds = max($retrySeconds, (int)$matches[1]);
+        }
+        error_log("429 Rate Limit hit for $url. Waiting $retrySeconds seconds.");
+        if ($isAjax) {
+            return ['error' => true, 'retry' => true, 'delay' => $retrySeconds];
+        } else {
+            sleep($retrySeconds); // For non-AJAX, delay and retry
+            return fetchWithRetry($url, $apiKey, $isAjax, $attempt);
+        }
     } elseif ($httpCode == 200) {
-        error_log("Successfully fetched URL: $url - HTTP 200 (Attempt $attempt)");
+        error_log("Success: $url - HTTP 200 (Attempt $attempt)");
         return ['error' => false, 'data' => json_decode($body, true)];
     } else {
-        error_log("Failed fetching URL: $url - HTTP $httpCode (Attempt $attempt)");
+        error_log("Failed: $url - HTTP $httpCode (Attempt $attempt)");
         return ['error' => true, 'message' => "API Error: HTTP $httpCode"];
     }
 }
@@ -502,9 +504,9 @@ function fetchTopScorers($competition, $apiKey, $baseUrl) {
     return ['error' => false, 'data' => $response['data']['scorers'] ?? []];
 }
 
-// AJAX handling remains unchanged
+// AJAX handling
 $action = $_GET['action'] ?? 'main';
-if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match', 'search_teams'])) {
+if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match', 'search_teams', 'process_queue'])) {
     header('Content-Type: application/json');
     switch ($action) {
         case 'fetch_team_data':
@@ -514,14 +516,13 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
             }
             
             $response = fetchTeamResults($teamId, $apiKey, $baseUrl);
+            if ($response['queued']) {
+                echo json_encode(['success' => false, 'queued' => true, 'delay' => $response['delay']]);
+                exit;
+            }
             if ($response['error']) {
                 if (isset($response['retry'])) {
-                    echo json_encode([
-                        'success' => false,
-                        'retry' => true,
-                        'retrySeconds' => $response['retrySeconds'],
-                        'nextAttempt' => $response['nextAttempt']
-                    ]);
+                    echo json_encode(['success' => false, 'retry' => true, 'delay' => $response['delay']]);
                     exit;
                 }
                 handleJsonError($response['message']);
@@ -572,8 +573,12 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 ]
             ], $apiKey, $baseUrl, $teamStats, $_GET['competition'] ?? 'PL');
             
-            if (!empty($predictionData[7])) {
-                echo json_encode(['success' => false, 'retry' => true, 'retryInfo' => $predictionData[7]]);
+            if (!empty($predictionData[7]['queued'])) {
+                echo json_encode(['success' => false, 'queued' => true, 'delay' => $predictionData[7]['delay']]);
+                exit;
+            }
+            if (!empty($predictionData[7]['retry'])) {
+                echo json_encode(['success' => false, 'retry' => true, 'delay' => $predictionData[7]['delay']]);
                 exit;
             }
             
@@ -593,6 +598,10 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
             $query = strtolower($_GET['query'] ?? '');
             $competition = $_GET['competition'] ?? 'PL';
             $teams = fetchTeams($competition, $apiKey, $baseUrl);
+            if (!empty($teams['queued'])) {
+                echo json_encode(['success' => false, 'queued' => true, 'delay' => $teams['delay']]);
+                exit;
+            }
             $filteredTeams = array_filter($teams, function($team) use ($query) {
                 return stripos($team['name'], $query) !== false || stripos($team['shortName'] ?? '', $query) !== false;
             });
@@ -600,9 +609,15 @@ if (isset($_GET['ajax']) || in_array($action, ['fetch_team_data', 'predict_match
                 return ['id' => $team['id'], 'name' => $team['name'], 'crest' => $team['crest'] ?? ''];
             }, $filteredTeams)));
             exit;
+
+        case 'process_queue':
+            processQueue();
+            echo json_encode(['processed' => true]);
+            exit;
     }
 }
-
+                 
+            
 // Navigation bar remains unchanged
 if (!isset($_GET['ajax'])) {
     echo "<nav class='navbar'>";
@@ -679,7 +694,7 @@ if (!isset($_GET['ajax'])) {
     </script>";
 }
 
-// Main page logic remains largely unchanged
+// Main page logic
 try {
     $competitionsUrl = $baseUrl . 'competitions';
     $compResponse = fetchWithRetry($competitionsUrl, $apiKey);
@@ -724,7 +739,7 @@ try {
         }
     }
 
-    $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate";
+    $matchesUrl = $baseUrl . "competitions/$selectedComp/matches?dateFrom=$fromDate&dateTo=$toDate&limit=4"; // Cap at 4 matches
     $matchResponse = fetchWithRetry($matchesUrl, $apiKey);
     if ($matchResponse['error']) {
         if (isset($matchResponse['retry'])) {
@@ -741,6 +756,7 @@ try {
                    stripos($match['awayTeam']['name'] ?? '', $searchTeam) !== false;
         });
     }
+    
 ?>
 
 <!DOCTYPE html>
