@@ -30,6 +30,60 @@ function sendResponse($success, $message, $data = []) {
     exit;
 }
 
+// Function to get approximate location from IP
+function getLocationFromIP() {
+    $ip = $_SERVER['REMOTE_ADDR'];
+    if ($ip === '127.0.0.1' || $ip === '::1') {
+        return "Localhost";
+    }
+    
+    $url = "http://ip-api.com/json/{$ip}";
+    $response = @file_get_contents($url);
+    if ($response) {
+        $data = json_decode($response, true);
+        if ($data['status'] === 'success') {
+            return "{$data['city']}, {$data['regionName']}, {$data['country']}";
+        }
+    }
+    return "Unknown location";
+}
+
+// Function to send notification email
+function sendNotificationEmail($to, $type, $username, $location) {
+    $mail = new PHPMailer(true);
+
+    try {
+        // SMTP Settings
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'emmanuelkirui042@gmail.com';
+        $mail->Password = 'unwv yswa pqaq hefc';
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        $mail->setFrom('noreply@gmail.com', 'Creative Pulse Solutions (CEO)');
+        $mail->addAddress($to);
+
+        $mail->isHTML(true);
+        $subject = $type === 'login' ? 'Successful Login Notification' : 'Welcome to Creative Pulse Solutions';
+        $body = $type === 'login' ?
+            "Hello {$username},<br><br>Your account was successfully logged into from:<br>Location: {$location}<br>Time: " . date('Y-m-d H:i:s') . "<br><br>If this wasn't you, please reset your password immediately at: <a href='https://creativepulse.42web.io/cps/reset_password.php'>Reset Password</a>"
+            :
+            "Welcome {$username},<br><br>Your account was successfully created from:<br>Location: {$location}<br>Time: " . date('Y-m-d H:i:s') . "<br><br>Enjoy our services!";
+        
+        $mail->Subject = $subject;
+        $mail->Body = $body;
+        $mail->AltBody = strip_tags($body);
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("PHPMailer Error: " . $mail->ErrorInfo);
+        return false;
+    }
+}
+
 // Function to send reset email using PHPMailer
 function sendResetEmail($to, $resetLink) {
     $mail = new PHPMailer(true);
@@ -39,16 +93,14 @@ function sendResetEmail($to, $resetLink) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'emmanuelkirui042@gmail.com'; // Your Gmail address
-        $mail->Password = 'unwv yswa pqaq hefc'; // Your App Password
+        $mail->Username = 'emmanuelkirui042@gmail.com';
+        $mail->Password = 'unwv yswa pqaq hefc';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        // Sender and recipient settings
         $mail->setFrom('noreply@gmail.com', 'Creative Pulse Solutions (CEO)');
         $mail->addAddress($to);
 
-        // Email content
         $mail->isHTML(true);
         $mail->Subject = 'Password Reset Request';
         $mail->Body = "Click here to reset your password: <a href='$resetLink'>$resetLink</a><br>This link expires in 1 hour.";
@@ -62,13 +114,11 @@ function sendResetEmail($to, $resetLink) {
     }
 }
 
-// Handle logout (moved outside POST block to handle GET requests)
+// Handle logout
 if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
-    // Clear all session data
-    session_unset(); // Remove all session variables
-    session_destroy(); // Destroy the session
+    session_unset();
+    session_destroy();
 
-    // Clear session cookie explicitly
     if (ini_get("session.use_cookies")) {
         $params = session_get_cookie_params();
         setcookie(session_name(), '', time() - 42000,
@@ -77,11 +127,8 @@ if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
         );
     }
 
-    // Log the logout event (optional)
     error_log("User logged out: " . ($_SESSION['username'] ?? 'Unknown') . " at " . date('Y-m-d H:i:s'));
-
-    // Send JSON response and redirect
-    sendResponse(true, 'Logged out successfully', ['redirect' => 'valmanu.php']); // Adjust 'index.php' to your main file
+    sendResponse(true, 'Logged out successfully', ['redirect' => 'valmanu.php']);
 }
 
 // Handle POST requests
@@ -102,6 +149,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['id'];
+            
+            $location = getLocationFromIP();
+            sendNotificationEmail($user['email'], 'login', $username, $location);
+            
             sendResponse(true, 'Login successful');
         } else {
             sendResponse(false, 'Invalid username or password');
@@ -127,7 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'Password must be at least 8 characters long');
         }
 
-        // Check if username or email already exists
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM cp_users WHERE username = :username OR email = :email");
         $stmt->execute(['username' => $username, 'email' => $email]);
         if ($stmt->fetchColumn() > 0) {
@@ -145,6 +195,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($success) {
             $_SESSION['username'] = $username;
             $_SESSION['user_id'] = $pdo->lastInsertId();
+            
+            $location = getLocationFromIP();
+            sendNotificationEmail($email, 'signup', $username, $location);
+            
             sendResponse(true, 'Signup successful');
         } else {
             sendResponse(false, 'Signup failed. Please try again.');
@@ -167,7 +221,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'No account found with this email');
         }
 
-        // Generate reset token
         $resetToken = bin2hex(random_bytes(16));
         $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
@@ -178,7 +231,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'expires' => $expires
         ]);
 
-        // Send reset email using PHPMailer
         $resetLink = "https://creativepulse.42web.io/cps/reset_password.php?token=$resetToken";
         if (sendResetEmail($email, $resetLink)) {
             sendResponse(true, 'Password reset link sent to your email');
