@@ -154,7 +154,7 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
         if (!empty($matches[1])) {
             $retrySeconds = max($retrySeconds, (int)$matches[1]);
         }
-        error_log("429 Rate Limit hit for $url. Waiting $retrySeconds seconds.");
+        error_log("429 Rate Limit hit for $url at " . date('Y-m-d H:i:s') . ". Waiting $retrySeconds seconds.");
         if ($isAjax) {
             return ['error' => true, 'retry' => true, 'delay' => $retrySeconds];
         } else {
