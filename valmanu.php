@@ -129,46 +129,37 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
 
     // Handle rate limiting from API (HTTP 429)
     if ($httpCode == 429) {
-        $retrySeconds = min(pow(2, $attempt), 32);
-        preg_match('/Retry-After: (\d+)/i', $headers, $matches);
-        if (!empty($matches[1])) {
-            $retrySeconds = max($retrySeconds, (int)$matches[1]);
-        }
+    $retrySeconds = MINUTE_IN_SECONDS; // Set delay to 60 seconds, matching enforceRateLimit
+    preg_match('/Retry-After: (\d+)/i', $headers, $matches);
+    if (!empty($matches[1])) {
+        $retrySeconds = max($retrySeconds, (int)$matches[1]); // Respect Retry-After if longer than 60s
+    }
 
-        error_log("Rate limit exceeded for URL: $url - HTTP 429 - Retrying in $retrySeconds seconds (Attempt " . ($attempt + 1) . ")");
+    error_log("Rate limit exceeded for URL: $url - HTTP 429 - Waiting $retrySeconds seconds (Attempt " . ($attempt + 1) . ")");
 
-        if ($isAjax) {
-            return [
-                'error' => true,
-                'retry' => true,
-                'retrySeconds' => $retrySeconds,
-                'nextAttempt' => $attempt + 1
-            ];
-        } else {
-            // Display retry countdown for non-AJAX requests
-            echo "<script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    let timeLeft = $retrySeconds;
-                    const retryDiv = document.createElement('div');
-                    retryDiv.id = 'retry-message';
-                    retryDiv.className = 'retry-message countdown-box';
-                    retryDiv.innerHTML = '<span class=\"retry-text\">Rate limit exceeded. Retry attempt ' + " . ($attempt + 1) . " + '. Retrying in </span><span id=\"countdown\" class=\"countdown-timer\">' + timeLeft + '</span><span class=\"retry-text\"> seconds...</span>';
-                    document.body.insertBefore(retryDiv, document.body.firstChild.nextSibling);
-                    
-                    const timer = setInterval(() => {
-                        timeLeft--;
-                        document.getElementById('countdown').textContent = timeLeft;
-                        if (timeLeft <= 0) {
-                            clearInterval(timer);
-                            let url = window.location.pathname + window.location.search;
-                            url += (window.location.search ? '&' : '?') + 'attempt=' + " . ($attempt + 1) . ";
-                            window.location.href = url;
-                        }
-                    }, 1000);
-                });
-            </script>";
-            return ['error' => true, 'retry' => true];
-        }
+    echo "<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let timeLeft = $retrySeconds;
+            const retryDiv = document.createElement('div');
+            retryDiv.id = 'retry-message';
+            retryDiv.className = 'retry-message countdown-box';
+            retryDiv.innerHTML = '<span class=\"retry-text\">Rate limit exceeded. Retry attempt ' + " . ($attempt + 1) . " + '. Retrying in </span><span id=\"countdown\" class=\"countdown-timer\">' + timeLeft + '</span><span class=\"retry-text\"> seconds...</span>';
+            document.body.insertBefore(retryDiv, document.body.firstChild.nextSibling);
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('countdown').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    let url = window.location.pathname + window.location.search;
+                    url += (window.location.search ? '&' : '?') + 'attempt=' + " . ($attempt + 1) . ";
+                    window.location.href = url; // Auto-reload after 60 seconds
+                }
+            }, 1000);
+        });
+    </script>";
+    return ['error' => true, 'retry' => true];
+}
     } elseif ($httpCode == 200) {
         error_log("Successfully fetched URL: $url - HTTP 200 (Attempt $attempt)");
         return ['error' => false, 'data' => json_decode($body, true)];
