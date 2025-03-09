@@ -287,8 +287,8 @@ class DataRequestHandler {
                     box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
                 }
                 .btn {
-                    display: block;
-                    width: 100%;
+                    display: inline-block;
+                    width: 48%;
                     padding: 12px;
                     background: var(--primary);
                     color: white;
@@ -299,8 +299,15 @@ class DataRequestHandler {
                     cursor: pointer;
                     transition: background-color 0.3s ease;
                 }
+                .btn-secondary {
+                    background: var(--secondary);
+                    margin-right: 4%;
+                }
                 .btn:hover {
                     background: #0056b3;
+                }
+                .btn-secondary:hover {
+                    background: #5a6268;
                 }
                 .btn:disabled {
                     background: var(--secondary);
@@ -322,6 +329,11 @@ class DataRequestHandler {
                     background: #f8d7da;
                     color: var(--danger);
                     border: 1px solid #f5c6cb;
+                }
+                .button-group {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 20px;
                 }
             </style>
         </head>
@@ -354,7 +366,10 @@ class DataRequestHandler {
                             placeholder="Enter your password"
                         >
                     </div>
-                    <button type="submit" class="btn" id="submitBtn">Request My Data</button>
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
+                        <button type="submit" class="btn" id="submitBtn">Request My Data</button>
+                    </div>
                     <div id="message" class="message" style="display: none;"></div>
                 </form>
             </div>
