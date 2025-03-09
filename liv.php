@@ -3,54 +3,6 @@
 $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
-// Start session to store rate limit data and competitions
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Rate Limiting Logic
-$max_requests = 10; // Maximum requests allowed per minute
-$time_window = 60;  // Time window in seconds (1 minute)
-
-// Initialize session variables if not set
-if (!isset($_SESSION['request_count'])) {
-    $_SESSION['request_count'] = 0;
-    $_SESSION['window_start'] = time();
-}
-
-// Check if the time window has expired
-$current_time = time();
-if ($current_time - $_SESSION['window_start'] >= $time_window) {
-    // Reset the counter and start a new window
-    $_SESSION['request_count'] = 0;
-    $_SESSION['window_start'] = $current_time;
-}
-
-// Check if the request limit has been exceeded
-if ($_SESSION['request_count'] >= $max_requests) {
-    // Display feedback message and exit
-    echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
-            <h2 style='color: red;'>Rate Limit Exceeded</h2>
-            <p>You have exceeded the limit of $max_requests requests per minute. Please wait <span id='countdown'></span> seconds before trying again.</p>
-          </div>";
-    echo "<script>
-            let timeLeft = " . ($time_window - ($current_time - $_SESSION['window_start'])) . ";
-            const countdownElement = document.getElementById('countdown');
-            const interval = setInterval(() => {
-                timeLeft--;
-                countdownElement.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    window.location.reload(); // Reload the page after the wait
-                }
-            }, 1000);
-          </script>";
-    exit;
-}
-
-// Increment the request counter
-$_SESSION['request_count']++;
-
 // Only output the navigation bar and script if it's not an AJAX request
 if (!isset($_GET['ajax'])) {
     echo "<nav class='navbar'>";
@@ -200,6 +152,10 @@ if (!isset($_GET['ajax'])) {
 
 
 
+// Start session to store competitions and their data
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 // Function to fetch data from the API
 function fetchAPI($url, $api_key, $retries = 3) {
     $curl = curl_init();
@@ -217,41 +173,54 @@ function fetchAPI($url, $api_key, $retries = 3) {
 
     // Handle rate limits (HTTP 429)
     if ($http_code == 429) {
-        if ($retries > 0) {
-            $wait_time = pow(2, 4 - $retries); // Exponential backoff
-            echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
-                    <h2 style='color: red;'>Too Many Requests (429)</h2>
-                    <p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>$wait_time</span> seconds...</p>
-                  </div>";
-            echo "<script>
-                    let timeLeft = $wait_time;
-                    const countdownElement = document.getElementById('countdown');
-                    const interval = setInterval(() => {
-                        timeLeft--;
-                        countdownElement.textContent = timeLeft;
-                        if (timeLeft <= 0) {
-                            clearInterval(interval);
-                            window.location.reload();
-                        }
-                    }, 1000);
-                  </script>";
-            flush();
-            sleep($wait_time);
-            return fetchAPI($url, $api_key, $retries - 1);
+    if ($retries > 0) {
+        // Calculate wait time using exponential backoff
+        $wait_time = pow(2, 4 - $retries); // 2^3 = 8, 2^2 = 4, 2^1 = 2
+
+        // Output the initial countdown message and embed JavaScript for dynamic countdown
+        echo "
+        <div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
+            <h2 style='color: red;'>Too Many Requests (429)</h2>
+            <p>Retrying in <span id='countdown' style='font-weight: bold; color: blue;'>$wait_time</span> seconds...</p>
+        </div>";
+
+        echo "
+        <script>
+            // Initialize countdown variables
+            let timeLeft = $wait_time;
+            const countdownElement = document.getElementById('countdown');
+
+            // Update the countdown every second
+            const interval = setInterval(() => {
+                timeLeft--;
+                countdownElement.textContent = timeLeft;
+
+                // Reload the page when the countdown reaches 0
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    window.location.reload(); // Reload the page to retry
+                }
+            }, 1000); // Update every second
+        </script>";
+            flush(); // Send output to the browser immediately
+            sleep($wait_time); // Wait for the countdown to finish on the server side
+
+            return fetchAPI($url, $api_key, $retries - 1); // Retry with one less retry attempt
         } else {
-            header('Location: error');
+            // All retries exhausted for 429 error
+            header('Location: error'); // Redirect to an error page
             exit;
         }
     }
 
+    // Handle other errors
     if ($http_code != 200) {
-        header('Location: error');
+        header('Location: error'); // Redirect to an error page
         exit;
     }
 
     return json_decode($response, true);
-}
-
+}                       
 // Fetch all competitions only once and store in session
 if (!isset($_SESSION['competitions'])) {
     $_SESSION['competitions'] = fetchAPI($competitions_url, $api_key)['competitions'];
@@ -608,8 +577,6 @@ function convertToEAT($utcDate) {
 
 // Get selected competition and fetch its data
 $selected_competition = isset($_GET['competition']) ? $_GET['competition'] : 'PL'; // Default to Premier League
-$selected_date_filter = isset($_GET['date_filter']) ? $_GET['date_filter'] : 'today'; // Default to Date today
-
 
 // Fetch data for the selected competition
 if ($selected_competition) {
@@ -839,7 +806,7 @@ window.onload = function () {
 echo '<form id="searchForm" method="GET" action="">';
 // Default selected competition and date filter values
 $default_competition = 'PL';
-$default_date_filter = 'today';
+$default_date_filter = 'all';
 
 // Set selected values from GET request or defaults
 $selected_competition = isset($_GET['competition']) ? $_GET['competition'] : $default_competition;
