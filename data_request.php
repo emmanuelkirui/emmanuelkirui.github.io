@@ -4,7 +4,7 @@
  * Handles user data requests with database-validated password and email
  * 
  * @author Emmanuel Kirui 
- * @version 1.4
+ * @version 1.5
  * @date March 08, 2025
  */
 
@@ -57,21 +57,24 @@ class DataRequestHandler {
         exit(json_encode(array_merge(['success' => $success, 'message' => $message], $data)));
     }
 
-    private function validateCredentials(int $userId, string $password, string $email): bool {
+    private function validateCredentials(string $email, string $password): ?array {
         $stmt = $this->pdo->prepare(
-            "SELECT password, email FROM cp_users WHERE id = :id"
+            "SELECT id, username, password, email 
+             FROM cp_users 
+             WHERE email = :email"
         );
-        $stmt->execute(['id' => $userId]);
+        $stmt->execute(['email' => $email]);
         $user = $stmt->fetch();
 
-        if (!$user) {
-            return false;
+        if (!$user || !password_verify($password, $user['password'])) {
+            return null;
         }
 
-        $passwordValid = password_verify($password, $user['password']);
-        $emailValid = strtolower($email) === strtolower($user['email']);
-
-        return $passwordValid && $emailValid;
+        return [
+            'id' => $user['id'],
+            'username' => $user['username'],
+            'email' => $user['email']
+        ];
     }
 
     private function sendUserDataEmail(string $to, string $username, array $userData): bool {
@@ -153,13 +156,6 @@ class DataRequestHandler {
             return;
         }
 
-        if (!isset($_SESSION['user_id'])) {
-            $this->sendJsonResponse(false, 'Authentication required');
-        }
-
-        $userId = (int)$_SESSION['user_id'];
-        $username = htmlspecialchars($_SESSION['username']);
-        
         $input = json_decode(file_get_contents('php://input'), true);
         $password = $input['password'] ?? '';
         $email = $input['email'] ?? '';
@@ -171,10 +167,14 @@ class DataRequestHandler {
             $this->sendJsonResponse(false, 'Email is required');
         }
 
-        // Validate both email and password against database
-        if (!$this->validateCredentials($userId, $password, $email)) {
+        // Validate credentials and get user data
+        $user = $this->validateCredentials($email, $password);
+        if (!$user) {
             $this->sendJsonResponse(false, 'Invalid email or password');
         }
+
+        $userId = $user['id'];
+        $username = htmlspecialchars($user['username']);
 
         if (!$this->checkRateLimit($userId)) {
             $this->sendJsonResponse(false, "Rate limit exceeded ({$this->maxRequestsPerDay} requests per 24 hours)");
@@ -323,17 +323,6 @@ class DataRequestHandler {
                     color: var(--danger);
                     border: 1px solid #f5c6cb;
                 }
-                .login-link {
-                    text-align: center;
-                    margin-top: 20px;
-                }
-                .login-link a {
-                    color: var(--primary);
-                    text-decoration: none;
-                }
-                .login-link a:hover {
-                    text-decoration: underline;
-                }
             </style>
         </head>
         <body>
@@ -343,40 +332,33 @@ class DataRequestHandler {
                     <p>Creative Pulse Solutions</p>
                 </div>
 
-                <?php if (!isset($_SESSION['user_id'])): ?>
-                    <div class="login-link">
-                        <p>Please <a href="/login">sign in</a> to request your data.</p>
+                <form id="dataRequestForm" onsubmit="requestData(event)">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            required 
+                            placeholder="Enter your email"
+                        >
                     </div>
-                <?php else: ?>
-                    <form id="dataRequestForm" onsubmit="requestData(event)">
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email" 
-                                required 
-                                placeholder="Enter your email"
-                            >
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <input 
-                                type="password" 
-                                id="password" 
-                                name="password" 
-                                required 
-                                minlength="8"
-                                placeholder="Enter your password"
-                            >
-                        </div>
-                        <button type="submit" class="btn" id="submitBtn">Request My Data</button>
-                        <div id="message" class="message" style="display: none;"></div>
-                    </form>
-                <?php endif; ?>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required 
+                            minlength="8"
+                            placeholder="Enter your password"
+                        >
+                    </div>
+                    <button type="submit" class="btn" id="submitBtn">Request My Data</button>
+                    <div id="message" class="message" style="display: none;"></div>
+                </form>
             </div>
 
-            <?php if (isset($_SESSION['user_id'])): ?>
             <script>
             async function requestData(event) {
                 event.preventDefault();
@@ -425,7 +407,6 @@ class DataRequestHandler {
                 }
             }
             </script>
-            <?php endif; ?>
         </body>
         </html>
         <?php
