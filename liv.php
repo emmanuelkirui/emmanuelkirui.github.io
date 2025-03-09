@@ -3,7 +3,7 @@
 $api_key = "d2ef1a157a0d4c83ba4023d1fbd28b5c"; // Replace with your API key
 $competitions_url = "https://api.football-data.org/v4/competitions"; // List all competitions
 
-// Start session to store competitions and rate limiting data
+// Start session to store competitions and queue
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -11,56 +11,67 @@ if (session_status() === PHP_SESSION_NONE) {
 // Rate Limiting Configuration
 define('MAX_REQUESTS', 10); // Max 10 requests per minute
 define('TIME_WINDOW', 60);  // Time window in seconds (1 minute)
+define('REQUEST_INTERVAL', 6); // Seconds between requests (60 / 10 = 6 seconds)
 
-// Function to enforce rate limiting
-function enforceRateLimit() {
+// Initialize the request queue if not set
+if (!isset($_SESSION['request_queue'])) {
+    $_SESSION['request_queue'] = [];
+}
+if (!isset($_SESSION['last_request_time'])) {
+    $_SESSION['last_request_time'] = 0;
+}
+
+// Function to add a request to the queue
+function queueAPIRequest($url, $api_key) {
+    $_SESSION['request_queue'][] = [
+        'url' => $url,
+        'api_key' => $api_key,
+        'timestamp' => time()
+    ];
+}
+
+// Function to process the queue
+function processQueue() {
     $current_time = time();
 
-    // Initialize session variables if not set
-    if (!isset($_SESSION['request_count'])) {
-        $_SESSION['request_count'] = 0;
-        $_SESSION['first_request_time'] = $current_time;
-    }
-
-    // Reset count if the time window has passed
-    if ($current_time - $_SESSION['first_request_time'] >= TIME_WINDOW) {
-        $_SESSION['request_count'] = 0;
-        $_SESSION['first_request_time'] = $current_time;
-    }
-
-    // Check if we've exceeded the request limit
-    if ($_SESSION['request_count'] >= MAX_REQUESTS) {
-        $time_remaining = TIME_WINDOW - ($current_time - $_SESSION['first_request_time']);
+    // Check if enough time has passed since the last request
+    if ($current_time - $_SESSION['last_request_time'] < REQUEST_INTERVAL && !empty($_SESSION['request_queue'])) {
+        // Not enough time has passed, display a message and wait
+        $time_to_wait = REQUEST_INTERVAL - ($current_time - $_SESSION['last_request_time']);
         echo "<div style='text-align: center; font-family: Arial, sans-serif; margin-top: 50px;'>
-                <h2 style='color: red;'>Rate Limit Exceeded</h2>
-                <p>Please wait <span id='countdown' style='font-weight: bold; color: blue;'>$time_remaining</span> seconds...</p>
+                <h2 style='color: blue;'>Processing Queue</h2>
+                <p>Next request in <span id='countdown' style='font-weight: bold; color: blue;'>$time_to_wait</span> seconds...</p>
               </div>";
         echo "<script>
-                let timeLeft = $time_remaining;
+                let timeLeft = $time_to_wait;
                 const countdownElement = document.getElementById('countdown');
                 const interval = setInterval(() => {
                     timeLeft--;
                     countdownElement.textContent = timeLeft;
                     if (timeLeft <= 0) {
                         clearInterval(interval);
-                        window.location.reload();
+                        window.location.reload(); // Reload to process the next request
                     }
                 }, 1000);
               </script>";
         flush();
-        sleep($time_remaining); // Pause execution until the window resets
-        $_SESSION['request_count'] = 0; // Reset after waiting
-        $_SESSION['first_request_time'] = time();
+        sleep($time_to_wait);
     }
 
-    // Increment request count
-    $_SESSION['request_count']++;
-}
-// Function to fetch data from the API with rate limiting
-function fetchAPI($url, $api_key, $retries = 3) {
-    // Enforce rate limiting before making the request
-    enforceRateLimit();
+    // Process the next request if available
+    if (!empty($_SESSION['request_queue'])) {
+        $request = array_shift($_SESSION['request_queue']); // Remove and get the first request
+        $_SESSION['last_request_time'] = time(); // Update last request time
 
+        $response = executeAPIRequest($request['url'], $request['api_key']);
+        return $response;
+    }
+
+    return null; // No requests in queue
+}
+
+// Function to execute a single API request
+function executeAPIRequest($url, $api_key, $retries = 3) {
     $curl = curl_init();
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
@@ -96,7 +107,7 @@ function fetchAPI($url, $api_key, $retries = 3) {
                   </script>";
             flush();
             sleep($wait_time);
-            return fetchAPI($url, $api_key, $retries - 1);
+            return executeAPIRequest($url, $api_key, $retries - 1);
         } else {
             header('Location: error');
             exit;
@@ -110,6 +121,15 @@ function fetchAPI($url, $api_key, $retries = 3) {
     }
 
     return json_decode($response, true);
+}
+
+// Modified fetchAPI to use the queue
+function fetchAPI($url, $api_key) {
+    // Add request to the queue
+    queueAPIRequest($url, $api_key);
+
+    // Process the queue and return the result
+    return processQueue();
 }
 
 // Fetch all competitions only once and store in session
