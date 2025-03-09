@@ -276,7 +276,13 @@ $year = date("Y");
 
         <section>
             <h2>8. Your Privacy Rights</h2>
-            <p>Depending on your location and applicable laws (e.g., GDPR, CCPA), you may have the following rights regarding your personal data:</p>
+            <p>Depending on your location and applicable laws (e.g., GDPR, CCPA), you have specific rights regarding your personal data. We are committed to ensuring you can exercise these rights easily and transparently.</p>
+
+            <h3>8.1 Requesting Information We Collect About You</h3>
+            <p>As required by law, you have the right to know what personal information we collect, store, and process about you. To make this process straightforward, we provide a dedicated <a href="data_request.php" class="contact-link">Data Request</a> page where you can request a detailed report of the data we hold. This includes categories of information listed in Section 1, such as personal details you’ve provided and usage data we’ve collected. To submit a request, visit <a href="data_request.php" class="contact-link">data_request.php</a>, follow the instructions, and we will provide a response within 72 hours, subject to identity verification for your security.</p>
+
+            <h3>8.2 Additional Rights</h3>
+            <p>In addition to accessing your data, you may also have the following rights:</p>
             <ul>
                 <li><strong>Access:</strong> Request a copy of the data we hold about you.</li>
                 <li><strong>Correction:</strong> Ask us to update or correct inaccurate information.</li>
@@ -285,9 +291,8 @@ $year = date("Y");
                 <li><strong>Portability:</strong> Receive your data in a structured, machine-readable format.</li>
                 <li><strong>Opt-Out:</strong> Unsubscribe from marketing communications or object to processing based on legitimate interests.</li>
             </ul>
-            <p>To exercise these rights, contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>. We will respond within 72 hours and may require identity verification for security.</p>
+            <p>To exercise any of these rights, use our <a href="data_request.php" class="contact-link">Data Request</a> page or contact us directly at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>. We aim to respond within 72 hours and may require identity verification to protect your privacy.</p>
         </section>
-
         <section>
             <h2>9. International Data Transfers</h2>
             <p>If you access our Services from outside Kenya, your data may be transferred to and processed in "Kenya" (or the relevant [Country/Region] where you are). We ensure such transfers comply with applicable data protection laws, using mechanisms like Standard Contractual Clauses where required.</p>
