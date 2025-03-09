@@ -843,7 +843,7 @@ window.onload = function () {
 echo '<form id="searchForm" method="GET" action="">';
 // Default selected competition and date filter values
 $default_competition = 'PL';
-$default_date_filter = 'all';
+$default_date_filter = 'today';
 
 // Set selected values from GET request or defaults
 $selected_competition = isset($_GET['competition']) ? $_GET['competition'] : $default_competition;
