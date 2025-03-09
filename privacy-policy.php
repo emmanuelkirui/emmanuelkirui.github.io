@@ -243,13 +243,15 @@ $year = date("Y");
 
         <section>
             <h2>5. Cookies and Tracking Technologies</h2>
-            <p>We use cookies and similar technologies to enhance your experience and gather insights. These may include:</p>
+            <p>We use cookies and similar technologies (e.g., web beacons, pixels) to enhance your experience, gather insights, and improve our Services. Cookies are small data files stored on your device that help us understand how you interact with our Website. The types of cookies we might employ include:</p>
             <ul>
-                <li><strong>Essential Cookies:</strong> Necessary for basic Website functionality (e.g., session management).</li>
-                <li><strong>Performance Cookies:</strong> To analyze site usage and improve performance (e.g., Google Analytics).</li>
-                <li><strong>Preference Cookies:</strong> To remember your settings and personalize your experience.</li>
+                <li><strong>Essential Cookies:</strong> Necessary for basic Website functionality, such as enabling navigation, securing access to certain areas, or maintaining your session (e.g., session cookies).</li>
+                <li><strong>Performance Cookies:</strong> Used to analyze site usage and improve performance by collecting anonymous data on page visits, load times, and user behavior (e.g., Google Analytics cookies).</li>
+                <li><strong>Preference Cookies:</strong> Allow us to remember your settings and personalize your experience, such as language preferences or display options.</li>
+                <li><strong>Marketing Cookies:</strong> Employed to deliver personalized advertisements or track the effectiveness of marketing campaigns, often set by third-party partners with your consent.</li>
+                <li><strong>Social Media Cookies:</strong> Facilitate interaction with social media platforms (e.g., sharing content), set by services like Twitter or Facebook when you use these features.</li>
             </ul>
-            <p>You can manage cookie preferences via your browser settings or opt-out tools provided by third-party services. Disabling cookies may impact some features of the Website. For more details, review our <a href="third-party" class="contact-link">Third-Party Services</a> page.</p>
+            <p>You can manage cookie preferences through your browser settings or opt-out tools provided by third-party services. Disabling certain cookies may impact the functionality or personalization of the Website. For more details on third-party tools we use, review our <a href="third-party" class="contact-link">Third-Party Services</a> page.</p>
         </section>
 
         <section>
