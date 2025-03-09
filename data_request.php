@@ -129,7 +129,7 @@ class DataRequestHandler {
 
     private function getEmailPlainText(string $username, array $userData): string {
         return "Creative Pulse Solutions\n\nHello {$username},\n\nYour data request has been processed.\n\nData:\n" . print_r($userData, true)
-            . "\nContact support@creativepulsesolutions.com for assistance.";
+            . "\nContact support@creativepulse42web.io for assistance.";
     }
 
     private function checkRateLimit(int $userId): bool {
