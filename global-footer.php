@@ -1,6 +1,13 @@
 <?php
 $year = date("Y"); // Auto-updating year
+
+// Set the previous_page cookie to the current page URL if not already set and not on recaptcha_handler.php
+if (!isset($_COOKIE['previous_page']) && !str_contains($_SERVER['REQUEST_URI'], 'recaptcha_handler.php')) {
+    $currentPage = $_SERVER['REQUEST_URI'];
+    setcookie('previous_page', $currentPage, time() + 3600, '/'); // Expires in 1 hour, site-wide path
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
