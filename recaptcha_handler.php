@@ -1,10 +1,10 @@
 <?php
 // recaptcha_handler.php
 session_start([
-    'cookie_secure' => true,    // Only send cookie over HTTPS
-    'cookie_httponly' => true,  // Prevent JavaScript access
+    'cookie_secure' => true,
+    'cookie_httponly' => true,
+    'cookie_samesite' => 'Strict'
 ]);
-
 // Configuration
 define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
 define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key
