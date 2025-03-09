@@ -443,17 +443,13 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
 
         // Match details
-        // With this more robust check:
-        $homeTeam = $match['homeTeam']['name'] ?? 
-           ($match['homeTeam']['shortName'] ?? 
-           'Home Team'); // Fallback to shortName first, then a generic name
-        $awayTeam = $match['awayTeam']['name'] ?? 
-           ($match['awayTeam']['shortName'] ?? 
-           'Away Team');
+        // Use tla if available, otherwise fall back to shortName or name
+        $homeTeam = $match['homeTeam']['tla'] ?? ($match['homeTeam']['shortName'] ?? ($match['homeTeam']['name'] ?? 'Home Team'));
+        $awayTeam = $match['awayTeam']['tla'] ?? ($match['awayTeam']['shortName'] ?? ($match['awayTeam']['name'] ?? 'Away Team'));
         $status = $match['status'] ?? 'SCHEDULED';
         $homeGoals = $match['score']['fullTime']['home'] ?? null;
         $awayGoals = $match['score']['fullTime']['away'] ?? null;
-
+        
         // Prediction aligned with score
         if ($predictedHomeGoals > $predictedAwayGoals) {
             $prediction = "$homeTeam to win";
