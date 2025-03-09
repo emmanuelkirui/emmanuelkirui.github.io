@@ -1835,7 +1835,7 @@ try {
     border-radius: 8px;
     box-shadow: var(--shadow);
     min-width: 150px;
-    z-index: 100;
+    z-index: 9999;
     margin-top: 5px;
 }
 
