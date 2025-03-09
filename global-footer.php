@@ -286,6 +286,7 @@ if (!isset($_COOKIE['previous_page']) && !str_contains($_SERVER['REQUEST_URI'], 
             <li><a href="contactus.php"><i class="fas fa-envelope"></i> Contact Us</a></li>
             <li><a href="global-blog.php"><i class="fas fa-blog"></i> Blog</a></li>
             <li><a href="our-team.php"><i class="fas fa-users"></i> Our Team</a></li>
+            <li><a href="data_requests.php"><i class="fas fa-database"></i> Data Requests</a></li>
         </ul>
 
         <p class="gambling-disclaimer">
