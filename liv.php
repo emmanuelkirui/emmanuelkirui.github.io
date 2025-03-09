@@ -876,7 +876,7 @@ function toggleCustomRange(value) {
 
 if ($selected_competition && $fixtures_data) {
     // Filter matches by date
-    $date_filter = isset($_GET['date_filter']) ? $_GET['date_filter'] : 'all';
+    $date_filter = isset($_GET['date_filter']) ? $_GET['date_filter'] : 'today';
     $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : null;
     $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : null;
 
