@@ -1910,7 +1910,59 @@ try {
     }
 }
 
+/* Standings table tier styling */
+.standings-table tr.upper-table {
+    background-color: rgba(40, 167, 69, 0.1); /* Light green for upper table */
+    border-left: 4px solid #28a745; /* Green border */
+}
 
+.standings-table tr.mid-table {
+    background-color: rgba(255, 193, 7, 0.1); /* Light yellow for mid-table */
+    border-left: 4px solid #ffc107; /* Yellow border */
+}
+
+.standings-table tr.lower-table {
+    background-color: rgba(220, 53, 69, 0.1); /* Light red for lower table */
+    border-left: 4px solid #dc3545; /* Red border */
+}
+
+/* Hover effects for better interaction */
+.standings-table tr.upper-table:hover {
+    background-color: rgba(40, 167, 69, 0.2);
+}
+
+.standings-table tr.mid-table:hover {
+    background-color: rgba(255, 193, 7, 0.2);
+}
+
+.standings-table tr.lower-table:hover {
+    background-color: rgba(220, 53, 69, 0.2);
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .standings-table tr.upper-table {
+    background-color: rgba(40, 167, 69, 0.3);
+}
+
+[data-theme="dark"] .standings-table tr.mid-table {
+    background-color: rgba(255, 193, 7, 0.3);
+}
+
+[data-theme="dark"] .standings-table tr.lower-table {
+    background-color: rgba(220, 53, 69, 0.3);
+}
+
+[data-theme="dark"] .standings-table tr.upper-table:hover {
+    background-color: rgba(40, 167, 69, 0.4);
+}
+
+[data-theme="dark"] .standings-table tr.mid-table:hover {
+    background-color: rgba(255, 193, 7, 0.4);
+}
+
+[data-theme="dark"] .standings-table tr.lower-table:hover {
+    background-color: rgba(220, 53, 69, 0.4);
+}
     </style>
 </head>
 <body>
@@ -2200,8 +2252,23 @@ try {
             <?php
             $standings = fetchStandings($selectedComp, $apiKey, $baseUrl);
             if (!$standings['error'] && !empty($standings['data'])) {
+                $totalTeams = count($standings['data']);
+                $upperLimit = ceil($totalTeams * 0.25); // Top 25%
+                $lowerLimit = floor($totalTeams * 0.75); // Bottom 25%
+
                 foreach ($standings['data'] as $team) {
-                    echo "<tr>";
+                    $position = $team['position'];
+                    // Determine the tier class
+                    $tierClass = '';
+                    if ($position <= $upperLimit) {
+                        $tierClass = 'upper-table';
+                    } elseif ($position > $lowerLimit) {
+                        $tierClass = 'lower-table';
+                    } else {
+                        $tierClass = 'mid-table';
+                    }
+
+                    echo "<tr class='$tierClass'>";
                     echo "<td>" . $team['position'] . "</td>";
                     echo "<td>" . ($team['team']['name'] ?? 'Unknown') . "</td>";
                     echo "<td>" . $team['playedGames'] . "</td>";
