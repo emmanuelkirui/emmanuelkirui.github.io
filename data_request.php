@@ -1,10 +1,10 @@
 <?php
 /**
  * Professional Data Request Handler
- * Handles user data requests with password verification and email notifications
+ * Handles user data requests with password and email input
  * 
  * @author Emmanuel Kirui 
- * @version 1.2
+ * @version 1.3
  * @date March 08, 2025
  */
 
@@ -31,7 +31,7 @@ use PHPMailer\PHPMailer\Exception;
 
 /**
  * Class DataRequestHandler
- * Manages data requests with professional UI and email notifications
+ * Manages data requests with professional UI
  */
 class DataRequestHandler {
     private $pdo;
@@ -152,9 +152,13 @@ class DataRequestHandler {
         
         $input = json_decode(file_get_contents('php://input'), true);
         $password = $input['password'] ?? '';
+        $email = filter_var($input['email'] ?? '', FILTER_VALIDATE_EMAIL);
 
         if (empty($password)) {
             $this->sendJsonResponse(false, 'Password is required');
+        }
+        if (!$email) {
+            $this->sendJsonResponse(false, 'Valid email is required');
         }
 
         if (!$this->verifyPassword($userId, $password)) {
@@ -185,7 +189,7 @@ class DataRequestHandler {
             ];
 
             $this->logRequest($userId);
-            $emailSent = $this->sendUserDataEmail($userData['email'], $username, $dataToSend);
+            $emailSent = $this->sendUserDataEmail($email, $username, $dataToSend);
 
             $this->sendJsonResponse(
                 $emailSent,
@@ -256,7 +260,8 @@ class DataRequestHandler {
                     font-weight: 500;
                     color: var(--dark);
                 }
-                input[type="password"] {
+                input[type="password"],
+                input[type="email"] {
                     width: 100%;
                     padding: 12px;
                     border: 1px solid #ced4da;
@@ -264,7 +269,8 @@ class DataRequestHandler {
                     font-size: 16px;
                     transition: border-color 0.3s ease;
                 }
-                input[type="password"]:focus {
+                input[type="password"]:focus,
+                input[type="email"]:focus {
                     outline: none;
                     border-color: var(--primary);
                     box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
@@ -333,7 +339,17 @@ class DataRequestHandler {
                 <?php else: ?>
                     <form id="dataRequestForm" onsubmit="requestData(event)">
                         <div class="form-group">
-                            <label for="password">Password Verification</label>
+                            <label for="email">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required 
+                                placeholder="Enter your email"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
                             <input 
                                 type="password" 
                                 id="password" 
@@ -358,11 +374,10 @@ class DataRequestHandler {
                 const submitBtn = document.getElementById('submitBtn');
                 const messageDiv = document.getElementById('message');
                 const password = document.getElementById('password').value;
+                const email = document.getElementById('email').value;
 
-                // Reset message
                 messageDiv.style.display = 'none';
                 
-                // Disable button during request
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Processing...';
 
@@ -373,7 +388,10 @@ class DataRequestHandler {
                             'Content-Type': 'application/json',
                             'X-Requested-With': 'XMLHttpRequest'
                         },
-                        body: JSON.stringify({ password: password })
+                        body: JSON.stringify({ 
+                            password: password,
+                            email: email 
+                        })
                     });
 
                     const data = await response.json();
