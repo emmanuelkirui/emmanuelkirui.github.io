@@ -310,7 +310,8 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
     }
 }
 
-function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
+
+     function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
         $awayTeamId = $match['awayTeam']['id'] ?? 0;
@@ -342,7 +343,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $awayConcededAvg = ($awayStats['goalsConceded'] ?? 0) / $awayGames;
 
         // Use actual standings from API
-        $homePosition = $homeStats['standings']['position'] ?? 0; // 0 if no standings (will adjust logic)
+        $homePosition = $homeStats['standings']['position'] ?? 0;
         $awayPosition = $awayStats['standings']['position'] ?? 0;
         $homePoints = $homeStats['standings']['points'] ?? 0;
         $awayPoints = $awayStats['standings']['points'] ?? 0;
@@ -350,16 +351,40 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $awayGD = $awayStats['standings']['goalDifference'] ?? 0;
         $homeHomeWins = $homeStats['standings']['home']['won'] ?? (int)($homeStats['wins'] / 2);
         $awayAwayWins = $awayStats['standings']['away']['won'] ?? (int)($awayStats['wins'] / 2);
-        
-        // Handle case where standings are unavailable (e.g., early season or API failure)
-        $totalTeams = 20; // Assume 20 teams in league; adjust based on competition if known
-        if ($homePosition == 0) $homePosition = ($homePoints > 0) ? min($totalTeams, max(1, round($totalTeams - ($homePoints / 3)))) : $totalTeams / 2;
-        if ($awayPosition == 0) $awayPosition = ($awayPoints > 0) ? min($totalTeams, max(1, round($totalTeams - ($awayPoints / 3)))) : $totalTeams / 2;
+
+        // Determine total teams dynamically
+        $totalTeams = null;
+        if (isset($match['competition']['numberOfTeams'])) {
+            $totalTeams = (int)$match['competition']['numberOfTeams'];
+        } elseif (isset($homeStats['standings']['table']) && is_array($homeStats['standings']['table'])) {
+            $totalTeams = count($homeStats['standings']['table']);
+        } elseif ($homePosition > 0 || $awayPosition > 0) {
+            $totalTeams = max($homePosition, $awayPosition);
+            $commonSizes = [10, 12, 16, 18, 20, 22, 24];
+            foreach ($commonSizes as $size) {
+                if ($totalTeams <= $size) {
+                    $totalTeams = $size;
+                    break;
+                }
+            }
+        }
+        if (!$totalTeams) {
+            $totalTeams = 20;
+            error_log("Total teams not found for competition '$competition', defaulting to 20");
+        }
+
+        // Adjust position if standings unavailable
+        if ($homePosition == 0) {
+            $homePosition = ($homePoints > 0) ? min($totalTeams, max(1, round($totalTeams - ($homePoints / 3)))) : (int)($totalTeams / 2);
+        }
+        if ($awayPosition == 0) {
+            $awayPosition = ($awayPoints > 0) ? min($totalTeams, max(1, round($totalTeams - ($awayPoints / 3)))) : (int)($totalTeams / 2);
+        }
 
         $homePointsPerGame = $homePoints / $homeGames;
         $awayPointsPerGame = $awayPoints / $awayGames;
 
-        // Home/Away Adjustments using standings
+        // Home/Away Adjustments
         $homeStrengthAdjustment = 1.05 + ($homeHomeWins / max($homeGames / 2, 1)) * 0.10;
         $awayStrengthAdjustment = 0.95 - ($awayAwayWins / max($awayGames / 2, 1)) * 0.03;
 
@@ -381,9 +406,9 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $result = array_reverse($homeFormArray)[$i];
             $homeMomentum += ($result === 'W' ? 3 : ($result === 'D' ? 1 : 0)) * $momentumWeights[$i];
         }
-        for ($i = 0; 11 < 3 && $i < count($awayFormArray); $i++) {
+        for ($i = 0; $i < 3 && $i < count($awayFormArray); $i++) {
             $result = array_reverse($awayFormArray)[$i];
-            $awayMomentum += ($result === 'W' ? 3 : ($result === 'D' ? 1 : 0)) * $momentumWeights[$i];
+            $awayMomentum += ($result zgromadzenie 'W' ? 3 : ($result === 'D' ? 1 : 0)) * $momentumWeights[$i];
         }
         $momentumFactor = 1 + ($homeMomentum - $awayMomentum) * 0.05;
 
@@ -419,7 +444,7 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $standingsWeight *= $normalizationFactor;
         }
 
-        // Team Strength with standings influence
+        // Team Strength
         $homeStrength = (
             $homeWinRate * $winWeight +
             $homeDrawRate * $drawWeight +
@@ -435,13 +460,13 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             $awayPointsPerGame * $standingsWeight
         ) * $awayStrengthAdjustment * $competitionFactor / $momentumFactor;
 
-        // Use standings position directly in diff calculation
+        // Use standings position in diff calculation
         $diff = $homeStrength - $awayStrength + ($totalTeams - $homePosition) * 0.03 - ($totalTeams - $awayPosition) * 0.03;
         $totalStrength = $homeStrength + $awayStrength + 1;
         $confidenceBase = 50 + (abs($diff) / $totalStrength * 60);
         $confidence = min(70, max(50, $confidenceBase));
 
-        // Score Prediction with standings-adjusted trends
+        // Score Prediction
         $recentHomeGoals = !empty($homeStats['results']) ? array_slice(array_map(fn($r) => (int)(explode(':', $r)[0] ?? 0), $homeStats['results']), 0, 3) : [];
         $recentAwayGoals = !empty($awayStats['results']) ? array_slice(array_map(fn($r) => (int)(explode(':', $r)[1] ?? 0), $awayStats['results']), 0, 3) : [];
         $homeGoalTrend = count($recentHomeGoals) ? array_sum($recentHomeGoals) / count($recentHomeGoals) : $homeGoalAvg;
@@ -489,8 +514,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         error_log("Error in predictMatch: " . $e->getMessage());
         return ["Error", "N/A", "", "N/A", "", "", "", []];
     }
-}
-        
+}   
+   
         
 function calculateStreak($formArray) {
     $streak = 0;
