@@ -1,10 +1,10 @@
 <?php
 /**
  * Professional Data Request Handler
- * Handles user data requests with password and email input
+ * Handles user data requests with database-validated password and email
  * 
  * @author Emmanuel Kirui 
- * @version 1.3
+ * @version 1.4
  * @date March 08, 2025
  */
 
@@ -31,7 +31,7 @@ use PHPMailer\PHPMailer\Exception;
 
 /**
  * Class DataRequestHandler
- * Manages data requests with professional UI
+ * Manages data requests with database validation
  */
 class DataRequestHandler {
     private $pdo;
@@ -57,11 +57,21 @@ class DataRequestHandler {
         exit(json_encode(array_merge(['success' => $success, 'message' => $message], $data)));
     }
 
-    private function verifyPassword(int $userId, string $password): bool {
-        $stmt = $this->pdo->prepare("SELECT password FROM cp_users WHERE id = :id");
+    private function validateCredentials(int $userId, string $password, string $email): bool {
+        $stmt = $this->pdo->prepare(
+            "SELECT password, email FROM cp_users WHERE id = :id"
+        );
         $stmt->execute(['id' => $userId]);
-        $storedHash = $stmt->fetchColumn();
-        return password_verify($password, $storedHash);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            return false;
+        }
+
+        $passwordValid = password_verify($password, $user['password']);
+        $emailValid = strtolower($email) === strtolower($user['email']);
+
+        return $passwordValid && $emailValid;
     }
 
     private function sendUserDataEmail(string $to, string $username, array $userData): bool {
@@ -152,17 +162,18 @@ class DataRequestHandler {
         
         $input = json_decode(file_get_contents('php://input'), true);
         $password = $input['password'] ?? '';
-        $email = filter_var($input['email'] ?? '', FILTER_VALIDATE_EMAIL);
+        $email = $input['email'] ?? '';
 
         if (empty($password)) {
             $this->sendJsonResponse(false, 'Password is required');
         }
-        if (!$email) {
-            $this->sendJsonResponse(false, 'Valid email is required');
+        if (empty($email)) {
+            $this->sendJsonResponse(false, 'Email is required');
         }
 
-        if (!$this->verifyPassword($userId, $password)) {
-            $this->sendJsonResponse(false, 'Invalid password');
+        // Validate both email and password against database
+        if (!$this->validateCredentials($userId, $password, $email)) {
+            $this->sendJsonResponse(false, 'Invalid email or password');
         }
 
         if (!$this->checkRateLimit($userId)) {
