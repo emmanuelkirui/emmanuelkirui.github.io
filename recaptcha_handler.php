@@ -1,5 +1,9 @@
 <?php
 // recaptcha_handler.php
+session_start([
+    'cookie_secure' => true,    // Only send cookie over HTTPS
+    'cookie_httponly' => true,  // Prevent JavaScript access
+]);
 
 // Configuration
 define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
