@@ -310,8 +310,7 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
     }
 }
 
-
-        function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
+function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
         $awayTeamId = $match['awayTeam']['id'] ?? 0;
@@ -467,7 +466,9 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
         return ["Error", "N/A", "", "N/A", "", "", "", []];
     }
 }
-
+        
+        
+        
 function calculateStreak($formArray) {
     $streak = 0;
     $lastResult = null;
