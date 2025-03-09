@@ -98,7 +98,7 @@ function getDeviceBrowserInfo() {
 // Function to send notification email
 function sendNotificationEmail($to, $type, $username, $location, $timezone, $device, $browser) {
     $mail = new PHPMailer(true);
-
+    
     try {
         // SMTP Settings
         $mail->isSMTP();
@@ -109,24 +109,64 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('noreply@gmail.com', 'Creative Pulse Solutions (CEO)');
+        $mail->setFrom('noreply@creativepulse.com', 'Creative Pulse Solutions');
         $mail->addAddress($to);
 
-        // Set timezone and get local time
         date_default_timezone_set($timezone);
-        $localTime = date('Y-m-d H:i:s');
+        $localTime = date('F j, Y \a\t h:i A');
 
         $mail->isHTML(true);
-        $subject = $type === 'login' ? 'Successful Login Notification' : 'Welcome to Creative Pulse Solutions';
-        $body = $type === 'login' ?
-            "Hello {$username},<br><br>Your account was successfully logged into from:<br>Location: {$location}<br>Time: {$localTime} ({$timezone})<br>Device: {$device}<br>Browser: {$browser}<br><br>If this wasn't you, please reset your password immediately at: <a href='https://creativepulse.42web.io/cps/reset_password.php'>Reset Password</a>"
-            :
-            "Welcome {$username},<br><br>Your account was successfully created from:<br>Location: {$location}<br>Time: {$localTime} ({$timezone})<br>Device: {$device}<br>Browser: {$browser}<br><br>Enjoy our services!";
         
-        $mail->Subject = $subject;
-        $mail->Body = $body;
-        $mail->AltBody = strip_tags($body);
-
+        if ($type === 'login') {
+            $mail->Subject = 'Security Alert: Successful Login to Your Account';
+            $mail->Body = "
+                <html>
+                <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+                    <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+                        <h2 style='color: #2c3e50;'>Successful Login Notification</h2>
+                        <p>Dear {$username},</p>
+                        <p>We wanted to inform you that your Creative Pulse Solutions account was successfully accessed:</p>
+                        <table style='width: 100%; border-collapse: collapse; margin: 20px 0;'>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Date & Time:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$localTime} ({$timezone})</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Location:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$location}</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Device:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$device}</td></tr>
+                            <tr><td style='padding: 8px;'><strong>Browser:</strong></td><td style='padding: 8px;'>{$browser}</td></tr>
+                        </table>
+                        <p>If this was you, no action is required. If you don't recognize this activity, please:</p>
+                        <p><a href='https://creativepulse.42web.io/cps/reset_password.php' style='background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Reset Your Password</a></p>
+                        <p>Best regards,<br>The Creative Pulse Solutions Team</p>
+                        <p style='font-size: 12px; color: #777;'>This is an automated message. Please do not reply directly to this email.</p>
+                    </div>
+                </body>
+                </html>";
+        } else {
+            $mail->Subject = 'Welcome to Creative Pulse Solutions';
+            $mail->Body = "
+                <html>
+                <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+                    <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+                        <h2 style='color: #2c3e50;'>Welcome to Creative Pulse Solutions</h2>
+                        <p>Dear {$username},</p>
+                        <p>Thank you for joining Creative Pulse Solutions! Your account was successfully created on:</p>
+                        <table style='width: 100%; border-collapse: collapse; margin: 20px 0;'>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Date & Time:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$localTime} ({$timezone})</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Location:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$location}</td></tr>
+                            <tr><td style='padding: 8px;'><strong>Device:</strong></td><td style='padding: 8px;'>{$device} via {$browser}</td></tr>
+                        </table>
+                        <p>We're excited to have you on board. Get started by:</p>
+                        <ul>
+                            <li>Exploring our services</li>
+                            <li>Updating your profile</li>
+                            <li>Contacting our support team if you need assistance</li>
+                        </ul>
+                        <p>Best regards,<br>The Creative Pulse Solutions Team</p>
+                        <p style='font-size: 12px; color: #777;'>For support: support@creativepulse.com</p>
+                    </div>
+                </body>
+                </html>";
+        }
+        
+        $mail->AltBody = strip_tags($mail->Body);
         $mail->send();
         return true;
     } catch (Exception $e) {
@@ -149,14 +189,29 @@ function sendResetEmail($to, $resetLink) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('noreply@gmail.com', 'Creative Pulse Solutions (CEO)');
+        $mail->setFrom('noreply@creativepulse.com', 'Creative Pulse Solutions');
         $mail->addAddress($to);
 
         $mail->isHTML(true);
-        $mail->Subject = 'Password Reset Request';
-        $mail->Body = "Click here to reset your password: <a href='$resetLink'>$resetLink</a><br>This link expires in 1 hour.";
-        $mail->AltBody = "Click here to reset your password: $resetLink\nThis link expires in 1 hour.";
-
+        $mail->Subject = 'Password Reset Request - Creative Pulse Solutions';
+        $mail->Body = "
+            <html>
+            <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+                <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
+                    <h2 style='color: #2c3e50;'>Password Reset Request</h2>
+                    <p>Hello,</p>
+                    <p>We received a request to reset your Creative Pulse Solutions account password. Click the button below to proceed:</p>
+                    <p style='margin: 20px 0;'>
+                        <a href='{$resetLink}' style='background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;'>Reset Password</a>
+                    </p>
+                    <p>This link will expire in 1 hour for security reasons. If you didn't request this reset, please contact our support team immediately.</p>
+                    <p>Best regards,<br>The Creative Pulse Solutions Team</p>
+                    <p style='font-size: 12px; color: #777;'>Support: support@creativepulse.42web.io | This is an automated message</p>
+                </div>
+            </body>
+            </html>";
+        $mail->AltBody = "Password Reset Request\n\nClick here to reset your password: {$resetLink}\nThis link expires in 1 hour.\n\nIf you didn't request this, contact support@creativepulse.com";
+        
         $mail->send();
         return true;
     } catch (Exception $e) {
