@@ -210,7 +210,7 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
     return $response['data']['teams'] ?? [];
 }
 
-      function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
+function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $forceRefresh = isset($_GET['force_refresh']) && $_GET['force_refresh'] === 'true';
 
@@ -308,8 +308,7 @@ function fetchTeams($competition, $apiKey, $baseUrl) {
     } catch (Exception $e) {
         return ['error' => true, 'message' => "Error calculating team strength: " . $e->getMessage()];
     }
-}          
-        
+}
 
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
@@ -330,6 +329,18 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
             return ["Loading...", "N/A", "", "N/A", "", $homeStats['form'] ?? "", $awayStats['form'] ?? "", $retryInfo];
         }
 
+        // Basic stats with defaults
+        $homeGames = max($homeStats['games'] ?? 1, 1);
+        $awayGames = max($awayStats['games'] ?? 1, 1);
+        $homeWinRate = ($homeStats['wins'] ?? 0) / $homeGames;
+        $homeDrawRate = ($homeStats['draws'] ?? 0) / $homeGames;
+        $awayWinRate = ($awayStats['wins'] ?? 0) / $awayGames;
+        $awayDrawRate = ($awayStats['draws'] ?? 0) / $awayGames;
+        $homeGoalAvg = ($homeStats['goalsScored'] ?? 0) / $homeGames;
+        $awayGoalAvg = ($awayStats['goalsScored'] ?? 0) / $awayGames;
+        $homeConcededAvg = ($homeStats['goalsConceded'] ?? 0) / $homeGames;
+        $awayConcededAvg = ($awayStats['goalsConceded'] ?? 0) / $awayGames;
+
         // Use actual standings from API
         $homePosition = $homeStats['standings']['position'] ?? 0;
         $awayPosition = $awayStats['standings']['position'] ?? 0;
@@ -337,8 +348,10 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $awayPoints = $awayStats['standings']['points'] ?? 0;
         $homeGD = $homeStats['standings']['goalDifference'] ?? 0;
         $awayGD = $awayStats['standings']['goalDifference'] ?? 0;
+        $homeHomeWins = $homeStats['standings']['home']['won'] ?? (int)($homeStats['wins'] / 2);
+        $awayAwayWins = $awayStats['standings']['away']['won'] ?? (int)($awayStats['wins'] / 2);
 
-        // Determine total teams dynamically
+        // Determine total teams dynamically (unchanged)
         $totalTeams = $match['competition']['numberOfTeams'] ?? 20;
         if ($homePosition == 0) $homePosition = ($homePoints > 0) ? min($totalTeams, max(1, round($totalTeams - ($homePoints / 3)))) : (int)($totalTeams / 2);
         if ($awayPosition == 0) $awayPosition = ($awayPoints > 0) ? min($totalTeams, max(1, round($totalTeams - ($awayPoints / 3)))) : (int)($totalTeams / 2);
@@ -439,8 +452,8 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         $homeDefStrength = min(1.6, ($homeConcededAvg * 0.9 + 0.1) * $awayOpponentStrength);
         $awayDefStrength = min(1.6, ($awayConcededAvg * 0.9 + 0.1) * $homeOpponentStrength);
 
-        $expectedHomeGoals = max(0, min(3.0, ($homeAttackStrength * (1 + $diff / 50)) / ($awayDefStrength + 0.5) * $competitionFactor);
-        $expectedAwayGoals = max(0, min(3.0, ($awayAttackStrength * (1 - $diff / 50)) / ($homeDefStrength + 0.5) * $competitionFactor);
+        $expectedHomeGoals = max(0, min(3.0, ($homeAttackStrength * (1 + $diff / 50)) / ($awayDefStrength + 0.5) * $competitionFactor));
+        $expectedAwayGoals = max(0, min(3.0, ($awayAttackStrength * (1 - $diff / 50)) / ($homeDefStrength + 0.5) * $competitionFactor));
         $predictedHomeGoals = round($expectedHomeGoals * 0.9 + $homeGoalTrend * 0.1);
         $predictedAwayGoals = round($expectedAwayGoals * 0.9 + $awayGoalTrend * 0.1);
         $predictedScore = "$predictedHomeGoals-$predictedAwayGoals";
@@ -477,9 +490,6 @@ function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
         return ["Error", "N/A", "", "N/A", "", "", "", []];
     }
 }
-
-        
-        
         
 function calculateStreak($formArray) {
     $streak = 0;
