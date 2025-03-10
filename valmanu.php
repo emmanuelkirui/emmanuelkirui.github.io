@@ -767,23 +767,6 @@ try {
                    stripos($match['awayTeam']['name'] ?? '', $searchTeam) !== false;
         });
     }
-            // Calculate correct predictions
-    $correctPredictions = 0;
-    $totalFinishedMatches = 0;
-    foreach ($allMatches as $index => $match) {
-        if ($match['status'] === 'FINISHED' && isset($match['score']['fullTime']['home']) && isset($match['score']['fullTime']['away'])) {
-            $totalFinishedMatches++;
-            $predictionData = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
-            $prediction = $predictionData[0];
-            $homeGoals = $match['score']['fullTime']['home'];
-            $awayGoals = $match['score']['fullTime']['away'];
-            $actualResult = ($homeGoals > $awayGoals) ? "{$match['homeTeam']['name']} to win" :
-                           (($homeGoals < $awayGoals) ? "{$match['awayTeam']['name']} to win" : "Draw");
-            if ($prediction === $actualResult) $correctPredictions++;
-        }
-    }
-    $predictionAccuracy = $totalFinishedMatches > 0 ? "($correctPredictions/$totalFinishedMatches)" : "(0/0)";
-
     
 ?>
 
@@ -1578,33 +1561,7 @@ try {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-.prediction-stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            font-size: 1.1em;
-            color: var(--text-color);
-            background-color: var(--card-bg);
-            padding: 10px 15px;
-            border-radius: 8px;
-            box-shadow: var(--shadow);
-        }
 
-        #correct-predictions {
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-
-        #last-updated {
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        [data-theme="dark"] #last-updated {
-            color: #bdc3c7;
-        }
-        
 .last-updated {
     text-align: center;
     font-size: 0.9em;
@@ -2034,7 +1991,6 @@ try {
         <div class="header">
             <h1>CPS Football Predictions</h1>
             <div id="last-updated" class="last-updated">Last updated: Checking...</div>
-            <span id="correct-predictions">Correct Predictions: <?php echo $predictionAccuracy; ?></span>
             <p>Select Competition, Date Range (EAT), or Search Teams</p>
         </div>
 
@@ -3127,31 +3083,8 @@ function updateMatchUI(element, index, data) {
 
             element.cells[7].textContent = `${data.homeForm} / ${data.awayForm}`;
         }
-// Update correct predictions
-            if (data.resultIndicator) {
-                const correctPredictionsElement = document.getElementById('correct-predictions');
-                let [correct, total] = correctPredictionsElement.textContent.match(/(\d+)\/(\d+)/)?.slice(1) || [0, 0];
-                total = parseInt(total) || 0;
-                correct = parseInt(correct) || 0;
-
-                if (!element.dataset.counted) {
-                    total++;
-                    const predictedResult = data.prediction;
-                    const actualResult = data.resultIndicator.includes('✓') ? predictedResult : 
-                                        (predictedResult.includes('Draw') ? 
-                                            (data.predictedScore.split('-')[0] > data.predictedScore.split('-')[1] ? `${element.dataset.homeName} to win` : `${element.dataset.awayName} to win`) : 
-                                            (predictedResult.includes(element.dataset.homeName) ? `${element.dataset.awayName} to win` : `${element.dataset.homeName} to win`));
-                    if (data.resultIndicator.includes('✓')) {
-                        correct++;
-                    }
-                    element.dataset.counted = 'true';
-                }
-
-                correctPredictionsElement.textContent = `Correct Predictions: (${correct}/${total})`;
-            }
-        }
-
-    
+    }
+}
 
 function processQueue() {
     fetch('?action=process_queue')
