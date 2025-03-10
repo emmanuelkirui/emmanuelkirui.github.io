@@ -121,6 +121,44 @@ if (!isset($_COOKIE['previous_page']) && !str_contains($_SERVER['REQUEST_URI'], 
             text-decoration: underline;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .modal-close:hover {
+            color: #000;
+        }
+
         /* Cookie Consent */
         #cookieConsent {
             position: fixed;
@@ -296,7 +334,7 @@ if (!isset($_COOKIE['previous_page']) && !str_contains($_SERVER['REQUEST_URI'], 
 
         <p class="disclaimer">
             This site uses third-party services, cookies, and advertisements. These third parties have their own policies, and we are not responsible for their actions. Please review their terms.
-            <a href="privacy-policy.php">View our Privacy Policy</a>
+            <a href="#" id="openModal">View our Privacy Policy</a>
         </p>
 
         <!-- Social Media Icons -->
@@ -310,6 +348,15 @@ if (!isset($_COOKIE['previous_page']) && !str_contains($_SERVER['REQUEST_URI'], 
     </div>
 </footer>
 
+<!-- Modal -->
+<div id="privacyModal" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Privacy Policy</h2>
+        <div id="modalContent"></div> <!-- Content will be loaded here -->
+    </div>
+</div>
+
 <!-- Cookie Consent -->
 <div id="cookieConsent">
     <p><i class="fa fa-cookie-bite"></i> This site uses cookies to improve user experience.
@@ -318,39 +365,73 @@ if (!isset($_COOKIE['previous_page']) && !str_contains($_SERVER['REQUEST_URI'], 
     <button id="acceptCookies">Accept</button>
 </div>
 
-<!-- Cookie Consent Script with Expiration -->
+<!-- Scripts -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const cookieConsent = document.getElementById("cookieConsent");
-    const acceptCookiesButton = document.getElementById("acceptCookies");
-    const cookieKey = "cookiesAccepted";
-    const expirationDays = 30;
+    // Modal Script
+    const modal = document.getElementById("privacyModal");
+    const openModalLink = document.getElementById("openModal");
+    const closeModal = document.querySelector(".modal-close");
+    const modalContent = document.getElementById("modalContent");
 
-    function isCookieConsentValid() {
-        const consentData = JSON.parse(localStorage.getItem(cookieKey));
-        if (!consentData) return false;
+    openModalLink.addEventListener("click", function (e) {
+        e.preventDefault(); // Prevent default link behavior
 
-        const expirationDate = new Date(consentData.expires);
-        return new Date() < expirationDate;
-    }
-
-    if (!isCookieConsentValid()) {
-        cookieConsent.style.display = "block";
-    }
-
-    acceptCookiesButton.addEventListener("click", function () {
-        const expirationDate = new Date();
-        expirationDate.setDate(expirationDate.getDate() + expirationDays);
-
-        const consentData = {
-            accepted: true,
-            expires: expirationDate.toISOString()
-        };
-        localStorage.setItem(cookieKey, JSON.stringify(consentData));
-
-        cookieConsent.style.display = "none";
+        // Load content from privacy-policy.php using AJAX
+        fetch("privacy-policy.php")
+            .then(response => response.text())
+            .then(data => {
+                modalContent.innerHTML = data; // Insert content into modal
+                modal.style.display = "flex"; // Show the modal
+            })
+            .catch(error => {
+                console.error("Error loading Privacy Policy:", error);
+                modalContent.innerHTML = "<p>Error loading Privacy Policy. Please try again later.</p>";
+                modal.style.display = "flex";
+            });
     });
-});
+
+    closeModal.addEventListener("click", function () {
+        modal.style.display = "none";
+    });
+
+    window.addEventListener("click", function (e) {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+    // Cookie Consent Script with Expiration
+    document.addEventListener("DOMContentLoaded", function () {
+        const cookieConsent = document.getElementById("cookieConsent");
+        const acceptCookiesButton = document.getElementById("acceptCookies");
+        const cookieKey = "cookiesAccepted";
+        const expirationDays = 30;
+
+        function isCookieConsentValid() {
+            const consentData = JSON.parse(localStorage.getItem(cookieKey));
+            if (!consentData) return false;
+
+            const expirationDate = new Date(consentData.expires);
+            return new Date() < expirationDate;
+        }
+
+        if (!isCookieConsentValid()) {
+            cookieConsent.style.display = "block";
+        }
+
+        acceptCookiesButton.addEventListener("click", function () {
+            const expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + expirationDays);
+
+            const consentData = {
+                accepted: true,
+                expires: expirationDate.toISOString()
+            };
+            localStorage.setItem(cookieKey, JSON.stringify(consentData));
+
+            cookieConsent.style.display = "none";
+        });
+    });
 </script>
 
 </body>
