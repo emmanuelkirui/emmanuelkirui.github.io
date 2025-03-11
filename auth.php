@@ -34,7 +34,7 @@ function sendResponse($success, $message, $data = []) {
 function getLocationInfoFromIP() {
     $ip = $_SERVER['REMOTE_ADDR'];
     $result = [
-        'ip' => $ip,  // Explicitly include IP
+        'ip' => $ip,  // Explicitly store IP
         'location' => 'Unknown location',
         'timezone' => 'UTC'
     ];
@@ -63,32 +63,20 @@ function getDeviceBrowserInfo() {
     $device = 'Unknown Device';
     $browser = 'Unknown Browser';
 
-    // Detect device
     if (preg_match('/Mobile|Android|iPhone|iPad/', $userAgent)) {
         $device = 'Mobile Device';
-        if (preg_match('/Android/', $userAgent)) {
-            $device = 'Android Device';
-        } elseif (preg_match('/iPhone/', $userAgent)) {
-            $device = 'iPhone';
-        } elseif (preg_match('/iPad/', $userAgent)) {
-            $device = 'iPad';
-        }
+        if (preg_match('/Android/', $userAgent)) $device = 'Android Device';
+        elseif (preg_match('/iPhone/', $userAgent)) $device = 'iPhone';
+        elseif (preg_match('/iPad/', $userAgent)) $device = 'iPad';
     } elseif (preg_match('/Windows|Macintosh|Linux/', $userAgent)) {
         $device = 'Desktop';
     }
 
-    // Detect browser
-    if (preg_match('/Chrome/', $userAgent)) {
-        $browser = 'Google Chrome';
-    } elseif (preg_match('/Firefox/', $userAgent)) {
-        $browser = 'Mozilla Firefox';
-    } elseif (preg_match('/Safari/', $userAgent) && !preg_match('/Chrome/', $userAgent)) {
-        $browser = 'Safari';
-    } elseif (preg_match('/Edge/', $userAgent)) {
-        $browser = 'Microsoft Edge';
-    } elseif (preg_match('/MSIE|Trident/', $userAgent)) {
-        $browser = 'Internet Explorer';
-    }
+    if (preg_match('/Chrome/', $userAgent)) $browser = 'Google Chrome';
+    elseif (preg_match('/Firefox/', $userAgent)) $browser = 'Mozilla Firefox';
+    elseif (preg_match('/Safari/', $userAgent) && !preg_match('/Chrome/', $userAgent)) $browser = 'Safari';
+    elseif (preg_match('/Edge/', $userAgent)) $browser = 'Microsoft Edge';
+    elseif (preg_match('/MSIE|Trident/', $userAgent)) $browser = 'Internet Explorer';
 
     return [
         'device' => $device,
@@ -116,7 +104,7 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
         date_default_timezone_set($timezone);
         $localTime = date('F j, Y \a\t h:i A');
 
-        // Social media icons (YouTube, X, Instagram, Facebook, TikTok only)
+        // Social media icons
         $socialIcons = '
             <div style="margin-top: 20px; text-align: center;">
                 <a href="https://youtube.com/@emmanuelkirui9043" style="margin: 0 10px; text-decoration: none; color: #ff0000;"><i class="fa-brands fa-youtube"></i></a>
@@ -206,7 +194,7 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
     }
 }
 
-// Function to send reset email using PHPMailer (unchanged)
+// Function to send reset email using PHPMailer
 function sendResetEmail($to, $resetLink) {
     $mail = new PHPMailer(true);
 
@@ -228,8 +216,8 @@ function sendResetEmail($to, $resetLink) {
         $mail->Body = "
             <html>
             <head>
-                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous' referrerpolicy='no-referrer' />
-                </head>
+                <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous' referrerpolicy='no-referrer' />
+            </head>
             <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                 <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                     <h2 style='color: #2c3e50;'>Password Reset Request</h2>
@@ -254,7 +242,7 @@ function sendResetEmail($to, $resetLink) {
     }
 }
 
-// Handle logout (unchanged)
+// Handle logout
 if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
     session_unset();
     session_destroy();
@@ -292,6 +280,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $locationInfo = getLocationInfoFromIP();
             $deviceBrowserInfo = getDeviceBrowserInfo();
+
+            // Log IP for debugging
+            error_log("Login IP: " . $locationInfo['ip']);
+
             sendNotificationEmail(
                 $user['email'],
                 'login',
@@ -300,10 +292,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $locationInfo['timezone'],
                 $deviceBrowserInfo['device'],
                 $deviceBrowserInfo['browser'],
-                $locationInfo['ip']  // Pass IP to email
+                $locationInfo['ip']
             );
             
-            sendResponse(true, 'Login successful', ['ip' => $locationInfo['ip']]); // Optional: Include IP in response
+            sendResponse(true, 'Login successful');
         } else {
             sendResponse(false, 'Invalid username or password');
         }
@@ -348,6 +340,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $locationInfo = getLocationInfoFromIP();
             $deviceBrowserInfo = getDeviceBrowserInfo();
+
+            // Log IP for debugging
+            error_log("Signup IP: " . $locationInfo['ip']);
+
             sendNotificationEmail(
                 $email,
                 'signup',
@@ -356,16 +352,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $locationInfo['timezone'],
                 $deviceBrowserInfo['device'],
                 $deviceBrowserInfo['browser'],
-                $locationInfo['ip']  // Pass IP to email
+                $locationInfo['ip']
             );
             
-            sendResponse(true, 'Signup successful', ['ip' => $locationInfo['ip']]); // Optional: Include IP in response
+            sendResponse(true, 'Signup successful');
         } else {
             sendResponse(false, 'Signup failed. Please try again.');
         }
     }
 
-    // Password Reset Request (unchanged)
+    // Password Reset Request
     if (isset($_POST['reset_request'])) {
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
