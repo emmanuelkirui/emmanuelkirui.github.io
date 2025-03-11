@@ -30,10 +30,11 @@ function sendResponse($success, $message, $data = []) {
     exit;
 }
 
-// Function to get location and timezone from IP
+// Function to get location, timezone, and IP
 function getLocationInfoFromIP() {
     $ip = $_SERVER['REMOTE_ADDR'];
     $result = [
+        'ip' => $ip,  // Explicitly include IP
         'location' => 'Unknown location',
         'timezone' => 'UTC'
     ];
@@ -95,8 +96,8 @@ function getDeviceBrowserInfo() {
     ];
 }
 
-// Function to send notification email
-function sendNotificationEmail($to, $type, $username, $location, $timezone, $device, $browser) {
+// Function to send notification email with IP
+function sendNotificationEmail($to, $type, $username, $location, $timezone, $device, $browser, $ip) {
     $mail = new PHPMailer(true);
     
     try {
@@ -152,6 +153,7 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
                         <table style='width: 100%; border-collapse: collapse; margin: 20px 0;'>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Date & Time:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$localTime} ({$timezone})</td></tr>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Location:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$location}</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>IP Address:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$ip}</td></tr>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Device:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$device}</td></tr>
                             <tr><td style='padding: 8px;'><strong>Browser:</strong></td><td style='padding: 8px;'>{$browser}</td></tr>
                         </table>
@@ -178,6 +180,7 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
                         <table style='width: 100%; border-collapse: collapse; margin: 20px 0;'>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Date & Time:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$localTime} ({$timezone})</td></tr>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Location:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$location}</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>IP Address:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$ip}</td></tr>
                             <tr><td style='padding: 8px;'><strong>Device:</strong></td><td style='padding: 8px;'>{$device} via {$browser}</td></tr>
                         </table>
                         <p>We're excited to have you on board. Get started by:</p>
@@ -203,7 +206,7 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
     }
 }
 
-// Function to send reset email using PHPMailer
+// Function to send reset email using PHPMailer (unchanged)
 function sendResetEmail($to, $resetLink) {
     $mail = new PHPMailer(true);
 
@@ -251,7 +254,7 @@ function sendResetEmail($to, $resetLink) {
     }
 }
 
-// Handle logout
+// Handle logout (unchanged)
 if (isset($_GET['logout']) && $_GET['logout'] === 'true') {
     session_unset();
     session_destroy();
@@ -296,10 +299,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $locationInfo['location'],
                 $locationInfo['timezone'],
                 $deviceBrowserInfo['device'],
-                $deviceBrowserInfo['browser']
+                $deviceBrowserInfo['browser'],
+                $locationInfo['ip']  // Pass IP to email
             );
             
-            sendResponse(true, 'Login successful');
+            sendResponse(true, 'Login successful', ['ip' => $locationInfo['ip']]); // Optional: Include IP in response
         } else {
             sendResponse(false, 'Invalid username or password');
         }
@@ -351,16 +355,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $locationInfo['location'],
                 $locationInfo['timezone'],
                 $deviceBrowserInfo['device'],
-                $deviceBrowserInfo['browser']
+                $deviceBrowserInfo['browser'],
+                $locationInfo['ip']  // Pass IP to email
             );
             
-            sendResponse(true, 'Signup successful');
+            sendResponse(true, 'Signup successful', ['ip' => $locationInfo['ip']]); // Optional: Include IP in response
         } else {
             sendResponse(false, 'Signup failed. Please try again.');
         }
     }
 
-    // Password Reset Request
+    // Password Reset Request (unchanged)
     if (isset($_POST['reset_request'])) {
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
