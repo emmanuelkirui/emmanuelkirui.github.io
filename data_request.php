@@ -115,18 +115,43 @@ class DataRequestHandler {
     }
 
     private function getEmailBody(string $username, string $dataHtml): string {
-        return "<html><body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
-            <div style='max-width: 600px; margin: 0 auto;'>
-                <h1 style='color: #007bff;'>Creative Pulse Solutions</h1>
-                <p>Hello {$username},</p>
-                <p>Your data request has been processed successfully. Below is the information associated with your account:</p>
-                {$dataHtml}
-                <p style='margin-top: 20px;'>If you have any questions, please contact our support team at <a href='mailto:support@creativepulsesolutions.com' style='color: #007bff;'>support@creativepulsesolutions.com</a>.</p>
-                <p style='color: #666; font-size: 12px;'>This is an automated message, please do not reply directly to this email.</p>
+    return "<html><body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
+        <div style='max-width: 600px; margin: 0 auto;'>
+            <h1 style='color: #007bff;'>Creative Pulse Solutions</h1>
+            <p>Hello {$username},</p>
+            <p>Your data request has been processed successfully. Below is the information associated with your account:</p>
+            {$dataHtml}
+            <p style='margin-top: 20px;'>If you have any questions, please contact our support team at <a href='mailto:support@creativepulsesolutions.com' style='color: #007bff;'>support@creativepulsesolutions.com</a>.</p>
+            <p style='color: #666; font-size: 12px;'>This is an automated message, please do not reply directly to this email.</p>
+            
+            <!-- Footer Section -->
+            <div style='margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;'>
+                <!-- Social Media Icons -->
+                <div style='margin-bottom: 15px;'>
+                    <a href='https://facebook.com/creativepulsesolutions' style='margin: 0 10px;'>
+                        <img src='https://cdn-icons-png.flaticon.com/512/124/124010.png' alt='Facebook' style='width: 24px; height: 24px;'>
+                    </a>
+                    <a href='https://twitter.com/creativepulse' style='margin: 0 10px;'>
+                        <img src='https://cdn-icons-png.flaticon.com/512/124/124021.png' alt='Twitter' style='width: 24px; height: 24px;'>
+                    </a>
+                    <a href='https://instagram.com/creativepulsesolutions' style='margin: 0 10px;'>
+                        <img src='https://cdn-icons-png.flaticon.com/512/174/174855.png' alt='Instagram' style='width: 24px; height: 24px;'>
+                    </a>
+                    <a href='https://linkedin.com/company/creativepulsesolutions' style='margin: 0 10px;'>
+                        <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='LinkedIn' style='width: 24px; height: 24px;'>
+                    </a>
+                </div>
+                <!-- Legal Links -->
+                <div style='color: #666; font-size: 12px;'>
+                    <a href='https://creativepulse.42web.io/privacy-policy' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Privacy Policy</a>
+                    |
+                    <a href='https://creativepulse.42web.io/cps/terms-conditions' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Terms & Conditions</a>
+                </div>
+                <p style='color: #999; font-size: 11px; margin-top: 10px;'>© " . date('Y') . " Creative Pulse Solutions. All rights reserved.</p>
             </div>
-        </body></html>";
-    }
-
+        </div>
+    </body></html>";
+}
     private function getEmailPlainText(string $username, array $userData): string {
         return "Creative Pulse Solutions\n\nHello {$username},\n\nYour data request has been processed.\n\nData:\n" . print_r($userData, true)
             . "\nContact support@creativepulse42web.io for assistance.";
