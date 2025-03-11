@@ -62,6 +62,7 @@ function getDeviceBrowserInfo() {
     $device = 'Unknown Device';
     $browser = 'Unknown Browser';
 
+    // Detect device
     if (preg_match('/Mobile|Android|iPhone|iPad/', $userAgent)) {
         $device = 'Mobile Device';
         if (preg_match('/Android/', $userAgent)) {
@@ -75,6 +76,7 @@ function getDeviceBrowserInfo() {
         $device = 'Desktop';
     }
 
+    // Detect browser
     if (preg_match('/Chrome/', $userAgent)) {
         $browser = 'Google Chrome';
     } elseif (preg_match('/Firefox/', $userAgent)) {
@@ -113,32 +115,24 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
         date_default_timezone_set($timezone);
         $localTime = date('F j, Y \a\t h:i A');
 
-        // Footer with social media icons and legal links
+        // Social media icons (YouTube, X, Instagram, Facebook, TikTok only)
+        $socialIcons = '
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="https://youtube.com/@emmanuelkirui9043" style="margin: 0 10px; text-decoration: none; color: #ff0000;"><i class="fa-brands fa-youtube"></i></a>
+                <a href="https://x.com/emmanuelkirui" style="margin: 0 10px; text-decoration: none; color: #000000;"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://instagram.com/emmanuelkirui3" style="margin: 0 10px; text-decoration: none; color: #e4405f;"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://facebook.com/emmanuelkirui042" style="margin: 0 10px; text-decoration: none; color: #3b5998;"><i class="fa-brands fa-facebook"></i></a>
+                <a href="https://tiktok.com/@emmanuelkirui3" style="margin: 0 10px; text-decoration: none; color: #000000;"><i class="fa-brands fa-tiktok"></i></a>
+            </div>';
+
         $footer = '
-            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
-                <div style="margin-bottom: 15px;">
-                    <a href="https://youtube.com/@emmanuelkirui9043" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" style="width: 24px; height: 24px;">
-                    </a>
-                    <a href="https://x.com/emmanuelkirui" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/5969/5969020.png" alt="X" style="width: 24px; height: 24px;">
-                    </a>
-                    <a href="https://instagram.com/emmanuelkirui3" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram" style="width: 24px; height: 24px;">
-                    </a>
-                    <a href="https://facebook.com/emmanuelkirui042" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook" style="width: 24px; height: 24px;">
-                    </a>
-                    <a href="https://tiktok.com/@emmanuelkirui3" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3046/3046123.png" alt="TikTok" style="width: 24px; height: 24px;">
-                    </a>
-                </div>
-                <div style="color: #666; font-size: 12px;">
-                    <a href="https://creativepulse.42web.io/cps/privacy-policy" style="color: #007bff; text-decoration: none; margin: 0 10px;">Privacy Policy</a>
-                    |
-                    <a href="https://creativepulse.42web.io/cps/terms-conditions" style="color: #007bff; text-decoration: none; margin: 0 10px;">Terms & Conditions</a>
-                </div>
-                <p style="color: #999; font-size: 11px; margin-top: 10px;">© ' . date('Y') . ' Creative Pulse Solutions. All rights reserved.</p>
+            <div style="font-size: 12px; color: #777; margin-top: 20px; text-align: center;">
+                <p>Support: support@creativepulse.42web.io | This is an automated message</p>
+                <p>
+                    <a href="https://creativepulse.42web.io/cps/privacy-policy" style="color: #777; text-decoration: none;">Privacy Policy</a> | 
+                    <a href="https://creativepulse.42web.io/cps/terms-conditions" style="color: #777; text-decoration: none;">Terms & Conditions</a>
+                </p>
+                ' . $socialIcons . '
             </div>';
 
         $mail->isHTML(true);
@@ -147,6 +141,9 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
             $mail->Subject = 'Security Alert: Successful Login to Your Account';
             $mail->Body = "
                 <html>
+                <head>
+                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous' referrerpolicy='no-referrer' />
+                </head>
                 <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                         <h2 style='color: #2c3e50;'>Successful Login Notification</h2>
@@ -170,6 +167,9 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
             $mail->Subject = 'Welcome to Creative Pulse Solutions';
             $mail->Body = "
                 <html>
+                <head>
+                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous' referrerpolicy='no-referrer' />
+                </head>
                 <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                         <h2 style='color: #2c3e50;'>Welcome to Creative Pulse Solutions</h2>
@@ -220,38 +220,13 @@ function sendResetEmail($to, $resetLink) {
         $mail->setFrom('noreply@creativepulse.com', 'Creative Pulse Solutions');
         $mail->addAddress($to);
 
-        // Footer with social media icons and legal links
-        $footer = '
-            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
-                <div style="margin-bottom: 15px;">
-                    <a href="https://youtube.com/@emmanuelkirui9043" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube" style="width: 24px; height: 24px;">
-                    </a>
-                    <a href="https://x.com/emmanuelkirui" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/5969/5969020.png" alt="X" style="width: 24px; height: 24px;">
-                    </a>
-                    <a href="https://instagram.com/emmanuelkirui3" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram" style="width: 24px; height: 24px;">
-                    </a>
-                    <a href="https://facebook.com/emmanuelkirui042" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook" style="width: 24px; height: 24px;">
-                    </a>
-                    <a href="https://tiktok.com/@emmanuelkirui3" style="margin: 0 10px;">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3046/3046123.png" alt="TikTok" style="width: 24px; height: 24px;">
-                    </a>
-                </div>
-                <div style="color: #666; font-size: 12px;">
-                    <a href="https://creativepulse.42web.io/cps/privacy-policy" style="color: #007bff; text-decoration: none; margin: 0 10px;">Privacy Policy</a>
-                    |
-                    <a href="https://creativepulse.42web.io/cps/terms-conditions" style="color: #007bff; text-decoration: none; margin: 0 10px;">Terms & Conditions</a>
-                </div>
-                <p style="color: #999; font-size: 11px; margin-top: 10px;">© ' . date('Y') . ' Creative Pulse Solutions. All rights reserved.</p>
-            </div>';
-
         $mail->isHTML(true);
         $mail->Subject = 'Password Reset Request - Creative Pulse Solutions';
         $mail->Body = "
             <html>
+            <head>
+                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous' referrerpolicy='no-referrer' />
+                </head>
             <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                 <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                     <h2 style='color: #2c3e50;'>Password Reset Request</h2>
@@ -263,7 +238,6 @@ function sendResetEmail($to, $resetLink) {
                     <p>This link will expire in 1 hour for security reasons. If you didn't request this reset, please contact our support team immediately.</p>
                     <p>Best regards,<br>The Creative Pulse Solutions Team</p>
                     <p style='font-size: 12px; color: #777;'>Support: support@creativepulse.42web.io | This is an automated message</p>
-                    {$footer}
                 </div>
             </body>
             </html>";
