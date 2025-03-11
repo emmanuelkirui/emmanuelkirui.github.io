@@ -143,7 +143,7 @@ class DataRequestHandler {
                 </div>
                 <!-- Legal Links -->
                 <div style='color: #666; font-size: 12px;'>
-                    <a href='https://creativepulse.42web.io/privacy-policy' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Privacy Policy</a>
+                    <a href='https://creativepulse.42web.i/cps/privacy-policy' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Privacy Policy</a>
                     |
                     <a href='https://creativepulse.42web.io/cps/terms-conditions' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Terms & Conditions</a>
                 </div>
