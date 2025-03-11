@@ -115,12 +115,35 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
         date_default_timezone_set($timezone);
         $localTime = date('F j, Y \a\t h:i A');
 
+        // Social media icons (YouTube, X, Instagram, Facebook, TikTok only)
+        $socialIcons = '
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="https://youtube.com/@emmanuelkirui9043" style="margin: 0 10px; text-decoration: none; color: #ff0000;"><i class="fa-brands fa-youtube"></i></a>
+                <a href="https://x.com/emmanuelkirui" style="margin: 0 10px; text-decoration: none; color: #000000;"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="https://instagram.com/emmanuelkirui3" style="margin: 0 10px; text-decoration: none; color: #e4405f;"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://facebook.com/emmanuelkirui042" style="margin: 0 10px; text-decoration: none; color: #3b5998;"><i class="fa-brands fa-facebook"></i></a>
+                <a href="https://tiktok.com/@emmanuelkirui3" style="margin: 0 10px; text-decoration: none; color: #000000;"><i class="fa-brands fa-tiktok"></i></a>
+            </div>';
+
+        $footer = '
+            <div style="font-size: 12px; color: #777; margin-top: 20px; text-align: center;">
+                <p>Support: support@creativepulse.42web.io | This is an automated message</p>
+                <p>
+                    <a href="https://creativepulse.42web.io/cps/privacy-policy" style="color: #777; text-decoration: none;">Privacy Policy</a> | 
+                    <a href="https://creativepulse.42web.io/cps/terms-conditions" style="color: #777; text-decoration: none;">Terms & Conditions</a>
+                </p>
+                ' . $socialIcons . '
+            </div>';
+
         $mail->isHTML(true);
         
         if ($type === 'login') {
             $mail->Subject = 'Security Alert: Successful Login to Your Account';
             $mail->Body = "
                 <html>
+                <head>
+                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous' referrerpolicy='no-referrer' />
+                </head>
                 <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                         <h2 style='color: #2c3e50;'>Successful Login Notification</h2>
@@ -136,6 +159,7 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
                         <p><a href='https://creativepulse.42web.io/cps/reset_password.php' style='background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;'>Reset Your Password</a></p>
                         <p>Best regards,<br>The Creative Pulse Solutions Team</p>
                         <p style='font-size: 12px; color: #777;'>This is an automated message. Please do not reply directly to this email.</p>
+                        {$footer}
                     </div>
                 </body>
                 </html>";
@@ -143,6 +167,9 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
             $mail->Subject = 'Welcome to Creative Pulse Solutions';
             $mail->Body = "
                 <html>
+                <head>
+                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous' referrerpolicy='no-referrer' />
+                </head>
                 <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                         <h2 style='color: #2c3e50;'>Welcome to Creative Pulse Solutions</h2>
@@ -161,6 +188,7 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
                         </ul>
                         <p>Best regards,<br>The Creative Pulse Solutions Team</p>
                         <p style='font-size: 12px; color: #777;'>For support: support@creativepulse.com</p>
+                        {$footer}
                     </div>
                 </body>
                 </html>";
@@ -196,6 +224,9 @@ function sendResetEmail($to, $resetLink) {
         $mail->Subject = 'Password Reset Request - Creative Pulse Solutions';
         $mail->Body = "
             <html>
+            <head>
+                    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css' integrity='sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==' crossorigin='anonymous' referrerpolicy='no-referrer' />
+                </head>
             <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                 <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                     <h2 style='color: #2c3e50;'>Password Reset Request</h2>
