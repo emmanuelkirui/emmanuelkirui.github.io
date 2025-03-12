@@ -239,7 +239,7 @@ $year = date("Y");
                 <li>Using our trademarks, service marks, or branding in any manner that suggests endorsement, affiliation, or sponsorship without explicit authorization.</li>
                 <li>Removing or altering any copyright, trademark, or proprietary notices from our content.</li>
             </ul>
-            <p>Your license to use the Services does not grant you ownership of any intellectual property rights in the content or Services.</p>
+            <p>Your <span style="color: purple;">license</span> to use the Services does not grant you ownership of any intellectual property rights in the content or Services.</p>
         </section>
 
         <section>
@@ -302,7 +302,7 @@ $year = date("Y");
 
         <section>
             <h2>11. Governing Law and Dispute Resolution</h2>
-            <p>These Terms shall be governed by and construed in accordance with the laws of "Kenya" (or the relevant jurisdiction where you are), without regard to its conflict of law principles. Any disputes arising out of or relating to these Terms or the Services shall be resolved exclusively in the courts located in [Insert Location, e.g., "Nairobi, Kenya" or "Los Angeles, California"]. You agree to submit to the personal jurisdiction of such courts.</p>
+            <p>These Terms shall be governed by and construed in accordance with the laws of "Kenya" (or the relevant jurisdiction where you are), without regard to its conflict of law principles. Any disputes arising out of or relating to these Terms or the Services shall be resolved exclusively in the courts located in Nairobi, Kenya or Location of your jurisdiction. You agree to submit to the personal jurisdiction of such courts.</p>
             <p>We encourage informal resolution of disputes. Please contact us before initiating formal proceedings.</p>
         </section>
 
