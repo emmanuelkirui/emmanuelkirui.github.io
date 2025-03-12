@@ -59,7 +59,7 @@ class DataRequestHandler {
 
     private function validateCredentials(string $email, string $password): ?array {
         $stmt = $this->pdo->prepare(
-            "SELECT id, username, password, email,full_name
+            "SELECT id, username, password, email
              FROM cp_users 
              WHERE email = :email"
         );
@@ -74,7 +74,6 @@ class DataRequestHandler {
             'id' => $user['id'],
             'username' => $user['username'],
             'email' => $user['email']
-            'fullname' => $user['full_name']
         ];
     }
 
