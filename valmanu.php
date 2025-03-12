@@ -35,19 +35,20 @@ function enforceRateLimit($url = null) {
     });
     $requests = array_values($requests);
 
-    // If we're at the limit, queue or delay
+    // Check if we've hit the limit
     if (count($requests) >= REQUESTS_PER_MINUTE) {
         $oldestRequestTime = $requests[0];
         $timeToWait = MINUTE_IN_SECONDS - ($currentTime - $oldestRequestTime);
 
         if ($url) {
-            // Queue the request if provided
+            // Queue the request
             $_SESSION['request_queue'][] = ['url' => $url, 'timestamp' => $currentTime + $timeToWait];
             error_log("Rate limit reached. Queued request for $url. Waiting $timeToWait seconds.");
             return ['queued' => true, 'delay' => $timeToWait];
         } elseif ($timeToWait > 0) {
+            // Delay execution for non-queued calls
             error_log("Rate limit reached. Delaying execution by $timeToWait seconds.");
-            sleep($timeToWait); // Delay execution for non-queued calls
+            sleep($timeToWait);
         }
     }
 
@@ -69,22 +70,28 @@ function processQueue() {
     $requests = &$_SESSION['api_requests'];
     $requests = array_filter($requests, fn($ts) => ($currentTime - $ts) < MINUTE_IN_SECONDS);
     $requests = array_values($requests);
+    $remainingCapacity = REQUESTS_PER_MINUTE - count($requests);
 
     $processed = 0;
-    while ($processed < 1 && count($requests) < REQUESTS_PER_MINUTE && !empty($queue)) { // Process 1 at a time
+    $maxPerCycle = min(2, $remainingCapacity); // Process up to 2 requests per cycle, respecting limit
+    while ($processed < $maxPerCycle && !empty($queue)) {
         $nextRequest = array_shift($queue);
         if ($nextRequest['timestamp'] <= $currentTime) {
             $requests[] = $currentTime;
             $_SESSION['api_requests'] = $requests;
             error_log("Processing queued request: " . $nextRequest['url']);
             $processed++;
-            sleep(6); // Throttle to 1 request every 6 seconds
+            sleep(6); // Throttle to 1 request every 6 seconds (10 requests/minute = 6s/request)
         } else {
-            array_unshift($queue, $nextRequest);
+            array_unshift($queue, $nextRequest); // Put back if not ready
             break;
         }
     }
     $_SESSION['request_queue'] = $queue;
+
+    if ($processed > 0) {
+        error_log("Processed $processed queued requests. Remaining queue: " . count($queue));
+    }
 }
 
 // Error handling functions remain unchanged
@@ -107,11 +114,22 @@ function handleJsonError($message) {
 }
 
 // fetchWithRetry, fetchTeamResults, fetchStandings, fetchTeams, calculateTeamStrength, predictMatch functions remain unchanged
-function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
+        function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
     $maxAttempts = 3;
     $baseTimeout = 15;
+    $cacheFile = 'cache/' . md5($url) . '.json';
+    $cacheTTL = 3600; // Cache for 1 hour
 
-    // Check rate limit before proceeding
+    // Check cache first
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTTL) {
+        $cachedData = json_decode(file_get_contents($cacheFile), true);
+        if ($cachedData) {
+            error_log("Serving cached response for $url");
+            return ['error' => false, 'data' => $cachedData];
+        }
+    }
+
+    // Check rate limit
     $rateLimitCheck = enforceRateLimit($url);
     if ($rateLimitCheck['queued']) {
         return ['error' => true, 'queued' => true, 'delay' => $rateLimitCheck['delay']];
@@ -134,7 +152,7 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
         curl_close($ch);
 
         if ($errorCode == CURLE_OPERATION_TIMEDOUT && $attempt < $maxAttempts) {
-            $retrySeconds = min(pow(2, $attempt), 8);
+            $retrySeconds = min(pow(2, $attempt), 8); // Exponential backoff, max 8s
             sleep($retrySeconds);
             return fetchWithRetry($url, $apiKey, $isAjax, $attempt + 1);
         }
@@ -158,12 +176,15 @@ function fetchWithRetry($url, $apiKey, $isAjax = false, $attempt = 0) {
         if ($isAjax) {
             return ['error' => true, 'retry' => true, 'delay' => $retrySeconds];
         } else {
-            sleep($retrySeconds); // For non-AJAX, delay and retry
+            sleep($retrySeconds);
             return fetchWithRetry($url, $apiKey, $isAjax, $attempt);
         }
     } elseif ($httpCode == 200) {
         error_log("Success: $url - HTTP 200 (Attempt $attempt)");
-        return ['error' => false, 'data' => json_decode($body, true)];
+        $data = json_decode($body, true);
+        if (!file_exists('cache')) mkdir('cache', 0777, true);
+        file_put_contents($cacheFile, json_encode($data));
+        return ['error' => false, 'data' => $data];
     } else {
         error_log("Failed: $url - HTTP $httpCode (Attempt $attempt)");
         return ['error' => true, 'message' => "API Error: HTTP $httpCode"];
