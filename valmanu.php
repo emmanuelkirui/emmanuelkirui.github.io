@@ -2431,6 +2431,74 @@ try {
     </div>
     
     <script>
+               // Client-side rate limiting configuration
+const REQUESTS_PER_MINUTE = 10;
+const MINUTE_IN_SECONDS = 60;
+const REQUEST_INTERVAL = MINUTE_IN_SECONDS * 1000 / REQUESTS_PER_MINUTE; // 6000ms (6 seconds)
+
+// Track requests and queue
+let requestTimestamps = [];
+let requestQueue = [];
+
+// Function to enforce client-side rate limiting
+function enforceClientRateLimit(callback, args) {
+    const now = Date.now();
+    
+    // Clean up old timestamps
+    requestTimestamps = requestTimestamps.filter(ts => now - ts < MINUTE_IN_SECONDS * 1000);
+    
+    if (requestTimestamps.length < REQUESTS_PER_MINUTE) {
+        // Execute immediately
+        requestTimestamps.push(now);
+        callback(...args);
+    } else {
+        // Queue the request
+        const oldestTimestamp = requestTimestamps[0];
+        const delay = Math.max(0, (oldestTimestamp + MINUTE_IN_SECONDS * 1000) - now);
+        
+        console.log(`Rate limit hit. Queuing request for ${delay}ms`);
+        requestQueue.push({ callback, args, scheduledTime: now + delay });
+        
+        // Update UI to show queued status
+        const [index, homeId, awayId, isHome] = args; // Adjust based on function signature
+        const targetElement = callback.name === 'fetchTeamData' 
+            ? document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`)
+            : document.getElementById(`prediction-${index}`);
+        targetElement.innerHTML = `<p>Queued, retrying in ${(delay / 1000).toFixed(1)}s</p>`;
+        
+        // Ensure queue processing is running
+        processRequestQueue();
+    }
+}
+
+// Function to process queued requests
+function processRequestQueue() {
+    if (!requestQueue.length) return;
+
+    const now = Date.now();
+    requestTimestamps = requestTimestamps.filter(ts => now - ts < MINUTE_IN_SECONDS * 1000);
+    
+    const availableSlots = REQUESTS_PER_MINUTE - requestTimestamps.length;
+    if (availableSlots <= 0) {
+        setTimeout(processRequestQueue, REQUEST_INTERVAL);
+        return;
+    }
+
+    const toProcess = requestQueue
+        .filter(req => req.scheduledTime <= now)
+        .slice(0, availableSlots);
+
+    toProcess.forEach(req => {
+        requestTimestamps.push(now);
+        req.callback(...req.args);
+    });
+
+    requestQueue = requestQueue.filter(req => !toProcess.includes(req));
+    
+    if (requestQueue.length) {
+        setTimeout(processRequestQueue, REQUEST_INTERVAL);
+    }
+} 
         function switchView(view) {
     const gridView = document.getElementById('match-grid');
     const tableView = document.getElementById('match-table');
@@ -2782,7 +2850,12 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             }
         });
 
-        function fetchTeamData(teamId, index, isHome, attempt = 0, maxAttempts = 10) {
+        
+function fetchTeamData(teamId, index, isHome, attempt = 0, maxAttempts = 10) {
+    enforceClientRateLimit(fetchTeamDataImpl, [teamId, index, isHome, attempt, maxAttempts]);
+}
+
+function fetchTeamDataImpl(teamId, index, isHome, attempt, maxAttempts) {
     const delay = Math.min(Math.pow(2, attempt) * 1000, 6000);
     const formElement = document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`);
     const tableFormElement = document.getElementById(`table-form-${isHome ? 'home' : 'away'}-${index}`);
@@ -2796,6 +2869,7 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         historyElement.innerHTML = '<p>Loading history... <span class="loading-spinner">⏳</span></p>';
     }
 
+    // Progress bar setup
     const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
     if (!progressBar.classList.contains('progress-fill')) {
         progressBar.classList.add('progress-fill');
@@ -2804,7 +2878,9 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         progressContainer.appendChild(progressBar);
         predictionElement.appendChild(progressContainer);
     }
+    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
 
+    // Retry notice at attempt 5
     if (attempt === 5) {
         const retryNotice = document.createElement('div');
         retryNotice.className = 'retry-notice';
@@ -2822,7 +2898,7 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         setTimeout(() => retryNotice.remove(), delay + 1000);
     }
 
-    console.log(`Fetching team data for ${teamId} (debounced, attempt ${attempt})`);
+    console.log(`Fetching team data for ${teamId} (attempt ${attempt})`);
     fetch(`?action=fetch_team_data&teamId=${teamId}&competition=<?php echo $selectedComp; ?>&force_refresh=true&attempt=${attempt}`, {
         headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
     })
@@ -2831,14 +2907,13 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         if (data.queued) {
             formElement.innerHTML = `<p>Queued, retrying in ${data.delay}s</p>`;
             tableFormElement.innerHTML = `<p>Queued, retrying in ${data.delay}s</p>`;
-            setTimeout(() => debouncedFetchTeamData(teamId, index, isHome, attempt), data.delay * 1000);
+            setTimeout(() => fetchTeamData(teamId, index, isHome, attempt), data.delay * 1000);
         } else if (data.success) {
             updateTeamUI(data, index, isHome, formElement, tableFormElement, historyElement, predictionElement);
             progressBar.parentElement.remove();
             predictionElement.querySelector('.retry-notice')?.remove();
         } else if (data.retry && attempt < maxAttempts) {
-            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-            setTimeout(() => debouncedFetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+            setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
         } else {
             console.error(`Max retries reached for team ${teamId}`);
             formElement.innerHTML = '<p>Error loading data</p>';
@@ -2850,8 +2925,7 @@ document.getElementById('standings-view-btn').addEventListener('click', function
     .catch(error => {
         console.error('Error fetching team data:', error);
         if (attempt < maxAttempts) {
-            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-            setTimeout(() => debouncedFetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
+            setTimeout(() => fetchTeamData(teamId, index, isHome, attempt + 1, maxAttempts), delay);
         } else {
             formElement.innerHTML = '<p>Failed to load data</p>';
             tableFormElement.innerHTML = '<p>Failed</p>';
@@ -2860,7 +2934,6 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         }
     });
 }
-    
             
 
         function updateTeamUI(data, index, isHome, formElement, tableFormElement, historyElement, predictionElement) {
@@ -2905,14 +2978,18 @@ document.getElementById('standings-view-btn').addEventListener('click', function
                 historyElement.innerHTML = historyHtml;
             }
         }
+        function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 10) {
+    enforceClientRateLimit(fetchPredictionImpl, [index, homeId, awayId, attempt, maxAttempts]);
+}
 
-                function fetchPrediction(index, homeId, awayId, attempt = 0, maxAttempts = 10) {
+function fetchPredictionImpl(index, homeId, awayId, attempt, maxAttempts) {
     const delay = Math.min(Math.pow(2, attempt) * 1000, 10000);
     const predictionElement = document.getElementById(`prediction-${index}`);
     const tablePrediction = document.getElementById(`table-prediction-${index}`);
     const tableConfidence = document.getElementById(`table-confidence-${index}`);
     const tablePredictedScore = document.getElementById(`table-predicted-score-${index}`);
 
+    // Progress bar setup
     const progressBar = predictionElement.querySelector('.progress-fill') || document.createElement('div');
     if (!progressBar.classList.contains('progress-fill')) {
         progressBar.classList.add('progress-fill');
@@ -2921,7 +2998,9 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         progressContainer.appendChild(progressBar);
         predictionElement.appendChild(progressContainer);
     }
+    progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
 
+    // Retry notice at attempt 5
     if (attempt === 5) {
         const retryNotice = document.createElement('div');
         retryNotice.className = 'retry-notice';
@@ -2939,7 +3018,7 @@ document.getElementById('standings-view-btn').addEventListener('click', function
         setTimeout(() => retryNotice.remove(), delay + 1000);
     }
 
-    console.log(`Fetching prediction for match ${index} (debounced, attempt ${attempt})`);
+    console.log(`Fetching prediction for match ${index} (attempt ${attempt})`);
     fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=<?php echo $selectedComp; ?>&attempt=${attempt}`, {
         headers: { 'X-Auth-Token': '<?php echo $apiKey; ?>' }
     })
@@ -2950,7 +3029,7 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             tablePrediction.innerHTML = `Queued (${data.delay}s)`;
             tableConfidence.innerHTML = '';
             tablePredictedScore.innerHTML = '';
-            setTimeout(() => debouncedFetchPrediction(index, homeId, awayId, attempt), data.delay * 1000);
+            setTimeout(() => fetchPrediction(index, homeId, awayId, attempt), data.delay * 1000);
         } else if (data.success) {
             predictionElement.innerHTML = `
                 <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
@@ -2966,10 +3045,13 @@ document.getElementById('standings-view-btn').addEventListener('click', function
             progressBar.parentElement.remove();
             predictionElement.querySelector('.retry-notice')?.remove();
         } else if (data.retry && attempt < maxAttempts) {
-            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-            setTimeout(() => debouncedFetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
+            setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
         } else {
             console.error(`Max retries reached for prediction ${index}`);
+            predictionElement.innerHTML = '<p>Error loading prediction</p>';
+            tablePrediction.innerHTML = 'Error';
+            tableConfidence.innerHTML = '';
+            tablePredictedScore.innerHTML = '';
             progressBar.parentElement.remove();
             predictionElement.querySelector('.retry-notice')?.remove();
         }
@@ -2977,9 +3059,12 @@ document.getElementById('standings-view-btn').addEventListener('click', function
     .catch(error => {
         console.error('Error fetching prediction:', error);
         if (attempt < maxAttempts) {
-            progressBar.style.width = `${(attempt + 1) / maxAttempts * 100}%`;
-            setTimeout(() => debouncedFetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
+            setTimeout(() => fetchPrediction(index, homeId, awayId, attempt + 1, maxAttempts), delay);
         } else {
+            predictionElement.innerHTML = '<p>Failed to load prediction</p>';
+            tablePrediction.innerHTML = 'Failed';
+            tableConfidence.innerHTML = '';
+            tablePredictedScore.innerHTML = '';
             progressBar.parentElement.remove();
             predictionElement.querySelector('.retry-notice')?.remove();
         }
@@ -3007,7 +3092,7 @@ let pollingInterval;
 function startMatchPolling() {
     if (pollingInterval) clearInterval(pollingInterval);
     pollingInterval = setInterval(() => {
-        processQueue();
+        processRequestQueue(); // Process any queued requests first
         const matches = document.querySelectorAll('.match-card, .match-table tr');
         const maxRequestsPerPoll = Math.min(5, matches.length);
         let requestsMade = 0;
@@ -3021,7 +3106,7 @@ function startMatchPolling() {
 
             if (status === 'FINISHED' && element.querySelector('.result-indicator')) return;
 
-            debouncedFetchPrediction(index, homeId, awayId);
+            fetchPrediction(index, homeId, awayId); // Use rate-limited version
             requestsMade++;
         });
 
@@ -3352,9 +3437,8 @@ const debouncedFetchPrediction = debounce((index, homeId, awayId, attempt = 0, m
     adjustTeamSpacing();
     window.addEventListener('resize', adjustTeamSpacing);
 
-    debouncedStartPolling();
-
-    if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
+   
+if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
         incompleteTeams.forEach(teamId => {
             document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
                 const index = card.dataset.index;
@@ -3363,11 +3447,11 @@ const debouncedFetchPrediction = debounce((index, homeId, awayId, attempt = 0, m
 
                 if (homeId == teamId) {
                     document.getElementById(`form-home-${index}`).innerHTML = '<span class="loading-spinner">⏳</span>';
-                    debouncedFetchTeamData(homeId, index, true);
+                    fetchTeamData(homeId, index, true);
                 }
                 if (awayId == teamId) {
                     document.getElementById(`form-away-${index}`).innerHTML = '<span class="loading-spinner">⏳</span>';
-                    debouncedFetchTeamData(awayId, index, false);
+                    fetchTeamData(awayId, index, false);
                 }
 
                 setTimeout(() => {
@@ -3375,12 +3459,14 @@ const debouncedFetchPrediction = debounce((index, homeId, awayId, attempt = 0, m
                         !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
                         !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
                     if (otherTeamLoaded) {
-                        debouncedFetchPrediction(index, homeId, awayId);
+                        fetchPrediction(index, homeId, awayId);
                     }
                 }, 1000);
             });
         });
     }
+
+    startMatchPolling();
 };
 </script>
 </body>
