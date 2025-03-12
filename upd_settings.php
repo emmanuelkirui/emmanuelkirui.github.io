@@ -11,6 +11,9 @@
             margin: 0 auto;
             padding: 20px;
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         h2 {
@@ -22,6 +25,7 @@
         h3 {
             color: #555;
             margin-top: 30px;
+            margin-bottom: 15px;
         }
 
         .section {
@@ -30,10 +34,16 @@
             margin: 20px 0;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .info-item {
-            margin: 10px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
         }
 
         .muted {
@@ -41,15 +51,21 @@
             font-style: italic;
         }
 
-        input[type="text"],
-        input[type="password"] {
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             width: 100%;
             max-width: 300px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
             padding: 8px;
-            margin: 10px 0;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
+            flex: 1;
         }
 
         input[disabled] {
@@ -64,8 +80,8 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            margin-top: 10px;
             transition: background 0.3s;
+            align-self: flex-start;
         }
 
         button:hover {
@@ -80,13 +96,30 @@
             background: #b02a37;
         }
 
+        .input-button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .input-button-group {
+                flex-direction: row;
+                align-items: flex-end;
+            }
+
+            .form-group {
+                flex: 1;
+            }
+
+            button {
+                margin-left: 10px;
+            }
+        }
+
         @media (max-width: 600px) {
             .section {
                 padding: 15px;
-            }
-            input[type="text"],
-            input[type="password"] {
-                max-width: 100%;
             }
         }
     </style>
@@ -102,32 +135,45 @@
 
     <div class="section">
         <h3>Update Username</h3>
-        <input type="text" id="new_username" placeholder="New Username" required>
-        <button onclick="updateUsername()">Update Username</button>
+        <div class="input-button-group">
+            <div class="form-group">
+                <input type="text" id="new_username" placeholder="New Username" required>
+            </div>
+            <button onclick="updateUsername()">Update Username</button>
+        </div>
     </div>
 
     <div class="section">
         <h3>Update Full Name</h3>
-        <input type="text" id="new_full_name" placeholder="New Full Name" required>
-        <button onclick="updateFullName()">Update Full Name</button>
+        <div class="input-button-group">
+            <div class="form-group">
+                <input type="text" id="new_full_name" placeholder="New Full Name" required>
+            </div>
+            <button onclick="updateFullName()">Update Full Name</button>
+        </div>
     </div>
 
     <div class="section">
         <h3>Change Password</h3>
-        <input type="password" id="current_password" placeholder="Current Password" required>
-        <input type="password" id="new_password" placeholder="New Password" required>
-        <input type="password" id="confirm_password" placeholder="Confirm New Password" required>
-        <button onclick="updatePassword()">Update Password</button>
+        <div class="form-group">
+            <input type="password" id="current_password" placeholder="Current Password" required>
+            <input type="password" id="new_password" placeholder="New Password" required>
+            <input type="password" id="confirm_password" placeholder="Confirm New Password" required>
+            <button onclick="updatePassword()">Update Password</button>
+        </div>
     </div>
 
     <div class="section">
         <h3>Delete Account</h3>
-        <input type="password" id="delete_password" placeholder="Enter Password" required>
-        <button class="danger-button" onclick="deleteAccount()">Delete Account</button>
+        <div class="input-button-group">
+            <div class="form-group">
+                <input type="password" id="delete_password" placeholder="Enter Password" required>
+            </div>
+            <button class="danger-button" onclick="deleteAccount()">Delete Account</button>
+        </div>
     </div>
 
     <script>
-        // JavaScript remains the same as in your original code
         window.onload = function() {
             fetch('acc_settings.php', {
                 method: 'POST',
