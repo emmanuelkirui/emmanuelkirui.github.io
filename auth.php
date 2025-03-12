@@ -34,7 +34,7 @@ function sendResponse($success, $message, $data = []) {
 function getLocationInfoFromIP() {
     $ip = $_SERVER['REMOTE_ADDR'];
     $result = [
-        'ip' => $ip,  // Explicitly store IP
+        'ip' => $ip,
         'location' => 'Unknown location',
         'timezone' => 'UTC'
     ];
@@ -57,9 +57,10 @@ function getLocationInfoFromIP() {
     return $result;
 }
 
-// Function to get device and browser info from user agent
+// Function to get device and browser info
 function getDeviceBrowserInfo() {
     $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $deviceIp = $_SERVER['REMOTE_ADDR'];
     $device = 'Unknown Device';
     $browser = 'Unknown Browser';
 
@@ -80,16 +81,16 @@ function getDeviceBrowserInfo() {
 
     return [
         'device' => $device,
-        'browser' => $browser
+        'browser' => $browser,
+        'device_ip' => $deviceIp
     ];
 }
 
-// Function to send notification email with IP
-function sendNotificationEmail($to, $type, $username, $location, $timezone, $device, $browser, $ip) {
+// Function to send notification email
+function sendNotificationEmail($to, $type, $fullName, $username, $location, $timezone, $device, $browser, $ip, $deviceIp) {
     $mail = new PHPMailer(true);
     
     try {
-        // SMTP Settings
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
@@ -104,7 +105,6 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
         date_default_timezone_set($timezone);
         $localTime = date('F j, Y \a\t h:i A');
 
-        // Social media icons
         $socialIcons = '
             <div style="margin-top: 20px; text-align: center;">
                 <a href="https://youtube.com/@emmanuelkirui9043" style="margin: 0 10px; text-decoration: none; color: #ff0000;"><i class="fa-brands fa-youtube"></i></a>
@@ -136,12 +136,13 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
                 <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                         <h2 style='color: #2c3e50;'>Successful Login Notification</h2>
-                        <p>Dear {$username},</p>
-                        <p>We wanted to inform you that your Creative Pulse Solutions account was successfully accessed:</p>
+                        <p>Dear {$fullName},</p>
+                        <p>We wanted to inform you that your Creative Pulse Solutions account ({$username}) was successfully accessed:</p>
                         <table style='width: 100%; border-collapse: collapse; margin: 20px 0;'>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Date & Time:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$localTime} ({$timezone})</td></tr>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Location:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$location}</td></tr>
-                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>IP Address:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$ip}</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Login IP:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$ip}</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Device IP:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$deviceIp}</td></tr>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Device:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$device}</td></tr>
                             <tr><td style='padding: 8px;'><strong>Browser:</strong></td><td style='padding: 8px;'>{$browser}</td></tr>
                         </table>
@@ -163,12 +164,13 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
                 <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
                     <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
                         <h2 style='color: #2c3e50;'>Welcome to Creative Pulse Solutions</h2>
-                        <p>Dear {$username},</p>
-                        <p>Thank you for joining Creative Pulse Solutions! Your account was successfully created on:</p>
+                        <p>Dear {$fullName},</p>
+                        <p>Thank you for joining Creative Pulse Solutions! Your account ({$username}) was successfully created on:</p>
                         <table style='width: 100%; border-collapse: collapse; margin: 20px 0;'>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Date & Time:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$localTime} ({$timezone})</td></tr>
                             <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Location:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$location}</td></tr>
-                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>IP Address:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$ip}</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Login IP:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$ip}</td></tr>
+                            <tr><td style='padding: 8px; border-bottom: 1px solid #eee;'><strong>Device IP:</strong></td><td style='padding: 8px; border-bottom: 1px solid #eee;'>{$deviceIp}</td></tr>
                             <tr><td style='padding: 8px;'><strong>Device:</strong></td><td style='padding: 8px;'>{$device} via {$browser}</td></tr>
                         </table>
                         <p>We're excited to have you on board. Get started by:</p>
@@ -194,12 +196,11 @@ function sendNotificationEmail($to, $type, $username, $location, $timezone, $dev
     }
 }
 
-// Function to send reset email using PHPMailer
+// Function to send reset email
 function sendResetEmail($to, $resetLink) {
     $mail = new PHPMailer(true);
 
     try {
-        // SMTP Settings
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
@@ -277,25 +278,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($user && password_verify($password, $user['password'])) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_type'] = $user['user_type'];
+            $_SESSION['full_name'] = $user['full_name'];
             
             $locationInfo = getLocationInfoFromIP();
             $deviceBrowserInfo = getDeviceBrowserInfo();
 
-            // Log IP for debugging
-            error_log("Login IP: " . $locationInfo['ip']);
+            // Update user IP addresses
+            $stmt = $pdo->prepare("UPDATE cp_users SET last_ip = :last_ip, device_ip = :device_ip WHERE id = :id");
+            $stmt->execute([
+                'last_ip' => $locationInfo['ip'],
+                'device_ip' => $deviceBrowserInfo['device_ip'],
+                'id' => $user['id']
+            ]);
+
+            // Log login history
+            $stmt = $pdo->prepare("INSERT INTO cp_login_history (user_id, login_ip, device_ip, device_info) VALUES (:user_id, :login_ip, :device_ip, :device_info)");
+            $stmt->execute([
+                'user_id' => $user['id'],
+                'login_ip' => $locationInfo['ip'],
+                'device_ip' => $deviceBrowserInfo['device_ip'],
+                'device_info' => $deviceBrowserInfo['device'] . ' - ' . $deviceBrowserInfo['browser']
+            ]);
 
             sendNotificationEmail(
                 $user['email'],
                 'login',
+                $user['full_name'],
                 $username,
                 $locationInfo['location'],
                 $locationInfo['timezone'],
                 $deviceBrowserInfo['device'],
                 $deviceBrowserInfo['browser'],
-                $locationInfo['ip']
+                $locationInfo['ip'],
+                $deviceBrowserInfo['device_ip']
             );
             
-            sendResponse(true, 'Login successful');
+            sendResponse(true, 'Login successful', ['user_type' => $user['user_type']]);
         } else {
             sendResponse(false, 'Invalid username or password');
         }
@@ -305,10 +324,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['signup'])) {
         $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        $fullName = filter_input(INPUT_POST, 'full_name', FILTER_SANITIZE_STRING);
         $password = $_POST['password'];
         $confirmPassword = $_POST['confirm_password'];
 
-        if (empty($username) || empty($email) || empty($password) || empty($confirmPassword)) {
+        if (empty($username) || empty($email) || empty($fullName) || empty($password) || empty($confirmPassword)) {
             sendResponse(false, 'All fields are required');
         }
 
@@ -327,32 +347,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO cp_users (username, email, password) VALUES (:username, :email, :password)");
+        $locationInfo = getLocationInfoFromIP();
+        $deviceBrowserInfo = getDeviceBrowserInfo();
+
+        $stmt = $pdo->prepare("INSERT INTO cp_users (username, email, full_name, password, user_type, last_ip, device_ip) 
+                              VALUES (:username, :email, :full_name, :password, 'user', :last_ip, :device_ip)");
         $success = $stmt->execute([
             'username' => $username,
             'email' => $email,
-            'password' => $hashedPassword
+            'full_name' => $fullName,
+            'password' => $hashedPassword,
+            'last_ip' => $locationInfo['ip'],
+            'device_ip' => $deviceBrowserInfo['device_ip']
         ]);
 
         if ($success) {
             $_SESSION['username'] = $username;
             $_SESSION['user_id'] = $pdo->lastInsertId();
+            $_SESSION['user_type'] = 'user';
+            $_SESSION['full_name'] = $fullName;
             
-            $locationInfo = getLocationInfoFromIP();
-            $deviceBrowserInfo = getDeviceBrowserInfo();
-
-            // Log IP for debugging
-            error_log("Signup IP: " . $locationInfo['ip']);
-
             sendNotificationEmail(
                 $email,
                 'signup',
+                $fullName,
                 $username,
                 $locationInfo['location'],
                 $locationInfo['timezone'],
                 $deviceBrowserInfo['device'],
                 $deviceBrowserInfo['browser'],
-                $locationInfo['ip']
+                $locationInfo['ip'],
+                $deviceBrowserInfo['device_ip']
             );
             
             sendResponse(true, 'Signup successful');
