@@ -125,6 +125,7 @@
     </style>
 </head>
 <body>
+    <button onclick="history.back()" style="margin-bottom: 20px;">Back to Previous Page</button>
     <h2>Account Settings</h2>
 
     <div class="section" id="userInfo">
