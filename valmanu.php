@@ -16,7 +16,7 @@ if (!isset($_SESSION['request_queue'])) {
     $_SESSION['request_queue'] = []; // Queue for delayed requests
 }
 
-$apiKey = 'd4c9fea41bf94bb29cade8f12952b3d8';
+$apiKey = '15fd0c1bff2041b2b21f76bcc909dbf9';
 $baseUrl = 'https://api.football-data.org/v4/';
 $teamStats = &$_SESSION['teamStats'];
 
