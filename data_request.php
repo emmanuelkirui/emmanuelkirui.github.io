@@ -140,10 +140,17 @@ class DataRequestHandler {
                     <a href='https://linkedin.com/company/creativepulsesolutions' style='margin: 0 10px;'>
                         <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='LinkedIn' style='width: 24px; height: 24px;'>
                     </a>
+                    <a href='https://youtube.com/@emmanuelkirui9043' style='margin: 0 10px;'>
+                     <img src='https://cdn-icons-png.flaticon.com/512/174/174879.png' alt='YouTube' style='width: 24px; height: 24px;'>
+                   </a>
+        
+                   <a href='https://tiktok.com/@emmanuelkirui3' style='margin: 0 10px;'>
+                     <img src='https://cdn-icons-png.flaticon.com/512/3046/3046128.png' alt='TikTok' style='width: 24px; height: 24px;'>
+                   </a>
                 </div>
                 <!-- Legal Links -->
                 <div style='color: #666; font-size: 12px;'>
-                    <a href='https://creativepulse.42web.i/cps/privacy-policy' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Privacy Policy</a>
+                    <a href='https://creativepulse.42web.io/cps/privacy-policy' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Privacy Policy</a>
                     |
                     <a href='https://creativepulse.42web.io/cps/terms-conditions' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Terms & Conditions</a>
                 </div>
@@ -207,7 +214,7 @@ class DataRequestHandler {
 
         try {
             $stmt = $this->pdo->prepare(
-                "SELECT username, email, created_at 
+                "SELECT username, email,full_name, created_at 
                  FROM cp_users 
                  WHERE id = :id"
             );
@@ -221,6 +228,7 @@ class DataRequestHandler {
             $dataToSend = [
                 'Username' => $userData['username'],
                 'Email' => $userData['email'],
+                'Full Name' => $userData['full_name'],
                 'Account Created' => $userData['created_at']
             ];
 
