@@ -8,7 +8,7 @@ session_start([
 // Configuration
 define('RECAPTCHA_SITE_KEY', '6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN');     // Replace with your Site Key
 define('RECAPTCHA_SECRET_KEY', '6Les-YkqAAAAAEYqVJL4skWPrbLatjcgZ6-sWapW'); // Replace with your Secret Key
-define('VERIFICATION_DURATION', 1800); // 30 minutes in seconds
+define('VERIFICATION_DURATION', 86400); // 24 hours in seconds
 
 class RecaptchaHandler {
     private $siteKey;
