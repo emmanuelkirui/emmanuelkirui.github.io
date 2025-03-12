@@ -684,7 +684,7 @@ if (!isset($_GET['ajax'])) {
     echo "<div class='user-menu'>";
     echo "<button class='nav-link user-btn' onclick='toggleUserMenu()'>" . htmlspecialchars($_SESSION['username']) . " ▼</button>";
     echo "<div class='user-dropdown' id='userDropdown'>";
-    echo "<a href='#settings' class='dropdown-item'>Settings</a>";
+    echo "<a href='upd_settings' class='dropdown-item'>Settings</a>";
     echo "<a href='#' class='dropdown-item' onclick='handleLogout(event)'>Logout</a>";
     echo "</div>";
     echo "</div>";
