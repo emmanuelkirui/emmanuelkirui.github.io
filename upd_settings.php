@@ -45,7 +45,7 @@
     <script>
         // Load current settings on page load
         window.onload = function() {
-            fetch('setting.php', {
+            fetch('acc_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'get_settings=true'
@@ -62,7 +62,7 @@
 
         function updateUsername() {
             const newUsername = document.getElementById('new_username').value;
-            fetch('setting.php', {
+            fetch('acc_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'update_username=true&new_username=' + encodeURIComponent(newUsername)
@@ -78,7 +78,7 @@
 
         function updateFullName() {
             const newFullName = document.getElementById('new_full_name').value;
-            fetch('setting.php', {
+            fetch('acc_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'update_full_name=true&new_full_name=' + encodeURIComponent(newFullName)
@@ -96,7 +96,7 @@
             const currentPassword = document.getElementById('current_password').value;
             const newPassword = document.getElementById('new_password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
-            fetch('setting.php', {
+            fetch('acc_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'update_password=true&current_password=' + encodeURIComponent(currentPassword) +
@@ -110,7 +110,7 @@
         function deleteAccount() {
             const password = document.getElementById('delete_password').value;
             if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
-                fetch('setting.php', {
+                fetch('acc_settings.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'delete_account=true&password=' + encodeURIComponent(password)
