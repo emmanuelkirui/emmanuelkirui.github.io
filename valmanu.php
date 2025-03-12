@@ -2437,7 +2437,7 @@ const MINUTE_IN_SECONDS = 60;
 const REQUEST_INTERVAL = MINUTE_IN_SECONDS * 1000 / REQUESTS_PER_MINUTE; // 6000ms (6 seconds)
 
 // Track requests and queue
-let requestTimestamps = [];
+let requestTimestamps = JSON.parse(localStorage.getItem('requestTimestamps') || '[]');
 let requestQueue = [];
 
 // Function to enforce client-side rate limiting
@@ -2450,21 +2450,26 @@ function enforceClientRateLimit(callback, args) {
     if (requestTimestamps.length < REQUESTS_PER_MINUTE) {
         // Execute immediately
         requestTimestamps.push(now);
+        localStorage.setItem('requestTimestamps', JSON.stringify(requestTimestamps));
+        console.log(`Executing request immediately. Current count: ${requestTimestamps.length}/${REQUESTS_PER_MINUTE}`);
         callback(...args);
     } else {
         // Queue the request
         const oldestTimestamp = requestTimestamps[0];
         const delay = Math.max(0, (oldestTimestamp + MINUTE_IN_SECONDS * 1000) - now);
         
-        console.log(`Rate limit hit. Queuing request for ${delay}ms`);
+        console.log(`Rate limit hit. Queuing request for ${delay}ms. Current count: ${requestTimestamps.length}/${REQUESTS_PER_MINUTE}`);
         requestQueue.push({ callback, args, scheduledTime: now + delay });
         
         // Update UI to show queued status
-        const [index, homeId, awayId, isHome] = args; // Adjust based on function signature
+        const [index] = args; // Adjust based on function signature
         const targetElement = callback.name === 'fetchTeamData' 
-            ? document.getElementById(`form-${isHome ? 'home' : 'away'}-${index}`)
+            ? document.getElementById(`form-${args[2] ? 'home' : 'away'}-${index}`) // isHome is args[2]
             : document.getElementById(`prediction-${index}`);
         targetElement.innerHTML = `<p>Queued, retrying in ${(delay / 1000).toFixed(1)}s</p>`;
+        
+        // Persist timestamps even when queueing (though unchanged here, for consistency)
+        localStorage.setItem('requestTimestamps', JSON.stringify(requestTimestamps));
         
         // Ensure queue processing is running
         processRequestQueue();
@@ -2480,6 +2485,7 @@ function processRequestQueue() {
     
     const availableSlots = REQUESTS_PER_MINUTE - requestTimestamps.length;
     if (availableSlots <= 0) {
+        console.log(`No available slots. Next check in ${REQUEST_INTERVAL}ms`);
         setTimeout(processRequestQueue, REQUEST_INTERVAL);
         return;
     }
@@ -2490,15 +2496,22 @@ function processRequestQueue() {
 
     toProcess.forEach(req => {
         requestTimestamps.push(now);
+        localStorage.setItem('requestTimestamps', JSON.stringify(requestTimestamps));
+        console.log(`Processing queued request. New count: ${requestTimestamps.length}/${REQUESTS_PER_MINUTE}`);
         req.callback(...req.args);
     });
 
     requestQueue = requestQueue.filter(req => !toProcess.includes(req));
     
     if (requestQueue.length) {
+        console.log(`Queue still has ${requestQueue.length} items. Next check in ${REQUEST_INTERVAL}ms`);
         setTimeout(processRequestQueue, REQUEST_INTERVAL);
+    } else {
+        console.log('Queue fully processed');
     }
-} 
+}
+
+
         function switchView(view) {
     const gridView = document.getElementById('match-grid');
     const tableView = document.getElementById('match-table');
@@ -3439,33 +3452,35 @@ const debouncedFetchPrediction = debounce((index, homeId, awayId, attempt = 0, m
 
    
 if (typeof incompleteTeams !== 'undefined' && incompleteTeams.length > 0) {
-        incompleteTeams.forEach(teamId => {
-            document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
-                const index = card.dataset.index;
-                const homeId = card.dataset.homeId;
-                const awayId = card.dataset.awayId;
+    let delay = 0;
+    incompleteTeams.forEach(teamId => {
+        document.querySelectorAll(`.match-card[data-home-id="${teamId}"], .match-card[data-away-id="${teamId}"]`).forEach(card => {
+            const index = card.dataset.index;
+            const homeId = card.dataset.homeId;
+            const awayId = card.dataset.awayId;
 
-                if (homeId == teamId) {
-                    document.getElementById(`form-home-${index}`).innerHTML = '<span class="loading-spinner">⏳</span>';
-                    fetchTeamData(homeId, index, true);
-                }
-                if (awayId == teamId) {
-                    document.getElementById(`form-away-${index}`).innerHTML = '<span class="loading-spinner">⏳</span>';
-                    fetchTeamData(awayId, index, false);
-                }
+            if (homeId == teamId) {
+                document.getElementById(`form-home-${index}`).innerHTML = '<span class="loading-spinner">⏳</span>';
+                setTimeout(() => fetchTeamData(homeId, index, true), delay);
+            }
+            if (awayId == teamId) {
+                document.getElementById(`form-away-${index}`).innerHTML = '<span class="loading-spinner">⏳</span>';
+                setTimeout(() => fetchTeamData(awayId, index, false), delay);
+            }
 
-                setTimeout(() => {
-                    const otherTeamLoaded = homeId == teamId ?
-                        !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
-                        !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
-                    if (otherTeamLoaded) {
-                        fetchPrediction(index, homeId, awayId);
-                    }
-                }, 1000);
-            });
+            setTimeout(() => {
+                const otherTeamLoaded = homeId == teamId ?
+                    !document.getElementById(`form-away-${index}`).querySelector('.loading-spinner') :
+                    !document.getElementById(`form-home-${index}`).querySelector('.loading-spinner');
+                if (otherTeamLoaded) {
+                    fetchPrediction(index, homeId, awayId);
+                }
+            }, delay + 1000);
+
+            delay += REQUEST_INTERVAL; // Stagger by 6 seconds
         });
-    }
-
+    });
+}
     startMatchPolling();
 };
 </script>
