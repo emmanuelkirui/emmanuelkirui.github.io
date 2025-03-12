@@ -141,8 +141,8 @@ class DataRequestHandler {
                         <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='LinkedIn' style='width: 24px; height: 24px;'>
                     </a>
                     <a href='https://youtube.com/@emmanuelkirui9043' style='margin: 0 10px;'>
-                     <img src='https://cdn-icons-png.flaticon.com/512/174/174879.png' alt='YouTube' style='width: 24px; height: 24px;'>
-                   </a>
+                       <img src='https://cdn-icons-png.flaticon.com/512/3938/3938026.png' alt='YouTube' style='width: 24px; height: 24px;'>
+                    </a>
         
                    <a href='https://tiktok.com/@emmanuelkirui3' style='margin: 0 10px;'>
                      <img src='https://cdn-icons-png.flaticon.com/512/3046/3046128.png' alt='TikTok' style='width: 24px; height: 24px;'>
