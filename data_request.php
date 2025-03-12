@@ -59,7 +59,7 @@ class DataRequestHandler {
 
     private function validateCredentials(string $email, string $password): ?array {
         $stmt = $this->pdo->prepare(
-            "SELECT id, username, password, email 
+            "SELECT id, username, password, email,full_name
              FROM cp_users 
              WHERE email = :email"
         );
@@ -74,6 +74,7 @@ class DataRequestHandler {
             'id' => $user['id'],
             'username' => $user['username'],
             'email' => $user['email']
+            'fullname' => $user['full_name']
         ];
     }
 
@@ -140,10 +141,17 @@ class DataRequestHandler {
                     <a href='https://linkedin.com/company/creativepulsesolutions' style='margin: 0 10px;'>
                         <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='LinkedIn' style='width: 24px; height: 24px;'>
                     </a>
+                    <a href='https://youtube.com/@emmanuelkirui9043' style='margin: 0 10px;'>
+                       <img src='https://cdn-icons-png.flaticon.com/512/174/174879.png' alt='YouTube' style='width: 24px; height: 24px;'>
+                    </a>
+        
+                     <a href='https://tiktok.com/@emmanuelkirui3' style='margin: 0 10px;'>
+                       <img src='https://cdn-icons-png.flaticon.com/512/3046/3046128.png' alt='TikTok' style='width: 24px; height: 24px;'>
+                     </a>
                 </div>
                 <!-- Legal Links -->
                 <div style='color: #666; font-size: 12px;'>
-                    <a href='https://creativepulse.42web.i/cps/privacy-policy' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Privacy Policy</a>
+                    <a href='https://creativepulse.42web.io/cps/privacy-policy' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Privacy Policy</a>
                     |
                     <a href='https://creativepulse.42web.io/cps/terms-conditions' style='color: #007bff; text-decoration: none; margin: 0 10px;'>Terms & Conditions</a>
                 </div>
