@@ -213,7 +213,7 @@ $year = date("Y");
            <li><strong>Football-Data.org:</strong> A sports data API providing football-related statistics, live scores, and match information to enrich our content with real-time sports updates. Learn more in their <a href="https://www.football-data.org/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.football-data.org/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
            <li><strong>Hosting Providers (e.g., AWS, SiteGround):</strong> Infrastructure services that host our website, store data, and ensure uptime and reliability. Policies depend on the specific provider; please contact us for details on our current hosting partner.</li>
         </ul>
-         <p><em>Note:</em> This list is representative and subject to change as we adopt new tools or discontinue others. We aim to keep this page updated to reflect our current third-party ecosystem.</p>
+         <p style="color: blue;" ><em>Note:</em> This list is representative and subject to change as we adopt new tools or discontinue others. We aim to keep this page updated to reflect our current third-party ecosystem.</p>
        </section>
 
         <section>
