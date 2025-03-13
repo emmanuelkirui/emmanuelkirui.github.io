@@ -158,6 +158,17 @@
             background: #555;
         }
 
+        .pagination {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .search-container {
+            margin-bottom: 15px;
+        }
+
         @media (min-width: 600px) {
             .input-button-group {
                 flex-direction: row;
@@ -237,6 +248,9 @@
 
     <div class="section" id="adminSection" style="display: none;">
         <h3>Admin: Manage Users</h3>
+        <div class="search-container">
+            <input type="text" id="userSearch" placeholder="Search users..." oninput="searchUsers()">
+        </div>
         <div class="table-container">
             <table class="user-table" id="userTable">
                 <thead>
@@ -252,6 +266,7 @@
                 <tbody></tbody>
             </table>
         </div>
+        <div class="pagination" id="pagination"></div>
         <h4>Update User</h4>
         <div class="form-group">
             <input type="text" id="admin_user_id" placeholder="User ID" readonly disabled required>
@@ -269,6 +284,9 @@
     <script>
         let isAdmin = false;
         let currentUserId = null;
+        let allUsers = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
 
         window.onload = function() {
             fetch('acc_settings.php', {
@@ -283,7 +301,7 @@
                     document.getElementById('email').textContent = data.email;
                     document.getElementById('full_name').textContent = data.full_name;
                     document.getElementById('user_type').textContent = data.user_type;
-                    currentUserId = data.id; // Assuming backend returns current user's ID
+                    currentUserId = data.id;
 
                     isAdmin = data.user_type === 'admin';
                     if (isAdmin) {
@@ -304,26 +322,83 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const tbody = document.querySelector('#userTable tbody');
-                    tbody.innerHTML = '';
-                    data.users.forEach(user => {
-                        const tr = document.createElement('tr');
-                        const isCurrentUser = parseInt(user.id) === parseInt(currentUserId);
-                        tr.innerHTML = `
-                            <td>${user.id}</td>
-                            <td>${user.username}</td>
-                            <td>${user.email}</td>
-                            <td>${user.full_name}</td>
-                            <td>${user.user_type}</td>
-                            <td>
-                                <button onclick="fillUpdateForm(${user.id}, '${user.username}', '${user.email}', '${user.full_name}', '${user.user_type}')">Edit</button>
-                                <button class="danger-button" onclick="adminDeleteUser(${user.id})" ${isCurrentUser ? 'disabled' : ''}>Delete</button>
-                            </td>
-                        `;
-                        tbody.appendChild(tr);
-                    });
+                    allUsers = data.users;
+                    renderTable(1);
                 }
             });
+        }
+
+        function renderTable(page) {
+            currentPage = page;
+            const tbody = document.querySelector('#userTable tbody');
+            tbody.innerHTML = '';
+
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const filteredUsers = allUsers.filter(user => 
+                user.username.toLowerCase().includes(searchTerm) ||
+                user.email.toLowerCase().includes(searchTerm) ||
+                user.full_name.toLowerCase().includes(searchTerm) ||
+                user.id.toString().includes(searchTerm) ||
+                user.user_type.toLowerCase().includes(searchTerm)
+            );
+
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedUsers = filteredUsers.slice(start, end);
+
+            paginatedUsers.forEach(user => {
+                const tr = document.createElement('tr');
+                const isCurrentUser = parseInt(user.id) === parseInt(currentUserId);
+                tr.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.full_name}</td>
+                    <td>${user.user_type}</td>
+                    <td>
+                        <button onclick="fillUpdateForm(${user.id}, '${user.username}', '${user.email}', '${user.full_name}', '${user.user_type}')">Edit</button>
+                        <button class="danger-button" onclick="adminDeleteUser(${user.id})" ${isCurrentUser ? 'disabled' : ''}>Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            updatePagination(filteredUsers.length);
+        }
+
+        function updatePagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Previous button
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = 'Previous';
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => renderTable(currentPage - 1);
+            pagination.appendChild(prevBtn);
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.textContent = i;
+                pageBtn.disabled = i === currentPage;
+                pageBtn.onclick = () => renderTable(i);
+                pagination.appendChild(pageBtn);
+            }
+
+            // Next button
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = 'Next';
+            nextBtn.disabled = currentPage === totalPages;
+            nextBtn.onclick = () => renderTable(currentPage + 1);
+            pagination.appendChild(nextBtn);
+        }
+
+        function searchUsers() {
+            renderTable(1);
         }
 
         function fillUpdateForm(id, username, email, fullName, userType) {
