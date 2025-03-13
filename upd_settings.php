@@ -263,7 +263,6 @@
                 <option value="admin">Admin</option>
             </select>
             <button onclick="adminUpdateUser()">Update User</button>
-            <button class="danger-button" onclick="adminDeleteUser()">Delete User</button>
         </div>
     </div>
 
@@ -284,7 +283,7 @@
                     document.getElementById('email').textContent = data.email;
                     document.getElementById('full_name').textContent = data.full_name;
                     document.getElementById('user_type').textContent = data.user_type;
-                    currentUserId = data.id; // Assuming the backend returns the current user's ID
+                    currentUserId = data.id; // Assuming backend returns current user's ID
 
                     isAdmin = data.user_type === 'admin';
                     if (isAdmin) {
