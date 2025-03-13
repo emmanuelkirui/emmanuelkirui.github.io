@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// DB credentials (same as auth.php)
+// DB credentials
 define('DB_HOST', 'sql105.infinityfree.com');
 define('DB_USER', 'if0_37772405');
 define('DB_PASS', 'hMCWvBjYOKjDE');
@@ -28,18 +28,135 @@ function sendResponse($success, $message, $data = []) {
     exit;
 }
 
+// Check if current user is admin
+function isAdmin($pdo, $userId) {
+    $stmt = $pdo->prepare("SELECT user_type FROM cp_users WHERE id = :id");
+    $stmt->execute(['id' => $userId]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $user && $user['user_type'] === 'admin';
+}
+
 // Get current user data
 function getUserData($pdo, $userId) {
-    $stmt = $pdo->prepare("SELECT username, email, full_name FROM cp_users WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT id, username, email, full_name, user_type FROM cp_users WHERE id = :id");
     $stmt->execute(['id' => $userId]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Handle POST requests
+// Get all users (for admin)
+function getAllUsers($pdo) {
+    $stmt = $pdo->prepare("SELECT id, username, email, full_name, user_type FROM cp_users ORDER BY id");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = $_SESSION['user_id'];
+    $isAdminUser = isAdmin($pdo, $userId);
 
-    // Update username
+    // Admin-specific endpoints
+    if ($isAdminUser) {
+        // Get all users
+        if (isset($_POST['get_all_users'])) {
+            $users = getAllUsers($pdo);
+            sendResponse(true, 'Users retrieved successfully', ['users' => $users]);
+        }
+
+        // Update any user's data
+        if (isset($_POST['admin_update_user'])) {
+            $targetUserId = filter_input(INPUT_POST, 'target_user_id', FILTER_VALIDATE_INT);
+            $newUsername = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+            $newEmail = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+            $newFullName = filter_input(INPUT_POST, 'full_name', FILTER_SANITIZE_STRING);
+            $newUserType = filter_input(INPUT_POST, 'user_type', FILTER_SANITIZE_STRING);
+
+            if (!$targetUserId) {
+                sendResponse(false, 'Invalid user ID');
+            }
+
+            $updates = [];
+            $params = ['id' => $targetUserId];
+
+            if ($newUsername) {
+                if (strlen($newUsername) < 3) {
+                    sendResponse(false, 'Username must be at least 3 characters long');
+                }
+                $updates[] = "username = :username";
+                $params['username'] = $newUsername;
+            }
+            if ($newEmail) {
+                $updates[] = "email = :email";
+                $params['email'] = $newEmail;
+            }
+            if ($newFullName) {
+                if (strlen($newFullName) < 2) {
+                    sendResponse(false, 'Full name must be at least 2 characters long');
+                }
+                $updates[] = "full_name = :full_name";
+                $params['full_name'] = $newFullName;
+            }
+            if ($newUserType) {
+                // Validate user_type (add your allowed values)
+                $allowedTypes = ['admin', 'user']; // Modify as needed
+                if (!in_array($newUserType, $allowedTypes)) {
+                    sendResponse(false, 'Invalid user type');
+                }
+                $updates[] = "user_type = :user_type";
+                $params['user_type'] = $newUserType;
+            }
+
+            if (empty($updates)) {
+                sendResponse(false, 'No changes specified');
+            }
+
+            $query = "UPDATE cp_users SET " . implode(', ', $updates) . " WHERE id = :id";
+            $stmt = $pdo->prepare($query);
+            $success = $stmt->execute($params);
+
+            if ($success) {
+                error_log("Admin updated user {$targetUserId} at " . date('Y-m-d H:i:s'));
+                sendResponse(true, 'User updated successfully');
+            } else {
+                sendResponse(false, 'Failed to update user');
+            }
+        }
+
+        // Delete any user
+        if (isset($_POST['admin_delete_user'])) {
+            $targetUserId = filter_input(INPUT_POST, 'target_user_id', FILTER_VALIDATE_INT);
+            
+            if (!$targetUserId) {
+                sendResponse(false, 'Invalid user ID');
+            }
+
+            if ($targetUserId === $userId) {
+                sendResponse(false, 'Cannot delete your own admin account');
+            }
+
+            try {
+                $pdo->beginTransaction();
+
+                $stmt = $pdo->prepare("DELETE FROM cp_login_history WHERE user_id = :id");
+                $stmt->execute(['id' => $targetUserId]);
+
+                $stmt = $pdo->prepare("DELETE FROM cp_password_resets WHERE user_id = :id");
+                $stmt->execute(['id' => $targetUserId]);
+
+                $stmt = $pdo->prepare("DELETE FROM cp_users WHERE id = :id");
+                $stmt->execute(['id' => $targetUserId]);
+
+                $pdo->commit();
+                error_log("Admin deleted user {$targetUserId} at " . date('Y-m-d H:i:s'));
+                sendResponse(true, 'User deleted successfully');
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                error_log("User deletion failed for user {$targetUserId}: " . $e->getMessage());
+                sendResponse(false, 'Failed to delete user: ' . $e->getMessage());
+            }
+        }
+    }
+
+    // Regular user endpoints
     if (isset($_POST['update_username'])) {
         $newUsername = filter_input(INPUT_POST, 'new_username', FILTER_SANITIZE_STRING);
         
@@ -51,14 +168,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'Username must be at least 3 characters long');
         }
 
-        // Check if username is already taken
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM cp_users WHERE username = :username AND id != :id");
         $stmt->execute(['username' => $newUsername, 'id' => $userId]);
         if ($stmt->fetchColumn() > 0) {
             sendResponse(false, 'Username is already taken');
         }
 
-        // Update username
         $stmt = $pdo->prepare("UPDATE cp_users SET username = :username WHERE id = :id");
         $success = $stmt->execute([
             'username' => $newUsername,
@@ -74,7 +189,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Update full name
     if (isset($_POST['update_full_name'])) {
         $newFullName = filter_input(INPUT_POST, 'new_full_name', FILTER_SANITIZE_STRING);
         
@@ -86,7 +200,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'Full name must be at least 2 characters long');
         }
 
-        // Update full name
         $stmt = $pdo->prepare("UPDATE cp_users SET full_name = :full_name WHERE id = :id");
         $success = $stmt->execute([
             'full_name' => $newFullName,
@@ -102,7 +215,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Update password
     if (isset($_POST['update_password'])) {
         $currentPassword = $_POST['current_password'] ?? '';
         $newPassword = $_POST['new_password'] ?? '';
@@ -120,7 +232,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'New password must be at least 8 characters long');
         }
 
-        // Verify current password
         $stmt = $pdo->prepare("SELECT password FROM cp_users WHERE id = :id");
         $stmt->execute(['id' => $userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -129,7 +240,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'Current password is incorrect');
         }
 
-        // Update password
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("UPDATE cp_users SET password = :password WHERE id = :id");
         $success = $stmt->execute([
@@ -145,7 +255,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Delete account
     if (isset($_POST['delete_account'])) {
         $password = $_POST['password'] ?? '';
 
@@ -153,7 +262,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'Password is required to delete account');
         }
 
-        // Verify password
         $stmt = $pdo->prepare("SELECT password FROM cp_users WHERE id = :id");
         $stmt->execute(['id' => $userId]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -162,7 +270,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             sendResponse(false, 'Incorrect password');
         }
 
-        // Begin transaction for safe deletion
         try {
             $pdo->beginTransaction();
 
@@ -189,7 +296,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Get current settings
     if (isset($_POST['get_settings'])) {
         $userData = getUserData($pdo, $userId);
         if ($userData) {
