@@ -224,19 +224,24 @@
         }
 
         function updatePassword() {
-            const currentPassword = document.getElementById('current_password').value;
-            const newPassword = document.getElementById('new_password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-            fetch('acc_settings.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'update_password=true¤t_password=' + encodeURIComponent(currentPassword) +
-                      '&new_password=' + encodeURIComponent(newPassword) +
-                      '&confirm_password=' + encodeURIComponent(confirmPassword)
-            })
-            .then(response => response.json())
-            .then(data => alert(data.message));
-        }
+    const currentPassword = document.getElementById('current_password').value;
+    const newPassword = document.getElementById('new_password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (newPassword !== confirmPassword) {
+        alert('New password and confirmation do not match');
+        return;
+    }
+    fetch('acc_settings.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'update_password=true&current_password=' + encodeURIComponent(currentPassword) +
+              '&new_password=' + encodeURIComponent(newPassword) +
+              '&confirm_password=' + encodeURIComponent(confirmPassword)
+    })
+    .then(response => response.json())
+    .then(data => alert(data.message));
+}
 
         function deleteAccount() {
             const password = document.getElementById('delete_password').value;
