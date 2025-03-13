@@ -1867,45 +1867,40 @@ try {
       /* Append to existing <style> section, after .auth-btn styles */
 
 /* User menu styles (for logged-in state) */
+
 .user-menu {
-    position: relative;
-    display: inline-block;
+    position: relative; /* Ensure the dropdown is positioned relative to this */
 }
 
 .user-btn {
-    padding: 8px 15px;
-    min-width: 0;
-    width: auto;
-    display: inline-block;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    border: 1px solid var(--primary-color);
-    border-radius: 8px;
+    background: none;
+    border: none;
     cursor: pointer;
+    font-size: 1.1em;
+    padding: 12px 20px;
+    color: var(--text-color);
     transition: all 0.3s ease;
 }
 
 .user-btn:hover {
     background-color: var(--primary-color);
     color: white;
-    transform: translateY(-2px);
 }
 
 .user-dropdown {
-    display: none;
     position: absolute;
-    top: 100%;
-    right: 0;
+    top: 100%; /* Position it just below the button */
+    right: 0; /* Align to the right of the user button */
     background-color: var(--card-bg);
-    border-radius: 8px;
     box-shadow: var(--shadow);
+    border-radius: 8px;
     min-width: 150px;
-    z-index: 9999;
-    margin-top: 5px;
+    z-index: 1001; /* Ensure it’s above other elements */
+    display: none; /* Hidden by default */
 }
 
 .user-dropdown.active {
-    display: block;
+    display: block; /* Show when active */
 }
 
 .dropdown-item {
@@ -1921,6 +1916,10 @@ try {
     color: white;
 }
 
+/* Ensure navbar doesn’t clip content */
+.navbar {
+    overflow: visible; /* Prevent clipping of dropdown */
+}
         
 /* Hide/show forms */
 .auth-form {
@@ -1970,8 +1969,9 @@ try {
     }
 
     .user-dropdown {
-        width: 100%;
-        right: 0;
+        right: auto; /* Allow it to align naturally in mobile view */
+        left: 0; /* Align to the left of the button on mobile */
+        width: 100%; /* Full width on mobile */
     }
 }
 
