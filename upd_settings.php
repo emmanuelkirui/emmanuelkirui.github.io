@@ -254,7 +254,7 @@
         </div>
         <h4>Update User</h4>
         <div class="form-group">
-            <input type="number" id="admin_user_id" placeholder="User ID" readonly required>
+            <input type="text" id="admin_user_id" placeholder="User ID" readonly disabled required>
             <input type="text" id="admin_username" placeholder="New Username">
             <input type="email" id="admin_email" placeholder="New Email">
             <input type="text" id="admin_full_name" placeholder="New Full Name">
@@ -269,6 +269,7 @@
 
     <script>
         let isAdmin = false;
+        let currentUserId = null;
 
         window.onload = function() {
             fetch('acc_settings.php', {
@@ -283,6 +284,7 @@
                     document.getElementById('email').textContent = data.email;
                     document.getElementById('full_name').textContent = data.full_name;
                     document.getElementById('user_type').textContent = data.user_type;
+                    currentUserId = data.id; // Assuming the backend returns the current user's ID
 
                     isAdmin = data.user_type === 'admin';
                     if (isAdmin) {
@@ -307,6 +309,7 @@
                     tbody.innerHTML = '';
                     data.users.forEach(user => {
                         const tr = document.createElement('tr');
+                        const isCurrentUser = parseInt(user.id) === parseInt(currentUserId);
                         tr.innerHTML = `
                             <td>${user.id}</td>
                             <td>${user.username}</td>
@@ -315,6 +318,7 @@
                             <td>${user.user_type}</td>
                             <td>
                                 <button onclick="fillUpdateForm(${user.id}, '${user.username}', '${user.email}', '${user.full_name}', '${user.user_type}')">Edit</button>
+                                <button class="danger-button" onclick="adminDeleteUser(${user.id})" ${isCurrentUser ? 'disabled' : ''}>Delete</button>
                             </td>
                         `;
                         tbody.appendChild(tr);
@@ -432,8 +436,11 @@
             });
         }
 
-        function adminDeleteUser() {
-            const userId = document.getElementById('admin_user_id').value;
+        function adminDeleteUser(userId) {
+            if (parseInt(userId) === parseInt(currentUserId)) {
+                alert('You cannot delete your own admin account');
+                return;
+            }
             if (confirm('Are you sure you want to delete this user?')) {
                 fetch('acc_settings.php', {
                     method: 'POST',
