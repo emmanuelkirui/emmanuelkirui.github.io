@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Settings</title>
     <style>
+        /* Existing styles remain the same */
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
@@ -60,7 +61,8 @@
         }
 
         input[type="text"],
-        input[type="password"] {
+        input[type="password"],
+        select {
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -102,6 +104,21 @@
             gap: 10px;
         }
 
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th, .user-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .user-table th {
+            background: #f5f5f5;
+        }
+
         @media (min-width: 600px) {
             .input-button-group {
                 flex-direction: row;
@@ -132,6 +149,7 @@
         <div class="info-item">Username: <span id="username"></span></div>
         <div class="info-item">Email: <span id="email" class="muted"></span> <span class="muted">(cannot be changed)</span></div>
         <div class="info-item">Full Name: <span id="full_name"></span></div>
+        <div class="info-item">User Type: <span id="user_type"></span></div>
     </div>
 
     <div class="section">
@@ -174,6 +192,36 @@
         </div>
     </div>
 
+    <div class="section" id="adminSection" style="display: none;">
+        <h3>Admin: Manage Users</h3>
+        <table class="user-table" id="userTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Full Name</th>
+                    <th>User Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <h4>Update User</h4>
+        <div class="form-group">
+            <input type="number" id="admin_user_id" placeholder="User ID" required>
+            <input type="text" id="admin_username" placeholder="New Username">
+            <input type="email" id="admin_email" placeholder="New Email">
+            <input type="text" id="admin_full_name" placeholder="New Full Name">
+            <select id="admin_user_type">
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+            </select>
+            <button onclick="adminUpdateUser()">Update User</button>
+            <button class="danger-button" onclick="adminDeleteUser()">Delete User</button>
+        </div>
+    </div>
+
     <script>
         window.onload = function() {
             fetch('acc_settings.php', {
@@ -187,9 +235,53 @@
                     document.getElementById('username').textContent = data.username;
                     document.getElementById('email').textContent = data.email;
                     document.getElementById('full_name').textContent = data.full_name;
+                    document.getElementById('user_type').textContent = data.user_type;
+
+                    // Show admin section if user is admin
+                    if (data.user_type === 'admin') {
+                        document.getElementById('adminSection').style.display = 'block';
+                        loadAllUsers();
+                    }
                 }
             });
         };
+
+        function loadAllUsers() {
+            fetch('acc_settings.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'get_all_users=true'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const tbody = document.querySelector('#userTable tbody');
+                    tbody.innerHTML = '';
+                    data.users.forEach(user => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                            <td>${user.full_name}</td>
+                            <td>${user.user_type}</td>
+                            <td>
+                                <button onclick="fillUpdateForm(${user.id}, '${user.username}', '${user.email}', '${user.full_name}', '${user.user_type}')">Edit</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+            });
+        }
+
+        function fillUpdateForm(id, username, email, fullName, userType) {
+            document.getElementById('admin_user_id').value = id;
+            document.getElementById('admin_username').value = username;
+            document.getElementById('admin_email').value = email;
+            document.getElementById('admin_full_name').value = fullName;
+            document.getElementById('admin_user_type').value = userType;
+        }
 
         function updateUsername() {
             const newUsername = document.getElementById('new_username').value;
@@ -224,24 +316,24 @@
         }
 
         function updatePassword() {
-    const currentPassword = document.getElementById('current_password').value;
-    const newPassword = document.getElementById('new_password').value;
-    const confirmPassword = document.getElementById('confirm_password').value;
-    
-    if (newPassword !== confirmPassword) {
-        alert('New password and confirmation do not match');
-        return;
-    }
-    fetch('acc_settings.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'update_password=true&current_password=' + encodeURIComponent(currentPassword) +
-              '&new_password=' + encodeURIComponent(newPassword) +
-              '&confirm_password=' + encodeURIComponent(confirmPassword)
-    })
-    .then(response => response.json())
-    .then(data => alert(data.message));
-}
+            const currentPassword = document.getElementById('current_password').value;
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('New password and confirmation do not match');
+                return;
+            }
+            fetch('acc_settings.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'update_password=true&current_password=' + encodeURIComponent(currentPassword) +
+                      '&new_password=' + encodeURIComponent(newPassword) +
+                      '&confirm_password=' + encodeURIComponent(confirmPassword)
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message));
+        }
 
         function deleteAccount() {
             const password = document.getElementById('delete_password').value;
@@ -256,6 +348,55 @@
                     alert(data.message);
                     if (data.success && data.redirect) {
                         window.location.href = data.redirect;
+                    }
+                });
+            }
+        }
+
+        function adminUpdateUser() {
+            const userId = document.getElementById('admin_user_id').value;
+            const username = document.getElementById('admin_username').value;
+            const email = document.getElementById('admin_email').value;
+            const fullName = document.getElementById('admin_full_name').value;
+            const userType = document.getElementById('admin_user_type').value;
+
+            let body = 'admin_update_user=true&target_user_id=' + encodeURIComponent(userId);
+            if (username) body += '&username=' + encodeURIComponent(username);
+            if (email) body += '&email=' + encodeURIComponent(email);
+            if (fullName) body += '&full_name=' + encodeURIComponent(fullName);
+            if (userType) body += '&user_type=' + encodeURIComponent(userType);
+
+            fetch('acc_settings.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    loadAllUsers(); // Refresh user list
+                }
+            });
+        }
+
+        function adminDeleteUser() {
+            const userId = document.getElementById('admin_user_id').value;
+            if (confirm('Are you sure you want to delete this user?')) {
+                fetch('acc_settings.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'admin_delete_user=true&target_user_id=' + encodeURIComponent(userId)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.success) {
+                        loadAllUsers(); // Refresh user list
+                        document.getElementById('admin_user_id').value = '';
+                        document.getElementById('admin_username').value = '';
+                        document.getElementById('admin_email').value = '';
+                        document.getElementById('admin_full_name').value = '';
                     }
                 });
             }
