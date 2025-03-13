@@ -69,9 +69,10 @@
             flex: 1;
         }
 
-        input[disabled] {
+        input[disabled], button[disabled] {
             background: #f5f5f5;
             color: #777;
+            cursor: not-allowed;
         }
 
         button {
@@ -85,7 +86,7 @@
             align-self: flex-start;
         }
 
-        button:hover {
+        button:hover:not([disabled]) {
             background: #0056b3;
         }
 
@@ -93,7 +94,7 @@
             background: #dc3545;
         }
 
-        .danger-button:hover {
+        .danger-button:hover:not([disabled]) {
             background: #b02a37;
         }
 
@@ -103,17 +104,16 @@
             gap: 10px;
         }
 
-        /* Updated table styles for responsiveness and scrolling */
         .table-container {
             width: 100%;
             overflow-x: auto;
             margin-top: 15px;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            -webkit-overflow-scrolling: touch;
         }
 
         .user-table {
             width: 100%;
-            min-width: 600px; /* Minimum width before scrolling kicks in */
+            min-width: 600px;
             border-collapse: collapse;
             background: #fff;
         }
@@ -123,7 +123,7 @@
             padding: 10px;
             border: 1px solid #ddd;
             text-align: left;
-            white-space: nowrap; /* Prevents text wrapping */
+            white-space: nowrap;
         }
 
         .user-table th {
@@ -141,7 +141,6 @@
             background: #f0f0f0;
         }
 
-        /* Scrollbar styling */
         .table-container::-webkit-scrollbar {
             height: 8px;
         }
@@ -232,7 +231,7 @@
             <div class="form-group">
                 <input type="password" id="delete_password" placeholder="Enter Password" required>
             </div>
-            <button class="danger-button" onclick="deleteAccount()">Delete Account</button>
+            <button id="deleteAccountBtn" class="danger-button" onclick="deleteAccount()">Delete Account</button>
         </div>
     </div>
 
@@ -255,7 +254,7 @@
         </div>
         <h4>Update User</h4>
         <div class="form-group">
-            <input type="number" id="admin_user_id" placeholder="User ID" required>
+            <input type="number" id="admin_user_id" placeholder="User ID" readonly required>
             <input type="text" id="admin_username" placeholder="New Username">
             <input type="email" id="admin_email" placeholder="New Email">
             <input type="text" id="admin_full_name" placeholder="New Full Name">
@@ -269,6 +268,8 @@
     </div>
 
     <script>
+        let isAdmin = false;
+
         window.onload = function() {
             fetch('acc_settings.php', {
                 method: 'POST',
@@ -283,8 +284,10 @@
                     document.getElementById('full_name').textContent = data.full_name;
                     document.getElementById('user_type').textContent = data.user_type;
 
-                    if (data.user_type === 'admin') {
+                    isAdmin = data.user_type === 'admin';
+                    if (isAdmin) {
                         document.getElementById('adminSection').style.display = 'block';
+                        document.getElementById('deleteAccountBtn').disabled = true;
                         loadAllUsers();
                     }
                 }
@@ -381,6 +384,10 @@
         }
 
         function deleteAccount() {
+            if (isAdmin) {
+                alert('Admin accounts cannot delete themselves');
+                return;
+            }
             const password = document.getElementById('delete_password').value;
             if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
                 fetch('acc_settings.php', {
