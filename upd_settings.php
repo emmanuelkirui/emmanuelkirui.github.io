@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Account Settings</title>
     <style>
-        /* Existing styles remain the same */
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
@@ -104,19 +103,60 @@
             gap: 10px;
         }
 
-        .user-table {
+        /* Updated table styles for responsiveness and scrolling */
+        .table-container {
             width: 100%;
-            border-collapse: collapse;
+            overflow-x: auto;
+            margin-top: 15px;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
 
-        .user-table th, .user-table td {
-            padding: 8px;
+        .user-table {
+            width: 100%;
+            min-width: 600px; /* Minimum width before scrolling kicks in */
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        .user-table th, 
+        .user-table td {
+            padding: 10px;
             border: 1px solid #ddd;
             text-align: left;
+            white-space: nowrap; /* Prevents text wrapping */
         }
 
         .user-table th {
             background: #f5f5f5;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .user-table tbody tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .user-table tbody tr:hover {
+            background: #f0f0f0;
+        }
+
+        /* Scrollbar styling */
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
 
         @media (min-width: 600px) {
@@ -137,6 +177,10 @@
         @media (max-width: 600px) {
             .section {
                 padding: 15px;
+            }
+
+            .form-group {
+                max-width: 100%;
             }
         }
     </style>
@@ -194,19 +238,21 @@
 
     <div class="section" id="adminSection" style="display: none;">
         <h3>Admin: Manage Users</h3>
-        <table class="user-table" id="userTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Full Name</th>
-                    <th>User Type</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="table-container">
+            <table class="user-table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Full Name</th>
+                        <th>User Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
         <h4>Update User</h4>
         <div class="form-group">
             <input type="number" id="admin_user_id" placeholder="User ID" required>
@@ -237,7 +283,6 @@
                     document.getElementById('full_name').textContent = data.full_name;
                     document.getElementById('user_type').textContent = data.user_type;
 
-                    // Show admin section if user is admin
                     if (data.user_type === 'admin') {
                         document.getElementById('adminSection').style.display = 'block';
                         loadAllUsers();
@@ -327,7 +372,7 @@
             fetch('acc_settings.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'update_password=true&current_password=' + encodeURIComponent(currentPassword) +
+                body: 'update_password=true¤t_password=' + encodeURIComponent(currentPassword) +
                       '&new_password=' + encodeURIComponent(newPassword) +
                       '&confirm_password=' + encodeURIComponent(confirmPassword)
             })
@@ -375,7 +420,7 @@
             .then(data => {
                 alert(data.message);
                 if (data.success) {
-                    loadAllUsers(); // Refresh user list
+                    loadAllUsers();
                 }
             });
         }
@@ -392,7 +437,7 @@
                 .then(data => {
                     alert(data.message);
                     if (data.success) {
-                        loadAllUsers(); // Refresh user list
+                        loadAllUsers();
                         document.getElementById('admin_user_id').value = '';
                         document.getElementById('admin_username').value = '';
                         document.getElementById('admin_email').value = '';
