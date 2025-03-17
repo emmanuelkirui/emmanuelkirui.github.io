@@ -140,6 +140,26 @@
             background-color: var(--dark-secondary);
         }
 
+         /* Back Button */
+         .back-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .back-btn {
+            background-color: var(--dark-secondary);
+        }
+
+        .back-btn:hover {
+            background-color: #2980b9;
+        }
+        
         .theme-toggle {
             position: relative;
             display: inline-block;
@@ -402,10 +422,12 @@
                     <li><a href="#projects">Projects</a></li>
                     <li><a href="#contact">Contact</a></li>
                     <li>
+                        <div>
                         <label class="theme-toggle">
                             <input type="checkbox" id="theme-switch">
                             <span class="slider"></span>
                         </label>
+                        </div>
                     </li>
                 </ul>
             </nav>
@@ -413,11 +435,12 @@
     </header>
 
     <div class="container">
+    <button class="back-btn" onclick="window.history.back()">← Back</button>
         <section id="about">
-            <img src="https://via.placeholder.com/150" alt="Profile Picture" class="profile-img">
+            <img src="logo/LOGO2.png" alt="Profile Picture" class="profile-img">
             <h2>About Me</h2>
             <p>Hello! I'm Emmanuel Kirui, the founder of Creative Pulse Solutions. With a passion for creativity and technology, I specialize in football predictions and a wide range of creative services including graphics design, motion design, video animation, and more.</p>
-            <p>Based in [Your Location], I bring a unique blend of analytical skills and artistic vision to every project, delivering professional results tailored to client needs.</p>
+            <p>Based in Kenya, I bring a unique blend of analytical skills and artistic vision to every project, delivering professional results tailored to client needs.</p>
         </section>
 
         <section id="skills">
@@ -454,7 +477,7 @@
             <h2>Contact Me</h2>
             <ul>
                 <li><strong>Email:</strong> <a href="mailto:emmanuelkirui042@gmail.com">emmanuelkirui042@gmail.com</a></li>
-                <li><strong>Phone:</strong> [Your Phone Number]</li>
+                <li><strong>Phone:</strong> +254742994437</li>
                 <li><strong>LinkedIn:</strong> <a href="#">linkedin.com/in/emmanuel-kirui</a></li>
                 <li><strong>Portfolio:</strong> <a href="#">creativepulsesolutions.com</a></li>
             </ul>
