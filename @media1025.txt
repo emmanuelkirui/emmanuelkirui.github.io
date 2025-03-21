@@ -1,0 +1,56 @@
+/* Desktops (1025px and above) */
+@media (min-width: 1025px) {
+    .footer {
+        padding: 25px 15px; /* Adjusted padding */
+    }
+
+    .footer-container {
+        max-width: 1200px; /* Consistent max-width */
+    }
+
+    .footer-links {
+        display: grid; /* Switch to grid for columns */
+        grid-template-columns: repeat(3, 1fr); /* 3 columns, adjust as needed */
+        gap: 25px; /* Space between items */
+        justify-items: center; /* Center items horizontally within each column */
+        width: 100%; /* Ensure it spans the container */
+    }
+
+    .footer-links li {
+        margin: 0; /* Reset margin */
+    }
+
+    .footer-links a {
+        font-size: 18px;
+    }
+
+    .social-icons {
+        gap: 20px;
+    }
+
+    .social-icons a {
+        font-size: 26px;
+    }
+
+    .disclaimer, .gambling-disclaimer {
+        font-size: 16px;
+    }
+
+    #cookieConsent {
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 600px;
+        right: auto;
+        padding: 15px;
+    }
+
+    #cookieConsent p {
+        font-size: 16px;
+    }
+
+    #cookieConsent button {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+}
