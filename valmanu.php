@@ -330,6 +330,102 @@ function calculateTeamStrength($teamId, $apiKey, $baseUrl, &$teamStats, $competi
         return ['error' => true, 'message' => "Error calculating team strength: " . $e->getMessage()];
     }
 }
+/**
+ * Predicts the match outcome based on team standings and form from existing teamStats.
+ *
+ * @param int $home_team_id The ID of the home team
+ * @param int $away_team_id The ID of the away team
+ * @param string $competition The competition code (e.g., 'PL' for Premier League)
+ * @param string $apiKey The API key for football-data.org
+ * @param string $baseUrl The base URL for the API
+ * @param array &$teamStats Reference to the session-stored team stats
+ * @return array An array containing the prediction decision and reason
+ */
+function getPredictionSuggestion($home_team_id, $away_team_id, $competition, $apiKey, $baseUrl, &$teamStats) {
+    // Ensure team stats are calculated or fetched
+    $home_stats = calculateTeamStrength($home_team_id, $apiKey, $baseUrl, $teamStats, $competition);
+    $away_stats = calculateTeamStrength($away_team_id, $apiKey, $baseUrl, $teamStats, $competition);
+
+    // Handle cases where stats couldn't be fetched
+    if ($home_stats['needsRetry'] || $away_stats['needsRetry']) {
+        return [
+            'decision' => 'N/A',
+            'reason' => 'Unable to fetch team data at this time. Please try again later.'
+        ];
+    }
+
+    // Extract key metrics for home team
+    $home_position = $home_stats['standings']['position'] ?? 20; // Default to bottom if unavailable
+    $home_gd = $home_stats['standings']['goalDifference'] ?? 0;
+    $home_gs = $home_stats['standings']['goalsScored'] ?? 0;
+    $home_points = $home_stats['standings']['points'] ?? 0;
+    $home_form = $home_stats['form'] ?? '';
+    $home_form_weight = calculateFormWeight($home_form);
+
+    // Extract key metrics for away team
+    $away_position = $away_stats['standings']['position'] ?? 20; // Default to bottom if unavailable
+    $away_gd = $away_stats['standings']['goalDifference'] ?? 0;
+    $away_gs = $away_stats['standings']['goalsScored'] ?? 0;
+    $away_points = $away_stats['standings']['points'] ?? 0;
+    $away_form = $away_stats['form'] ?? '';
+    $away_form_weight = calculateFormWeight($away_form);
+
+    // Decision logic based on standings and form
+    if ($home_position < $away_position && $home_form_weight > $away_form_weight) {
+        $decision = "Home Win";
+        $reason = "Home team ranks higher and is in better recent form.";
+    } elseif ($home_position > $away_position && $home_form_weight < $away_form_weight) {
+        $decision = "Away Win";
+        $reason = "Away team ranks higher and is in better recent form.";
+    } elseif ($home_gd > $away_gd && $home_gs > $away_gs) {
+        $decision = "Home Win";
+        $reason = "Home team has a better goal difference and scoring record.";
+    } elseif ($home_gd < $away_gd && $home_gs < $away_gs) {
+        $decision = "Away Win";
+        $reason = "Away team has a better goal difference and scoring record.";
+    } elseif ($home_points > $away_points) {
+        $decision = "Home Win";
+        $reason = "Home team has accumulated more points.";
+    } elseif ($home_points < $away_points) {
+        $decision = "Away Win";
+        $reason = "Away team has accumulated more points.";
+    } else {
+        $decision = "Draw";
+        $reason = "Teams appear evenly matched based on available data.";
+    }
+
+    return [
+        'decision' => $decision,
+        'reason' => $reason
+    ];
+}
+
+/**
+ * Calculates a weight based on recent form string (e.g., "WWDLW").
+ *
+ * @param string $form The form string (e.g., "WWDLW")
+ * @return float A weighted score based on recent performance
+ */
+function calculateFormWeight($form) {
+    if (empty($form)) {
+        return 0; // Default weight if no form data
+    }
+
+    $form_array = str_split($form);
+    $weights = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6]; // Increasing weight for more recent games
+    $total_weight = 0;
+    $count = min(count($form_array), 6); // Consider up to 6 games
+
+    for ($i = 0; $i < $count; $i++) {
+        $result = $form_array[$count - 1 - $i]; // Reverse to prioritize recent games
+        $score = ($result === 'W') ? 3 : (($result === 'D') ? 1 : 0);
+        $total_weight += $score * $weights[$i];
+    }
+
+    return $total_weight;
+}
+
+
 function predictMatch($match, $apiKey, $baseUrl, &$teamStats, $competition) {
     try {
         $homeTeamId = $match['homeTeam']['id'] ?? 0;
@@ -2075,6 +2171,7 @@ try {
                             [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm, $retryInfo] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
                             $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
                             $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
+                            $result = getPredictionSuggestion($home_team_id, $away_team_id, $competition, $apiKey, $baseUrl, $teamStats);
 
                             $needsRetry = $homeStats['needsRetry'] || $awayStats['needsRetry'];
                             if ($needsRetry) {
@@ -2166,6 +2263,7 @@ try {
                                         <span>GD: " . ($awayStats['standings']['goalDifference'] ?? 'N/A') . "</span>
                                         <span>PTS: " . ($awayStats['standings']['points'] ?? 'N/A') . "</span>
                                     </div>";
+                                echo "<span style=\"font-style: italic; font-size: 0.85em;\">Prediction: " . $result['decision'] . " - Reason: " . $result['reason'] . "</span>";
                             } else {
                                 echo "<p>Loading history...</p>";
                             }
