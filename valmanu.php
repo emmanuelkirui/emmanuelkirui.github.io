@@ -2171,8 +2171,7 @@ try {
                             [$prediction, $confidence, $resultIndicator, $predictedScore, $advantage, $homeForm, $awayForm, $retryInfo] = predictMatch($match, $apiKey, $baseUrl, $teamStats, $selectedComp);
                             $homeStats = calculateTeamStrength($homeTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
                             $awayStats = calculateTeamStrength($awayTeamId, $apiKey, $baseUrl, $teamStats, $selectedComp);
-                            $result = getPredictionSuggestion($home_team_id, $away_team_id, $competition, $apiKey, $baseUrl, $teamStats);
-
+                            
                             $needsRetry = $homeStats['needsRetry'] || $awayStats['needsRetry'];
                             if ($needsRetry) {
                                 echo "<script>incompleteTeams = incompleteTeams || [];";
@@ -2263,7 +2262,9 @@ try {
                                         <span>GD: " . ($awayStats['standings']['goalDifference'] ?? 'N/A') . "</span>
                                         <span>PTS: " . ($awayStats['standings']['points'] ?? 'N/A') . "</span>
                                     </div>";
-                                echo "Prediction: " . $result['decision'] . " - Reason: " . $result['reason'];
+                                // Dynamic prediction for the current match
+        $result = getPredictionSuggestion($homeTeamId, $awayTeamId, $selectedComp, $apiKey, $baseUrl, $teamStats);
+        echo "<span style=\"font-style: italic; font-size: 0.85em;\">Prediction: " . $result['decision'] . " - Reason: " . $result['reason'] . "</span>";
                             } else {
                                 echo "<p>Loading history...</p>";
                             }
