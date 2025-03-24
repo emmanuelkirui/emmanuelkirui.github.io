@@ -2263,9 +2263,7 @@ try {
                                         <span>GD: " . ($awayStats['standings']['goalDifference'] ?? 'N/A') . "</span>
                                         <span>PTS: " . ($awayStats['standings']['points'] ?? 'N/A') . "</span>
                                     </div>";
-                                <span style="font-style: italic; font-size: 0.85em;">
-                                 echo "Prediction: " . $result['decision'] . " - Reason: " . $result['reason'];
-                                </span>
+                                echo "Prediction: " . $result['decision'] . " - Reason: " . $result['reason'];
                             } else {
                                 echo "<p>Loading history...</p>";
                             }
