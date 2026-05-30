@@ -1,0 +1,1812 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EMMANUEL KIPROTICH KIRUI – Portfolio</title>
+<meta name="description" content="I am an IT professional with a background in cybersecurity, cloud technologies, and prompt design in AI. I am passionate about building secure and scalable appl">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* ══════════════════════════════════════════════════
+   VARIABLES & RESET
+══════════════════════════════════════════════════ */
+:root{
+  --bg:#080c14;--surf:#0f1320;--surf2:#161c2e;--border:rgba(255,255,255,.07);
+  --cyan:#00e5ff;--violet:#9333ea;--pink:#ec4899;--green:#00e676;--amber:#ffab00;
+  --text:#eef2ff;--muted:#8b92a9;
+  --font-head:'Plus Jakarta Sans',sans-serif;--font-body:'Inter',sans-serif;
+  --glow-cyan:0 0 30px rgba(0,229,255,.25);
+  --glow-violet:0 0 30px rgba(147,51,234,.3);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;font-synthesis:none;}
+::selection{background:var(--cyan);color:#000;}
+a{color:var(--cyan);text-decoration:none;}
+
+/* ══════════════════════════════════════════════════
+   ANIMATED BACKGROUND CANVAS
+══════════════════════════════════════════════════ */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+.page-wrap{position:relative;z-index:1;}
+
+/* ══════════════════════════════════════════════════
+   NAVBAR
+══════════════════════════════════════════════════ */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 5%;
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(8,12,20,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);transition:box-shadow .3s;}
+nav.scrolled{box-shadow:0 4px 30px rgba(0,0,0,.4);}
+.nav-brand{font-family:var(--font-head);font-size:1.25rem;font-weight:800;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{font-size:.85rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;
+  font-weight:500;transition:color .2s;font-family:var(--font-head);}
+.nav-links a:hover{color:var(--cyan);}
+.nav-right{display:flex;align-items:center;gap:16px;}
+.nav-admin{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--cyan);
+  padding:6px 16px;border-radius:20px;font-size:.78rem;font-weight:600;transition:all .2s;}
+.nav-admin:hover{background:rgba(0,229,255,.2);}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;}
+.mobile-nav{display:none;position:fixed;top:60px;left:0;right:0;background:rgba(8,12,20,.97);
+  backdrop-filter:blur(20px);padding:20px;z-index:99;border-bottom:1px solid var(--border);}
+.mobile-nav.open{display:block;}
+.mobile-nav a{display:block;padding:12px 0;color:var(--muted);border-bottom:1px solid var(--border);font-size:.9rem;}
+
+/* ══════════════════════════════════════════════════
+   HERO
+══════════════════════════════════════════════════ */
+.hero{min-height:100vh;display:flex;align-items:center;padding:120px 5% 80px;
+  position:relative;}
+.hero-inner{display:grid;grid-template-columns:1fr auto;gap:60px;align-items:center;justify-items:start;max-width:1200px;margin:0 auto;width:100%;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.08);
+  border:1px solid rgba(0,229,255,.25);padding:6px 16px;border-radius:20px;
+  font-size:.75rem;color:var(--cyan);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;}
+.hero-tag .dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.4);}}
+.hero h1{font-family:var(--font-head);font-size:clamp(2.2rem,5vw,3.8rem);font-weight:800;
+  line-height:1.15;margin-bottom:16px;letter-spacing:-0.02em;}
+.hero h1 .highlight{background:linear-gradient(135deg,var(--cyan) 0%,var(--violet) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero .subtitle{font-size:1.1rem;color:var(--cyan);font-weight:500;margin-bottom:16px;font-family:var(--font-head);}
+.hero .bio{color:var(--muted);line-height:1.7;max-width:540px;font-size:.95rem;margin-bottom:32px;}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#fff;
+  padding:13px 28px;border-radius:10px;font-weight:600;font-family:var(--font-head);
+  font-size:.9rem;display:inline-flex;align-items:center;gap:8px;transition:all .3s;
+  box-shadow:0 4px 24px rgba(0,229,255,.25);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,229,255,.4);color:#fff;}
+.btn-outline{border:1px solid rgba(0,229,255,.4);color:var(--cyan);padding:13px 28px;
+  border-radius:10px;font-weight:600;font-family:var(--font-head);font-size:.9rem;
+  display:inline-flex;align-items:center;gap:8px;transition:all .3s;}
+.btn-outline:hover{background:rgba(0,229,255,.08);transform:translateY(-2px);}
+.hero-social{display:flex;gap:12px;margin-top:24px;}
+.hero-social a{width:40px;height:40px;background:var(--surf2);border:1px solid var(--border);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);
+  font-size:.95rem;transition:all .2s;}
+.hero-social a:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:var(--glow-cyan);}
+/* Avatar */
+.hero-avatar-wrap{position:relative;flex-shrink:0;width:260px;height:260px;align-self:center;justify-self:center;}
+
+/* Static photo container */
+.avatar-inner{position:absolute;inset:14px;border-radius:50%;background:var(--surf);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-size:4rem;color:var(--muted);z-index:3;
+  box-shadow:0 0 0 2px rgba(0,229,255,.15),0 8px 40px rgba(0,0,0,.5);}
+.avatar-inner img{width:100%;height:100%;object-fit:cover;}
+
+/* Conic gradient ring — hue shifts continuously */
+.avatar-ring{position:absolute;inset:0;border-radius:50%;z-index:1;
+  background:conic-gradient(
+    from 0deg,
+    #00e5ff 0%,
+    #7c3aed 25%,
+    #f59e0b 50%,
+    #10b981 75%,
+    #00e5ff 100%
+  );
+  animation:hue-spin 4s linear infinite;}
+/* Slightly blurred glow layer behind ring */
+.avatar-ring::before{content:'';position:absolute;inset:-6px;border-radius:50%;z-index:-1;
+  background:inherit;filter:blur(12px);opacity:.55;animation:hue-spin 4s linear infinite;}
+/* Thin mask to create ring shape */
+.avatar-ring::after{content:'';position:absolute;inset:8px;border-radius:50%;
+  background:var(--surf);z-index:2;}
+
+@keyframes hue-spin{
+  0%  {filter:hue-rotate(0deg);}
+  100%{filter:hue-rotate(360deg);}
+}
+
+/* Orbiting dot track */
+.avatar-orbit{position:absolute;inset:-18px;border-radius:50%;z-index:4;
+  animation:orbit-spin 6s linear infinite;}
+.avatar-orbit-2{position:absolute;inset:-10px;border-radius:50%;z-index:4;
+  animation:orbit-spin 9s linear infinite reverse;}
+
+@keyframes orbit-spin{
+  from{transform:rotate(0deg);}
+  to  {transform:rotate(360deg);}
+}
+
+/* Individual dots on the orbit */
+.orbit-dot{position:absolute;border-radius:50%;transform-origin:50% 50%;}
+.orbit-dot-1{width:12px;height:12px;top:-6px;left:50%;margin-left:-6px;
+  background:#00e5ff;box-shadow:0 0 8px 3px rgba(0,229,255,.8);}
+.orbit-dot-2{width:8px;height:8px;bottom:-4px;left:50%;margin-left:-4px;
+  background:#7c3aed;box-shadow:0 0 8px 3px rgba(124,58,237,.8);}
+.orbit-dot-3{width:9px;height:9px;top:50%;margin-top:-4px;right:-4px;
+  background:#f59e0b;box-shadow:0 0 8px 3px rgba(245,158,11,.8);}
+.orbit-dot-4{width:7px;height:7px;top:50%;margin-top:-3px;left:-3px;
+  background:#10b981;box-shadow:0 0 6px 2px rgba(16,185,129,.8);}
+.hero-stats{display:flex;gap:28px;margin-top:32px;}
+.stat-item{text-align:center;}
+.stat-item .num{font-family:var(--font-head);font-size:1.6rem;font-weight:800;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;}
+.stat-item .lbl{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+
+/* ══════════════════════════════════════════════════
+   SECTIONS
+══════════════════════════════════════════════════ */
+section{padding:80px 5%;max-width:1200px;margin:0 auto;}
+section[style*="max-width:none"]{padding:80px 5%;}
+.section-label{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.section-label span{font-size:.75rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.12em;font-weight:700;font-family:var(--font-head);}
+.section-label::before{content:'';display:block;width:32px;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet));}
+h2.section-title{font-family:var(--font-head);font-size:clamp(1.7rem,3.5vw,2.4rem);font-weight:800;margin-bottom:48px;line-height:1.15;letter-spacing:-0.02em;}
+h2.section-title .grad{background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.section-full{max-width:none!important;padding:80px 5%;}
+.section-bg{background:var(--surf);}
+.section-bg section{padding:80px 5%;}
+
+/* ══════════════════════════════════════════════════
+   SKILLS
+══════════════════════════════════════════════════ */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.skill-card{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;
+  transition:all .3s;position:relative;overflow:hidden;}
+.skill-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.skill-card:hover{border-color:rgba(0,229,255,.3);transform:translateY(-3px);box-shadow:var(--glow-cyan);}
+.skill-card:hover::before{transform:scaleX(1);}
+.skill-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.skill-icon{width:36px;height:36px;background:rgba(0,229,255,.1);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;color:var(--cyan);}
+.skill-pct{font-family:var(--font-head);font-size:.85rem;font-weight:700;color:var(--cyan);}
+.skill-name{font-size:.88rem;font-weight:500;margin-bottom:8px;}
+.skill-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.skill-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:2px;
+  transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+
+/* ══════════════════════════════════════════════════
+   EXPERIENCE TIMELINE
+══════════════════════════════════════════════════ */
+.timeline{position:relative;padding-left:36px;}
+.timeline::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:2px;
+  background:linear-gradient(180deg,var(--cyan),var(--violet),transparent);}
+.timeline-item{position:relative;margin-bottom:40px;}
+.timeline-dot{position:absolute;left:-42px;top:8px;width:14px;height:14px;border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  box-shadow:0 0 0 3px rgba(0,229,255,.2),0 0 12px rgba(0,229,255,.4);}
+.exp-card{background:var(--surf2);border:1px solid var(--border);border-radius:14px;
+  padding:22px 24px;transition:all .3s;}
+.exp-card:hover{border-color:rgba(0,229,255,.25);box-shadow:var(--glow-cyan);}
+.exp-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px;flex-wrap:wrap;}
+.exp-role{font-family:var(--font-head);font-size:1.05rem;font-weight:700;}
+.exp-type{padding:3px 12px;border-radius:12px;font-size:.72rem;font-weight:600;white-space:nowrap;}
+.type-Employment{background:rgba(0,230,118,.12);color:var(--green);}
+.type-Internship{background:rgba(255,171,0,.12);color:var(--amber);}
+.type-Volunteer{background:rgba(147,51,234,.12);color:#c084fc;}
+.type-Contract{background:rgba(236,72,153,.12);color:var(--pink);}
+.exp-company{color:var(--cyan);font-size:.9rem;font-weight:500;margin-bottom:4px;}
+.exp-meta{color:var(--muted);font-size:.8rem;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;}
+.exp-meta i{margin-right:4px;}
+.exp-duties{padding-left:0;list-style:none;}
+.exp-duties li{position:relative;padding-left:16px;color:var(--muted);font-size:.85rem;
+  line-height:1.6;margin-bottom:4px;}
+.exp-duties li::before{content:'\f054';font-family:'Font Awesome 6 Free';font-weight:900;
+  position:absolute;left:0;color:var(--cyan);font-size:.65rem;top:3px;}
+
+/* ══════════════════════════════════════════════════
+   PROJECTS SLIDESHOW + GRID  (Enhanced)
+══════════════════════════════════════════════════ */
+
+/* ── Slideshow wrapper ── */
+.slideshow{
+  position:relative;overflow:hidden;border-radius:20px;margin-bottom:56px;
+  background:var(--surf2);
+  border:1px solid var(--border);
+  box-shadow:0 0 0 1px rgba(0,229,255,.06), 0 24px 60px rgba(0,0,0,.45);
+}
+/* Subtle animated top-border gradient */
+.slideshow::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;z-index:10;
+  background:linear-gradient(90deg,var(--cyan),var(--violet),var(--pink),var(--cyan));
+  background-size:300% 100%;
+  animation:slide-border 4s linear infinite;
+}
+@keyframes slide-border{0%{background-position:0% 0%;}100%{background-position:300% 0%;}}
+
+/* ── Slides track ── */
+.slides{display:flex;transition:transform .65s cubic-bezier(.77,0,.18,1);}
+.slide{min-width:100%;padding:52px 52px 72px;position:relative;overflow:hidden;}
+
+/* Per-slide background accent */
+.slide::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(147,51,234,.07) 0%,transparent 70%);
+}
+
+/* ── Slide content ── */
+.slide-content{max-width:560px;position:relative;z-index:2;}
+.slide-number{
+  display:inline-block;font-family:var(--font-head);
+  font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:14px;
+}
+.slide h3{
+  font-family:var(--font-head);font-size:clamp(1.4rem,2.5vw,1.9rem);
+  font-weight:800;margin-bottom:10px;line-height:1.2;letter-spacing:-0.02em;
+}
+.slide p{color:var(--muted);line-height:1.75;margin-bottom:22px;font-size:.92rem;}
+.slide .tech-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;}
+.tech-tag{
+  background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.18);
+  color:var(--cyan);padding:4px 13px;border-radius:20px;
+  font-size:.72rem;font-weight:600;letter-spacing:.03em;
+  transition:background .2s,border-color .2s;
+}
+.tech-tag:hover{background:rgba(0,229,255,.16);border-color:rgba(0,229,255,.4);}
+
+/* ── Slide image / placeholder ── */
+.slide-img{
+  position:absolute;right:52px;top:50%;transform:translateY(-50%);
+  width:300px;height:190px;object-fit:cover;border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 12px 48px rgba(0,0,0,.55), 0 0 0 1px rgba(0,229,255,.08);
+  z-index:2;
+  transition:transform .4s ease,box-shadow .4s ease;
+}
+.slide-img:hover{transform:translateY(-54%) scale(1.02);box-shadow:0 20px 60px rgba(0,0,0,.7), 0 0 24px rgba(0,229,255,.15);}
+.slide-placeholder{
+  position:absolute;right:52px;top:50%;transform:translateY(-50%);
+  width:300px;height:190px;
+  background:linear-gradient(135deg,rgba(0,229,255,.06),rgba(147,51,234,.08));
+  border:1px solid rgba(255,255,255,.07);border-radius:14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.15);font-size:3rem;gap:10px;z-index:2;
+}
+.slide-placeholder::after{
+  content:'No preview';font-size:.65rem;letter-spacing:.1em;
+  text-transform:uppercase;color:rgba(255,255,255,.18);font-family:var(--font-head);
+}
+
+/* ── Navigation dots ── */
+.slideshow-nav{
+  position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;align-items:center;z-index:10;
+}
+.slide-dot{
+  width:7px;height:7px;background:rgba(255,255,255,.15);border-radius:50%;
+  cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);
+}
+.slide-dot.active{background:var(--cyan);width:28px;border-radius:4px;box-shadow:0 0 8px rgba(0,229,255,.6);}
+.slide-dot:hover:not(.active){background:rgba(255,255,255,.35);}
+
+/* ── Prev / Next arrow buttons ── */
+.ss-btn{
+  position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(8,12,20,.7);border:1px solid rgba(255,255,255,.1);
+  color:var(--text);width:44px;height:44px;border-radius:50%;
+  cursor:pointer;font-size:.95rem;transition:all .25s;
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);z-index:10;
+}
+.ss-btn:hover{
+  border-color:var(--cyan);color:var(--cyan);
+  box-shadow:0 0 16px rgba(0,229,255,.35);
+  transform:translateY(-50%) scale(1.08);
+}
+.ss-prev{left:18px;}
+.ss-next{right:18px;}
+
+/* ── Slide progress bar ── */
+.ss-progress{
+  position:absolute;bottom:0;left:0;height:3px;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));
+  border-radius:0 3px 3px 0;
+  transition:width .65s cubic-bezier(.77,0,.18,1);
+  z-index:10;
+}
+
+/* ══════════════════════════════════════════════════
+   PROJECTS GRID  (Enhanced)
+══════════════════════════════════════════════════ */
+.projects-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:22px;
+}
+.proj-card{
+  background:var(--surf2);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+  transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease;
+  display:flex;flex-direction:column;
+  position:relative;
+}
+.proj-card::before{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(135deg,rgba(0,229,255,.04),rgba(147,51,234,.06));
+  opacity:0;transition:opacity .35s;pointer-events:none;
+}
+.proj-card:hover{
+  border-color:rgba(147,51,234,.45);
+  transform:translateY(-6px);
+  box-shadow:0 20px 50px rgba(0,0,0,.45), var(--glow-violet);
+}
+.proj-card:hover::before{opacity:1;}
+
+/* Image banner */
+.proj-card-img{
+  height:160px;
+  background:linear-gradient(135deg,rgba(0,229,255,.04),rgba(147,51,234,.09));
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.18);font-size:2.2rem;
+  border-bottom:1px solid var(--border);overflow:hidden;
+  position:relative;
+}
+.proj-card-img::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 50%,rgba(8,12,20,.6) 100%);
+  pointer-events:none;
+}
+.proj-card-img img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .5s ease;
+}
+.proj-card:hover .proj-card-img img{transform:scale(1.06);}
+
+/* Card body */
+.proj-card-body{padding:20px;flex:1;display:flex;flex-direction:column;}
+.proj-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.proj-card h3{
+  font-family:var(--font-head);font-size:1.02rem;font-weight:700;
+  line-height:1.3;
+}
+.proj-status{
+  flex-shrink:0;font-size:.65rem;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;padding:3px 9px;border-radius:10px;
+  background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.2);
+}
+.proj-card p{
+  color:var(--muted);font-size:.82rem;line-height:1.6;
+  margin-bottom:14px;flex:1;
+}
+.proj-card .tech-tags{margin-bottom:16px;}
+.proj-card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:14px;border-top:1px solid rgba(255,255,255,.05);
+  margin-top:auto;
+}
+.proj-link{
+  color:var(--cyan);font-size:.78rem;font-weight:700;
+  display:inline-flex;align-items:center;gap:6px;
+  transition:all .2s;letter-spacing:.02em;
+  padding:5px 12px;border-radius:8px;border:1px solid rgba(0,229,255,.2);
+  background:rgba(0,229,255,.05);
+}
+.proj-link:hover{
+  color:#fff;background:rgba(0,229,255,.15);
+  border-color:rgba(0,229,255,.5);
+  box-shadow:0 0 12px rgba(0,229,255,.2);
+  transform:translateX(2px);
+}
+.proj-private{
+  color:var(--muted);font-size:.75rem;
+  display:inline-flex;align-items:center;gap:5px;
+  opacity:.65;
+}
+.proj-idx{
+  font-family:var(--font-head);font-size:.68rem;font-weight:800;
+  color:rgba(255,255,255,.12);letter-spacing:.04em;
+}
+
+
+/* ══════════════════════════════════════════════════
+   EDUCATION
+══════════════════════════════════════════════════ */
+.edu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;}
+.edu-card{background:var(--surf2);border:1px solid var(--border);border-radius:14px;padding:24px;
+  transition:all .3s;position:relative;overflow:hidden;}
+.edu-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--violet),var(--cyan));transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.edu-card:hover{border-color:rgba(147,51,234,.35);box-shadow:var(--glow-violet);}
+.edu-card:hover::after{transform:scaleX(1);}
+.edu-icon{width:44px;height:44px;background:linear-gradient(135deg,rgba(147,51,234,.2),rgba(0,229,255,.1));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+  color:var(--violet);margin-bottom:14px;}
+.edu-degree{font-family:var(--font-head);font-size:.95rem;font-weight:700;margin-bottom:4px;}
+.edu-inst{color:var(--cyan);font-size:.85rem;margin-bottom:4px;}
+.edu-meta{color:var(--muted);font-size:.78rem;}
+.edu-grade{display:inline-block;margin-top:8px;background:rgba(0,230,118,.1);color:var(--green);
+  padding:3px 10px;border-radius:6px;font-size:.75rem;font-weight:600;}
+
+/* ══════════════════════════════════════════════════
+   CERTIFICATIONS / CREDLY BADGES
+══════════════════════════════════════════════════ */
+.cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;}
+/* Credly live badges row */
+.credly-section{margin-top:48px;}
+.credly-section-title{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.credly-section-title span{font-size:.75rem;color:var(--cyan);text-transform:uppercase;letter-spacing:.12em;font-weight:700;font-family:var(--font-head);}
+.credly-section-title::before{content:'';display:block;width:32px;height:2px;background:linear-gradient(90deg,var(--cyan),var(--violet));}
+.credly-profile-link{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:.82rem;margin-bottom:28px;transition:color .2s;}
+.credly-profile-link:hover{color:var(--cyan);}
+.credly-profile-link i{color:var(--cyan);}
+.credly-badges-row{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:16px;
+  width:100%;
+}
+.credly-badge-wrap{
+  background:var(--surf2);border:1px solid var(--border);border-radius:14px;
+  padding:16px 12px;transition:all .3s;text-align:center;
+  overflow:hidden;width:100%;box-sizing:border-box;
+}
+.credly-badge-wrap:hover{border-color:rgba(0,229,255,.3);transform:translateY(-4px);box-shadow:var(--glow-cyan);}
+.credly-badge-wrap a{display:block;text-decoration:none;}
+/* Make the Credly-injected iframe fill its container */
+.credly-badge-wrap [data-share-badge-id]{display:block!important;width:100%!important;}
+.credly-badge-wrap [data-share-badge-id] iframe{width:100%!important;max-width:100%!important;}
+.credly-badge-wrap img{width:100%;max-width:120px;height:auto;object-fit:contain;border-radius:10px;display:block;margin:0 auto 10px;}
+.credly-badge-wrap .badge-name{font-family:var(--font-head);font-size:.8rem;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.3;word-break:break-word;}
+.credly-badge-wrap .badge-issuer{font-size:.7rem;color:var(--muted);margin-bottom:8px;}
+.credly-badge-wrap .badge-verify{display:inline-flex;align-items:center;gap:4px;font-size:.7rem;color:var(--cyan);font-weight:600;}
+/* Responsive breakpoints */
+@media(max-width:900px){
+  .credly-badges-row{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;}
+}
+@media(max-width:480px){
+  .credly-badges-row{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .credly-badge-wrap{padding:12px 8px;}
+}
+@media(max-width:320px){
+  .credly-badges-row{grid-template-columns:1fr 1fr;gap:8px;}
+}
+.credly-badge-img-fallback{width:140px;height:140px;background:linear-gradient(135deg,rgba(0,229,255,.1),rgba(147,51,234,.1));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+  color:var(--cyan);font-size:2.5rem;border:1px solid var(--border);}
+.cert-card{background:var(--surf2);border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;transition:all .3s;}
+.cert-card-inner{padding:22px;text-align:center;}
+.cert-card:hover{border-color:rgba(0,229,255,.3);transform:translateY(-4px);box-shadow:var(--glow-cyan);}
+.cert-has-pdf .cert-card-inner{cursor:pointer;}
+.cert-has-pdf:hover{transform:translateY(-2px);}
+.cert-has-pdf.cert-open{transform:none!important;border-color:rgba(239,68,68,.4);}
+.cert-pdf-hint{display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+  background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);
+  padding:4px 12px;border-radius:8px;font-size:.75rem;font-weight:600;}
+.cert-chevron{transition:transform .3s;}
+.cert-open .cert-chevron{transform:rotate(180deg);}
+.cert-pdf-preview{border-top:1px solid var(--border);}
+.cert-pdf-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 14px;background:rgba(239,68,68,.06);font-size:.78rem;color:var(--muted);flex-wrap:wrap;}
+.cert-pdf-iframe{width:100%;height:440px;border:none;display:block;background:#fff;}
+@media(max-width:640px){.cert-pdf-iframe{height:300px;}}
+.cert-badge{width:80px;height:80px;margin:0 auto 14px;border-radius:12px;overflow:hidden;
+  background:linear-gradient(135deg,rgba(0,229,255,.1),rgba(147,51,234,.1));
+  display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--muted);}
+.cert-badge img{width:100%;height:100%;object-fit:contain;}
+.cert-title{font-family:var(--font-head);font-size:.9rem;font-weight:700;margin-bottom:4px;}
+.cert-issuer{color:var(--muted);font-size:.75rem;margin-bottom:10px;}
+.cert-year{background:rgba(255,171,0,.1);color:var(--amber);padding:2px 8px;border-radius:6px;font-size:.72rem;}
+.credly-link{display:inline-flex;align-items:center;gap:5px;margin-top:10px;color:var(--cyan);font-size:.75rem;}
+
+/* ══════════════════════════════════════════════════
+   FILES / DOCUMENTS
+══════════════════════════════════════════════════ */
+.files-list{display:flex;flex-direction:column;gap:12px;}
+.file-item{background:var(--surf2);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .3s;}
+.file-item:hover{border-color:rgba(0,229,255,.25);}
+.file-item-bar{display:flex;align-items:center;gap:16px;padding:16px 20px;transition:background .2s;}
+.file-item-bar.file-item-pdf{cursor:pointer;}
+.file-item-bar.file-item-pdf:hover{background:rgba(0,229,255,.04);}
+.file-item-bar .ficon{font-size:1.8rem;flex-shrink:0;}
+.ficon-pdf{color:#f44336;}.ficon-doc,.ficon-docx{color:#2196f3;}
+.ficon-img{color:var(--green);}.ficon-zip{color:var(--amber);}.ficon-other{color:var(--muted);}
+.file-item-info{flex:1;min-width:0;}
+.file-item-info h4{font-size:.88rem;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.file-item-info small{color:var(--muted);font-size:.75rem;}
+.file-pdf-hint{color:var(--cyan);margin-left:4px;}
+.file-item-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.file-expand-icon{color:var(--muted);font-size:.85rem;transition:transform .3s;margin-right:4px;}
+.file-item.open .file-expand-icon{transform:rotate(180deg);}
+.file-dl-btn,.file-open-btn{width:32px;height:32px;background:var(--surf);border:1px solid var(--border);
+  border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);
+  font-size:.8rem;transition:all .2s;text-decoration:none;}
+.file-dl-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.file-open-btn:hover{border-color:rgba(0,229,255,.4);color:var(--cyan);}
+.file-pdf-preview{border-top:1px solid var(--border);}
+.file-pdf-iframe{width:100%;height:480px;border:none;display:block;background:#fff;}
+@media(max-width:640px){
+  .file-pdf-iframe{height:320px;}
+  .file-item-bar{padding:12px 14px;gap:12px;}
+}
+
+/* ══════════════════════════════════════════════════
+   TESTIMONIALS
+══════════════════════════════════════════════════ */
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}
+.testi-card{background:var(--surf2);border:1px solid var(--border);border-radius:14px;padding:24px;
+  position:relative;transition:all .3s;}
+.testi-card:hover{border-color:rgba(147,51,234,.3);}
+.testi-card .quote{position:absolute;top:16px;right:16px;font-size:2rem;color:rgba(0,229,255,.12);
+  font-family:Georgia,serif;line-height:1;}
+.testi-text{color:var(--muted);font-size:.87rem;line-height:1.7;font-style:italic;margin-bottom:16px;}
+.testi-author strong{display:block;font-size:.88rem;font-weight:600;}
+.testi-author small{color:var(--muted);font-size:.78rem;}
+.testi-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--cyan),var(--violet));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;
+  font-weight:800;font-size:.9rem;flex-shrink:0;}
+.testi-row{display:flex;align-items:center;gap:12px;}
+/* Testimonial PDF */
+.testi-pdf-wrap{margin-top:16px;border-top:1px solid var(--border);padding-top:14px;}
+.testi-pdf-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+.testi-pdf-label{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;font-weight:600;}
+.testi-pdf-label i{color:#ef4444;}
+.testi-pdf-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.testi-pdf-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;border-radius:7px;
+  font-size:.75rem;font-weight:600;text-decoration:none;transition:all .2s;cursor:pointer;}
+.testi-pdf-btn-preview{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.28);}
+.testi-pdf-btn-preview:hover{background:rgba(239,68,68,.22);color:#ff7676;}
+.testi-pdf-btn-download{background:rgba(0,229,255,.08);color:var(--cyan);border:1px solid rgba(0,229,255,.2);}
+.testi-pdf-btn-download:hover{background:rgba(0,229,255,.16);}
+.testi-pdf-embed-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:#fff;}
+.testi-pdf-iframe{width:100%;height:420px;border:none;display:block;}
+.testi-pdf-fallback{display:none;padding:32px;text-align:center;color:var(--muted);}
+.testi-pdf-fallback i{font-size:2.5rem;color:#ef4444;margin-bottom:12px;display:block;}
+.testi-pdf-fallback p{font-size:.85rem;margin-bottom:14px;}
+@media(max-width:640px){.testi-pdf-iframe{height:300px;}}
+/* Testimonial PDF toggle — mirrors cert-has-pdf pattern */
+.testi-has-pdf .testi-card-inner{cursor:pointer;}
+.testi-has-pdf:hover{transform:translateY(-2px);}
+.testi-has-pdf.testi-open{transform:none!important;border-color:rgba(239,68,68,.4);}
+.testi-pdf-hint{display:inline-flex;align-items:center;gap:6px;margin-top:10px;
+  background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);
+  padding:4px 12px;border-radius:8px;font-size:.75rem;font-weight:600;}
+.testi-chevron{transition:transform .3s;}
+.testi-open .testi-chevron{transform:rotate(180deg);}
+.testi-pdf-preview{border-top:1px solid var(--border);}
+.testi-pdf-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 14px;background:rgba(239,68,68,.06);font-size:.78rem;color:var(--muted);flex-wrap:wrap;}
+
+/* ══════════════════════════════════════════════════
+   CONTACT
+══════════════════════════════════════════════════ */
+.contact-wrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;}
+.contact-info .item{display:flex;align-items:center;gap:16px;margin-bottom:24px;padding:18px;
+  background:var(--surf2);border:1px solid var(--border);border-radius:12px;transition:all .3s;}
+.contact-info .item:hover{border-color:rgba(0,229,255,.3);}
+.contact-info .ico{width:44px;height:44px;background:rgba(0,229,255,.1);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;color:var(--cyan);font-size:1.1rem;flex-shrink:0;}
+.contact-info h4{font-size:.85rem;font-weight:600;margin-bottom:2px;}
+.contact-info p{color:var(--muted);font-size:.82rem;}
+.contact-info a{color:var(--cyan);}
+
+/* ══════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════ */
+footer{text-align:center;padding:40px 5%;border-top:1px solid var(--border);color:var(--muted);font-size:.82rem;}
+footer .footer-brand{font-family:var(--font-head);font-size:1.1rem;font-weight:700;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ══════════════════════════════════════════════════
+   ANIMATIONS
+══════════════════════════════════════════════════ */
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE — full multi-breakpoint system
+══════════════════════════════════════════════════ */
+
+/* ── Tablet landscape / small desktop  ≤ 1100px ── */
+@media(max-width:1100px){
+  .hero-inner{gap:36px;}
+  .hero-avatar-wrap{width:220px;height:220px;}
+  .slide-placeholder,.slide-img{width:220px;height:150px;right:28px;}
+}
+
+/* ── Tablet portrait  ≤ 900px ── */
+@media(max-width:900px){
+  /* Nav */
+  .nav-links{display:none;}
+  .hamburger{display:block;}
+  nav{padding:14px 4%;}
+
+  /* Hero — single column, centred */
+  .hero{padding:100px 4% 60px;}
+  .hero-inner{grid-template-columns:1fr;text-align:center;gap:0;justify-items:center;}
+  .hero-avatar-wrap{
+    display:flex;justify-content:center;align-items:center;margin-bottom:32px;order:-1;
+  }
+  .avatar-ring{position:absolute;inset:0;}
+  .hero-avatar-wrap{width:170px;height:170px;}
+  .hero-btns{justify-content:center;}
+  .hero-social{justify-content:center;}
+  .hero-stats{justify-content:center;gap:20px;}
+  .hero .bio{margin-left:auto;margin-right:auto;}
+
+  /* Sections */
+  section{padding:60px 4%;}
+  .section-bg section{padding:60px 4%;}
+
+  /* Timeline — pull in so dot doesn't clip */
+  .timeline{padding-left:28px;}
+  .timeline-dot{left:-34px;}
+
+  /* Slideshow image hidden at tablet */
+  .slide-placeholder,.slide-img{display:none;}
+  .slide{padding:36px 28px 56px;}
+  .slide-content{max-width:100%;}
+
+  /* Grids relax min-width */
+  .skills-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+  .projects-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));}
+  .edu-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+  .cert-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));}
+  .testi-grid{grid-template-columns:1fr;}
+
+  /* Contact */
+  .contact-wrap{grid-template-columns:1fr;}
+}
+
+/* ── Large phone  ≤ 640px ── */
+@media(max-width:640px){
+  /* Nav brand text size */
+  .nav-brand{font-size:1rem;}
+
+  /* Hero */
+  .hero{padding:90px 4% 50px;}
+  .hero-avatar-wrap{width:140px;height:140px;}
+  .hero h1{font-size:clamp(1.9rem,8vw,2.6rem);}
+  .hero .subtitle{font-size:.95rem;}
+  .hero .bio{font-size:.88rem;}
+  .hero-btns{flex-direction:column;align-items:center;}
+  .btn-primary,.btn-outline{width:100%;max-width:280px;justify-content:center;}
+  .hero-stats{gap:14px;}
+  .stat-item .num{font-size:1.3rem;}
+
+  /* Timeline */
+  .timeline{padding-left:22px;}
+  .timeline-dot{left:-28px;width:12px;height:12px;}
+  .exp-card{padding:16px;}
+  .exp-header{flex-direction:column;gap:6px;}
+
+  /* Skills — single column */
+  .skills-grid{grid-template-columns:1fr;}
+
+  /* Projects */
+  .projects-grid{grid-template-columns:1fr;}
+  .slide{padding:28px 20px 56px;}
+  .ss-btn{width:36px;height:36px;font-size:.85rem;}
+
+  /* Education */
+  .edu-grid{grid-template-columns:1fr;}
+
+  /* Certs */
+  .cert-grid{grid-template-columns:repeat(2,1fr);}
+
+  /* Contact card padding */
+  .contact-info .item{padding:14px;}
+  .contact-info .ico{width:38px;height:38px;}
+
+  /* Section titles */
+  h2.section-title{margin-bottom:32px;}
+
+  /* Footer */
+  footer{padding:28px 4%;}
+}
+
+/* ── Small phone  ≤ 400px ── */
+@media(max-width:400px){
+  nav{padding:12px 3%;}
+  .hero{padding:84px 3% 44px;}
+  .hero h1{font-size:1.75rem;}
+  section{padding:48px 3%;}
+  .cert-grid{grid-template-columns:1fr;}
+  .hero-stats{flex-wrap:wrap;justify-content:center;gap:10px 20px;}
+  .hero-social a{width:36px;height:36px;}
+  .exp-card{padding:14px;}
+  .contact-info .item{flex-direction:column;text-align:center;}
+  .contact-info .ico{margin:0 auto 8px;}
+}
+
+/* ══════════════════════════════════════════════════
+   PDF MODAL
+══════════════════════════════════════════════════ */
+#pdf-modal-overlay{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:16px;
+}
+#pdf-modal-overlay.open{display:flex;}
+#pdf-modal-box{
+  background:#1a1d2e;border:1px solid rgba(0,229,255,.2);
+  border-radius:16px;width:100%;max-width:900px;
+  height:90vh;display:flex;flex-direction:column;
+  box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(0,229,255,.08);
+  overflow:hidden;
+}
+#pdf-modal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.07);
+  background:rgba(0,0,0,.3);flex-shrink:0;gap:10px;
+}
+#pdf-modal-title{
+  font-family:var(--font-head);font-size:.9rem;font-weight:600;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  display:flex;align-items:center;gap:8px;
+}
+#pdf-modal-title i{color:#ef4444;flex-shrink:0;}
+.pdf-modal-actions{display:flex;gap:8px;flex-shrink:0;align-items:center;}
+.pdf-modal-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:8px;font-size:.78rem;font-weight:600;
+  text-decoration:none;border:none;cursor:pointer;
+  font-family:var(--font-head);transition:all .2s;
+}
+.pdf-modal-btn-dl{background:rgba(0,229,255,.1);color:var(--cyan);border:1px solid rgba(0,229,255,.25);}
+.pdf-modal-btn-dl:hover{background:rgba(0,229,255,.22);}
+.pdf-modal-btn-close{background:rgba(255,255,255,.07);color:var(--muted);border:1px solid rgba(255,255,255,.1);}
+.pdf-modal-btn-close:hover{background:rgba(255,255,255,.14);color:var(--text);}
+#pdf-modal-iframe{flex:1;border:none;background:#fff;display:block;width:100%;}
+#pdf-modal-loading{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;color:var(--muted);font-size:.9rem;gap:12px;}
+#pdf-modal-loading i{font-size:2.5rem;color:#ef4444;animation:pulse 1.5s infinite;}
+@media(max-width:640px){
+  #pdf-modal-box{height:95vh;border-radius:12px;}
+  #pdf-modal-header{padding:10px 14px;}
+  .pdf-modal-btn{padding:5px 10px;font-size:.72rem;}
+}
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script>
+if(typeof pdfjsLib!=='undefined'){
+  pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';
+}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script>
+</head>
+<body>
+<!-- ══════════════════════════════════════════════
+     ANIMATED BACKGROUND
+══════════════════════════════════════════════ -->
+<canvas id="bg-canvas" width="1280" height="800"></canvas>
+
+<div class="page-wrap">
+<!-- ══════════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-brand">EMMANUEL <span style="-webkit-text-fill-color:var(--muted);background:none;font-weight:400;">Kirui</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#certifications">Certs</a></li>
+    <li><a href="#referees">Referees</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="https://creativepulse.42web.io/cps/admin.php" class="nav-admin"><i class="fas fa-lock"></i> Admin</a>
+    <button class="hamburger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
+      <i class="fas fa-bars"></i>
+    </button>
+  </div>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="#about" onclick="document.getElementById('mobileNav').classList.remove('open')">About</a>
+  <a href="#skills" onclick="document.getElementById('mobileNav').classList.remove('open')">Skills</a>
+  <a href="#experience" onclick="document.getElementById('mobileNav').classList.remove('open')">Experience</a>
+  <a href="#projects" onclick="document.getElementById('mobileNav').classList.remove('open')">Projects</a>
+  <a href="#certifications" onclick="document.getElementById('mobileNav').classList.remove('open')">Certifications</a>
+  <a href="#referees" onclick="document.getElementById('mobileNav').classList.remove('open')">Referees</a>
+  <a href="#contact" onclick="document.getElementById('mobileNav').classList.remove('open')">Contact</a>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════ -->
+<section class="hero" id="about">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-tag"><span class="dot"></span> Available for Opportunities</div>
+      <h1>Hi, I'm <span class="highlight">EMMANUEL</span><br>Kiprotich Kirui</h1>
+      <p class="subtitle">IT Professional &amp; Software Developer</p>
+      <p class="bio">I am an IT professional with a background in cybersecurity, cloud technologies, and prompt design in AI. I am passionate about building secure and scalable applications, leveraging my skills in Vertex AI and cybersecurity.</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary"><i class="fas fa-paper-plane"></i> Get In Touch</a>
+        <a href="#projects" class="btn-outline"><i class="fas fa-code"></i> View Projects</a>      </div>
+      <div class="hero-social">
+        <a href="mailto:emmanuelkirui042@gmail.com" title="Email"><i class="fas fa-envelope"></i></a>        <a href="https://github.com/emmanuelkirui" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>        <a href="https://linkedin.com/in/emmanuelkirui" target="_blank" title="LinkedIn"><i class="fab fa-linkedin"></i></a>        <a href="tel:+254 742994437" title="Phone"><i class="fas fa-phone"></i></a>      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><div class="num">5+</div><div class="lbl">Roles</div></div>
+        <div class="stat-item"><div class="num">3+</div><div class="lbl">Projects</div></div>
+        <div class="stat-item"><div class="num">2+</div><div class="lbl">Certs</div></div>
+        <div class="stat-item"><div class="num">8+</div><div class="lbl">Skills</div></div>
+      </div>
+    </div>
+    <div class="hero-avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="avatar-orbit">
+        <span class="orbit-dot orbit-dot-1"></span>
+        <span class="orbit-dot orbit-dot-2"></span>
+      </div>
+      <div class="avatar-orbit-2">
+        <span class="orbit-dot orbit-dot-3"></span>
+        <span class="orbit-dot orbit-dot-4"></span>
+      </div>
+      <div class="avatar-inner">
+                  <img src="https://creativepulse.42web.io/cps/uploads/6a1771868e290_66771.jpg" alt="EMMANUEL KIPROTICH KIRUI">
+              </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     SKILLS
+══════════════════════════════════════════════ -->
+<div class="section-bg">
+<section id="skills">
+  <div class="section-label"><span>Expertise</span></div>
+  <h2 class="section-title">Technical <span class="grad">Skills</span></h2>
+  <div class="skills-grid">
+        <div class="skill-card fade-in">
+      <div class="skill-top">
+        <div class="skill-icon"><i class="fas fa-star"></i></div>
+        <span class="skill-pct">90%</span>
+      </div>
+      <div class="skill-name">PHP</div>
+      <div class="skill-bar"><div class="skill-fill" data-w="90" style="width:0%"></div></div>
+    </div>
+        <div class="skill-card fade-in">
+      <div class="skill-top">
+        <div class="skill-icon"><i class="fas fa-star"></i></div>
+        <span class="skill-pct">85%</span>
+      </div>
+      <div class="skill-name">JavaScript</div>
+      <div class="skill-bar"><div class="skill-fill" data-w="85" style="width:0%"></div></div>
+    </div>
+        <div class="skill-card fade-in">
+      <div class="skill-top">
+        <div class="skill-icon"><i class="fas fa-star"></i></div>
+        <span class="skill-pct">80%</span>
+      </div>
+      <div class="skill-name">Python</div>
+      <div class="skill-bar"><div class="skill-fill" data-w="80" style="width:0%"></div></div>
+    </div>
+        <div class="skill-card fade-in">
+      <div class="skill-top">
+        <div class="skill-icon"><i class="fas fa-star"></i></div>
+        <span class="skill-pct">88%</span>
+      </div>
+      <div class="skill-name">MySQL</div>
+      <div class="skill-bar"><div class="skill-fill" data-w="88" style="width:0%"></div></div>
+    </div>
+        <div class="skill-card fade-in">
+      <div class="skill-top">
+        <div class="skill-icon"><i class="fas fa-star"></i></div>
+        <span class="skill-pct">92%</span>
+      </div>
+      <div class="skill-name">HTML/CSS</div>
+      <div class="skill-bar"><div class="skill-fill" data-w="92" style="width:0%"></div></div>
+    </div>
+        <div class="skill-card fade-in">
+      <div class="skill-top">
+        <div class="skill-icon"><i class="fas fa-star"></i></div>
+        <span class="skill-pct">75%</span>
+      </div>
+      <div class="skill-name">Linux</div>
+      <div class="skill-bar"><div class="skill-fill" data-w="75" style="width:0%"></div></div>
+    </div>
+        <div class="skill-card fade-in">
+      <div class="skill-top">
+        <div class="skill-icon"><i class="fas fa-star"></i></div>
+        <span class="skill-pct">78%</span>
+      </div>
+      <div class="skill-name">Networking</div>
+      <div class="skill-bar"><div class="skill-fill" data-w="78" style="width:0%"></div></div>
+    </div>
+        <div class="skill-card fade-in">
+      <div class="skill-top">
+        <div class="skill-icon"><i class="fas fa-star"></i></div>
+        <span class="skill-pct">70%</span>
+      </div>
+      <div class="skill-name">React</div>
+      <div class="skill-bar"><div class="skill-fill" data-w="70" style="width:0%"></div></div>
+    </div>
+      </div>
+</section>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     EXPERIENCE
+══════════════════════════════════════════════ -->
+<section id="experience">
+  <div class="section-label"><span>Career</span></div>
+  <h2 class="section-title">Work <span class="grad">Experience</span></h2>
+  <div class="timeline">
+        <div class="timeline-item fade-in">
+      <div class="timeline-dot"></div>
+      <div class="exp-card">
+        <div class="exp-header">
+          <span class="exp-role">IT Support /Administrative Assistant</span>
+          <span class="exp-type type-Contract">Contract</span>
+        </div>
+        <div class="exp-company"><i class="fas fa-building" style="font-size:.8rem;"></i> Jumkino Medical Center, Kericho</div>
+        <div class="exp-meta">
+          <span><i class="fas fa-map-marker-alt"></i>Kericho</span>          <span><i class="far fa-calendar"></i>Aug 2025 – November 2025</span>        </div>
+                <ul class="exp-duties">
+                    <li>- Provided technical support for hardware, software, and network issues</li>
+                    <li>- Maintained and updated systems for performance and security</li>
+                    <li>- Assisted in data entry and troubleshooting user queries</li>
+                    <li>- Assisted in processing insurance claims, ensuring accuracy and timely resolution.</li>
+                    <li>-Provided front desk support as a receptionist, managing client inquiries and administrative</li>
+                    <li>tasks.</li>
+                  </ul>
+              </div>
+    </div>
+        <div class="timeline-item fade-in">
+      <div class="timeline-dot"></div>
+      <div class="exp-card">
+        <div class="exp-header">
+          <span class="exp-role">IT Support</span>
+          <span class="exp-type type-Volunteer">Volunteer</span>
+        </div>
+        <div class="exp-company"><i class="fas fa-building" style="font-size:.8rem;"></i> National Hospital Insurance Fund (NHIF), Kericho</div>
+        <div class="exp-meta">
+          <span><i class="fas fa-map-marker-alt"></i>Kericho</span>          <span><i class="far fa-calendar"></i>Jan 2024 – July 2024</span>        </div>
+                <ul class="exp-duties">
+                    <li>- Provided technical support for hardware, software, and network issues</li>
+                    <li>- Maintained and updated systems for performance and security</li>
+                    <li>- Assisted in data entry and troubleshooting user queries</li>
+                    <li>-Assisted in claims processing.</li>
+                  </ul>
+              </div>
+    </div>
+        <div class="timeline-item fade-in">
+      <div class="timeline-dot"></div>
+      <div class="exp-card">
+        <div class="exp-header">
+          <span class="exp-role">IT Support</span>
+          <span class="exp-type type-Internship">Internship</span>
+        </div>
+        <div class="exp-company"><i class="fas fa-building" style="font-size:.8rem;"></i> National Hospital Insurance Fund (NHIF), Kericho</div>
+        <div class="exp-meta">
+          <span><i class="fas fa-map-marker-alt"></i>Kericho</span>          <span><i class="far fa-calendar"></i>Aug 2023 - Nov 2023</span>        </div>
+                <ul class="exp-duties">
+                    <li>- Provided technical support for hardware, software, and network issues</li>
+                    <li>- Maintained and updated systems for performance and security</li>
+                    <li>- Assisted in data entry and troubleshooting user queries</li>
+                  </ul>
+              </div>
+    </div>
+        <div class="timeline-item fade-in">
+      <div class="timeline-dot"></div>
+      <div class="exp-card">
+        <div class="exp-header">
+          <span class="exp-role">IT Support</span>
+          <span class="exp-type type-Volunteer">Volunteer</span>
+        </div>
+        <div class="exp-company"><i class="fas fa-building" style="font-size:.8rem;"></i> Kapkoros Sub-County Hospital</div>
+        <div class="exp-meta">
+          <span><i class="fas fa-map-marker-alt"></i>Bomet</span>          <span><i class="far fa-calendar"></i>March 2026 – April 2026</span>        </div>
+                <ul class="exp-duties">
+                    <li>- Provided technical support  hardware and network issues</li>
+                    <li>-Provided front desk support as a receptionist, managing client inquiries and data entry.</li>
+                  </ul>
+              </div>
+    </div>
+        <div class="timeline-item fade-in">
+      <div class="timeline-dot"></div>
+      <div class="exp-card">
+        <div class="exp-header">
+          <span class="exp-role">ASSISTANT HRIO</span>
+          <span class="exp-type type-Employment">Employment</span>
+        </div>
+        <div class="exp-company"><i class="fas fa-building" style="font-size:.8rem;"></i> Rexus Medical Centre</div>
+        <div class="exp-meta">
+          <span><i class="fas fa-map-marker-alt"></i>Bomet</span>          <span><i class="far fa-calendar"></i>April 2026 – Current</span>        </div>
+                <ul class="exp-duties">
+                    <li>- Assisted in data entry and troubleshooting user queries</li>
+                    <li>- Assisted in processing insurance claims, ensuring accuracy and timely resolution.</li>
+                    <li>-Provided front desk support as a receptionist, managing client inquiries and administrative tasks.</li>
+                  </ul>
+              </div>
+    </div>
+      </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     PROJECTS (Slideshow + Grid)
+══════════════════════════════════════════════ -->
+<div class="section-bg">
+<section id="projects" style="max-width:none;">
+<div style="max-width:1200px;margin:0 auto;">
+  <div class="section-label"><span>Portfolio</span></div>
+  <h2 class="section-title">Featured <span class="grad">Projects</span></h2>
+  <!-- SLIDESHOW -->
+  <div class="slideshow">
+    <div class="slides" id="slides" style="transform: translateX(-100%);">
+            <div class="slide">
+        <div class="slide-content">
+          <div class="slide-number">Project 01 / 03</div>
+          <h3>Football Predictions System</h3>
+          <p></p>
+          <div class="tech-tags">
+            <span class="tech-tag">Python</span><span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">API</span>          </div>
+                  </div>
+                  <div class="slide-placeholder"><i class="fas fa-code"></i></div>
+              </div>
+            <div class="slide">
+        <div class="slide-content">
+          <div class="slide-number">Project 02 / 03</div>
+          <h3>School Management System</h3>
+          <p></p>
+          <div class="tech-tags">
+            <span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">JavaScript</span><span class="tech-tag">Bootstrap</span>          </div>
+                  </div>
+                  <div class="slide-placeholder"><i class="fas fa-code"></i></div>
+              </div>
+            <div class="slide">
+        <div class="slide-content">
+          <div class="slide-number">Project 03 / 03</div>
+          <h3>Network Monitoring Dashboard</h3>
+          <p></p>
+          <div class="tech-tags">
+            <span class="tech-tag">Python</span><span class="tech-tag">React</span><span class="tech-tag">WebSocket</span>          </div>
+                  </div>
+                  <div class="slide-placeholder"><i class="fas fa-code"></i></div>
+              </div>
+          </div>
+    <button class="ss-btn ss-prev" onclick="moveSlide(-1)" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
+    <button class="ss-btn ss-next" onclick="moveSlide(1)" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+    <div class="slideshow-nav" id="slideDots"><div class="slide-dot"></div><div class="slide-dot active"></div><div class="slide-dot"></div></div>
+    <div class="ss-progress" id="ssProgress" style="width: 66.6667%;"></div>
+  </div>
+  <!-- GRID -->
+  <div class="projects-grid">
+        <div class="proj-card fade-in">
+      <div class="proj-card-img">
+        <i class="fas fa-code"></i>      </div>
+      <div class="proj-card-body">
+        <div class="proj-card-top">
+          <h3>Football Predictions System</h3>
+                  </div>
+        <p></p>
+        <div class="tech-tags" style="margin-bottom:14px;">
+          <span class="tech-tag">Python</span><span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">API</span>        </div>
+        <div class="proj-card-footer">
+          <span class="proj-private"><i class="fas fa-lock"></i> Private Repo</span>          <span class="proj-idx">01</span>
+        </div>
+      </div>
+    </div>
+        <div class="proj-card fade-in">
+      <div class="proj-card-img">
+        <i class="fas fa-code"></i>      </div>
+      <div class="proj-card-body">
+        <div class="proj-card-top">
+          <h3>School Management System</h3>
+                  </div>
+        <p></p>
+        <div class="tech-tags" style="margin-bottom:14px;">
+          <span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">JavaScript</span><span class="tech-tag">Bootstrap</span>        </div>
+        <div class="proj-card-footer">
+          <span class="proj-private"><i class="fas fa-lock"></i> Private Repo</span>          <span class="proj-idx">02</span>
+        </div>
+      </div>
+    </div>
+        <div class="proj-card fade-in">
+      <div class="proj-card-img">
+        <i class="fas fa-code"></i>      </div>
+      <div class="proj-card-body">
+        <div class="proj-card-top">
+          <h3>Network Monitoring Dashboard</h3>
+                  </div>
+        <p></p>
+        <div class="tech-tags" style="margin-bottom:14px;">
+          <span class="tech-tag">Python</span><span class="tech-tag">React</span><span class="tech-tag">WebSocket</span>        </div>
+        <div class="proj-card-footer">
+          <span class="proj-private"><i class="fas fa-lock"></i> Private Repo</span>          <span class="proj-idx">03</span>
+        </div>
+      </div>
+    </div>
+      </div>
+</div>
+</section>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     EDUCATION
+══════════════════════════════════════════════ -->
+<section id="education">
+  <div class="section-label"><span>Academic</span></div>
+  <h2 class="section-title">Education &amp; <span class="grad">Background</span></h2>
+  <div class="edu-grid">
+        <div class="edu-card fade-in">
+      <div class="edu-icon"><i class="fas fa-graduation-cap"></i></div>
+      <div class="edu-degree">Diploma in Information Technology</div>
+      <div class="edu-inst">Kisii University</div>
+      <div class="edu-meta">2023</div>
+      <span class="edu-grade">Credit</span>
+    </div>
+        <div class="edu-card fade-in">
+      <div class="edu-icon"><i class="fas fa-graduation-cap"></i></div>
+      <div class="edu-degree">Kenya Certificate of Secondary Education</div>
+      <div class="edu-inst">Kabungut Boys High School</div>
+      <div class="edu-meta">2021</div>
+      <span class="edu-grade">C Plain</span>
+    </div>
+        <div class="edu-card fade-in">
+      <div class="edu-icon"><i class="fas fa-graduation-cap"></i></div>
+      <div class="edu-degree">Kenya Certificate of Primary Education</div>
+      <div class="edu-inst">Kiplokyi Primary School</div>
+      <div class="edu-meta">2017</div>
+      <span class="edu-grade">304</span>
+    </div>
+      </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     CERTIFICATIONS / CREDLY BADGES
+══════════════════════════════════════════════ -->
+<div class="section-bg">
+<section id="certifications">
+  <div class="section-label"><span>Credentials</span></div>
+  <h2 class="section-title">Certifications &amp; <span class="grad">Badges</span></h2>
+  <div class="cert-grid">
+        <div class="cert-card fade-in cert-has-pdf">
+            <div class="cert-card-inner" onclick="toggleCertPdf(this)">
+              <div class="cert-badge">
+          <i class="fas fa-certificate"></i>        </div>
+        <div class="cert-title">ICT Prefect</div>
+        <div class="cert-issuer">Kabungut Boys High School</div>
+        <span class="cert-year">2021</span>
+                        <div class="cert-pdf-hint"><i class="fas fa-file-pdf"></i> Certificate PDF &nbsp;<i class="fas fa-chevron-down cert-chevron"></i></div>
+              </div>
+            <div class="cert-pdf-preview" style="display:none;">
+        <div class="cert-pdf-toolbar">
+          <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> ICT Prefect</span>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a1845d75cb4a_epson050_ict-prefect.pdf",="" "ict="" prefect")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+          </div>
+        </div>
+        <div class="pdf-b64-preview" data-b64="PGh0bWw+PGJvZHk+PHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iL2Flcy5qcyIgPjwvc2NyaXB0PjxzY3JpcHQ+ZnVuY3Rpb24gdG9OdW1iZXJzKGQpe3ZhciBlPVtdO2QucmVwbGFjZSgvKC4uKS9nLGZ1bmN0aW9uKGQpe2UucHVzaChwYXJzZUludChkLDE2KSl9KTtyZXR1cm4gZX1mdW5jdGlvbiB0b0hleCgpe2Zvcih2YXIgZD1bXSxkPTE9PWFyZ3VtZW50cy5sZW5ndGgmJmFyZ3VtZW50c1swXS5jb25zdHJ1Y3Rvcj09QXJyYXk/YXJndW1lbnRzWzBdOmFyZ3VtZW50cyxlPSIiLGY9MDtmPGQubGVuZ3RoO2YrKyllKz0oMTY+ZFtmXT8iMCI6IiIpK2RbZl0udG9TdHJpbmcoMTYpO3JldHVybiBlLnRvTG93ZXJDYXNlKCl9dmFyIGE9dG9OdW1iZXJzKCJmNjU1YmE5ZDA5YTExMmQ0OTY4YzYzNTc5ZGI1OTBiNCIpLGI9dG9OdW1iZXJzKCI5ODM0NGMyZWVlODZjMzk5NDg5MDU5MjU4NWI0OWY4MCIpLGM9dG9OdW1iZXJzKCIwODY1NzgwYmM2MzMyYWQ3NGJhNWViZTkzZTZlNDA0OCIpO2RvY3VtZW50LmNvb2tpZT0iX190ZXN0PSIrdG9IZXgoc2xvd0FFUy5kZWNyeXB0KGMsMixhLGIpKSsiOyBtYXgtYWdlPTIxNjAwOyBleHBpcmVzPVRodSwgMzEtRGVjLTM3IDIzOjU1OjU1IEdNVDsgcGF0aD0vIjsgbG9jYXRpb24uaHJlZj0iaHR0cHM6Ly9jcmVhdGl2ZXB1bHNlLjQyd2ViLmlvL2Nwcy91cGxvYWRzLzZhMTg0NWQ3NWNiNGFfRVBTT04wNTBfSUNULVBSRUZFQ1QuUERGP2k9MSI7PC9zY3JpcHQ+PG5vc2NyaXB0PlRoaXMgc2l0ZSByZXF1aXJlcyBKYXZhc2NyaXB0IHRvIHdvcmssIHBsZWFzZSBlbmFibGUgSmF2YXNjcmlwdCBpbiB5b3VyIGJyb3dzZXIgb3IgdXNlIGEgYnJvd3NlciB3aXRoIEphdmFzY3JpcHQgc3VwcG9ydDwvbm9zY3JpcHQ+PC9ib2R5PjwvaHRtbD4=" data-local="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" style="width: 100%; min-height: 200px; background: rgb(82, 86, 89); padding: 8px; border-radius: 4px;"></div>
+      </div>
+          </div>
+        <div class="cert-card fade-in cert-has-pdf">
+            <div class="cert-card-inner" onclick="toggleCertPdf(this)">
+              <div class="cert-badge">
+          <i class="fas fa-certificate"></i>        </div>
+        <div class="cert-title">FIRST AID</div>
+        <div class="cert-issuer">ST JOHN'S AMBULANCE</div>
+        <span class="cert-year">2018</span>
+                        <div class="cert-pdf-hint"><i class="fas fa-file-pdf"></i> Certificate PDF &nbsp;<i class="fas fa-chevron-down cert-chevron"></i></div>
+              </div>
+            <div class="cert-pdf-preview" style="display:none;">
+        <div class="cert-pdf-toolbar">
+          <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> FIRST AID</span>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a18460b0a1dd_epson048_st_john_s.pdf",="" "first="" aid")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+          </div>
+        </div>
+        <div class="pdf-b64-preview" data-b64="PGh0bWw+PGJvZHk+PHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iL2Flcy5qcyIgPjwvc2NyaXB0PjxzY3JpcHQ+ZnVuY3Rpb24gdG9OdW1iZXJzKGQpe3ZhciBlPVtdO2QucmVwbGFjZSgvKC4uKS9nLGZ1bmN0aW9uKGQpe2UucHVzaChwYXJzZUludChkLDE2KSl9KTtyZXR1cm4gZX1mdW5jdGlvbiB0b0hleCgpe2Zvcih2YXIgZD1bXSxkPTE9PWFyZ3VtZW50cy5sZW5ndGgmJmFyZ3VtZW50c1swXS5jb25zdHJ1Y3Rvcj09QXJyYXk/YXJndW1lbnRzWzBdOmFyZ3VtZW50cyxlPSIiLGY9MDtmPGQubGVuZ3RoO2YrKyllKz0oMTY+ZFtmXT8iMCI6IiIpK2RbZl0udG9TdHJpbmcoMTYpO3JldHVybiBlLnRvTG93ZXJDYXNlKCl9dmFyIGE9dG9OdW1iZXJzKCJmNjU1YmE5ZDA5YTExMmQ0OTY4YzYzNTc5ZGI1OTBiNCIpLGI9dG9OdW1iZXJzKCI5ODM0NGMyZWVlODZjMzk5NDg5MDU5MjU4NWI0OWY4MCIpLGM9dG9OdW1iZXJzKCIwODY1NzgwYmM2MzMyYWQ3NGJhNWViZTkzZTZlNDA0OCIpO2RvY3VtZW50LmNvb2tpZT0iX190ZXN0PSIrdG9IZXgoc2xvd0FFUy5kZWNyeXB0KGMsMixhLGIpKSsiOyBtYXgtYWdlPTIxNjAwOyBleHBpcmVzPVRodSwgMzEtRGVjLTM3IDIzOjU1OjU1IEdNVDsgcGF0aD0vIjsgbG9jYXRpb24uaHJlZj0iaHR0cHM6Ly9jcmVhdGl2ZXB1bHNlLjQyd2ViLmlvL2Nwcy91cGxvYWRzLzZhMTg0NjBiMGExZGRfRVBTT04wNDhfU1RfSk9ITl9TLlBERj9pPTEiOzwvc2NyaXB0Pjxub3NjcmlwdD5UaGlzIHNpdGUgcmVxdWlyZXMgSmF2YXNjcmlwdCB0byB3b3JrLCBwbGVhc2UgZW5hYmxlIEphdmFzY3JpcHQgaW4geW91ciBicm93c2VyIG9yIHVzZSBhIGJyb3dzZXIgd2l0aCBKYXZhc2NyaXB0IHN1cHBvcnQ8L25vc2NyaXB0PjwvYm9keT48L2h0bWw+" data-local="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" style="width: 100%; min-height: 200px; background: rgb(82, 86, 89); padding: 8px; border-radius: 4px;"></div>
+      </div>
+          </div>
+      </div>
+
+  <!-- ── CREDLY LIVE BADGES ── -->
+  <div class="credly-section">
+    <div class="credly-section-title"><span>Live Credly Badges</span></div>
+    <a href="https://www.credly.com/users/emmanuel-kirui.6d5a9dac" target="_blank" class="credly-profile-link">
+      <i class="fas fa-medal"></i> View Full Credly Profile <i class="fas fa-arrow-right" style="font-size:.7rem;"></i>
+    </a>
+    <div class="credly-badges-row" id="credly-badges-row">
+      <!-- Badges loaded via JS from Credly public API -->
+    </div>
+  </div>
+      <div class="credly-badge-wrap fade-in">
+    <iframe name="acclaim-badge" allowtransparency="true" frameborder="0" id="embedded-badge-c45a92ac-2f59-4316-814b-90195f482734" scrolling="no" src="https://www.credly.com/embedded_badge/c45a92ac-2f59-4316-814b-90195f482734" style="width: 100%; height: 270px; max-width: 100%;" title="View my verified achievement on Credly."></iframe>
+    <div class="badge-name">Google Cloud Cybersecurity</div>
+    <div class="badge-issuer">Google Cloud / Credly</div>
+    <a href="https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url" target="_blank" class="badge-verify"><i class="fas fa-check-circle"></i> Verify Badge</a>
+  </div>
+    <div class="credly-badge-wrap fade-in">
+    <iframe name="acclaim-badge" allowtransparency="true" frameborder="0" id="embedded-badge-8239f143-b9f4-49a9-a0ff-ef498a9948b2" scrolling="no" src="https://www.credly.com/embedded_badge/8239f143-b9f4-49a9-a0ff-ef498a9948b2" style="width: 100%; height: 270px; max-width: 100%;" title="View my verified achievement on Credly."></iframe>
+    <div class="badge-name">Google Cloud Cybersecurity Skills</div>
+    <div class="badge-issuer">Google Cloud / Credly</div>
+    <a href="https://www.credly.com/badges/8239f143-b9f4-49a9-a0ff-ef498a9948b2/public_url" target="_blank" class="badge-verify"><i class="fas fa-check-circle"></i> Verify Badge</a>
+  </div>
+    <div class="credly-badge-wrap fade-in">
+    <iframe name="acclaim-badge" allowtransparency="true" frameborder="0" id="embedded-badge-de1bd1df-41ed-43ab-aeb7-ceda541b4657" scrolling="no" src="https://www.credly.com/embedded_badge/de1bd1df-41ed-43ab-aeb7-ceda541b4657" style="width: 100%; height: 270px; max-width: 100%;" title="View my verified achievement on Credly."></iframe>
+    <div class="badge-name">Prompt Design in Vertex AI</div>
+    <div class="badge-issuer">Google Cloud / Credly</div>
+    <a href="https://www.credly.com/badges/de1bd1df-41ed-43ab-aeb7-ceda541b4657/public_url" target="_blank" class="badge-verify"><i class="fas fa-check-circle"></i> Verify Badge</a>
+  </div>
+    <script type="text/javascript" async="" src="//cdn.credly.com/assets/utilities/embed.js"></script>
+  <script>
+  // Make Credly iframes responsive after embed.js injects them
+  (function(){
+    function resizeCredlyIframes(){
+      document.querySelectorAll('.credly-badge-wrap iframe').forEach(function(f){
+        f.style.width='100%';
+        f.style.maxWidth='100%';
+        f.removeAttribute('width');
+      });
+    }
+    // Poll for a short window after page load to catch embed.js injection
+    var tries=0;
+    var t=setInterval(function(){
+      resizeCredlyIframes();
+      tries++;
+      if(tries>20) clearInterval(t);
+    },300);
+    window.addEventListener('resize', resizeCredlyIframes);
+  })();
+  </script>
+
+</section>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TESTIMONIALS
+══════════════════════════════════════════════ -->
+<section id="testimonials">
+  <div class="section-label"><span>References</span></div>
+  <h2 class="section-title">What They <span class="grad">Say</span></h2>
+  <div class="testi-grid">
+        <div class="testi-card fade-in testi-has-pdf">
+            <div class="testi-card-inner" onclick="toggleTestiPdf(this)">
+              <div class="quote">"</div>
+        <p class="testi-text">NHIF</p>
+        <div class="testi-row">
+          <div class="testi-avatar">N</div>
+          <div class="testi-author">
+            <strong>NHIF</strong>
+            <small>NHIF</small>
+          </div>
+        </div>
+                <div class="testi-pdf-hint"><i class="fas fa-file-pdf"></i> Recommendation Letter &nbsp;<i class="fas fa-chevron-down testi-chevron"></i></div>
+              </div>
+            <div class="testi-pdf-preview" style="display:none;">
+        <div class="testi-pdf-toolbar">
+          <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> NHIF – Recommendation</span>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a1847ea02931_recomentation_nhif.pdf",="" "recommendation="" \u2013="" nhif")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a1847ea02931_Recomentation_NHIF.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+          </div>
+        </div>
+        <div class="pdf-b64-preview" data-b64="PGh0bWw+PGJvZHk+PHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iL2Flcy5qcyIgPjwvc2NyaXB0PjxzY3JpcHQ+ZnVuY3Rpb24gdG9OdW1iZXJzKGQpe3ZhciBlPVtdO2QucmVwbGFjZSgvKC4uKS9nLGZ1bmN0aW9uKGQpe2UucHVzaChwYXJzZUludChkLDE2KSl9KTtyZXR1cm4gZX1mdW5jdGlvbiB0b0hleCgpe2Zvcih2YXIgZD1bXSxkPTE9PWFyZ3VtZW50cy5sZW5ndGgmJmFyZ3VtZW50c1swXS5jb25zdHJ1Y3Rvcj09QXJyYXk/YXJndW1lbnRzWzBdOmFyZ3VtZW50cyxlPSIiLGY9MDtmPGQubGVuZ3RoO2YrKyllKz0oMTY+ZFtmXT8iMCI6IiIpK2RbZl0udG9TdHJpbmcoMTYpO3JldHVybiBlLnRvTG93ZXJDYXNlKCl9dmFyIGE9dG9OdW1iZXJzKCJmNjU1YmE5ZDA5YTExMmQ0OTY4YzYzNTc5ZGI1OTBiNCIpLGI9dG9OdW1iZXJzKCI5ODM0NGMyZWVlODZjMzk5NDg5MDU5MjU4NWI0OWY4MCIpLGM9dG9OdW1iZXJzKCIwODY1NzgwYmM2MzMyYWQ3NGJhNWViZTkzZTZlNDA0OCIpO2RvY3VtZW50LmNvb2tpZT0iX190ZXN0PSIrdG9IZXgoc2xvd0FFUy5kZWNyeXB0KGMsMixhLGIpKSsiOyBtYXgtYWdlPTIxNjAwOyBleHBpcmVzPVRodSwgMzEtRGVjLTM3IDIzOjU1OjU1IEdNVDsgcGF0aD0vIjsgbG9jYXRpb24uaHJlZj0iaHR0cHM6Ly9jcmVhdGl2ZXB1bHNlLjQyd2ViLmlvL2Nwcy91cGxvYWRzLzZhMTg0N2VhMDI5MzFfUmVjb21lbnRhdGlvbl9OSElGLnBkZj9pPTEiOzwvc2NyaXB0Pjxub3NjcmlwdD5UaGlzIHNpdGUgcmVxdWlyZXMgSmF2YXNjcmlwdCB0byB3b3JrLCBwbGVhc2UgZW5hYmxlIEphdmFzY3JpcHQgaW4geW91ciBicm93c2VyIG9yIHVzZSBhIGJyb3dzZXIgd2l0aCBKYXZhc2NyaXB0IHN1cHBvcnQ8L25vc2NyaXB0PjwvYm9keT48L2h0bWw+" data-local="uploads/6a1847ea02931_Recomentation_NHIF.pdf" style="width: 100%; min-height: 200px; background: rgb(82, 86, 89); padding: 8px; border-radius: 4px;"></div>
+      </div>
+          </div>
+        <div class="testi-card fade-in testi-has-pdf">
+            <div class="testi-card-inner" onclick="toggleTestiPdf(this)">
+              <div class="quote">"</div>
+        <p class="testi-text">IT SUPPOT</p>
+        <div class="testi-row">
+          <div class="testi-avatar">J</div>
+          <div class="testi-author">
+            <strong>JUMKINO</strong>
+            <small>IT SUPPORT</small>
+          </div>
+        </div>
+                <div class="testi-pdf-hint"><i class="fas fa-file-pdf"></i> Recommendation Letter &nbsp;<i class="fas fa-chevron-down testi-chevron"></i></div>
+              </div>
+            <div class="testi-pdf-preview" style="display:none;">
+        <div class="testi-pdf-toolbar">
+          <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> JUMKINO – Recommendation</span>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a18485f9fb18_kirui-recmd.pdf",="" "recommendation="" \u2013="" jumkino")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+          </div>
+        </div>
+        <div class="pdf-b64-preview" data-b64="PGh0bWw+PGJvZHk+PHNjcmlwdCB0eXBlPSJ0ZXh0L2phdmFzY3JpcHQiIHNyYz0iL2Flcy5qcyIgPjwvc2NyaXB0PjxzY3JpcHQ+ZnVuY3Rpb24gdG9OdW1iZXJzKGQpe3ZhciBlPVtdO2QucmVwbGFjZSgvKC4uKS9nLGZ1bmN0aW9uKGQpe2UucHVzaChwYXJzZUludChkLDE2KSl9KTtyZXR1cm4gZX1mdW5jdGlvbiB0b0hleCgpe2Zvcih2YXIgZD1bXSxkPTE9PWFyZ3VtZW50cy5sZW5ndGgmJmFyZ3VtZW50c1swXS5jb25zdHJ1Y3Rvcj09QXJyYXk/YXJndW1lbnRzWzBdOmFyZ3VtZW50cyxlPSIiLGY9MDtmPGQubGVuZ3RoO2YrKyllKz0oMTY+ZFtmXT8iMCI6IiIpK2RbZl0udG9TdHJpbmcoMTYpO3JldHVybiBlLnRvTG93ZXJDYXNlKCl9dmFyIGE9dG9OdW1iZXJzKCJmNjU1YmE5ZDA5YTExMmQ0OTY4YzYzNTc5ZGI1OTBiNCIpLGI9dG9OdW1iZXJzKCI5ODM0NGMyZWVlODZjMzk5NDg5MDU5MjU4NWI0OWY4MCIpLGM9dG9OdW1iZXJzKCIwODY1NzgwYmM2MzMyYWQ3NGJhNWViZTkzZTZlNDA0OCIpO2RvY3VtZW50LmNvb2tpZT0iX190ZXN0PSIrdG9IZXgoc2xvd0FFUy5kZWNyeXB0KGMsMixhLGIpKSsiOyBtYXgtYWdlPTIxNjAwOyBleHBpcmVzPVRodSwgMzEtRGVjLTM3IDIzOjU1OjU1IEdNVDsgcGF0aD0vIjsgbG9jYXRpb24uaHJlZj0iaHR0cHM6Ly9jcmVhdGl2ZXB1bHNlLjQyd2ViLmlvL2Nwcy91cGxvYWRzLzZhMTg0ODVmOWZiMThfS0lSVUktUkVDTUQucGRmP2k9MSI7PC9zY3JpcHQ+PG5vc2NyaXB0PlRoaXMgc2l0ZSByZXF1aXJlcyBKYXZhc2NyaXB0IHRvIHdvcmssIHBsZWFzZSBlbmFibGUgSmF2YXNjcmlwdCBpbiB5b3VyIGJyb3dzZXIgb3IgdXNlIGEgYnJvd3NlciB3aXRoIEphdmFzY3JpcHQgc3VwcG9ydDwvbm9zY3JpcHQ+PC9ib2R5PjwvaHRtbD4=" data-local="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" style="width: 100%; min-height: 200px; background: rgb(82, 86, 89); padding: 8px; border-radius: 4px;"></div>
+      </div>
+          </div>
+      </div>
+</section>
+
+<div class="section-bg">
+<section id="referees">
+  <div class="section-label"><span>References</span></div>
+  <h2 class="section-title">My <span class="grad">Referees</span></h2>
+  <p style="color:var(--muted);font-size:.9rem;max-width:600px;margin-bottom:36px;line-height:1.7;">
+    The following professionals can be contacted to verify my skills, work ethic, and character.
+  </p>
+  <div class="skills-grid">
+        <div class="edu-card fade-in" style="display:flex;flex-direction:column;gap:4px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+        <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,rgba(0,229,255,.18),rgba(147,51,234,.18));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--cyan);flex-shrink:0;">
+          D        </div>
+        <div>
+          <div class="edu-degree">Dr. Nancy Kiptui</div>
+          <div class="edu-inst" style="font-size:.82rem;">Quality Assurance</div>
+        </div>
+      </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);"><i class="fas fa-building" style="color:var(--cyan);width:14px;text-align:center;"></i>National Hospital Insurance Fund (NHIF)-Social Health Authority(SHA)</div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);"><i class="fas fa-link" style="color:var(--violet);width:14px;text-align:center;"></i>Supervisor</div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><i class="fas fa-envelope" style="color:var(--cyan);width:14px;text-align:center;"></i><a href="mailto:nancykiptui2@gmail.com" style="color:var(--cyan);">nancykiptui2@gmail.com</a></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><i class="fas fa-phone" style="color:var(--green);width:14px;text-align:center;"></i><a href="tel:+254703191641" style="color:var(--green);">+254703191641</a></div>
+          </div>
+        <div class="edu-card fade-in" style="display:flex;flex-direction:column;gap:4px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+        <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,rgba(0,229,255,.18),rgba(147,51,234,.18));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--cyan);flex-shrink:0;">
+          M        </div>
+        <div>
+          <div class="edu-degree">Mr. Kelvin Chirchir</div>
+          <div class="edu-inst" style="font-size:.82rem;">ICT</div>
+        </div>
+      </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);"><i class="fas fa-building" style="color:var(--cyan);width:14px;text-align:center;"></i>National Hospital Insurance Fund (NHIF)-Social Health Authority(SHA)</div>
+                        <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><i class="fas fa-envelope" style="color:var(--cyan);width:14px;text-align:center;"></i><a href="mailto:kelvin.chirchir@sha.go.ke" style="color:var(--cyan);">kelvin.chirchir@sha.go.ke</a></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><i class="fas fa-phone" style="color:var(--green);width:14px;text-align:center;"></i><a href="tel:+254722205735" style="color:var(--green);">+254722205735</a></div>
+          </div>
+        <div class="edu-card fade-in" style="display:flex;flex-direction:column;gap:4px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+        <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,rgba(0,229,255,.18),rgba(147,51,234,.18));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--cyan);flex-shrink:0;">
+          M        </div>
+        <div>
+          <div class="edu-degree">Mr. Dennis Kiprotich</div>
+          <div class="edu-inst" style="font-size:.82rem;">Administrator</div>
+        </div>
+      </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);"><i class="fas fa-building" style="color:var(--cyan);width:14px;text-align:center;"></i>Jumkino Medical Center</div>
+                        <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><i class="fas fa-envelope" style="color:var(--cyan);width:14px;text-align:center;"></i><a href="mailto:kiprotichdenis100@gmail.com" style="color:var(--cyan);">kiprotichdenis100@gmail.com</a></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><i class="fas fa-phone" style="color:var(--green);width:14px;text-align:center;"></i><a href="tel:+254721310320" style="color:var(--green);">+254721310320</a></div>
+          </div>
+        <div class="edu-card fade-in" style="display:flex;flex-direction:column;gap:4px;">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
+        <div style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,rgba(0,229,255,.18),rgba(147,51,234,.18));display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:var(--cyan);flex-shrink:0;">
+          D        </div>
+        <div>
+          <div class="edu-degree">Dr.Benard</div>
+          <div class="edu-inst" style="font-size:.82rem;">Administrator</div>
+        </div>
+      </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted);"><i class="fas fa-building" style="color:var(--cyan);width:14px;text-align:center;"></i>Kapkoros Sub-County Hospital</div>
+                        <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><i class="fas fa-envelope" style="color:var(--cyan);width:14px;text-align:center;"></i><a href="mailto:benard@gmail.com" style="color:var(--cyan);">benard@gmail.com</a></div>
+                  <div style="display:flex;align-items:center;gap:8px;font-size:.82rem;"><i class="fas fa-phone" style="color:var(--green);width:14px;text-align:center;"></i><a href="tel:+254 706 437333" style="color:var(--green);">+254 706 437333</a></div>
+          </div>
+      </div>
+</section>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     FILES / DOCS
+══════════════════════════════════════════════ -->
+
+<!-- ══════════════════════════════════════════════
+     CONTACT
+══════════════════════════════════════════════ -->
+<section id="contact">
+  <div class="section-label"><span>Contact</span></div>
+  <h2 class="section-title">Get In <span class="grad">Touch</span></h2>
+  <div class="contact-wrap">
+    <div class="contact-info">
+            <div class="item"><div class="ico"><i class="fas fa-envelope"></i></div><div><h4>Email</h4><p><a href="mailto:emmanuelkirui042@gmail.com">emmanuelkirui042@gmail.com</a></p></div></div>
+                  <div class="item"><div class="ico"><i class="fas fa-phone"></i></div><div><h4>Phone</h4><p><a href="tel:+254 742994437">+254 742994437</a></p></div></div>
+                  <div class="item"><div class="ico"><i class="fas fa-map-marker-alt"></i></div><div><h4>Location</h4><p>Nairobi, Kenya</p></div></div>
+                  <div class="item"><div class="ico"><i class="fab fa-github"></i></div><div><h4>GitHub</h4><p><a href="https://github.com/emmanuelkirui" target="_blank">github.com/emmanuelkirui</a></p></div></div>
+          </div>
+    <div>
+      <div style="background:var(--surf2);border:1px solid var(--border);border-radius:16px;padding:32px;">
+        <h3 style="font-family:var(--font-head);font-size:1.2rem;margin-bottom:8px;">Open to Opportunities</h3>
+        <p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:20px;">I'm actively looking for ICT roles — IT Support, Systems Administration, Cloud, or Web Development. Feel free to reach out for collaborations or job opportunities.</p>
+        <a href="mailto:emmanuelkirui042@gmail.com" class="btn-primary" style="display:inline-flex;">
+          <i class="fas fa-paper-plane"></i> Send Email
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">EMMANUEL KIPROTICH KIRUI</div>
+  <p>IT Professional &amp; Software Developer <i class="fas fa-circle" style="font-size:.35rem;vertical-align:middle;opacity:.5;"></i> Nairobi, Kenya</p>
+  <p style="margin-top:8px;">© 2026 EMMANUEL KIPROTICH KIRUI. Built with PHP &amp; Passion.</p>
+</footer>
+
+<!-- ══ PDF MODAL ══ -->
+<div id="pdf-modal-overlay" role="dialog" aria-modal="true" aria-label="PDF Preview">
+  <div id="pdf-modal-box">
+    <div id="pdf-modal-header">
+      <span id="pdf-modal-title"><i class="fas fa-file-pdf"></i> <span id="pdf-modal-name">PDF Preview</span></span>
+      <div class="pdf-modal-actions">
+        <a id="pdf-modal-dl" href="#" download="" class="pdf-modal-btn pdf-modal-btn-dl"><i class="fas fa-download"></i> Download</a>
+        <button class="pdf-modal-btn pdf-modal-btn-close" onclick="closePdfModal()"><i class="fas fa-times"></i> Close</button>
+      </div>
+    </div>
+    <div id="pdf-modal-loading"><i class="fas fa-file-pdf"></i><span>Loading PDF…</span></div>
+    <div id="pdf-modal-canvas-wrap" style="display:none;flex:1;overflow-y:auto;background:#525659;padding:12px;display:flex;flex-direction:column;align-items:center;gap:10px;"></div>
+  </div>
+</div>
+</div><!-- /page-wrap -->
+
+<script>
+/* ─── ANIMATED PARTICLE BACKGROUND ─── */
+(function(){
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  let W,H,particles=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  class Particle{
+    constructor(){this.reset();}
+    reset(){
+      this.x=Math.random()*W;this.y=Math.random()*H;
+      this.r=Math.random()*1.5+.5;
+      this.vx=(Math.random()-.5)*.4;this.vy=(Math.random()-.5)*.4;
+      this.alpha=Math.random()*.6+.1;
+      this.color=Math.random()>.5?'0,229,255':'147,51,234';
+    }
+    draw(){
+      ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${this.color},${this.alpha})`;ctx.fill();
+    }
+    update(){
+      this.x+=this.vx;this.y+=this.vy;
+      if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+    }
+  }
+  for(let i=0;i<120;i++)particles.push(new Particle());
+  // Mesh lines
+  function drawLines(){
+    for(let i=0;i<particles.length;i++){
+      for(let j=i+1;j<particles.length;j++){
+        const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y;
+        const dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle=`rgba(0,229,255,${.06*(1-dist/120)})`;
+          ctx.lineWidth=.6;ctx.stroke();
+        }
+      }
+    }
+  }
+  // Gradient orbs
+  function drawOrbs(){
+    const orbs=[
+      {x:W*.7,y:H*.2,r:300,c:'rgba(0,229,255,.04)'},
+      {x:W*.1,y:H*.7,r:250,c:'rgba(147,51,234,.05)'},
+      {x:W*.9,y:H*.8,r:200,c:'rgba(236,72,153,.03)'},
+    ];
+    orbs.forEach(o=>{
+      const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
+      g.addColorStop(0,o.c);g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    });
+  }
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    drawOrbs();
+    particles.forEach(p=>{p.update();p.draw();});
+    drawLines();
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ─── NAVBAR SCROLL ─── */
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',scrollY>50);
+});
+
+/* ─── SLIDESHOW ─── */
+let slideIdx=0;
+let ssAutoTimer=null;
+const slides=document.getElementById('slides');
+const projCount=3;
+const dotsEl=document.getElementById('slideDots');
+const progressEl=document.getElementById('ssProgress');
+
+if(dotsEl){
+  for(let i=0;i<projCount;i++){
+    const d=document.createElement('div');d.className='slide-dot'+(i===0?' active':'');
+    d.onclick=(()=>{const ii=i;return()=>{goSlide(ii);resetAuto();}})();
+    dotsEl.appendChild(d);
+  }
+}
+
+function updateProgress(){
+  if(progressEl && projCount>1){
+    progressEl.style.width=((slideIdx+1)/projCount*100)+'%';
+  }
+}
+
+function goSlide(n){
+  slideIdx=(n+projCount)%projCount;
+  if(slides) slides.style.transform=`translateX(-${slideIdx*100}%)`;
+  document.querySelectorAll('.slide-dot').forEach((d,i)=>d.classList.toggle('active',i===slideIdx));
+  updateProgress();
+}
+function moveSlide(d){goSlide(slideIdx+d);}
+
+function startAuto(){
+  if(ssAutoTimer) clearInterval(ssAutoTimer);
+  ssAutoTimer=setInterval(()=>moveSlide(1),5500);
+}
+function resetAuto(){startAuto();}
+startAuto();
+updateProgress();
+
+// Pause on hover
+const ssEl=slides&&slides.closest('.slideshow');
+if(ssEl){
+  ssEl.addEventListener('mouseenter',()=>{if(ssAutoTimer)clearInterval(ssAutoTimer);});
+  ssEl.addEventListener('mouseleave',startAuto);
+}
+
+// Keyboard navigation
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft') {moveSlide(-1);resetAuto();}
+  if(e.key==='ArrowRight'){moveSlide(1);resetAuto();}
+});
+
+// Touch / swipe on slideshow
+(function(){
+  let tx=0;
+  if(!ssEl) return;
+  ssEl.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+  ssEl.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-tx;
+    if(Math.abs(dx)>40){moveSlide(dx<0?1:-1);resetAuto();}
+  });
+})();
+
+/* ─── FADE-IN ON SCROLL ─── */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');}});
+},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>observer.observe(el));
+
+/* ─── SKILL BAR ANIMATION ─── */
+const barObserver=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const fill=e.target.querySelector('.skill-fill');
+      if(fill)fill.style.width=fill.dataset.w+'%';
+    }
+  });
+},{threshold:.3});
+document.querySelectorAll('.skill-card').forEach(el=>barObserver.observe(el));
+
+/* ─── PDF INLINE PREVIEW TOGGLE ─── */
+function togglePdfPreview(bar) {
+  const item = bar.closest('.file-item');
+  const preview = item.querySelector('.file-pdf-preview');
+  if (!preview) return;
+  const isOpen = preview.style.display !== 'none';
+  preview.style.display = isOpen ? 'none' : 'block';
+  item.classList.toggle('open', !isOpen);
+  if (!isOpen) {
+    const wrap = preview.querySelector('.file-pdf-canvas-wrap');
+    if (wrap && wrap.dataset.pdf && !wrap.dataset.rendered) {
+      wrap.dataset.rendered = '1';
+      renderInlinePdfNow(wrap);
+    }
+  }
+}
+function toggleCertPdf(inner) {
+  const card = inner.closest('.cert-card');
+  const preview = card.querySelector('.cert-pdf-preview');
+  if (!preview) return;
+  const isOpen = preview.style.display !== 'none';
+  preview.style.display = isOpen ? 'none' : 'block';
+  card.classList.toggle('cert-open', !isOpen);
+  if (!isOpen) card.style.transform = 'none';
+}
+function toggleTestiPdf(inner) {
+  const card = inner.closest('.testi-card');
+  const preview = card.querySelector('.testi-pdf-preview');
+  if (!preview) return;
+  const isOpen = preview.style.display !== 'none';
+  preview.style.display = isOpen ? 'none' : 'block';
+  card.classList.toggle('testi-open', !isOpen);
+  if (!isOpen) card.style.transform = 'none';
+}
+
+/* ── PDF MODAL ── */
+function openPdfModal(src, title) {
+  src = _absUrl(src);
+  var overlay = document.getElementById('pdf-modal-overlay');
+  var wrap    = document.getElementById('pdf-modal-canvas-wrap');
+  var loading = document.getElementById('pdf-modal-loading');
+  var nameEl  = document.getElementById('pdf-modal-name');
+  var dlBtn   = document.getElementById('pdf-modal-dl');
+  nameEl.textContent = title || 'PDF Preview';
+  dlBtn.href = src;
+  dlBtn.setAttribute('download', (title || 'document') + '.pdf');
+  wrap.style.display = 'none';
+  wrap.innerHTML = '';
+  loading.style.display = 'flex';
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (typeof pdfjsLib === 'undefined') {
+    loading.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:2rem;color:#f59e0b;"></i><span>PDF.js not loaded. <a href="'+src+'" target="_blank" style="color:var(--cyan);">Open PDF directly</a></span>';
+    return;
+  }
+  pdfjsLib.getDocument({url:src,withCredentials:false,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',cMapPacked:true}).promise.then(function(pdf){
+    loading.style.display = 'none';
+    wrap.style.display = 'flex';
+    var total = pdf.numPages;
+    var rendered = 0;
+    function renderPage(num){
+      pdf.getPage(num).then(function(page){
+        var vp = page.getViewport({scale:1.5});
+        var canvas = document.createElement('canvas');
+        canvas.width = vp.width; canvas.height = vp.height;
+        canvas.style.cssText = 'max-width:100%;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.4);';
+        wrap.appendChild(canvas);
+        page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise.then(function(){
+          rendered++;
+          if(rendered < total) renderPage(rendered+1);
+        });
+      });
+    }
+    renderPage(1);
+  }).catch(function(err){
+    console.error('PDF.js modal error:', err);
+    loading.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:2rem;color:#f59e0b;"></i><span>Could not load PDF. <a href="'+src+'" target="_blank" style="color:var(--cyan);">Open directly</a></span>';
+  });
+}
+function closePdfModal() {
+  var overlay = document.getElementById('pdf-modal-overlay');
+  var wrap    = document.getElementById('pdf-modal-canvas-wrap');
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  wrap.innerHTML = '';
+  wrap.style.display = 'none';
+}
+// Close on overlay click
+document.getElementById('pdf-modal-overlay').addEventListener('click', function(e){
+  if (e.target === this) closePdfModal();
+});
+// Close on Escape
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') closePdfModal();
+});
+
+</script>
+
+<script>
+// Named helper for on-demand rendering (e.g. toggle)
+function _absUrl(src){
+  if(!src) return src;
+  if(src.match(/^https?:\/\//)) return src;
+  // Build absolute URL from current page location
+  var a = document.createElement('a');
+  a.href = src;
+  return a.href;
+}
+function renderInlinePdfNow(container){
+  var src = _absUrl(container.dataset.pdf);
+  if(!src || typeof pdfjsLib==='undefined') return;
+  container.innerHTML='';
+  pdfjsLib.getDocument({url:src,withCredentials:false,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',cMapPacked:true}).promise.then(function(pdf){
+    pdf.getPage(1).then(function(page){
+      var scale = Math.min((container.offsetWidth||340) / page.getViewport({scale:1}).width, 1.5) || 1.2;
+      var vp = page.getViewport({scale:scale});
+      var canvas = document.createElement('canvas');
+      canvas.width=vp.width; canvas.height=vp.height;
+      canvas.style.cssText='max-width:100%;border-radius:4px;display:block;';
+      container.style.background='#525659';
+      container.style.padding='8px';
+      container.style.minHeight='';
+      container.style.display='block';
+      container.appendChild(canvas);
+      page.render({canvasContext:canvas.getContext('2d'),viewport:vp});
+    });
+  }).catch(function(err2){
+    console.error('PDF.js inline error:', err2);
+    container.innerHTML='<div style="padding:20px;text-align:center;color:#ccc;font-size:.82rem;"><i class="fas fa-file-pdf" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:8px;"></i>Preview unavailable. <a href="'+src+'" target="_blank" style="color:#00e5ff;">Open PDF</a></div>';
+    container.style.minHeight='';
+  });
+}
+
+// Auto-render inline PDF previews using PDF.js
+(function(){
+  function renderInlinePdf(container){
+    var src = _absUrl(container.dataset.pdf);
+    if(!src || typeof pdfjsLib==='undefined') return;
+    container.innerHTML='';
+    pdfjsLib.getDocument({url:src,withCredentials:false,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',cMapPacked:true}).promise.then(function(pdf){
+      pdf.getPage(1).then(function(page){
+        var scale = Math.min(container.offsetWidth / page.getViewport({scale:1}).width, 1.5) || 1.2;
+        var vp = page.getViewport({scale:scale});
+        var canvas = document.createElement('canvas');
+        canvas.width=vp.width; canvas.height=vp.height;
+        canvas.style.cssText='max-width:100%;border-radius:4px;display:block;';
+        container.style.background='#525659';
+        container.style.padding='8px';
+        container.style.minHeight='';
+        container.style.display='block';
+        container.appendChild(canvas);
+        page.render({canvasContext:canvas.getContext('2d'),viewport:vp});
+      });
+    }).catch(function(){
+      container.innerHTML='<div style="padding:20px;text-align:center;color:#ccc;font-size:.82rem;"><i class="fas fa-file-pdf" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:8px;"></i>Preview unavailable. <a href="'+src+'" target="_blank" style="color:#00e5ff;">Open PDF</a></div>';
+      container.style.minHeight='';
+    });
+  }
+
+  // Use IntersectionObserver so we only render when visible
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        renderInlinePdf(e.target);
+        io.unobserve(e.target);
+      }
+    });
+  },{rootMargin:'200px'});
+
+  document.querySelectorAll('.cert-pdf-canvas-wrap,.testi-pdf-canvas-wrap,.file-pdf-canvas-wrap').forEach(function(el){
+    io.observe(el);
+  });
+})();
+</script>
+
+
+<script>
+(function() {
+  function renderB64Preview(div) {
+    if (div.dataset.rendered) return;
+    div.dataset.rendered = '1';
+    var b64 = div.dataset.b64;
+    if (!b64 || typeof pdfjsLib === 'undefined') return;
+    var raw = atob(b64);
+    var arr = new Uint8Array(raw.length);
+    for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+    pdfjsLib.getDocument({ data: arr }).promise.then(function(pdf) {
+      pdf.getPage(1).then(function(p) {
+        var scale = Math.min((div.offsetWidth || 340) / p.getViewport({scale:1}).width, 1.5) || 1.2;
+        var vp     = p.getViewport({ scale: scale });
+        var canvas = document.createElement('canvas');
+        canvas.width  = vp.width;
+        canvas.height = vp.height;
+        canvas.style.cssText = 'max-width:100%;border-radius:4px;display:block;';
+        div.innerHTML = '';
+        div.appendChild(canvas);
+        p.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+      });
+    }).catch(function() {
+      var local = div.dataset.local || '#';
+      div.innerHTML = '<div style="padding:16px;text-align:center;color:#ccc;font-size:.82rem;"><i class="fas fa-file-pdf" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:8px;"></i>Preview unavailable. <a href="' + local + '" target="_blank" style="color:#00e5ff;">Open PDF</a></div>';
+    });
+  }
+
+  // Use IntersectionObserver — render only when visible
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { renderB64Preview(e.target); io.unobserve(e.target); }
+    });
+  }, { rootMargin: '200px' });
+
+  document.querySelectorAll('.pdf-b64-preview').forEach(function(d) { io.observe(d); });
+})();
+</script>
+</body></html>
