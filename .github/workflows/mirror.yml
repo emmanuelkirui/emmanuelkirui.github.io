@@ -1,0 +1,335 @@
+name: Mirror Portfolio
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Puppeteer + pdfjs-dist
+        run: npm install puppeteer pdfjs-dist@3.4.120
+
+      - name: Write mirror script
+        run: |
+          cat > mirror.js << 'EOF'
+          const puppeteer = require('puppeteer');
+          const fs    = require('fs');
+          const https = require('https');
+          const http  = require('http');
+          const path  = require('path');
+
+          function downloadBuffer(url, hops = 0) {
+            return new Promise((res, rej) => {
+              if (hops > 5) return rej(new Error('Too many redirects'));
+              const proto = url.startsWith('https') ? https : http;
+              const chunks = [];
+              proto.get(url, r => {
+                if (r.statusCode === 301 || r.statusCode === 302)
+                  return downloadBuffer(r.headers.location, hops + 1).then(res).catch(rej);
+                if (r.statusCode !== 200) return rej(new Error('HTTP ' + r.statusCode));
+                r.on('data', c => chunks.push(c));
+                r.on('end', () => res(Buffer.concat(chunks)));
+              }).on('error', rej);
+            });
+          }
+
+          (async () => {
+            if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
+
+            // ── Copy pdf.worker.min.js to repo root (same-origin worker) ──
+            const workerSrc = path.join(__dirname, 'node_modules', 'pdfjs-dist', 'build', 'pdf.worker.min.js');
+            fs.copyFileSync(workerSrc, 'pdf.worker.min.js');
+            console.log('Copied pdf.worker.min.js to repo root');
+
+            // ── Scrape ────────────────────────────────────────────────────
+            const browser = await puppeteer.launch({
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            });
+            const page = await browser.newPage();
+            await page.setViewport({ width: 1280, height: 800 });
+            await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36');
+            await page.setExtraHTTPHeaders({
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+              'Accept-Language': 'en-US,en;q=0.9',
+              'Cache-Control': 'no-cache',
+            });
+
+            console.log('Navigating...');
+            await page.goto('https://creativepulse.42web.io/cps/port_kirui.php', {
+              waitUntil: 'domcontentloaded', timeout: 120000
+            });
+            await page.evaluate(() => document.fonts.ready);
+            await new Promise(r => setTimeout(r, 6000));
+
+            // ── Inline CSS + base64 fonts ─────────────────────────────────
+            await page.evaluate(async () => {
+              for (const link of document.querySelectorAll('link[rel="stylesheet"]')) {
+                try {
+                  const resp = await fetch(link.href, { mode: 'cors' });
+                  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                  let css = await resp.text();
+                  for (const [, fu] of css.matchAll(/url\(['"]?(https?:\/\/[^'")\s]+\.woff2[^'")\s]*)['"]?\)/g)) {
+                    try {
+                      const fr = await fetch(fu);
+                      const b64 = btoa(String.fromCharCode(...new Uint8Array(await fr.arrayBuffer())));
+                      css = css.split(fu).join('data:font/woff2;base64,' + b64);
+                    } catch(e) {}
+                  }
+                  const s = document.createElement('style');
+                  s.textContent = css;
+                  link.parentNode.replaceChild(s, link);
+                } catch(e) { console.warn('CSS fail:', link.href); }
+              }
+            });
+
+            // ── Fix relative URLs → absolute ──────────────────────────────
+            await page.evaluate(() => {
+              const base = 'https://creativepulse.42web.io/cps/';
+              document.querySelectorAll('[src],[href],[action]').forEach(el => {
+                ['src','href','action'].forEach(attr => {
+                  const v = el.getAttribute(attr);
+                  if (v && !v.startsWith('http') && !v.startsWith('//') &&
+                      !['#','mailto:','tel:','data:','javascript:'].some(p => v.startsWith(p)))
+                    el.setAttribute(attr, base + v);
+                });
+              });
+            });
+
+            // ── Collect all PDF URLs from data-pdf + onclick attrs ─────────
+            const pdfUrls = await page.evaluate(() => {
+              const seen = new Set();
+              document.querySelectorAll('[data-pdf]').forEach(el => {
+                let s = el.getAttribute('data-pdf');
+                if (s) seen.add(s);
+              });
+              document.querySelectorAll('[onclick]').forEach(el => {
+                const m = el.getAttribute('onclick').match(/openPdfModal\(['"]([^'"]+)['"]/);
+                if (m) seen.add(m[1]);
+              });
+              return [...seen];
+            });
+            console.log('PDF URLs found:', pdfUrls);
+
+            // ── Download each PDF → save to uploads/ + keep buffer ────────
+            // map: originalSrc → { localPath, b64 }
+            const pdfMap = {};
+            for (const src of pdfUrls) {
+              const absUrl = src.startsWith('http')
+                ? src : 'https://creativepulse.42web.io/cps/' + src;
+              try {
+                console.log('Downloading:', absUrl);
+                const buf      = await downloadBuffer(absUrl);
+                const filename = decodeURIComponent(absUrl.split('/').pop());
+                const diskPath = path.join('uploads', filename);
+                fs.writeFileSync(diskPath, buf);
+                const localPath = 'uploads/' + filename;
+                const b64       = buf.toString('base64');
+                pdfMap[src]    = { localPath, b64 };
+                pdfMap[absUrl] = { localPath, b64 };
+                console.log('  saved:', diskPath, buf.length, 'bytes');
+              } catch(err) {
+                console.warn('  FAILED:', absUrl, err.message);
+              }
+            }
+
+            // ── Replace canvas-wraps: inject a <canvas> rendered by
+            //    an inline PDF.js call using the b64 data ─────────────────
+            // We do this by replacing them with a placeholder <div> that
+            // carries the b64 as a data attribute, then inject a renderer.
+            await page.evaluate((map) => {
+              document.querySelectorAll(
+                '.cert-pdf-canvas-wrap, .testi-pdf-canvas-wrap, .file-pdf-canvas-wrap'
+              ).forEach(wrap => {
+                const src = wrap.getAttribute('data-pdf') || '';
+                const entry = map[src] || map[
+                  src.startsWith('http') ? src
+                    : 'https://creativepulse.42web.io/cps/' + src
+                ];
+                if (!entry) return;
+
+                // Replace spinner div with a styled container
+                // store b64 as data attribute — rendered after page load
+                const div = document.createElement('div');
+                div.className = 'pdf-b64-preview';
+                div.dataset.b64 = entry.b64;
+                div.dataset.local = entry.localPath;
+                div.style.cssText = 'width:100%;min-height:200px;background:#525659;padding:8px;border-radius:4px;';
+                wrap.parentNode.replaceChild(div, wrap);
+              });
+            }, pdfMap);
+
+            // ── Patch openPdfModal in the page ────────────────────────────
+            await page.evaluate((map) => {
+              window._pdfMap = map;
+              window.openPdfModal = function(src, title) {
+                const absKey = src.startsWith('http')
+                  ? src : 'https://creativepulse.42web.io/cps/' + src;
+                const entry = window._pdfMap[src] || window._pdfMap[absKey];
+
+                const overlay = document.getElementById('pdf-modal-overlay');
+                const wrap    = document.getElementById('pdf-modal-canvas-wrap');
+                const loading = document.getElementById('pdf-modal-loading');
+                const nameEl  = document.getElementById('pdf-modal-name');
+                const dlBtn   = document.getElementById('pdf-modal-dl');
+
+                nameEl.textContent = title || 'PDF Preview';
+                const localPath = entry ? entry.localPath : src;
+                dlBtn.href = localPath;
+                dlBtn.setAttribute('download', localPath.split('/').pop());
+
+                loading.style.display    = 'none';
+                wrap.style.cssText = 'display:flex;flex:1;overflow-y:auto;background:#525659;padding:12px;flex-direction:column;align-items:center;gap:10px;height:80vh;';
+                wrap.innerHTML = '';
+
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+
+                if (!entry) {
+                  wrap.innerHTML = '<p style="color:#ccc;padding:20px;">PDF not available.</p>';
+                  return;
+                }
+
+                // Render using PDF.js with b64 data — no fetch needed
+                const raw  = atob(entry.b64);
+                const arr  = new Uint8Array(raw.length);
+                for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+
+                pdfjsLib.getDocument({ data: arr }).promise.then(function(pdf) {
+                  var total = pdf.numPages;
+                  function renderPage(n) {
+                    pdf.getPage(n).then(function(p) {
+                      var vp     = p.getViewport({ scale: 1.5 });
+                      var canvas = document.createElement('canvas');
+                      canvas.width  = vp.width;
+                      canvas.height = vp.height;
+                      canvas.style.cssText = 'max-width:100%;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.4);';
+                      wrap.appendChild(canvas);
+                      p.render({ canvasContext: canvas.getContext('2d'), viewport: vp })
+                        .promise.then(function() {
+                          if (n < total) renderPage(n + 1);
+                        });
+                    });
+                  }
+                  renderPage(1);
+                }).catch(function(err) {
+                  console.error('PDF.js modal error:', err);
+                  wrap.innerHTML = '<p style="color:#ccc;padding:20px;">Could not render PDF. <a href="' + localPath + '" target="_blank" style="color:#00e5ff;">Open directly</a></p>';
+                });
+              };
+            }, pdfMap);
+
+            let html = await page.content();
+
+            // ── Rewrite href download links to local uploads/ paths ───────
+            for (const [src, entry] of Object.entries(pdfMap)) {
+              if (!src.startsWith('http')) continue;
+              const enc = encodeURIComponent(entry.localPath.split('/').pop());
+              const localHref = 'uploads/' + enc;
+              html = html
+                .split('href="' + src + '"').join('href="' + localHref + '"')
+                .split("href='" + src + "'").join("href='" + localHref + "'");
+            }
+
+            // ── Replace the remote pdf.js CDN script with a same-origin one
+            //    (worker must be same-origin; we copied it above) ───────────
+            html = html.replace(
+              /src="https:\/\/cdnjs\.cloudflare\.com\/ajax\/libs\/pdf\.js\/[^"]+\/pdf\.min\.js"/,
+              'src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"'
+            );
+            // Fix workerSrc to point to same-origin file
+            html = html.replace(
+              /pdfjsLib\.GlobalWorkerOptions\.workerSrc\s*=\s*['"][^'"]+['"]/,
+              "pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js'"
+            );
+
+            // ── Inject renderer for inline .pdf-b64-preview divs ─────────
+            // This script runs after page load and renders page 1 of each
+            // inline preview using the b64 data already in the DOM.
+            const inlineRenderer = `<script>
+          (function() {
+            function renderB64Preview(div) {
+              if (div.dataset.rendered) return;
+              div.dataset.rendered = '1';
+              var b64 = div.dataset.b64;
+              if (!b64 || typeof pdfjsLib === 'undefined') return;
+              var raw = atob(b64);
+              var arr = new Uint8Array(raw.length);
+              for (var i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
+              pdfjsLib.getDocument({ data: arr }).promise.then(function(pdf) {
+                pdf.getPage(1).then(function(p) {
+                  var scale = Math.min((div.offsetWidth || 340) / p.getViewport({scale:1}).width, 1.5) || 1.2;
+                  var vp     = p.getViewport({ scale: scale });
+                  var canvas = document.createElement('canvas');
+                  canvas.width  = vp.width;
+                  canvas.height = vp.height;
+                  canvas.style.cssText = 'max-width:100%;border-radius:4px;display:block;';
+                  div.innerHTML = '';
+                  div.appendChild(canvas);
+                  p.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
+                });
+              }).catch(function() {
+                var local = div.dataset.local || '#';
+                div.innerHTML = '<div style="padding:16px;text-align:center;color:#ccc;font-size:.82rem;"><i class="fas fa-file-pdf" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:8px;"></i>Preview unavailable. <a href="' + local + '" target="_blank" style="color:#00e5ff;">Open PDF</a></div>';
+              });
+            }
+
+            // Use IntersectionObserver — render only when visible
+            var io = new IntersectionObserver(function(entries) {
+              entries.forEach(function(e) {
+                if (e.isIntersecting) { renderB64Preview(e.target); io.unobserve(e.target); }
+              });
+            }, { rootMargin: '200px' });
+
+            document.querySelectorAll('.pdf-b64-preview').forEach(function(d) { io.observe(d); });
+          })();
+          <\/script>`;
+
+            html = html.replace('</body>', inlineRenderer + '\n</body>');
+
+            // ── AdSense ───────────────────────────────────────────────────
+            const ads = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"><\/script>';
+            html = html.replace('</head>', ads + '\n</head>');
+
+            console.log('Final HTML size:', html.length, 'bytes');
+            fs.writeFileSync('index.html', html);
+            await browser.close();
+          })().catch(e => { console.error(e); process.exit(1); });
+          EOF
+
+      - name: Run mirror script
+        run: node mirror.js
+
+      - name: Verify output
+        run: |
+          SIZE=$(wc -c < index.html)
+          echo "index.html: $SIZE bytes"
+          if [ "$SIZE" -lt 50000 ]; then echo "ERROR: too small"; cat index.html; exit 1; fi
+          echo "--- PDFs in uploads/ ---"
+          ls -lh uploads/ 2>/dev/null
+          echo "--- pdf.worker.min.js in root ---"
+          ls -lh pdf.worker.min.js 2>/dev/null || echo "MISSING"
+          echo "--- pdf-b64-preview divs in HTML ---"
+          grep -o 'pdf-b64-preview' index.html | wc -l
+          echo "--- Remote PDF URLs remaining ---"
+          grep -oi 'creativepulse\.42web\.io[^"'"'"']*\.pdf' index.html | wc -l || true
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html uploads/ pdf.worker.min.js
+          git diff --cached --quiet || git commit -m "Mirror update $(date -u '+%Y-%m-%d %H:%M')"
+          git push
