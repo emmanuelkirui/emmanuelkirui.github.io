@@ -1,0 +1,75 @@
+name: Mirror Portfolio with Retry Logic
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  mirror-site:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm install puppeteer
+
+      - name: Process Pages
+        run: |
+          node -e "
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+
+          const PAGES = ['port_kirui.php', 'liv.php', 'valmanu.php'];
+          let failed = [];
+
+          (async () => {
+            const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+            
+            for (const pageName of PAGES) {
+              try {
+                const page = await browser.newPage();
+                const outName = (pageName === 'port_kirui.php') ? 'index.html' : pageName.replace('.php', '.html');
+                console.log('Attempting to process: ' + pageName);
+                
+                await page.goto('https://creativepulse.42web.io/cps/' + pageName, { waitUntil: 'networkidle2', timeout: 30000 });
+                const html = await page.content();
+                
+                fs.writeFileSync(outName, html);
+                console.log('SUCCESS: ' + outName);
+                await page.close();
+              } catch (e) {
+                console.log('FAILED: ' + pageName + ' - Adding to retry list.');
+                failed.push(pageName);
+              }
+            }
+            
+            // Retry phase
+            if (failed.length > 0) {
+              console.log('Retrying failed pages...');
+              for (const pageName of failed) {
+                try {
+                   const page = await browser.newPage();
+                   const outName = (pageName === 'port_kirui.php') ? 'index.html' : pageName.replace('.php', '.html');
+                   await page.goto('https://creativepulse.42web.io/cps/' + pageName, { waitUntil: 'networkidle2', timeout: 30000 });
+                   fs.writeFileSync(outName, await page.content());
+                   console.log('RETRY SUCCESS: ' + outName);
+                   await page.close();
+                } catch(e) {
+                   console.log('CRITICAL FAIL: ' + pageName + ' - Still not accessible.');
+                }
+              }
+            }
+            await browser.close();
+          })();"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add *.html
+          git diff --cached --quiet || git commit -m "Mirror update with retry logic"
+          git push origin main
