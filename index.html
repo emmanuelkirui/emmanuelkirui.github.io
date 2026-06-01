@@ -781,16 +781,15 @@ footer .footer-brand{font-family:var(--font-head);font-size:1.1rem;font-weight:7
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <script>
 if(typeof pdfjsLib!=='undefined'){
-  pdfjsLib.GlobalWorkerOptions.workerSrc='pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
 }
 </script>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script>
 </head>
 <body>
 <!-- ══════════════════════════════════════════════
      ANIMATED BACKGROUND
 ══════════════════════════════════════════════ -->
-<canvas id="bg-canvas" width="1280" height="800"></canvas>
+<canvas id="bg-canvas" width="800" height="600"></canvas>
 
 <div class="page-wrap">
 <!-- ══════════════════════════════════════════════
@@ -808,7 +807,7 @@ if(typeof pdfjsLib!=='undefined'){
     <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-right">
-    <a href="admin.html" class="nav-admin"><i class="fas fa-lock"></i> Admin</a>
+    <a href="admin.php" class="nav-admin"><i class="fas fa-lock"></i> Admin</a>
     <button class="hamburger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
       <i class="fas fa-bars"></i>
     </button>
@@ -857,7 +856,7 @@ if(typeof pdfjsLib!=='undefined'){
         <span class="orbit-dot orbit-dot-4"></span>
       </div>
       <div class="avatar-inner">
-                  <img src="https://creativepulse.42web.io/cps/uploads/avatar_6a1cfd8789737.jpg" alt="EMMANUEL KIPROTICH KIRUI">
+                  <img src="uploads/avatar_6a1cfd8789737.jpg" alt="EMMANUEL KIPROTICH KIRUI">
               </div>
     </div>
   </div>
@@ -1047,7 +1046,7 @@ if(typeof pdfjsLib!=='undefined'){
   <h2 class="section-title">Featured <span class="grad">Projects</span></h2>
   <!-- SLIDESHOW -->
   <div class="slideshow">
-    <div class="slides" id="slides" style="transform: translateX(-100%);">
+    <div class="slides" id="slides">
             <div class="slide">
         <div class="slide-content">
           <div class="slide-number">Project 01 / 03</div>
@@ -1081,8 +1080,8 @@ if(typeof pdfjsLib!=='undefined'){
           </div>
     <button class="ss-btn ss-prev" onclick="moveSlide(-1)" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
     <button class="ss-btn ss-next" onclick="moveSlide(1)" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
-    <div class="slideshow-nav" id="slideDots"><div class="slide-dot"></div><div class="slide-dot active"></div><div class="slide-dot"></div></div>
-    <div class="ss-progress" id="ssProgress" style="width: 66.6667%;"></div>
+    <div class="slideshow-nav" id="slideDots"><div class="slide-dot active"></div><div class="slide-dot"></div><div class="slide-dot"></div></div>
+    <div class="ss-progress" id="ssProgress" style="width: 33.3333%;"></div>
   </div>
   <!-- GRID -->
   <div class="projects-grid">
@@ -1771,5 +1770,4 @@ function renderInlinePdfNow(container){
 </script>
 
 
-<script>if(typeof pdfjsLib !== "undefined") pdfjsLib.GlobalWorkerOptions.workerSrc="pdf.worker.min.js";</script>
 </body></html>
