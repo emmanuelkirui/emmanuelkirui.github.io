@@ -1,0 +1,73 @@
+name: Mirror Entire Portfolio Site
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  mirror-site:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Puppeteer and PDF tools
+        run: npm install puppeteer pdfjs-dist@3.4.120
+
+      - name: Write mirror script
+        run: |
+          cat > mirror.js << 'EOF'
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          const path = require('path');
+          const https = require('https');
+
+          const PAGES = ['port_kirui.php', 'liv.php', 'valmanu.php'];
+
+          (async () => {
+            if (!fs.existsSync('uploads')) fs.mkdirSync('uploads');
+            const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+            
+            for (const pageName of PAGES) {
+              const page = await browser.newPage();
+              const targetUrl = 'https://creativepulse.42web.io/cps/' + pageName;
+              
+              // Determine output name
+              let outName = pageName.replace('.php', '.html');
+              if (pageName === 'port_kirui.php') outName = 'index.html';
+
+              console.log('Processing:', pageName, '->', outName);
+              await page.goto(targetUrl, { waitUntil: 'networkidle2' });
+
+              // ... (Insert asset/link rewriting logic here) ...
+
+              const html = await page.content();
+              
+              // THIS IS THE FIX: Use outName instead of 'index.html'
+              fs.writeFileSync(outName, html);
+              
+              await page.close();
+            }
+            await browser.close();
+          })();
+          EOF
+
+      - name: Run mirror script
+        run: node mirror.js
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add *.html
+          git add uploads/
+          git diff --cached --quiet || git commit -m "Mirror update $(date)"
+          git push origin main
