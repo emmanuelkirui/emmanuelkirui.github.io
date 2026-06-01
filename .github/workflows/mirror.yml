@@ -1,0 +1,90 @@
+name: Mirror Portfolio with Retry Logic
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  mirror-site:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Puppeteer
+        run: npm install puppeteer
+
+      - name: Process and Mirror Pages
+        run: |
+          node -e "
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+
+          const PAGES = ['port_kirui.php', 'liv.php', 'valmanu.php'];
+          const BASE_URL = 'https://creativepulse.42web.io/cps/';
+          let failed = [];
+
+          (async () => {
+            const browser = await puppeteer.launch({ 
+              args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+            });
+            
+            async function processPage(pageName) {
+              const page = await browser.newPage();
+              const outName = (pageName === 'port_kirui.php') ? 'index.html' : pageName.replace('.php', '.html');
+              
+              console.log('Navigating to: ' + pageName);
+              await page.goto(BASE_URL + pageName, { waitUntil: 'networkidle2', timeout: 60000 });
+              
+              // Original, proven path-fixing logic[span_1](start_span)[span_1](end_span)
+              await page.evaluate((base) => {
+                document.querySelectorAll('[src],[href],[action]').forEach(el => {
+                  ['src','href','action'].forEach(attr => {
+                    const val = el.getAttribute(attr);
+                    // Whitelist prevents breaking already absolute or special paths[span_2](start_span)[span_2](end_span)
+                    if (val && !val.startsWith('http') && !val.startsWith('//') && !val.startsWith('#') && !val.startsWith('mailto:') && !val.startsWith('tel:') && !val.startsWith('data:') && !val.startsWith('javascript:')) {
+                      el.setAttribute(attr, base + val);
+                    }
+                  });
+                });
+              }, BASE_URL);
+
+              const html = await page.content();
+              fs.writeFileSync(outName, html);
+              console.log('SUCCESS: ' + outName);
+              await page.close();
+            }
+
+            // Initial pass
+            for (const pageName of PAGES) {
+              try { await processPage(pageName); } catch (e) { 
+                console.log('FAILED: ' + pageName);
+                failed.push(pageName); 
+              }
+            }
+            
+            // Retry pass
+            for (const pageName of failed) {
+              try { 
+                console.log('RETRYING: ' + pageName);
+                await processPage(pageName); 
+              } catch (e) { console.log('CRITICAL FAIL: ' + pageName); }
+            }
+            await browser.close();
+          })();"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add *.html
+          git diff --cached --quiet || git commit -m "Mirror update $(date -u '+%Y-%m-%d %H:%M')"
+          git push origin main
