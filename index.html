@@ -781,7 +781,7 @@ footer .footer-brand{font-family:var(--font-head);font-size:1.1rem;font-weight:7
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <script>
 if(typeof pdfjsLib!=='undefined'){
-  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc="pdf.worker.min.js";
 }
 </script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script>
@@ -1047,7 +1047,7 @@ if(typeof pdfjsLib!=='undefined'){
   <h2 class="section-title">Featured <span class="grad">Projects</span></h2>
   <!-- SLIDESHOW -->
   <div class="slideshow">
-    <div class="slides" id="slides" style="transform: translateX(-100%);">
+    <div class="slides" id="slides" style="transform: translateX(-200%);">
             <div class="slide">
         <div class="slide-content">
           <div class="slide-number">Project 01 / 03</div>
@@ -1081,8 +1081,8 @@ if(typeof pdfjsLib!=='undefined'){
           </div>
     <button class="ss-btn ss-prev" onclick="moveSlide(-1)" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
     <button class="ss-btn ss-next" onclick="moveSlide(1)" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
-    <div class="slideshow-nav" id="slideDots"><div class="slide-dot"></div><div class="slide-dot active"></div><div class="slide-dot"></div></div>
-    <div class="ss-progress" id="ssProgress" style="width: 66.6667%;"></div>
+    <div class="slideshow-nav" id="slideDots"><div class="slide-dot"></div><div class="slide-dot"></div><div class="slide-dot active"></div></div>
+    <div class="ss-progress" id="ssProgress" style="width: 100%;"></div>
   </div>
   <!-- GRID -->
   <div class="projects-grid">
@@ -1189,10 +1189,10 @@ if(typeof pdfjsLib!=='undefined'){
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> ICT Prefect</span>
           <div style="display:flex;gap:8px;">
             <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a1845d75cb4a_epson050_ict-prefect.pdf",="" "ict="" prefect")"=""><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <a href="https://creativepulse.42web.io/cps/uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="pdf-local-preview" data-local="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" style="width: 100%; min-height: 200px; background: rgb(82, 86, 89); padding: 8px; border-radius: 4px;"></div>
+        <div class="cert-pdf-canvas-wrap" data-pdf="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
         <div class="cert-card fade-in cert-has-pdf">
@@ -1209,10 +1209,10 @@ if(typeof pdfjsLib!=='undefined'){
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> FIRST AID</span>
           <div style="display:flex;gap:8px;">
             <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a18460b0a1dd_epson048_st_john_s.pdf",="" "first="" aid")"=""><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <a href="https://creativepulse.42web.io/cps/uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="pdf-local-preview" data-local="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" style="width: 100%; min-height: 200px; background: rgb(82, 86, 89); padding: 8px; border-radius: 4px;"></div>
+        <div class="cert-pdf-canvas-wrap" data-pdf="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
       </div>
@@ -1298,7 +1298,7 @@ if(typeof pdfjsLib!=='undefined'){
             <a href="uploads/6a1847ea02931_Recomentation_NHIF.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="pdf-local-preview" data-local="uploads/6a1847ea02931_Recomentation_NHIF.pdf" style="width: 100%; min-height: 200px; background: rgb(82, 86, 89); padding: 8px; border-radius: 4px;"></div>
+        <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a1847ea02931_Recomentation_NHIF.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
         <div class="testi-card fade-in testi-has-pdf">
@@ -1322,7 +1322,7 @@ if(typeof pdfjsLib!=='undefined'){
             <a href="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="pdf-local-preview" data-local="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" style="width: 100%; min-height: 200px; background: rgb(82, 86, 89); padding: 8px; border-radius: 4px;"></div>
+        <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
       </div>
@@ -1771,52 +1771,5 @@ function renderInlinePdfNow(container){
 </script>
 
 
-<script>
-(function() {
-  // Ensure worker path is set
-  if (typeof pdfjsLib !== 'undefined') {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
-  }
-
-  function renderLocalPreview(div) {
-    if (div.dataset.rendered) return;
-    div.dataset.rendered = '1';
-    var localPath = div.dataset.local;
-    
-    if (!localPath || typeof pdfjsLib === 'undefined') {
-      showFallback(div, localPath);
-      return;
-    }
-    
-    pdfjsLib.getDocument(localPath).promise.then(function(pdf) {
-      pdf.getPage(1).then(function(p) {
-        var scale = Math.min((div.offsetWidth || 340) / p.getViewport({scale:1}).width, 1.5) || 1.2;
-        var vp     = p.getViewport({ scale: scale });
-        var canvas = document.createElement('canvas');
-        canvas.width  = vp.width;
-        canvas.height = vp.height;
-        canvas.style.cssText = 'max-width:100%;border-radius:4px;display:block;';
-        div.innerHTML = '';
-        div.appendChild(canvas);
-        p.render({ canvasContext: canvas.getContext('2d'), viewport: vp });
-      });
-    }).catch(function() {
-      showFallback(div, localPath);
-    });
-  }
-
-  function showFallback(div, path) {
-      var link = path || '#';
-      div.innerHTML = '<div style="padding:16px;text-align:center;color:#ccc;font-size:.82rem;"><i class="fas fa-file-pdf" style="font-size:2rem;color:#ef4444;display:block;margin-bottom:8px;"></i>Preview unavailable. <a href="' + link + '" target="_blank" style="color:#00e5ff;">Open PDF</a></div>';
-  }
-
-  var io = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { renderLocalPreview(e.target); io.unobserve(e.target); }
-    });
-  }, { rootMargin: '200px' });
-
-  document.querySelectorAll('.pdf-local-preview').forEach(function(d) { io.observe(d); });
-})();
-</script>
+<script>if(typeof pdfjsLib !== "undefined") pdfjsLib.GlobalWorkerOptions.workerSrc="pdf.worker.min.js";</script>
 </body></html>
