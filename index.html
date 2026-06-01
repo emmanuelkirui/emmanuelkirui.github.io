@@ -781,15 +781,16 @@ footer .footer-brand{font-family:var(--font-head);font-size:1.1rem;font-weight:7
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
 <script>
 if(typeof pdfjsLib!=='undefined'){
-  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+  pdfjsLib.GlobalWorkerOptions.workerSrc="pdf.worker.min.js";
 }
 </script>
-<meta name="google-adsense-account" content="ca-pub-9638774372490271"><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script></head>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script>
+</head>
 <body>
 <!-- ══════════════════════════════════════════════
      ANIMATED BACKGROUND
 ══════════════════════════════════════════════ -->
-<canvas id="bg-canvas" width="800" height="600"></canvas>
+<canvas id="bg-canvas" width="1280" height="800"></canvas>
 
 <div class="page-wrap">
 <!-- ══════════════════════════════════════════════
@@ -807,7 +808,7 @@ if(typeof pdfjsLib!=='undefined'){
     <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-right">
-    <a href="https://creativepulse.42web.io/cps/admin.php" class="nav-admin"><i class="fas fa-lock"></i> Admin</a>
+    <a href="admin.html" class="nav-admin"><i class="fas fa-lock"></i> Admin</a>
     <button class="hamburger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
       <i class="fas fa-bars"></i>
     </button>
@@ -1046,16 +1047,19 @@ if(typeof pdfjsLib!=='undefined'){
   <h2 class="section-title">Featured <span class="grad">Projects</span></h2>
   <!-- SLIDESHOW -->
   <div class="slideshow">
-    <div class="slides" id="slides">
+    <div class="slides" id="slides" style="transform: translateX(-100%);">
             <div class="slide">
         <div class="slide-content">
           <div class="slide-number">Project 01 / 03</div>
           <h3>Football Predictions System</h3>
-          <p></p>
+          <p>Football predictions and live scores</p>
           <div class="tech-tags">
             <span class="tech-tag">Python</span><span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">API</span>          </div>
+                    <a href="https://creativepulse.42web.io/cps/liv" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;">
+            <i class="fas fa-external-link-alt"></i> View Live Project
+          </a>
                   </div>
-                  <div class="slide-placeholder"><i class="fas fa-code"></i></div>
+                  <img class="slide-img" src="https://creativepulse.42web.io/cps/uploads/6a1db86a1c55e_67446.png" alt="Football Predictions System">
               </div>
             <div class="slide">
         <div class="slide-content">
@@ -1080,23 +1084,24 @@ if(typeof pdfjsLib!=='undefined'){
           </div>
     <button class="ss-btn ss-prev" onclick="moveSlide(-1)" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
     <button class="ss-btn ss-next" onclick="moveSlide(1)" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
-    <div class="slideshow-nav" id="slideDots"><div class="slide-dot active"></div><div class="slide-dot"></div><div class="slide-dot"></div></div>
-    <div class="ss-progress" id="ssProgress" style="width: 33.3333%;"></div>
+    <div class="slideshow-nav" id="slideDots"><div class="slide-dot"></div><div class="slide-dot active"></div><div class="slide-dot"></div></div>
+    <div class="ss-progress" id="ssProgress" style="width: 66.6667%;"></div>
   </div>
   <!-- GRID -->
   <div class="projects-grid">
         <div class="proj-card fade-in">
       <div class="proj-card-img">
-        <i class="fas fa-code"></i>      </div>
+        <img src="https://creativepulse.42web.io/cps/uploads/6a1db86a1c55e_67446.png" alt="Football Predictions System">      </div>
       <div class="proj-card-body">
         <div class="proj-card-top">
           <h3>Football Predictions System</h3>
-                  </div>
-        <p></p>
+          <span class="proj-status">Live</span>        </div>
+        <p>Football predictions and live scores</p>
         <div class="tech-tags" style="margin-bottom:14px;">
           <span class="tech-tag">Python</span><span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">API</span>        </div>
         <div class="proj-card-footer">
-          <span class="proj-private"><i class="fas fa-lock"></i> Private Repo</span>          <span class="proj-idx">01</span>
+                    <a href="https://creativepulse.42web.io/cps/liv" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
+                    <span class="proj-idx">01</span>
         </div>
       </div>
     </div>
@@ -1188,7 +1193,7 @@ if(typeof pdfjsLib!=='undefined'){
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> ICT Prefect</span>
           <div style="display:flex;gap:8px;">
             <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a1845d75cb4a_epson050_ict-prefect.pdf",="" "ict="" prefect")"=""><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <a href="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
         <div class="cert-pdf-canvas-wrap" data-pdf="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
@@ -1208,7 +1213,7 @@ if(typeof pdfjsLib!=='undefined'){
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> FIRST AID</span>
           <div style="display:flex;gap:8px;">
             <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a18460b0a1dd_epson048_st_john_s.pdf",="" "first="" aid")"=""><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <a href="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
         <div class="cert-pdf-canvas-wrap" data-pdf="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
@@ -1294,7 +1299,7 @@ if(typeof pdfjsLib!=='undefined'){
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> NHIF – Recommendation</span>
           <div style="display:flex;gap:8px;">
             <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a1847ea02931_recomentation_nhif.pdf",="" "recommendation="" \u2013="" nhif")"=""><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a1847ea02931_Recomentation_NHIF.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <a href="uploads/6a1847ea02931_Recomentation_NHIF.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
         <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a1847ea02931_Recomentation_NHIF.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
@@ -1318,7 +1323,7 @@ if(typeof pdfjsLib!=='undefined'){
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> JUMKINO – Recommendation</span>
           <div style="display:flex;gap:8px;">
             <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a18485f9fb18_kirui-recmd.pdf",="" "recommendation="" \u2013="" jumkino")"=""><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a18485f9fb18_KIRUI-RECMD.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <a href="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
         <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
@@ -1770,4 +1775,5 @@ function renderInlinePdfNow(container){
 </script>
 
 
+<script>if(typeof pdfjsLib !== "undefined") pdfjsLib.GlobalWorkerOptions.workerSrc="pdf.worker.min.js";</script>
 </body></html>
