@@ -657,8 +657,58 @@ h2.section-title .grad{background:linear-gradient(135deg,var(--cyan),var(--viole
 .contact-info a{color:var(--cyan);}
 
 /* ══════════════════════════════════════════════════
-   FOOTER
+   COOKIE CONSENT BANNER
 ══════════════════════════════════════════════════ */
+#cookie-consent{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  width:calc(100% - 48px);max-width:680px;
+  background:rgba(15,19,32,.97);
+  border:1px solid rgba(0,229,255,.2);
+  border-radius:14px;
+  box-shadow:0 8px 40px rgba(0,0,0,.55),0 0 0 1px rgba(0,229,255,.06);
+  backdrop-filter:blur(18px);
+  padding:18px 22px;
+  display:none;
+  align-items:center;gap:16px;
+  z-index:99999;
+  animation:cookie-slide-up .4s cubic-bezier(.22,1,.36,1);
+}
+#cookie-consent.visible{display:flex;}
+@keyframes cookie-slide-up{
+  from{opacity:0;transform:translateX(-50%) translateY(20px);}
+  to{opacity:1;transform:translateX(-50%) translateY(0);}
+}
+.cookie-icon{
+  font-size:1.6rem;flex-shrink:0;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cookie-text{flex:1;font-size:.82rem;color:var(--muted);line-height:1.55;}
+.cookie-text a{color:var(--cyan);text-decoration:none;}
+.cookie-text a:hover{text-decoration:underline;}
+.cookie-btns{display:flex;gap:8px;flex-shrink:0;}
+.cookie-accept{
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  color:#000;border:none;padding:8px 18px;border-radius:8px;
+  font-size:.8rem;font-weight:700;cursor:pointer;font-family:var(--font-head);
+  transition:opacity .2s,transform .2s;white-space:nowrap;
+}
+.cookie-accept:hover{opacity:.88;transform:translateY(-1px);}
+.cookie-decline{
+  background:rgba(255,255,255,.06);color:var(--muted);
+  border:1px solid rgba(255,255,255,.1);padding:8px 14px;border-radius:8px;
+  font-size:.8rem;font-weight:600;cursor:pointer;font-family:var(--font-head);
+  transition:all .2s;white-space:nowrap;
+}
+.cookie-decline:hover{background:rgba(255,255,255,.1);color:var(--text);}
+@media(max-width:600px){
+  #cookie-consent{flex-direction:column;align-items:flex-start;bottom:12px;
+    width:calc(100% - 24px);padding:16px 16px;}
+  .cookie-btns{width:100%;}
+  .cookie-accept,.cookie-decline{flex:1;text-align:center;justify-content:center;}
+}
+
+
 footer{text-align:center;padding:40px 5%;border-top:1px solid var(--border);color:var(--muted);font-size:.82rem;}
 footer .footer-brand{font-family:var(--font-head);font-size:1.1rem;font-weight:700;margin-bottom:8px;
   background:linear-gradient(135deg,var(--cyan),var(--violet));-webkit-background-clip:text;
@@ -1299,19 +1349,19 @@ if(typeof pdfjsLib!=='undefined'){
     </div>
   </div>
       <div class="credly-badge-wrap fade-in">
-    <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="c45a92ac-2f59-4316-814b-90195f482734" data-share-badge-host="https://www.credly.com" style="display:inline-block;"></div>
+    <iframe name="acclaim-badge" allowtransparency="true" frameborder="0" id="embedded-badge-c45a92ac-2f59-4316-814b-90195f482734" scrolling="no" src="https://www.credly.com/embedded_badge/c45a92ac-2f59-4316-814b-90195f482734" style="width: 100%; height: 270px; max-width: 100%;" title="View my verified achievement on Credly."></iframe>
     <div class="badge-name">Google Cloud Cybersecurity</div>
     <div class="badge-issuer">Google Cloud / Credly</div>
     <a href="https://www.credly.com/badges/c45a92ac-2f59-4316-814b-90195f482734/public_url" target="_blank" class="badge-verify"><i class="fas fa-check-circle"></i> Verify Badge</a>
   </div>
     <div class="credly-badge-wrap fade-in">
-    <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="8239f143-b9f4-49a9-a0ff-ef498a9948b2" data-share-badge-host="https://www.credly.com" style="display:inline-block;"></div>
+    <iframe name="acclaim-badge" allowtransparency="true" frameborder="0" id="embedded-badge-8239f143-b9f4-49a9-a0ff-ef498a9948b2" scrolling="no" src="https://www.credly.com/embedded_badge/8239f143-b9f4-49a9-a0ff-ef498a9948b2" style="width: 100%; height: 270px; max-width: 100%;" title="View my verified achievement on Credly."></iframe>
     <div class="badge-name">Google Cloud Cybersecurity Skills</div>
     <div class="badge-issuer">Google Cloud / Credly</div>
     <a href="https://www.credly.com/badges/8239f143-b9f4-49a9-a0ff-ef498a9948b2/public_url" target="_blank" class="badge-verify"><i class="fas fa-check-circle"></i> Verify Badge</a>
   </div>
     <div class="credly-badge-wrap fade-in">
-    <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="de1bd1df-41ed-43ab-aeb7-ceda541b4657" data-share-badge-host="https://www.credly.com" style="display:inline-block;"></div>
+    <iframe name="acclaim-badge" allowtransparency="true" frameborder="0" id="embedded-badge-de1bd1df-41ed-43ab-aeb7-ceda541b4657" scrolling="no" src="https://www.credly.com/embedded_badge/de1bd1df-41ed-43ab-aeb7-ceda541b4657" style="width: 100%; height: 270px; max-width: 100%;" title="View my verified achievement on Credly."></iframe>
     <div class="badge-name">Prompt Design in Vertex AI</div>
     <div class="badge-issuer">Google Cloud / Credly</div>
     <a href="https://www.credly.com/badges/de1bd1df-41ed-43ab-aeb7-ceda541b4657/public_url" target="_blank" class="badge-verify"><i class="fas fa-check-circle"></i> Verify Badge</a>
@@ -1846,6 +1896,66 @@ function renderInlinePdfNow(container){
   });
 })();
 </script>
+<!-- ══ COOKIE CONSENT ══ -->
+<div id="cookie-consent" role="dialog" aria-live="polite" aria-label="Cookie consent" class="visible">
+  <span class="cookie-icon"><i class="fas fa-cookie-bite"></i></span>
+  <p class="cookie-text">
+    We use cookies to improve your experience and analyse traffic.
+    By clicking <strong style="color:var(--text);">Accept</strong> you consent to our use of cookies.
+    <a href="https://creativepulse.42web.io/cps/privacy-policy.php">Learn more</a>.
+  </p>
+  <div class="cookie-btns">
+    <button class="cookie-accept" id="cookieAccept">Accept</button>
+    <button class="cookie-decline" id="cookieDecline">Decline</button>
+  </div>
+</div>
+
+<script>
+/* ── Cookie Consent ── */
+(function(){
+  var COOKIE_KEY = 'ek_cookie_consent';
+  var EXPIRY_DAYS = 180;
+
+  function getConsent(){
+    try {
+      var d = JSON.parse(localStorage.getItem(COOKIE_KEY));
+      if (!d) return null;
+      if (new Date() > new Date(d.expires)) { localStorage.removeItem(COOKIE_KEY); return null; }
+      return d.choice; // 'accepted' | 'declined'
+    } catch(e){ return null; }
+  }
+
+  function setConsent(choice){
+    var exp = new Date();
+    exp.setDate(exp.getDate() + EXPIRY_DAYS);
+    localStorage.setItem(COOKIE_KEY, JSON.stringify({ choice: choice, expires: exp.toISOString() }));
+  }
+
+  function hideBanner(){
+    var b = document.getElementById('cookie-consent');
+    b.classList.remove('visible');
+    setTimeout(function(){ b.style.display = 'none'; }, 400);
+  }
+
+  // Only show if no decision stored
+  if (getConsent() === null) {
+    var banner = document.getElementById('cookie-consent');
+    // Small delay so it doesn't fight the page load animation
+    setTimeout(function(){ banner.classList.add('visible'); }, 1200);
+  }
+
+  document.getElementById('cookieAccept').addEventListener('click', function(){
+    setConsent('accepted');
+    hideBanner();
+  });
+
+  document.getElementById('cookieDecline').addEventListener('click', function(){
+    setConsent('declined');
+    hideBanner();
+  });
+})();
+</script>
+
 
 
 </body></html>
