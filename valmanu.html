@@ -244,7 +244,7 @@
         }
     });
 
-    </script><script>window.errorQueue = window.errorQueue || []; window.errorQueue.push({title: 'Error', message: 'An error occurred. Please try again later.', type: 'error'});</script><script>window.errorQueue = window.errorQueue || []; window.errorQueue.push({title: 'Error', message: 'An error occurred. Please try again later.', type: 'error'});</script>
+    </script>
 
 
 
@@ -2647,7 +2647,7 @@
             </tr>
         </thead>
         <tbody>
-                    </tbody>
+            <tr class="upper-table"><td>1</td><td>AFC Bournemouth</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Arsenal FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Aston Villa FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Brentford FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Brighton &amp; Hove Albion FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Chelsea FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Coventry City FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Crystal Palace FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Everton FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Fulham FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Hull City AFC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Ipswich Town FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Leeds United FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Liverpool FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Manchester City FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Manchester United FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Newcastle United FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Nottingham Forest FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Sunderland AFC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Tottenham Hotspur FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr>        </tbody>
     </table>
 </div>
           <div class="top-scorers-table" id="top-scorers-table" style="display: none;">
@@ -4561,13 +4561,19 @@ function fetchPredictionImpl(index, homeId, awayId, attempt, maxAttempts) {
             tablePredictedScore.innerHTML = '';
             setTimeout(() => fetchPrediction(index, homeId, awayId, attempt), data.delay * 1000);
         } else if (data.success) {
+            // Defensive guard: if this element already shows a valid tick/cross,
+            // never let an empty resultIndicator from this fetch erase it. This
+            // can legitimately happen if the prediction cache file isn't present
+            // at the exact moment of this particular fetch.
+            const existingIndicator = predictionElement.querySelector('.result-indicator')?.textContent?.trim();
+            const resultIndicatorToUse = data.resultIndicator || existingIndicator || '';
             predictionElement.innerHTML = `
-                <p>Prediction: ${data.prediction} <span class="result-indicator">${data.resultIndicator}</span></p>
+                <p>Prediction: ${data.prediction} <span class="result-indicator">${resultIndicatorToUse}</span></p>
                 <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
                 <p class="confidence">Confidence: ${data.confidence}</p>
                 <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
             `;
-            tablePrediction.innerHTML = `${data.prediction} ${data.resultIndicator}`;
+            tablePrediction.innerHTML = `${data.prediction} ${resultIndicatorToUse}`;
             tableConfidence.innerHTML = data.confidence;
             tablePredictedScore.innerHTML = data.predictedScore;
             const matchCard = document.querySelector(`.match-card[data-index="${index}"]`);
@@ -4680,7 +4686,7 @@ function startMatchPolling() {
                     const predictionEl = document.getElementById(`prediction-${index}`);
                     const tablePredictionEl = document.getElementById(`table-prediction-${index}`);
                     if (predictionEl) {
-                        const predText = data.prediction || predictionEl.querySelector('p')?.textContent?.replace(/[✓✕]/g, '').trim() || '';
+                        const predText = data.prediction || predictionEl.querySelector('p')?.textContent?.replace(/[✓✕]\uFE0E?/g, '').trim() || '';
                         const predScore = data.predictedScore || predictionEl.querySelector('.predicted-score')?.textContent?.replace('Predicted Score: ', '') || '';
                         const predConf = data.confidence || predictionEl.querySelector('.confidence')?.textContent?.replace('Confidence: ', '') || '';
                         const predAdv = data.advantage || '';
@@ -4692,7 +4698,7 @@ function startMatchPolling() {
                         `;
                     }
                     if (tablePredictionEl) {
-                        const existingText = tablePredictionEl.textContent.replace(/[✓✕]/g, '').trim();
+                        const existingText = tablePredictionEl.textContent.replace(/[✓✕]\uFE0E?/g, '').trim();
                         tablePredictionEl.innerHTML = `${existingText} ${data.resultIndicator}`;
                     }
 
@@ -4710,9 +4716,22 @@ function startMatchPolling() {
                 if (isOnline()) {
                     debouncedFetchTeamData(element.dataset.homeId, index, true, 0, 10, false);
                     debouncedFetchTeamData(element.dataset.awayId, index, false, 0, 10, false);
-                    // Only re-fetch prediction if resultIndicator isn't already set,
-                    // to avoid overwriting the tick/cross with a stale or empty result
-                    if (!data.resultIndicator) {
+                    // Only re-fetch prediction if we don't already have a rendered
+                    // tick/cross. IMPORTANT: check the DOM, not data.resultIndicator --
+                    // the get_finished_matches / fetch_match_status sync that feeds this
+                    // function never includes resultIndicator (it only ever sends
+                    // status + goals), so that field is always absent here regardless
+                    // of whether a correct result is already showing. Checking it caused
+                    // every finished match to be re-fetched on every page load, and if
+                    // the prediction cache file wasn't present at that exact moment, the
+                    // re-fetch came back with a blank resultIndicator and overwrote the
+                    // perfectly correct tick/cross that was already on screen.
+                    const predictionElForCheck = document.getElementById(`prediction-${index}`);
+                    const tablePredictionElForCheck = document.getElementById(`table-prediction-${index}`);
+                    const alreadyHasIndicator =
+                        !!predictionElForCheck?.querySelector('.result-indicator')?.textContent?.trim() ||
+                        /[✓✕]/.test(tablePredictionElForCheck?.textContent || '');
+                    if (!alreadyHasIndicator) {
                         debouncedFetchPrediction(index, element.dataset.homeId, element.dataset.awayId);
                     }
                 } else {
@@ -5959,10 +5978,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-    <div class="toast-container"><div class="toast error show">
+    <div class="toast-container"><div class="toast info show">
                 <div>
-                    <div class="toast-title">Error</div>
-                    <p class="toast-message">An error occurred. Please try again later.</p>
+                    <div class="toast-title">10000</div>
+                    <p class="toast-message">✅ Cached: PL (from 2026-07-16 to 2026-07-16, Last updated: 16/07/2026, 03:35, Age: 372 mins)</p>
                 </div>
                 <span class="close-btn">×</span>
             </div></div></body></html><!-- Back to Top Component -->
