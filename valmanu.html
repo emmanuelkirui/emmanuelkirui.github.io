@@ -182,7 +182,7 @@
                 min-height: 18px;
             }
         }
-    </style><meta name="google-adsense-account" content="ca-pub-9638774372490271"><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script></head><body data-theme="dark"><div id="reconnect-notice" class="fade-in online" style="display: none;"><div class="spinner active" style="display: none;"></div><span class="status-message"></span></div><nav class="navbar"><div class="navbar-container"><div class="navbar-brand">CPS Football</div><div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div><div class="nav-menu" id="navMenu"><a href="https://creativepulse.42web.io/cps/valmanu" class="nav-link">Home</a><a href="https://creativepulse.42web.io/cps/liv" class="nav-link">Predictions</a><a href="https://creativepulse.42web.io/cps/livescore" class="nav-link">Live Scores</a><a href="javascript:history.back()" class="nav-link">Back</a><button class="nav-link auth-btn" onclick="openModal()">Login/Signup</button><button class="theme-toggle" onclick="toggleTheme()"><span class="theme-icon">☀️</span></button></div></div></nav><script>
+    </style><meta name="google-adsense-account" content="ca-pub-9638774372490271"><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script></head><body data-theme="dark"><div id="reconnect-notice" class="fade-in online" style="display: none;"><div class="spinner" style="display: none;"></div><span class="status-message"></span></div><nav class="navbar"><div class="navbar-container"><div class="navbar-brand">CPS Football</div><div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div><div class="nav-menu" id="navMenu"><a href="https://creativepulse.42web.io/cps/valmanu" class="nav-link">Home</a><a href="https://creativepulse.42web.io/cps/liv" class="nav-link">Predictions</a><a href="https://creativepulse.42web.io/cps/livescore" class="nav-link">Live Scores</a><a href="javascript:history.back()" class="nav-link">Back</a><button class="nav-link auth-btn" onclick="openModal()">Login/Signup</button><button class="theme-toggle" onclick="toggleTheme()"><span class="theme-icon">☀️</span></button></div></div></nav><script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
         const hamburger = document.querySelector('.hamburger');
@@ -244,7 +244,7 @@
         }
     });
 
-    </script>
+    </script><script>window.errorQueue = window.errorQueue || []; window.errorQueue.push({title: 'Error', message: 'An error occurred. Please try again later.', type: 'error'});</script><script>window.errorQueue = window.errorQueue || []; window.errorQueue.push({title: 'Error', message: 'An error occurred. Please try again later.', type: 'error'});</script>
 
 
 
@@ -267,6 +267,7 @@
     <script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script defer="" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <meta name="color-scheme" content="dark light">
     <meta name="description" content="Get accurate football predictions, live scores and match results in Kenya. Updated daily.">
     <meta property="og:title" content="CPS Football Predictions">
 <meta property="og:description" content="Get accurate football predictions, live scores and match results in Kenya. Updated daily.">
@@ -276,6 +277,7 @@
 
     <style>
         :root {
+            color-scheme: light dark;
             --primary-color: #2ecc71;
             --secondary-color: #3498db;
             --text-color: #333;
@@ -286,6 +288,7 @@
         }
 
         [data-theme="dark"] {
+            color-scheme: dark;
             --primary-color: #27ae60;
             --secondary-color: #2980b9;
             --text-color: #ecf0f1;
@@ -853,6 +856,19 @@
         .result-indicator {
             font-size: 1.2em;
             margin-left: 5px;
+        }
+
+        /* Defensive backstop: even with color-scheme declared, make sure nothing
+           can silently recolor the tick/cross to the surrounding text color. */
+        span[style*="color: green"],
+        span[style*="color:green"] {
+            color: #2ecc71 !important;
+            -webkit-text-fill-color: #2ecc71 !important;
+        }
+        span[style*="color: red"],
+        span[style*="color:red"] {
+            color: #e74c3c !important;
+            -webkit-text-fill-color: #e74c3c !important;
         }
 
         .past-results {
@@ -2509,8 +2525,8 @@
         <div class="filter-option" data-filter="custom">Custom Range</div>
     </div>
      <div class="custom-date-range">
-        <input type="date" name="start" value="2026-07-16">
-        <input type="date" name="end" value="2026-07-16">
+        <input type="date" name="start" value="2026-07-17">
+        <input type="date" name="end" value="2026-07-17">
         <button onclick="updateUrl('PL', 'custom')">Apply</button>
     </div>
    
@@ -5978,10 +5994,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-    <div class="toast-container"><div class="toast info show">
+    <div class="toast-container"><div class="toast error show">
                 <div>
-                    <div class="toast-title">10000</div>
-                    <p class="toast-message">✅ Cached: PL (from 2026-07-16 to 2026-07-16, Last updated: 16/07/2026, 03:35, Age: 372 mins)</p>
+                    <div class="toast-title">Error</div>
+                    <p class="toast-message">An error occurred. Please try again later.</p>
                 </div>
                 <span class="close-btn">×</span>
             </div></div></body></html><!-- Back to Top Component -->
