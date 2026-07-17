@@ -182,7 +182,7 @@
                 min-height: 18px;
             }
         }
-    </style><meta name="google-adsense-account" content="ca-pub-9638774372490271"><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script></head><body data-theme="dark"><div id="reconnect-notice" class="fade-in online" style="display: none;"><div class="spinner active" style="display: none;"></div><span class="status-message"></span></div><nav class="navbar"><div class="navbar-container"><div class="navbar-brand">CPS Football</div><div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div><div class="nav-menu" id="navMenu"><a href="https://creativepulse.42web.io/cps/valmanu" class="nav-link">Home</a><a href="https://creativepulse.42web.io/cps/liv" class="nav-link">Predictions</a><a href="https://creativepulse.42web.io/cps/livescore" class="nav-link">Live Scores</a><a href="javascript:history.back()" class="nav-link">Back</a><button class="nav-link auth-btn" onclick="openModal()">Login/Signup</button><button class="theme-toggle" onclick="toggleTheme()"><span class="theme-icon">☀️</span></button></div></div></nav><script>
+    </style><meta name="google-adsense-account" content="ca-pub-9638774372490271"><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script></head><body data-theme="dark"><div id="reconnect-notice" class="fade-in online" style="display: none;"><div class="spinner" style="display: none;"></div><span class="status-message"></span></div><nav class="navbar"><div class="navbar-container"><div class="navbar-brand">CPS Football</div><div class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></div><div class="nav-menu" id="navMenu"><a href="https://creativepulse.42web.io/cps/valmanu" class="nav-link">Home</a><a href="https://creativepulse.42web.io/cps/liv" class="nav-link">Predictions</a><a href="https://creativepulse.42web.io/cps/livescore" class="nav-link">Live Scores</a><a href="javascript:history.back()" class="nav-link">Back</a><button class="nav-link auth-btn" onclick="openModal()">Login/Signup</button><button class="theme-toggle" onclick="toggleTheme()"><span class="theme-icon">☀️</span></button></div></div></nav><script>
     function toggleMenu() {
         const menu = document.getElementById('navMenu');
         const hamburger = document.querySelector('.hamburger');
@@ -860,13 +860,13 @@
 
         /* Defensive backstop: even with color-scheme declared, make sure nothing
            can silently recolor the tick/cross to the surrounding text color. */
-        span[style*="color: green"],
-        span[style*="color:green"] {
+        span[style*="color: #2ecc71"],
+        span[style*="color:#2ecc71"] {
             color: #2ecc71 !important;
             -webkit-text-fill-color: #2ecc71 !important;
         }
-        span[style*="color: red"],
-        span[style*="color:red"] {
+        span[style*="color: #e74c3c"],
+        span[style*="color:#e74c3c"] {
             color: #e74c3c !important;
             -webkit-text-fill-color: #e74c3c !important;
         }
@@ -2832,7 +2832,20 @@ const observer = new IntersectionObserver(entries => {
             const index = entry.target.dataset.index;
             const homeId = entry.target.dataset.homeId;
             const awayId = entry.target.dataset.awayId;
-            debouncedFetchPrediction(index, homeId, awayId);
+            // Don't refetch (and risk overwriting) a prediction that already has
+            // a rendered tick/cross. This observer used to fire unconditionally
+            // the instant a card entered the viewport -- including immediately
+            // on page load for any above-the-fold card -- silently replacing a
+            // perfectly correct server-rendered result the moment the page
+            // finished laying out.
+            const predElObs = document.getElementById(`prediction-${index}`);
+            const tablePredElObs = document.getElementById(`table-prediction-${index}`);
+            const alreadyHasResultObs =
+                !!predElObs?.querySelector('.result-indicator')?.textContent?.trim() ||
+                /[✓✕]/.test(tablePredElObs?.textContent || '');
+            if (!alreadyHasResultObs) {
+                debouncedFetchPrediction(index, homeId, awayId);
+            }
             observer.unobserve(entry.target);
         }
     });
@@ -4668,7 +4681,14 @@ function startMatchPolling() {
                     if (homeId && awayId && index) {
                         debouncedFetchTeamData(homeId, index, true, 0, 10, true);
                         debouncedFetchTeamData(awayId, index, false, 0, 10, true);
-                        debouncedFetchPrediction(index, homeId, awayId);
+                        const predElCache = document.getElementById(`prediction-${index}`);
+                        const tablePredElCache = document.getElementById(`table-prediction-${index}`);
+                        const alreadyHasResultCache =
+                            !!predElCache?.querySelector('.result-indicator')?.textContent?.trim() ||
+                            /[✓✕]/.test(tablePredElCache?.textContent || '');
+                        if (!alreadyHasResultCache) {
+                            debouncedFetchPrediction(index, homeId, awayId);
+                        }
                     }
                 });
                 if (data.force_client_refresh && !document.body.classList.contains('admin')) {
@@ -4846,7 +4866,20 @@ function startMatchPolling() {
                                 if (data.status === 'FINISHED') {
                                     debouncedFetchTeamData(homeId, index, true, 0, 10, true);
                                     debouncedFetchTeamData(awayId, index, false, 0, 10, true);
-                                    debouncedFetchPrediction(index, homeId, awayId);
+                                    // Same guard as updateMatchUI: don't refetch (and risk
+                                    // overwriting) a prediction that already has a rendered
+                                    // tick/cross. This recurring poll used to call
+                                    // debouncedFetchPrediction unconditionally here, which
+                                    // was a second, unguarded path capable of wiping out an
+                                    // already-correct result on every 2-minute poll cycle.
+                                    const predEl = document.getElementById(`prediction-${index}`);
+                                    const tablePredEl = document.getElementById(`table-prediction-${index}`);
+                                    const alreadyHasResult =
+                                        !!predEl?.querySelector('.result-indicator')?.textContent?.trim() ||
+                                        /[✓✕]/.test(tablePredEl?.textContent || '');
+                                    if (!alreadyHasResult) {
+                                        debouncedFetchPrediction(index, homeId, awayId);
+                                    }
                                     requestsMade++;
                                 } else {
                                     if (!homeFormLoaded || homeIsHistorical) {
@@ -4870,7 +4903,14 @@ function startMatchPolling() {
                                 setTimeout(() => {
                                     debouncedFetchTeamData(homeId, index, true, 0, 10, false);
                                     debouncedFetchTeamData(awayId, index, false, 0, 10, false);
-                                    debouncedFetchPrediction(index, homeId, awayId);
+                                    const predElRetry = document.getElementById(`prediction-${index}`);
+                                    const tablePredElRetry = document.getElementById(`table-prediction-${index}`);
+                                    const alreadyHasResultRetry =
+                                        !!predElRetry?.querySelector('.result-indicator')?.textContent?.trim() ||
+                                        /[✓✕]/.test(tablePredElRetry?.textContent || '');
+                                    if (!alreadyHasResultRetry) {
+                                        debouncedFetchPrediction(index, homeId, awayId);
+                                    }
                                 }, 30000);
                             } else {
                                 showToast('Offline: Cannot fetch match status.', 'warning');
@@ -5505,12 +5545,23 @@ window.addEventListener('DOMContentLoaded', function() {
                                         const homeFormLoaded = homeFormElement && !homeFormElement.querySelector('.loading-spinner') && homeFormElement.dataset.form;
                                         const awayFormLoaded = awayFormElement && !awayFormElement.querySelector('.loading-spinner') && awayFormElement.dataset.form;
 
-                                        if (homeFormLoaded && awayFormLoaded) {
-                                            debouncedFetchPrediction(index, homeId, awayId);
-                                        } else {
-                                            setTimeout(() => {
+                                        // This loop targets every card for the incomplete team,
+                                        // which can include other, unrelated matches that already
+                                        // rendered a correct tick/cross -- don't refetch those.
+                                        const predElIncomplete = document.getElementById(`prediction-${index}`);
+                                        const tablePredElIncomplete = document.getElementById(`table-prediction-${index}`);
+                                        const alreadyHasResultIncomplete =
+                                            !!predElIncomplete?.querySelector('.result-indicator')?.textContent?.trim() ||
+                                            /[✓✕]/.test(tablePredElIncomplete?.textContent || '');
+
+                                        if (!alreadyHasResultIncomplete) {
+                                            if (homeFormLoaded && awayFormLoaded) {
                                                 debouncedFetchPrediction(index, homeId, awayId);
-                                            }, rateLimitDelay);
+                                            } else {
+                                                setTimeout(() => {
+                                                    debouncedFetchPrediction(index, homeId, awayId);
+                                                }, rateLimitDelay);
+                                            }
                                         }
                                         resolve();
                                     }, i * rateLimitDelay + rateLimitDelay);
