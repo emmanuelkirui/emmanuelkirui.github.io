@@ -891,7 +891,8 @@
             border-left-color: var(--accent-color); color: var(--accent-color); font-weight: 700;
         }
 
-        .sidebar-flag { font-size: 1.15rem; line-height: 1; flex-shrink: 0; }
+        .sidebar-flag { font-size: 1.15rem; line-height: 1; flex-shrink: 0; display:flex; align-items:center; justify-content:center; }
+        .sidebar-crest { width: 22px; height: 22px; object-fit: contain; display: block; }
 
         .sidebar-competition-name {
             flex: 1; overflow: hidden; text-overflow: ellipsis;
@@ -1323,44 +1324,44 @@
                 });
             }
         });
-    </script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><title>CPS‣Football Predictions</title><h1>Football Match Predictions</h1><link rel="preconnect" href="https://api.football-data.org"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css"><button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Competitions Sidebar"><i class="fas fa-layer-group"></i></button><div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div><div class="page-layout"><aside id="appSidebar" class="sidebar"><div class="sidebar-header"><i class="fas fa-trophy"></i> Competitions</div><input class="sidebar-search" type="text" placeholder="Search…" oninput="filterSidebarCompetitions(this.value)"><a href="https://creativepulse.42web.io/cps/?competition=BL1" class="sidebar-item " data-name="Bundesliga" title="Bundesliga">
-        <span class="sidebar-flag"><span class="fi fi-de" style="font-size:1.1rem;"></span></span>
+    </script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><title>CPS‣Football Predictions</title><h1>Football Match Predictions</h1><link rel="preconnect" href="https://api.football-data.org"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"><button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Competitions Sidebar"><i class="fas fa-layer-group"></i></button><div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div><div class="page-layout"><aside id="appSidebar" class="sidebar"><div class="sidebar-header"><i class="fas fa-trophy"></i> Competitions</div><input class="sidebar-search" type="text" placeholder="Search…" oninput="filterSidebarCompetitions(this.value)"><a href="https://creativepulse.42web.io/cps/?competition=BL1" class="sidebar-item " data-name="Bundesliga" title="Bundesliga">
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/BL1.png" alt="Bundesliga" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Bundesliga</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=BSA" class="sidebar-item " data-name="Campeonato Brasileiro Série A" title="Campeonato Brasileiro Série A">
-        <span class="sidebar-flag"><span class="fi fi-br" style="font-size:1.1rem;"></span></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/bsa.png" alt="Campeonato Brasileiro Série A" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Campeonato Brasileiro Série A</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=ELC" class="sidebar-item " data-name="Championship" title="Championship">
-        <span class="sidebar-flag"><i class="fas fa-globe" style="font-size:1rem;color:var(--accent-color);"></i></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/ELC.png" alt="Championship" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Championship</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=CLI" class="sidebar-item " data-name="Copa Libertadores" title="Copa Libertadores">
-        <span class="sidebar-flag"><i class="fas fa-globe" style="font-size:1rem;color:var(--accent-color);"></i></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/CLI.svg" alt="Copa Libertadores" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Copa Libertadores</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=DED" class="sidebar-item " data-name="Eredivisie" title="Eredivisie">
-        <span class="sidebar-flag"><span class="fi fi-nl" style="font-size:1.1rem;"></span></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/ED.png" alt="Eredivisie" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Eredivisie</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=EC" class="sidebar-item " data-name="European Championship" title="European Championship">
-        <span class="sidebar-flag"><i class="fas fa-trophy" style="font-size:1rem;color:var(--accent-color);"></i></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/ec.png" alt="European Championship" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">European Championship</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=WC" class="sidebar-item " data-name="FIFA World Cup" title="FIFA World Cup">
-        <span class="sidebar-flag"><i class="fas fa-globe" style="font-size:1rem;color:var(--accent-color);"></i></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/wm26.png" alt="FIFA World Cup" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">FIFA World Cup</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=FL1" class="sidebar-item " data-name="Ligue 1" title="Ligue 1">
-        <span class="sidebar-flag"><span class="fi fi-fr" style="font-size:1.1rem;"></span></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/FL1.png" alt="Ligue 1" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Ligue 1</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=PL" class="sidebar-item active" data-name="Premier League" title="Premier League">
-        <span class="sidebar-flag"><span class="fi fi-gb-eng" style="font-size:1.1rem;"></span></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/PL.png" alt="Premier League" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Premier League</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=PPL" class="sidebar-item " data-name="Primeira Liga" title="Primeira Liga">
-        <span class="sidebar-flag"><span class="fi fi-pt" style="font-size:1.1rem;"></span></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/PPL.png" alt="Primeira Liga" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Primeira Liga</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=PD" class="sidebar-item " data-name="Primera Division" title="Primera Division">
-        <span class="sidebar-flag"><span class="fi fi-es" style="font-size:1.1rem;"></span></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/laliga.png" alt="Primera Division" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Primera Division</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=SA" class="sidebar-item " data-name="Serie A" title="Serie A">
-        <span class="sidebar-flag"><span class="fi fi-it" style="font-size:1.1rem;"></span></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/c111.png" alt="Serie A" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">Serie A</span>
     </a><a href="https://creativepulse.42web.io/cps/?competition=CL" class="sidebar-item " data-name="UEFA Champions League" title="UEFA Champions League">
-        <span class="sidebar-flag"><i class="fas fa-trophy" style="font-size:1rem;color:var(--accent-color);"></i></span>
+        <span class="sidebar-flag"><img src="https://crests.football-data.org/CL.png" alt="UEFA Champions League" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy sidebar-crest-fallback" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>
         <span class="sidebar-competition-name">UEFA Champions League</span>
     </a></aside><div class="main-content"><div class="controls"><button id="view-toggle" onclick="toggleView()"><i class="fas fa-th"></i> Card View</button></div><div id="status_light" class="status" style="display: none;">
         <div class="status_light">

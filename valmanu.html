@@ -285,6 +285,10 @@
             --card-bg: #fff;
             --shadow: 0 4px 6px rgba(0,0,0,0.1);
             --accent-color: #007bff;
+            --navbar-bg: #fff;
+            --table-border: #dde3ec;
+            --link-hover-bg: rgba(0,123,255,0.07);
+            --button-hover-bg: #0056b3;
         }
 
         [data-theme="dark"] {
@@ -296,6 +300,10 @@
             --card-bg: #34495e;
             --shadow: 0 4px 6px rgba(0,0,0,0.3);
             --accent-color: #3399ff;
+            --navbar-bg: #1a252f;
+            --table-border: #3d5166;
+            --link-hover-bg: rgba(51,153,255,0.10);
+            --button-hover-bg: #1a7fd4;
         }
 
         body {
@@ -2491,6 +2499,72 @@
     z-index: 999;
 }
 
+        /* ── FLOATING COMPETITIONS SIDEBAR ─────────────────────────── */
+        .sidebar {
+            position: fixed; top: 60px; left: 0;
+            width: 260px; height: calc(100vh - 60px);
+            background: var(--navbar-bg); border-right: 1px solid var(--table-border);
+            overflow-y: auto; padding-bottom: 2rem;
+            transform: translateX(-100%);
+            transition: transform 0.28s cubic-bezier(0.4,0,0.2,1), box-shadow 0.28s ease;
+            scrollbar-width: thin; scrollbar-color: var(--accent-color) transparent;
+            z-index: 1100; box-shadow: none;
+        }
+        .sidebar.open { transform: translateX(0); box-shadow: 6px 0 32px rgba(0,0,0,0.28); }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
+        .sidebar-header {
+            padding: 0.85rem 1rem 0.6rem;
+            font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em;
+            text-transform: uppercase; color: var(--accent-color);
+            border-bottom: 1px solid var(--table-border);
+            display: flex; align-items: center; gap: 0.45rem;
+        }
+        .sidebar-search {
+            display: block; padding: 0.45rem 0.75rem;
+            margin: 0.6rem 0.65rem; border: 1px solid var(--table-border);
+            border-radius: 20px; background: var(--bg-color); color: var(--text-color);
+            font-size: 0.78rem; width: calc(100% - 1.3rem); outline: none;
+            transition: border-color 0.2s; box-sizing: border-box;
+        }
+        .sidebar-search:focus { border-color: var(--accent-color); }
+        .sidebar-item {
+            display: flex; align-items: center; gap: 0.6rem;
+            padding: 0.55rem 1rem; cursor: pointer; text-decoration: none;
+            color: var(--text-color); font-size: 0.82rem; font-weight: 500;
+            transition: background 0.15s ease, color 0.15s ease, border-left 0.15s;
+            border-left: 3px solid transparent; overflow: hidden;
+        }
+        .sidebar-item:hover {
+            background: var(--link-hover-bg);
+            border-left-color: var(--accent-color); color: var(--accent-color);
+        }
+        .sidebar-item.active {
+            background: rgba(0,123,255,0.12);
+            border-left-color: var(--accent-color); color: var(--accent-color); font-weight: 700;
+        }
+        .sidebar-flag { font-size: 1.15rem; line-height: 1; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .sidebar-crest { width: 22px; height: 22px; object-fit: contain; display: block; }
+        .sidebar-competition-name {
+            flex: 1; overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap; font-size: 0.8rem;
+        }
+        .sidebar-toggle-btn {
+            display: flex; position: fixed; bottom: 80px; left: 16px;
+            z-index: 1200; background: var(--accent-color); color: #fff;
+            border: none; border-radius: 50%; width: 46px; height: 46px;
+            font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,123,255,0.45);
+            align-items: center; justify-content: center;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .sidebar-toggle-btn:hover { background: var(--button-hover-bg); transform: scale(1.08); }
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 1050; backdrop-filter: blur(2px);
+        }
+        .sidebar-overlay.open { display: block; }
+
     </style>
 
 
@@ -2503,8 +2577,35 @@
     </div>
     <script>
     const incompleteTeams = [];
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('appSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar) sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('open');
+    }
+
+    function filterSidebarCompetitions(query) {
+        const items = document.querySelectorAll('.sidebar-item[data-name]');
+        items.forEach(function(item) {
+            const name = item.getAttribute('data-name') || '';
+            item.style.display = name.toLowerCase().includes(query.toLowerCase()) ? 'flex' : 'none';
+        });
+    }
+
+    // Close sidebar on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const sidebar = document.getElementById('appSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar && sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                if (overlay) overlay.classList.remove('open');
+            }
+        }
+    });
 </script>
-    <div class="container" style="padding-top: 80px;">
+<aside id="appSidebar" class="sidebar">  <div class="sidebar-header"><i class="fas fa-trophy"></i>&nbsp;Competitions</div>  <input class="sidebar-search" type="text" placeholder="Search competitions…" oninput="filterSidebarCompetitions(this.value)"><a href="https://creativepulse.42web.io/cps/?competition=BL1" class="sidebar-item " data-name="Bundesliga" title="Bundesliga">  <span class="sidebar-flag"><img src="https://crests.football-data.org/BL1.png" alt="Bundesliga" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Bundesliga</span></a><a href="https://creativepulse.42web.io/cps/?competition=BSA" class="sidebar-item " data-name="Campeonato Brasileiro Série A" title="Campeonato Brasileiro Série A">  <span class="sidebar-flag"><img src="https://crests.football-data.org/bsa.png" alt="Campeonato Brasileiro Série A" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Campeonato Brasileiro Série A</span></a><a href="https://creativepulse.42web.io/cps/?competition=ELC" class="sidebar-item " data-name="Championship" title="Championship">  <span class="sidebar-flag"><img src="https://crests.football-data.org/ELC.png" alt="Championship" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Championship</span></a><a href="https://creativepulse.42web.io/cps/?competition=CLI" class="sidebar-item " data-name="Copa Libertadores" title="Copa Libertadores">  <span class="sidebar-flag"><img src="https://crests.football-data.org/CLI.svg" alt="Copa Libertadores" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Copa Libertadores</span></a><a href="https://creativepulse.42web.io/cps/?competition=DED" class="sidebar-item " data-name="Eredivisie" title="Eredivisie">  <span class="sidebar-flag"><img src="https://crests.football-data.org/ED.png" alt="Eredivisie" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Eredivisie</span></a><a href="https://creativepulse.42web.io/cps/?competition=EC" class="sidebar-item " data-name="European Championship" title="European Championship">  <span class="sidebar-flag"><img src="https://crests.football-data.org/ec.png" alt="European Championship" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">European Championship</span></a><a href="https://creativepulse.42web.io/cps/?competition=WC" class="sidebar-item " data-name="FIFA World Cup" title="FIFA World Cup">  <span class="sidebar-flag"><img src="https://crests.football-data.org/wm26.png" alt="FIFA World Cup" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">FIFA World Cup</span></a><a href="https://creativepulse.42web.io/cps/?competition=FL1" class="sidebar-item " data-name="Ligue 1" title="Ligue 1">  <span class="sidebar-flag"><img src="https://crests.football-data.org/FL1.png" alt="Ligue 1" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Ligue 1</span></a><a href="https://creativepulse.42web.io/cps/?competition=PL" class="sidebar-item active" data-name="Premier League" title="Premier League">  <span class="sidebar-flag"><img src="https://crests.football-data.org/PL.png" alt="Premier League" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Premier League</span></a><a href="https://creativepulse.42web.io/cps/?competition=PPL" class="sidebar-item " data-name="Primeira Liga" title="Primeira Liga">  <span class="sidebar-flag"><img src="https://crests.football-data.org/PPL.png" alt="Primeira Liga" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Primeira Liga</span></a><a href="https://creativepulse.42web.io/cps/?competition=PD" class="sidebar-item " data-name="Primera Division" title="Primera Division">  <span class="sidebar-flag"><img src="https://crests.football-data.org/laliga.png" alt="Primera Division" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Primera Division</span></a><a href="https://creativepulse.42web.io/cps/?competition=SA" class="sidebar-item " data-name="Serie A" title="Serie A">  <span class="sidebar-flag"><img src="https://crests.football-data.org/c111.png" alt="Serie A" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Serie A</span></a><a href="https://creativepulse.42web.io/cps/?competition=CL" class="sidebar-item " data-name="UEFA Champions League" title="UEFA Champions League">  <span class="sidebar-flag"><img src="https://crests.football-data.org/CL.png" alt="UEFA Champions League" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">UEFA Champions League</span></a></aside><button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Competitions Sidebar"><i class="fas fa-layer-group"></i></button><div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>    <div class="container" style="padding-top: 80px;">
         <div class="header">
             <h1>CPS Football Predictions</h1>
             <div id="last-updated" class="last-updated">Last updated: Checking...</div>
