@@ -775,6 +775,41 @@
         }
         .acca-tab.active, .acca-tab:hover { background: #ffd200; border-color: #ffd200; color: #0d1117; }
         .acca-size-row { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+        .acca-date-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0 12px;
+            flex-wrap: wrap;
+        }
+        .acca-date-filter label {
+            font-size: .7rem;
+            color: #7b8299;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            white-space: nowrap;
+        }
+        .acca-date-filter input[type="date"] {
+            background: #161b27;
+            border: 1px solid #2a3047;
+            border-radius: 6px;
+            color: #e0e6f0;
+            font-size: .75rem;
+            padding: 4px 8px;
+            outline: none;
+            cursor: pointer;
+        }
+        .acca-date-filter input[type="date"]:focus { border-color: #ffd200; }
+        .acca-date-filter .acca-date-clear {
+            background: none;
+            border: 1px solid #2a3047;
+            border-radius: 6px;
+            color: #7b8299;
+            font-size: .7rem;
+            padding: 4px 8px;
+            cursor: pointer;
+        }
+        .acca-date-filter .acca-date-clear:hover { border-color: #ffd200; color: #ffd200; }
         .acca-size-label { font-size: .7rem; color: #7b8299; text-transform: uppercase; letter-spacing: .08em; }
         .acca-size-btn {
             background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
@@ -6147,6 +6182,15 @@ window.addEventListener('DOMContentLoaded', function() {
             <button class="acca-tab" type="button" data-filter="over25">Over 2.5 &gt;55%</button>
         </div>
 
+        <!-- Date filter -->
+        <div class="acca-date-filter">
+            <label>Date:</label>
+            <input type="date" id="acca-date-from" title="From date">
+            <span style="font-size:.7rem;color:#7b8299;">–</span>
+            <input type="date" id="acca-date-to" title="To date">
+            <button class="acca-date-clear" id="acca-date-clear" type="button">Clear</button>
+        </div>
+
         <div class="acca-size-row">
             <span class="acca-size-label">Quick select:</span>
             <button class="acca-size-btn" type="button" data-size="2">2-Fold</button>
@@ -6165,10 +6209,23 @@ window.addEventListener('DOMContentLoaded', function() {
     var allPicks = [];
     var selected = new Set();
     var currentFilter = 'all';
+    var dateFrom = '';
+    var dateTo   = '';
 
     var overlay  = document.getElementById('acca-modal');
     var closeBtn = document.getElementById('acca-modal-close');
     var list     = document.getElementById('acca-picks-list');
+
+    // Date filter
+    var dateFromEl = document.getElementById('acca-date-from');
+    var dateToEl   = document.getElementById('acca-date-to');
+    dateFromEl.addEventListener('change', function() { dateFrom = this.value; render(); });
+    dateToEl.addEventListener('change',   function() { dateTo   = this.value; render(); });
+    document.getElementById('acca-date-clear').addEventListener('click', function() {
+        dateFrom = dateTo = '';
+        dateFromEl.value = dateToEl.value = '';
+        render();
+    });
     var openBtn  = document.getElementById('accaButton');
     if (!overlay || !closeBtn || !list || !openBtn) return;
 
@@ -6211,6 +6268,11 @@ window.addEventListener('DOMContentLoaded', function() {
 
     function getFiltered() {
         return allPicks.map(function(p, i){ p._idx = i; return p; }).filter(function(p) {
+            // Date range filter — date field is "YYYY-MM-DD HH:MM EAT"
+            var d = p.date ? p.date.substring(0, 10) : '';
+            if (dateFrom && d < dateFrom) return false;
+            if (dateTo   && d > dateTo)   return false;
+            // Outcome filter
             if (currentFilter === 'home')   return p.prediction.includes('to Win') && !p.prediction.startsWith(p.awayTla);
             if (currentFilter === 'away')   return p.prediction.includes('to Win') && p.prediction.startsWith(p.awayTla);
             if (currentFilter === 'draw')   return p.prediction === 'Draw';
