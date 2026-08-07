@@ -262,7 +262,7 @@
     <title>CPS Football Predictions</title>
     <link rel="preconnect" href="http://api.football-data.org">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link href="https://creativepulse.42web.io/cps/css/font-awesome.min.css" rel="stylesheet">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
      <!-- Defer heavy libs so they don't block rendering -->
     <script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script defer="" src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -3222,24 +3222,15 @@ function updateAccuracyDisplay() {
 // (see $resultIndicator in predictMatch()), independent of any AJAX call —
 // so this is the reliable source of truth, and it works immediately without
 // waiting on a network round trip or on the match having finished live
-// during this session (the get_finished_matches/session-cache flow below
-// only ever captures the latter, which is why the counter used to sit at
-// "0% (0/0)" even on a page full of visible ticks and crosses).
+// during this session.
+//
+// NOTE: the grid view and table view are rendered by two SEPARATE PHP loops
+// that each independently recompute the prediction/result for every match.
+// They're normally deterministic and should agree, but if they ever drift
+// (stale per-loop cache state, etc.) the two views can show a different
+// ✓/✕ for the same match. The table view is treated as authoritative here;
+// the grid view is only used as a fallback for matches missing from the table.
 function seedAccuracyFromRenderedDOM() {
-    document.querySelectorAll('.match-card[data-status="FINISHED"]').forEach(card => {
-        const index = card.dataset.index;
-        if (index === undefined || countedMatchIndexes.has(index)) return;
-        const indicator = card.querySelector(`#prediction-${index} .result-indicator`);
-        if (!indicator) return; // prediction still loading, or no cached result yet
-        const symbol = indicator.textContent.trim();
-        if (symbol !== '✓\uFE0E' && symbol !== '✕\uFE0E' && symbol !== '✓' && symbol !== '✕') return;
-        countedMatchIndexes.add(index);
-        predictionStats.total++;
-        if (symbol.indexOf('✓') === 0) predictionStats.correct++;
-    });
-
-    // Fallback for matches only present in the table view (e.g. if a grid
-    // card for that index doesn't exist for some reason).
     document.querySelectorAll('.match-table tr[data-status="FINISHED"]').forEach(row => {
         const index = row.dataset.index;
         if (index === undefined || countedMatchIndexes.has(index)) return;
@@ -3252,6 +3243,20 @@ function seedAccuracyFromRenderedDOM() {
         countedMatchIndexes.add(index);
         predictionStats.total++;
         if (hasCheck) predictionStats.correct++;
+    });
+
+    // Fallback for matches only present in the grid view (e.g. if a table
+    // row for that index doesn't exist for some reason).
+    document.querySelectorAll('.match-card[data-status="FINISHED"]').forEach(card => {
+        const index = card.dataset.index;
+        if (index === undefined || countedMatchIndexes.has(index)) return;
+        const indicator = card.querySelector(`#prediction-${index} .result-indicator`);
+        if (!indicator) return; // prediction still loading, or no cached result yet
+        const symbol = indicator.textContent.trim();
+        if (symbol !== '✓\uFE0E' && symbol !== '✕\uFE0E' && symbol !== '✓' && symbol !== '✕') return;
+        countedMatchIndexes.add(index);
+        predictionStats.total++;
+        if (symbol.indexOf('✓') === 0) predictionStats.correct++;
     });
 
     updateAccuracyDisplay();
@@ -3297,20 +3302,19 @@ function runAccuracyMath(index, matchData, element) {
     const awayGoals = parseInt(matchData.awayGoals);
     
     // Get team names (handles cases like "ARS")
-    const homeName = element.querySelector('.home-team p')?.innerText.trim().toLowerCase() || "";
-    const awayName = element.querySelector('.away-team p')?.innerText.trim().toLowerCase() || "";
+    // prediction now uses TLA e.g. "ARS to win" / "CHE to win" / "Draw"
     const predictionText = document.getElementById(`prediction-${index}`)?.innerText.toLowerCase() || "";
+    // TLA stored in data-tla attribute on the <p> tag (innerText is now the full name)
+    const homeTla = (element.querySelector('.home-team p')?.dataset?.tla || element.querySelector('.home-team p')?.innerText || "").trim().toLowerCase();
+    const awayTla = (element.querySelector('.away-team p')?.dataset?.tla || element.querySelector('.away-team p')?.innerText || "").trim().toLowerCase();
 
     let isCorrect = false;
 
     if (homeGoals > awayGoals) {
-        // Home wins: check if prediction has "home" or the specific team name (e.g. "ARS")
-        isCorrect = predictionText.includes("home") || (homeName && predictionText.includes(homeName));
+        isCorrect = homeTla ? predictionText.includes(homeTla) : predictionText.includes("to win") && !predictionText.startsWith(awayTla);
     } else if (awayGoals > homeGoals) {
-        // Away wins
-        isCorrect = predictionText.includes("away") || (awayName && predictionText.includes(awayName));
+        isCorrect = awayTla ? predictionText.includes(awayTla) : predictionText.includes("to win") && !predictionText.startsWith(homeTla);
     } else {
-        // Draw
         isCorrect = predictionText.includes("draw");
     }
 
@@ -4951,7 +4955,10 @@ function fetchPredictionImpl(index, homeId, awayId, attempt, maxAttempts) {
     }
 
     console.log(`Fetching prediction for match ${index} (attempt ${attempt})`);
-    fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=PL&attempt=${attempt}`, {
+    const _card = document.querySelector(`.match-card[data-index="${index}"]`);
+    const _homeTla = encodeURIComponent(_card?.querySelector('.home-team p')?.dataset?.tla || _card?.querySelector('.home-team p')?.textContent?.trim() || '');
+    const _awayTla = encodeURIComponent(_card?.querySelector('.away-team p')?.dataset?.tla || _card?.querySelector('.away-team p')?.textContent?.trim() || '');
+    fetch(`?action=predict_match&homeId=${homeId}&awayId=${awayId}&competition=PL&attempt=${attempt}&homeTla=${_homeTla}&awayTla=${_awayTla}`, {
         headers: { 'X-Auth-Token': '15fd0c1bff2041b2b21f76bcc909dbf9' }
     })
     .then(response => response.json())
@@ -4979,11 +4986,33 @@ function fetchPredictionImpl(index, homeId, awayId, attempt, maxAttempts) {
             // at the exact moment of this particular fetch.
             const existingIndicator = predictionElement.querySelector('.result-indicator')?.textContent?.trim();
             const resultIndicatorToUse = data.resultIndicator || existingIndicator || '';
+
+            // Preserve/rebuild the xG button. This rebuild used to always drop
+            // it (and the Score line) entirely, which is why the button could
+            // silently vanish — or never appear at all for matches whose team
+            // data only finished loading after the initial page render — every
+            // time a prediction refresh ran. predict_match now returns xg data
+            // once both teams have loaded, so build/refresh the button from it;
+            // fall back to whatever button already exists if this particular
+            // response didn't carry xg data (e.g. still loading one side).
+            let xgBtnHtml = predictionElement.querySelector('.xg-open-btn')?.outerHTML || '';
+            if (data.xg) {
+                const homeTeamName = document.querySelector(`.match-card[data-index="${index}"] .home-team p`)?.textContent.trim() || '';
+                const awayTeamName = document.querySelector(`.match-card[data-index="${index}"] .away-team p`)?.textContent.trim() || '';
+                const xgPayload = JSON.stringify({ homeTeam: homeTeamName, awayTeam: awayTeamName, xg: data.xg })
+                    .replace(/"/g, '&quot;');
+                xgBtnHtml = `<button class="xg-open-btn" type="button" data-xg="${xgPayload}" title="View xG Analysis"><i class="fas fa-bolt"></i> xG</button>`;
+            }
+
+            const scoreText = data.score || predictionElement.querySelector('p.fw-bold')?.textContent?.replace(/^Score:\s*/, '') || 'N/A';
+
             predictionElement.innerHTML = `
                 <p>Prediction: ${data.prediction} <span class="result-indicator">${resultIndicatorToUse}</span></p>
                 <p class="predicted-score">Predicted Score: ${data.predictedScore}</p>
                 <p class="confidence">Confidence: ${data.confidence}</p>
                 <p class="advantage advantage-${data.advantage.toLowerCase().replace(' ', '-')}">${data.advantage}</p>
+                <p class="fw-bold"><strong>Score: ${scoreText}</strong></p>
+                ${xgBtnHtml}
             `;
             tablePrediction.innerHTML = `${data.prediction} ${resultIndicatorToUse}`;
             tableConfidence.innerHTML = data.confidence;
@@ -5337,6 +5366,12 @@ function updateTeamUI(data, index, isHome, formElement, tableFormElement, histor
 // const reversedForm = form.split('').reverse().join('');
 const displayForm = form; // Using the original sliced string
 
+// Tooltip text per letter, aligned to displayForm using the same left-pad
+// approach as the form string itself (data.formDetails is most-recent-first,
+// same order the server builds it in).
+const formDetailsSrc = data.formDetails || [];
+const displayFormDetails = Array(Math.max(0, 6 - formDetailsSrc.length)).fill('').concat(formDetailsSrc.slice(-6));
+
 for (let i = 0; i < 6; i++) {
     // We now check displayForm[i] instead of reversedForm[i]
     let className = displayForm[i] === 'W' ? 'win' : (displayForm[i] === 'D' ? 'draw' : (displayForm[i] === 'L' ? 'loss' : 'empty'));
@@ -5346,7 +5381,9 @@ for (let i = 0; i < 6; i++) {
         className += ' latest';
     }
     
-    formHtml += `<span class="${className}">${displayForm[i]}</span>`;
+    const tip = displayFormDetails[i] || '';
+    const titleAttr = tip ? ` title="${tip.replace(/"/g, '&quot;')}"` : '';
+    formHtml += `<span class="${className}"${titleAttr}>${displayForm[i]}</span>`;
 }
 
 if (formElement) formElement.innerHTML = formHtml;
@@ -6174,8 +6211,8 @@ window.addEventListener('DOMContentLoaded', function() {
 
     function getFiltered() {
         return allPicks.map(function(p, i){ p._idx = i; return p; }).filter(function(p) {
-            if (currentFilter === 'home')   return p.prediction === 'Win for Home';
-            if (currentFilter === 'away')   return p.prediction === 'Win for Away';
+            if (currentFilter === 'home')   return p.prediction.includes('to Win') && !p.prediction.startsWith(p.awayTla);
+            if (currentFilter === 'away')   return p.prediction.includes('to Win') && p.prediction.startsWith(p.awayTla);
             if (currentFilter === 'draw')   return p.prediction === 'Draw';
             if (currentFilter === 'btts')   return p.btts >= 60;
             if (currentFilter === 'over25') return p.over25 >= 55;
@@ -6195,8 +6232,10 @@ window.addEventListener('DOMContentLoaded', function() {
         var html = '';
         picks.forEach(function(p) {
             var isSel  = selected.has(p._idx);
-            var tipClass = p.prediction === 'Win for Home' ? 'home' : (p.prediction === 'Draw' ? 'draw' : 'away');
-            var tipLabel = p.prediction === 'Win for Home' ? '🏠 Home Win' : (p.prediction === 'Draw' ? '🤝 Draw' : '✈️ Away Win');
+            var isDraw   = p.prediction === 'Draw';
+            var isHome   = !isDraw && p.prediction.startsWith(p.homeTla);
+            var tipClass = isDraw ? 'draw' : (isHome ? 'home' : 'away');
+            var tipLabel = isDraw ? '🤝 Draw' : p.prediction;
             var bttsHtml = p.btts >= 55 ? "<span class='acca-tip-badge btts'>BTTS " + p.btts + "%</span>" : '';
             var overHtml = p.over25 >= 50 ? "<span class='acca-tip-badge over'>O2.5 " + p.over25 + "%</span>" : '';
 
@@ -6255,6 +6294,116 @@ window.addEventListener('DOMContentLoaded', function() {
         return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 })();
+</script>
+
+<!-- ── TOUCH TOOLTIP (tap-to-show for mobile) ──────────────────────────────
+     Dismisses ONLY when the user taps outside the tooltip or on a different
+     tooltip target. No auto-timer. No touchend hiding. Scroll keeps it up.
+     Desktop hover title= behaviour is untouched.
+     ─────────────────────────────────────────────────────────────────────── -->
+<style>
+  #cps-touch-tooltip {
+    position: fixed;
+    z-index: 2147483647;
+    max-width: min(300px, 88vw);
+    padding: 8px 13px;
+    background: rgba(20,20,20,0.95);
+    color: #fff;
+    font-size: 12.5px;
+    line-height: 1.5;
+    border-radius: 7px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    pointer-events: none;   /* never block taps beneath it */
+    white-space: normal;
+    word-break: break-word;
+    opacity: 0;
+    transition: opacity .18s ease;
+    will-change: opacity;
+  }
+  #cps-touch-tooltip.cps-tt-visible {
+    opacity: 1;
+  }
+</style>
+<script>
+(function () {
+  'use strict';
+
+  /* Only activate on touch-capable devices */
+  if (!('ontouchstart' in window) && !navigator.maxTouchPoints) return;
+
+  /* ── Singleton tooltip element ── */
+  const tt = document.createElement('div');
+  tt.id = 'cps-touch-tooltip';
+  document.body.appendChild(tt);
+
+  /* The element whose tip is currently shown (null when hidden) */
+  let activeSrc = null;
+
+  /* ── Walk up DOM to find nearest tooltip text ── */
+  function getTipText(el) {
+    while (el && el !== document.body) {
+      const t = el.getAttribute('title');
+      if (t && t.trim()) return { text: t.trim(), src: el };
+      const d = el.getAttribute('data-tip');
+      if (d && d.trim()) return { text: d.trim(), src: el };
+      el = el.parentElement;
+    }
+    return null;
+  }
+
+  function showTip(text, touchX, touchY, srcEl) {
+    tt.textContent = text;
+    activeSrc = srcEl;
+
+    const MARGIN = 8;
+    const TIP_W  = Math.min(300, window.innerWidth * 0.88);
+    let left = touchX - TIP_W / 2;
+    let top  = touchY - 50;   /* try above finger */
+
+    left = Math.max(MARGIN, Math.min(left, window.innerWidth - TIP_W - MARGIN));
+    if (top < MARGIN) top = touchY + 26;  /* flip below if off-screen */
+
+    tt.style.left  = left + 'px';
+    tt.style.top   = top  + 'px';
+    tt.style.width = TIP_W + 'px';
+
+    /* Trigger CSS fade-in */
+    tt.classList.remove('cps-tt-visible');
+    tt.getBoundingClientRect();           /* force reflow */
+    tt.classList.add('cps-tt-visible');
+  }
+
+  function hideTip() {
+    tt.classList.remove('cps-tt-visible');
+    activeSrc = null;
+  }
+
+  /* ── Main touch handler ── */
+  document.addEventListener('touchstart', function (e) {
+    const found = getTipText(e.target);
+
+    if (!found) {
+      /* Tapped somewhere with no tooltip — dismiss if one is showing */
+      if (activeSrc) hideTip();
+      return;
+    }
+
+    /* Tapped the same element that's already shown — dismiss (toggle off) */
+    if (activeSrc === found.src) {
+      hideTip();
+      return;
+    }
+
+    /* New tooltip target — show it */
+    const touch = e.touches[0];
+    showTip(found.text, touch.clientX, touch.clientY, found.src);
+
+  }, { passive: true });
+
+  /* touchcancel (e.g. incoming call) — clean up */
+  document.addEventListener('touchcancel', hideTip, { passive: true });
+
+}());
 </script>
 
 
