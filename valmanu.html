@@ -694,13 +694,13 @@
         .acca-size-btn.active { background: #ffd200; border-color: #ffd200; color: #0d1117; }
         .acca-pick {
             background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+            border-radius: 12px; padding: 12px 38px 12px 14px; margin-bottom: 10px;
             display: flex; flex-direction: column; gap: 6px;
             position: relative; overflow: hidden;
             transition: border-color .2s; cursor: pointer;
         }
         .acca-pick.selected { border-color: #ffd200; background: rgba(255,210,0,0.06); }
-        .acca-pick-header { display: flex; align-items: center; gap: 8px; justify-content: space-between; flex-wrap: wrap; }
+        .acca-pick-header { display: flex; align-items: flex-start; flex-direction: column; gap: 4px; }
         .acca-comp-badge {
             font-size: .6rem; text-transform: uppercase; letter-spacing: .1em;
             color: #7b8299; background: rgba(255,255,255,0.07);
@@ -1250,6 +1250,20 @@
             align-items: center;
             gap: 0.625rem;
         }
+
+        .cps-spinner {
+            display: inline-block;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2.5px solid rgba(220, 53, 69, 0.25);
+            border-top-color: #dc3545;
+            border-radius: 50%;
+            animation: cps-spin .75s linear infinite;
+            flex-shrink: 0;
+        }
+        .cps-spinner--sm { width: 0.8rem; height: 0.8rem; border-width: 2px; vertical-align: middle; }
+        @keyframes cps-spin { to { transform: rotate(360deg); } }
+        [data-theme="dark"] .cps-spinner { border-color: rgba(231,76,60,0.25); border-top-color: #e74c3c; }
          
         .message {
     margin-top: 15px;
@@ -1342,6 +1356,31 @@
     color: var(--text-color);
     margin-bottom: 10px;
 }
+.lu-ttl { font-size: 0.85em; opacity: 0.8; }
+.lu-ttl-val {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #28a745;
+    transition: color .4s;
+}
+.lu-ttl-val.lu-warn  { color: #fd7e14; }
+.lu-ttl-val.lu-crit  { color: #dc3545; }
+.lu-bar-wrap {
+    height: 4px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 6px auto 0;
+    max-width: 320px;
+}
+.lu-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: #28a745;
+    transition: width 1s linear, background-color .4s;
+    width: 100%;
+}
+[data-theme="dark"] .lu-bar-wrap { background: rgba(255,255,255,0.1); }
 
     
         /* Ensure progress bar styles are present */
@@ -2930,7 +2969,15 @@
 <aside id="appSidebar" class="sidebar">  <div class="sidebar-header"><i class="fas fa-trophy"></i>&nbsp;Competitions</div>  <input class="sidebar-search" type="text" placeholder="Search competitions…" oninput="filterSidebarCompetitions(this.value)"><a href="https://creativepulse.42web.io/cps/?competition=BL1" class="sidebar-item " data-name="Bundesliga" title="Bundesliga">  <span class="sidebar-flag"><img src="https://crests.football-data.org/BL1.png" alt="Bundesliga" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Bundesliga</span></a><a href="https://creativepulse.42web.io/cps/?competition=BSA" class="sidebar-item " data-name="Campeonato Brasileiro Série A" title="Campeonato Brasileiro Série A">  <span class="sidebar-flag"><img src="https://crests.football-data.org/bsa.png" alt="Campeonato Brasileiro Série A" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Campeonato Brasileiro Série A</span></a><a href="https://creativepulse.42web.io/cps/?competition=ELC" class="sidebar-item " data-name="Championship" title="Championship">  <span class="sidebar-flag"><img src="https://crests.football-data.org/ELC.png" alt="Championship" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Championship</span></a><a href="https://creativepulse.42web.io/cps/?competition=CLI" class="sidebar-item " data-name="Copa Libertadores" title="Copa Libertadores">  <span class="sidebar-flag"><img src="https://crests.football-data.org/CLI.svg" alt="Copa Libertadores" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Copa Libertadores</span></a><a href="https://creativepulse.42web.io/cps/?competition=DED" class="sidebar-item " data-name="Eredivisie" title="Eredivisie">  <span class="sidebar-flag"><img src="https://crests.football-data.org/ED.png" alt="Eredivisie" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Eredivisie</span></a><a href="https://creativepulse.42web.io/cps/?competition=EC" class="sidebar-item " data-name="European Championship" title="European Championship">  <span class="sidebar-flag"><img src="https://crests.football-data.org/ec.png" alt="European Championship" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">European Championship</span></a><a href="https://creativepulse.42web.io/cps/?competition=WC" class="sidebar-item " data-name="FIFA World Cup" title="FIFA World Cup">  <span class="sidebar-flag"><img src="https://crests.football-data.org/wm26.png" alt="FIFA World Cup" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">FIFA World Cup</span></a><a href="https://creativepulse.42web.io/cps/?competition=FL1" class="sidebar-item " data-name="Ligue 1" title="Ligue 1">  <span class="sidebar-flag"><img src="https://crests.football-data.org/FL1.png" alt="Ligue 1" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Ligue 1</span></a><a href="https://creativepulse.42web.io/cps/?competition=PL" class="sidebar-item active" data-name="Premier League" title="Premier League">  <span class="sidebar-flag"><img src="https://crests.football-data.org/PL.png" alt="Premier League" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Premier League</span></a><a href="https://creativepulse.42web.io/cps/?competition=PPL" class="sidebar-item " data-name="Primeira Liga" title="Primeira Liga">  <span class="sidebar-flag"><img src="https://crests.football-data.org/PPL.png" alt="Primeira Liga" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Primeira Liga</span></a><a href="https://creativepulse.42web.io/cps/?competition=PD" class="sidebar-item " data-name="Primera Division" title="Primera Division">  <span class="sidebar-flag"><img src="https://crests.football-data.org/laliga.png" alt="Primera Division" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Primera Division</span></a><a href="https://creativepulse.42web.io/cps/?competition=SA" class="sidebar-item " data-name="Serie A" title="Serie A">  <span class="sidebar-flag"><img src="https://crests.football-data.org/c111.png" alt="Serie A" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">Serie A</span></a><a href="https://creativepulse.42web.io/cps/?competition=CL" class="sidebar-item " data-name="UEFA Champions League" title="UEFA Champions League">  <span class="sidebar-flag"><img src="https://crests.football-data.org/CL.png" alt="UEFA Champions League" class="sidebar-crest" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><i class="fas fa-trophy" style="display:none;font-size:1rem;color:var(--accent-color);"></i></span>  <span class="sidebar-competition-name">UEFA Champions League</span></a></aside><button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Competitions Sidebar"><i class="fas fa-layer-group"></i></button><div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>    <div class="container" style="padding-top: 80px;">
         <div class="header">
             <h1>CPS Football Predictions</h1>
-            <div id="last-updated" class="last-updated">Last updated: Checking...</div>
+            <div id="last-updated" class="last-updated">
+                <span id="lu-text">Last updated: Checking...</span>
+                <span id="lu-ttl" class="lu-ttl" style="display:none;">
+                    — Cache expires in <span id="lu-ttl-val" class="lu-ttl-val">--:--</span>
+                </span>
+                <div id="lu-bar-wrap" class="lu-bar-wrap" style="display:none;">
+                    <div id="lu-bar" class="lu-bar"></div>
+                </div>
+            </div>
             <p>Select Competition, Date Range (EAT), or Search Teams</p>
         </div>
 
@@ -2948,8 +2995,8 @@
         <div class="filter-option" data-filter="custom">Custom Range</div>
     </div>
      <div class="custom-date-range">
-        <input type="date" name="start" value="2026-09-04">
-        <input type="date" name="end" value="2026-09-04">
+        <input type="date" name="start" value="2026-09-13">
+        <input type="date" name="end" value="2026-09-13">
         <button onclick="updateUrl('PL', 'custom')">Apply</button>
     </div>
    
@@ -3040,35 +3087,33 @@
         <div class="match-container">
             <div class="match-grid" id="match-grid" style="display: grid;">
                 
-                            <div class="match-card" data-home-id="349" data-away-id="64" data-index="0" data-advantage="Away Advantage" data-status="TIMED">
+                            <div class="match-card" data-home-id="1076" data-away-id="397" data-index="0" data-advantage="Away Advantage" data-status="IN_PLAY">
                                 <div class="teams">
-                                    <div class="team home-team" style="padding-right: 1.125em;">
-                                        <img src="https://crests.football-data.org/349.png" alt="Ipswich Town FC">
-                                        <p data-tla="IPS">Ipswich Town FC</p>
-                                        <div class="form-display" id="form-home-0" data-form="WDDWDL"><span class="loss" title="14 Apr 2026 vs Portsmouth FC (A): 0-2">L</span><span class="draw" title="19 Apr 2026 vs Middlesbrough FC (H): 2-2">D</span><span class="win" title="22 Apr 2026 vs Charlton Athletic FC (A): 2-1">W</span><span class="draw" title="25 Apr 2026 vs West Bromwich Albion FC (A): 0-0">D</span><span class="draw" title="28 Apr 2026 vs Southampton FC (A): 2-2">D</span><span class="win latest" title="02 May 2026 vs Queens Park Rangers FC (H): 3-0">W</span></div>
+                                    <div class="team home-team" style="padding-right: 0.90625em;">
+                                        <img src="https://crests.football-data.org/1076.png" alt="Coventry City FC">
+                                        <p data-tla="COV">Coventry City FC</p>
+                                        <div class="form-display" id="form-home-0" data-form="LLLWWW"><span class="win" title="21 Apr 2026 vs Portsmouth FC (H): 5-1">W</span><span class="win" title="26 Apr 2026 vs Wrexham AFC (H): 3-1">W</span><span class="win" title="02 May 2026 vs Watford FC (A): 4-0">W</span><span class="loss" title="21 Aug 2026 vs Arsenal FC (A): 0-3">L</span><span class="loss" title="29 Aug 2026 vs Hull City AFC (H): 0-1">L</span><span class="loss latest" title="05 Sep 2026 vs Manchester City FC (A): 0-1">L</span></div>
                                     </div>
-                                    <span class="vs" style="padding: 0px 22.8px;">VS</span>
-                                    <div class="team away-team away-advantage" style="padding-left: 1.125em;">
-                                        <img src="https://crests.football-data.org/64.png" alt="Liverpool FC">
-                                        <p data-tla="LIV">Liverpool FC</p>
-                                        <div class="form-display" id="form-away-0" data-form="DDLDLW"><span class="win" title="25 Apr 2026 vs Crystal Palace FC (H): 3-1">W</span><span class="loss" title="03 May 2026 vs Manchester United FC (A): 2-3">L</span><span class="draw" title="09 May 2026 vs Chelsea FC (H): 1-1">D</span><span class="loss" title="15 May 2026 vs Aston Villa FC (A): 2-4">L</span><span class="draw" title="24 May 2026 vs Brentford FC (H): 1-1">D</span><span class="draw latest" title="23 Aug 2026 vs Newcastle United FC (A): 2-2">D</span></div>
+                                    <span class="vs" style="padding: 0px 11.1px;">VS</span>
+                                    <div class="team away-team away-advantage" style="padding-left: 0.90625em;">
+                                        <img src="https://crests.football-data.org/397.png" alt="Brighton &amp; Hove Albion FC">
+                                        <p data-tla="BHA">Brighton &amp; Hove Albion FC</p>
+                                        <div class="form-display" id="form-away-0" data-form="DLWLLW"><span class="win" title="09 May 2026 vs Wolverhampton Wanderers FC (H): 3-0">W</span><span class="loss" title="17 May 2026 vs Leeds United FC (A): 0-1">L</span><span class="loss" title="24 May 2026 vs Manchester United FC (H): 0-3">L</span><span class="win" title="23 Aug 2026 vs Aston Villa FC (H): 4-0">W</span><span class="loss" title="30 Aug 2026 vs Chelsea FC (A): 3-4">L</span><span class="draw latest" title="05 Sep 2026 vs Leeds United FC (H): 1-1">D</span></div>
                                     </div>
                                 </div>
                                 <div class="match-info dark">
-                                   <p>2026-09-04 22:00:00 (TIMED)</p>
+                                   <p>2026-09-13 16:00:00 (IN_PLAY) - 0 : 3</p>
                                 </div>
-                                <div class="prediction" id="prediction-0">
-                <p>Prediction: LIV to win <span class="result-indicator"></span></p>
-                <p class="predicted-score">Predicted Score: 0-3</p>
-                <p class="confidence">Confidence: 63.6%</p>
-                <p class="advantage advantage-away-advantage">Away Advantage</p>
-                <p class="fw-bold"><strong>Score: N/A</strong></p>
-                <button class="xg-open-btn" type="button" data-xg="{&quot;homeTeam&quot;:&quot;Ipswich Town FC&quot;,&quot;awayTeam&quot;:&quot;Liverpool FC&quot;,&quot;xg&quot;:{&quot;homeXG&quot;:1.98,&quot;awayXG&quot;:1.35,&quot;totalXG&quot;:3.33,&quot;homeWin&quot;:52.1,&quot;draw&quot;:21.8,&quot;awayWin&quot;:26.1,&quot;over25&quot;:64.7,&quot;under25&quot;:35.3,&quot;btts_yes&quot;:63.8,&quot;btts_no&quot;:36.2,&quot;topScores&quot;:{&quot;1-1&quot;:9.57,&quot;2-1&quot;:9.47,&quot;1-0&quot;:7.09,&quot;2-0&quot;:7.02,&quot;1-2&quot;:6.46},&quot;homeScores&quot;:[&quot;0-2&quot;,&quot;2-2&quot;,&quot;2-1&quot;,&quot;0-0&quot;,&quot;2-2&quot;,&quot;3-0&quot;],&quot;awayScores&quot;:[&quot;3-1&quot;,&quot;2-3&quot;,&quot;1-1&quot;,&quot;2-4&quot;,&quot;1-1&quot;,&quot;2-2&quot;],&quot;confidence&quot;:&quot;High&quot;,&quot;nHome&quot;:4,&quot;nAway&quot;:5}}" title="View xG Analysis"><i class="fas fa-bolt"></i> xG</button>
-            </div>
+                                <div class="prediction" id="prediction-0"><p>Prediction: BHA to win <span class="result-indicator"></span></p>
+                                      <p class="predicted-score">Predicted Score: 0-3</p>
+                                      <p class="confidence">Confidence: 68.0%</p>
+                                      <p class="advantage advantage-away-advantage">Away Advantage</p>
+                                      <p class="fw-bold"><span class="live-score-dot"></span> <strong>Live: 0 -:- 3</strong></p>
+                                      <button class="xg-open-btn" type="button" data-xg="{&quot;homeTeam&quot;:&quot;Coventry City FC&quot;,&quot;awayTeam&quot;:&quot;Brighton &amp; Hove Albion FC&quot;,&quot;xg&quot;:{&quot;homeXG&quot;:1.8300000000000000710542735760100185871124267578125,&quot;awayXG&quot;:1.3400000000000000799360577730112709105014801025390625,&quot;totalXG&quot;:3.1699999999999999289457264239899814128875732421875,&quot;homeWin&quot;:49,&quot;draw&quot;:22.800000000000000710542735760100185871124267578125,&quot;awayWin&quot;:28.199999999999999289457264239899814128875732421875,&quot;over25&quot;:61.39999999999999857891452847979962825775146484375,&quot;under25&quot;:38.60000000000000142108547152020037174224853515625,&quot;btts_yes&quot;:62,&quot;btts_no&quot;:38,&quot;topScores&quot;:{&quot;1-1&quot;:10.300000000000000710542735760100185871124267578125,&quot;2-1&quot;:9.4199999999999999289457264239899814128875732421875,&quot;1-0&quot;:7.69000000000000039079850466805510222911834716796875,&quot;2-0&quot;:7.03000000000000024868995751603506505489349365234375,&quot;1-2&quot;:6.9000000000000003552713678800500929355621337890625},&quot;homeScores&quot;:[&quot;5-1&quot;,&quot;3-1&quot;,&quot;4-0&quot;,&quot;0-3&quot;,&quot;0-1&quot;,&quot;0-1&quot;],&quot;awayScores&quot;:[&quot;3-0&quot;,&quot;0-1&quot;,&quot;0-3&quot;,&quot;4-0&quot;,&quot;3-4&quot;,&quot;1-1&quot;],&quot;confidence&quot;:&quot;High&quot;,&quot;nHome&quot;:5,&quot;nAway&quot;:5}}" title="View xG Analysis"><i class="fas fa-bolt"></i> xG</button></div>
                                 <button class="view-history-btn" onclick="toggleHistory(this)">👁️ View History</button>
                                 <div class="past-results" id="history-0" style="display: none;">
-                                    <p><strong>Ipswich Town FC Recent Results:</strong></p>
-                                    <ul><li>2026-05-02: Ipswich Town FC 3 - 0 Queens Park Rangers FC</li><li>2026-04-28: Southampton FC 2 - 2 Ipswich Town FC</li><li>2026-04-25: West Bromwich Albion FC 0 - 0 Ipswich Town FC</li><li>2026-04-22: Charlton Athletic FC 1 - 2 Ipswich Town FC</li><li>2026-04-19: Ipswich Town FC 2 - 2 Middlesbrough FC</li><li>2026-04-14: Portsmouth FC 2 - 0 Ipswich Town FC</li><li>2026-04-11: Norwich City FC 0 - 2 Ipswich Town FC</li><li>2026-04-06: Ipswich Town FC 2 - 1 Birmingham City FC</li><li>2026-03-21: Ipswich Town FC 1 - 1 Millwall FC</li><li>2026-03-14: Sheffield Wednesday FC 0 - 2 Ipswich Town FC</li></ul>
+                                    <p><strong>Coventry City FC Recent Results:</strong></p>
+                                    <ul><li>2026-09-05: Manchester City FC 1 - 0 Coventry City FC</li><li>2026-08-29: Coventry City FC 0 - 1 Hull City AFC</li><li>2026-08-21: Arsenal FC 3 - 0 Coventry City FC</li><li>2026-05-02: Watford FC 0 - 4 Coventry City FC</li><li>2026-04-26: Coventry City FC 3 - 1 Wrexham AFC</li><li>2026-04-21: Coventry City FC 5 - 1 Portsmouth FC</li><li>2026-04-17: Blackburn Rovers FC 1 - 1 Coventry City FC</li><li>2026-04-11: Coventry City FC 0 - 0 Sheffield Wednesday FC</li><li>2026-04-06: Hull City AFC 0 - 0 Coventry City FC</li><li>2026-04-03: Coventry City FC 3 - 2 Derby County FC</li></ul>
                                     <div class="standings">
                                         <span>POS: N/A</span>
                                        <span>GS: N/A</span>
@@ -3076,15 +3121,60 @@
                                         <span>GD: N/A</span>
                                         <span>PTS: N/A</span>
                                     </div>
-                                    <p><strong>Liverpool FC Recent Results:</strong></p>
-                                    <ul><li>2026-08-23: Newcastle United FC 2 - 2 Liverpool FC</li><li>2026-05-24: Liverpool FC 1 - 1 Brentford FC</li><li>2026-05-15: Aston Villa FC 4 - 2 Liverpool FC</li><li>2026-05-09: Liverpool FC 1 - 1 Chelsea FC</li><li>2026-05-03: Manchester United FC 3 - 2 Liverpool FC</li><li>2026-04-25: Liverpool FC 3 - 1 Crystal Palace FC</li><li>2026-04-19: Everton FC 1 - 2 Liverpool FC</li><li>2026-04-14: Liverpool FC 0 - 2 Paris Saint-Germain FC</li><li>2026-04-11: Liverpool FC 2 - 0 Fulham FC</li><li>2026-04-08: Paris Saint-Germain FC 2 - 0 Liverpool FC</li></ul>
+                                    <p><strong>Brighton &amp; Hove Albion FC Recent Results:</strong></p>
+                                    <ul><li>2026-09-05: Brighton &amp; Hove Albion FC 1 - 1 Leeds United FC</li><li>2026-08-30: Chelsea FC 4 - 3 Brighton &amp; Hove Albion FC</li><li>2026-08-23: Brighton &amp; Hove Albion FC 4 - 0 Aston Villa FC</li><li>2026-05-24: Brighton &amp; Hove Albion FC 0 - 3 Manchester United FC</li><li>2026-05-17: Leeds United FC 1 - 0 Brighton &amp; Hove Albion FC</li><li>2026-05-09: Brighton &amp; Hove Albion FC 3 - 0 Wolverhampton Wanderers FC</li><li>2026-05-02: Newcastle United FC 3 - 1 Brighton &amp; Hove Albion FC</li><li>2026-04-21: Brighton &amp; Hove Albion FC 3 - 0 Chelsea FC</li><li>2026-04-18: Tottenham Hotspur FC 2 - 2 Brighton &amp; Hove Albion FC</li><li>2026-04-11: Burnley FC 0 - 2 Brighton &amp; Hove Albion FC</li></ul>
                                     <div class="standings">
-                                        <span>POS: 5</span>
-                                        <span>GS: 63</span>
-                                        <span>GC: 53</span>
-                                        <span>GD: 10</span>
-                                        <span>PTS: 60</span>
-                                    </div><p><strong>Match Day:3</strong></p><span style="font-style: italic; font-size: 0.85em;">Prediction: Away Team to win - Reason: Away team has a stronger performance based on recent form, goals scored, and standings.</span></div></div>            </div>
+                                        <span>POS: 8</span>
+                                        <span>GS: 52</span>
+                                        <span>GC: 46</span>
+                                        <span>GD: 6</span>
+                                        <span>PTS: 53</span>
+                                    </div><p><strong>Match Day:4</strong></p><span style="font-style: italic; font-size: 0.85em;">Prediction: Away Team to win - Reason: Away team has a stronger performance based on recent form, goals scored, and standings.</span></div></div>
+                            <div class="match-card" data-home-id="66" data-away-id="65" data-index="1" data-advantage="Away Advantage" data-status="TIMED">
+                                <div class="teams">
+                                    <div class="team home-team" style="padding-right: 0.90625em;">
+                                        <img src="https://crests.football-data.org/66.png" alt="Manchester United FC">
+                                        <p data-tla="MUN">Manchester United FC</p>
+                                        <div class="form-display" id="form-home-1" data-form="DWLWWD"><span class="draw" title="09 May 2026 vs Sunderland AFC (A): 0-0">D</span><span class="win" title="17 May 2026 vs Nottingham Forest FC (H): 3-2">W</span><span class="win" title="24 May 2026 vs Brighton &amp; Hove Albion FC (A): 3-0">W</span><span class="loss" title="22 Aug 2026 vs Hull City AFC (A): 0-2">L</span><span class="win" title="30 Aug 2026 vs Ipswich Town FC (H): 5-2">W</span><span class="draw latest" title="06 Sep 2026 vs Everton FC (A): 2-2">D</span></div>
+                                    </div>
+                                    <span class="vs" style="padding: 0px 11.1px;">VS</span>
+                                    <div class="team away-team away-advantage" style="padding-left: 0.90625em;">
+                                        <img src="https://crests.football-data.org/65.png" alt="Manchester City FC">
+                                        <p data-tla="MCI">Manchester City FC</p>
+                                        <div class="form-display" id="form-away-1" data-form="WWWWLD"><span class="draw" title="19 May 2026 vs AFC Bournemouth (A): 1-1">D</span><span class="loss" title="24 May 2026 vs Aston Villa FC (H): 1-2">L</span><span class="win" title="23 Aug 2026 vs AFC Bournemouth (H): 2-1">W</span><span class="win" title="28 Aug 2026 vs Crystal Palace FC (A): 4-1">W</span><span class="win" title="05 Sep 2026 vs Coventry City FC (H): 1-0">W</span><span class="win latest" title="08 Sep 2026 vs FC Porto (A): 2-0">W</span></div>
+                                    </div>
+                                </div>
+                                <div class="match-info dark">
+                                   <p>2026-09-13 18:30:00 (TIMED)</p>
+                                </div>
+                                <div class="prediction" id="prediction-1">
+                <p>Prediction: MCI to win <span class="result-indicator"></span></p>
+                <p class="predicted-score">Predicted Score: 0-2</p>
+                <p class="confidence">Confidence: 45.3%</p>
+                <p class="advantage advantage-away-advantage">Away Advantage</p>
+                <p class="fw-bold"><strong>Score: N/A</strong></p>
+                <button class="xg-open-btn" type="button" data-xg="{&quot;homeTeam&quot;:&quot;Manchester United FC&quot;,&quot;awayTeam&quot;:&quot;Manchester City FC&quot;,&quot;xg&quot;:{&quot;homeXG&quot;:1.89,&quot;awayXG&quot;:1.81,&quot;totalXG&quot;:3.7,&quot;homeWin&quot;:40.8,&quot;draw&quot;:21.6,&quot;awayWin&quot;:37.6,&quot;over25&quot;:71.5,&quot;under25&quot;:28.5,&quot;btts_yes&quot;:71,&quot;btts_no&quot;:29,&quot;topScores&quot;:{&quot;1-1&quot;:8.46,&quot;2-1&quot;:7.99,&quot;1-2&quot;:7.65,&quot;2-2&quot;:7.23,&quot;3-1&quot;:5.04},&quot;homeScores&quot;:[&quot;0-0&quot;,&quot;3-2&quot;,&quot;3-0&quot;,&quot;0-2&quot;,&quot;5-2&quot;,&quot;2-2&quot;],&quot;awayScores&quot;:[&quot;1-1&quot;,&quot;1-2&quot;,&quot;2-1&quot;,&quot;4-1&quot;,&quot;1-0&quot;,&quot;2-0&quot;],&quot;confidence&quot;:&quot;High&quot;,&quot;nHome&quot;:5,&quot;nAway&quot;:5}}" title="View xG Analysis"><i class="fas fa-bolt"></i> xG</button>
+            </div>
+                                <button class="view-history-btn" onclick="toggleHistory(this)">👁️ View History</button>
+                                <div class="past-results" id="history-1" style="display: none;">
+                                    <p><strong>Manchester United FC Recent Results:</strong></p>
+                                    <ul><li>2026-09-06: Everton FC 2 - 2 Manchester United FC</li><li>2026-08-30: Manchester United FC 5 - 2 Ipswich Town FC</li><li>2026-08-22: Hull City AFC 2 - 0 Manchester United FC</li><li>2026-05-24: Brighton &amp; Hove Albion FC 0 - 3 Manchester United FC</li><li>2026-05-17: Manchester United FC 3 - 2 Nottingham Forest FC</li><li>2026-05-09: Sunderland AFC 0 - 0 Manchester United FC</li><li>2026-05-03: Manchester United FC 3 - 2 Liverpool FC</li><li>2026-04-27: Manchester United FC 2 - 1 Brentford FC</li><li>2026-04-18: Chelsea FC 0 - 1 Manchester United FC</li><li>2026-04-13: Manchester United FC 1 - 2 Leeds United FC</li></ul>
+                                    <div class="standings">
+                                        <span>POS: 3</span>
+                                       <span>GS: 69</span>
+                                       <span>GC: 50</span>
+                                        <span>GD: 19</span>
+                                        <span>PTS: 71</span>
+                                    </div>
+                                    <p><strong>Manchester City FC Recent Results:</strong></p>
+                                    <ul><li>2026-09-08: FC Porto 0 - 2 Manchester City FC</li><li>2026-09-05: Manchester City FC 1 - 0 Coventry City FC</li><li>2026-08-28: Crystal Palace FC 1 - 4 Manchester City FC</li><li>2026-08-23: Manchester City FC 2 - 1 AFC Bournemouth</li><li>2026-05-24: Manchester City FC 1 - 2 Aston Villa FC</li><li>2026-05-19: AFC Bournemouth 1 - 1 Manchester City FC</li><li>2026-05-13: Manchester City FC 3 - 0 Crystal Palace FC</li><li>2026-05-09: Manchester City FC 3 - 0 Brentford FC</li><li>2026-05-04: Everton FC 3 - 3 Manchester City FC</li><li>2026-04-22: Burnley FC 0 - 1 Manchester City FC</li></ul>
+                                    <div class="standings">
+                                        <span>POS: 2</span>
+                                        <span>GS: 77</span>
+                                        <span>GC: 35</span>
+                                        <span>GD: 42</span>
+                                        <span>PTS: 78</span>
+                                    </div><p><strong>Match Day:4</strong></p><span style="font-style: italic; font-size: 0.85em;">Prediction: Away Team to win - Reason: Away team has a stronger performance based on recent form, goals scored, and standings.</span></div></div>            </div>
 
               <div class="match-table" id="match-table" style="display: none;">
     <div class="table-header">
@@ -3107,15 +3197,24 @@
             </tr>
         </thead>
         <tbody>
-            <tr data-index="0" data-home-id="349" data-away-id="64" data-status="TIMED">
-                              <td>2026-09-04 22:00:00</td>
-                              <td>Ipswich Town FC<div class="form-display" id="table-form-home-0"><span class="loss" title="14 Apr 2026 vs Portsmouth FC (A): 0-2">L</span><span class="draw" title="19 Apr 2026 vs Middlesbrough FC (H): 2-2">D</span><span class="win" title="22 Apr 2026 vs Charlton Athletic FC (A): 2-1">W</span><span class="draw" title="25 Apr 2026 vs West Bromwich Albion FC (A): 0-0">D</span><span class="draw" title="28 Apr 2026 vs Southampton FC (A): 2-2">D</span><span class="win latest" title="02 May 2026 vs Queens Park Rangers FC (H): 3-0">W</span></div></td>
-                              <td>-</td>
-                              <td>Liverpool FC<div class="form-display" id="table-form-away-0"><span class="win" title="25 Apr 2026 vs Crystal Palace FC (H): 3-1">W</span><span class="loss" title="03 May 2026 vs Manchester United FC (A): 2-3">L</span><span class="draw" title="09 May 2026 vs Chelsea FC (H): 1-1">D</span><span class="loss" title="15 May 2026 vs Aston Villa FC (A): 2-4">L</span><span class="draw" title="24 May 2026 vs Brentford FC (H): 1-1">D</span><span class="draw latest" title="23 Aug 2026 vs Newcastle United FC (A): 2-2">D</span></div></td>
-                              <td id="table-prediction-0">LIV to win </td>
-                              <td id="table-confidence-0">63.6%</td>
+            <tr data-index="0" data-home-id="1076" data-away-id="397" data-status="IN_PLAY">
+                              <td>2026-09-13 16:00:00</td>
+                              <td>Coventry City FC<div class="form-display" id="table-form-home-0"><span class="win" title="21 Apr 2026 vs Portsmouth FC (H): 5-1">W</span><span class="win" title="26 Apr 2026 vs Wrexham AFC (H): 3-1">W</span><span class="win" title="02 May 2026 vs Watford FC (A): 4-0">W</span><span class="loss" title="21 Aug 2026 vs Arsenal FC (A): 0-3">L</span><span class="loss" title="29 Aug 2026 vs Hull City AFC (H): 0-1">L</span><span class="loss latest" title="05 Sep 2026 vs Manchester City FC (A): 0-1">L</span></div></td>
+                              <td>0 -:- 3</td>
+                              <td>Brighton &amp; Hove Albion FC<div class="form-display" id="table-form-away-0"><span class="win" title="09 May 2026 vs Wolverhampton Wanderers FC (H): 3-0">W</span><span class="loss" title="17 May 2026 vs Leeds United FC (A): 0-1">L</span><span class="loss" title="24 May 2026 vs Manchester United FC (H): 0-3">L</span><span class="win" title="23 Aug 2026 vs Aston Villa FC (H): 4-0">W</span><span class="loss" title="30 Aug 2026 vs Chelsea FC (A): 3-4">L</span><span class="draw latest" title="05 Sep 2026 vs Leeds United FC (H): 1-1">D</span></div></td>
+                              <td id="table-prediction-0">BHA to win </td>
+                              <td id="table-confidence-0">68.0%</td>
                               <td id="table-predicted-score-0">0-3</td>
-                              <td>WDDWDL / DDLDLW</td>
+                              <td>LLLWWW / DLWLLW</td>
+                              </tr><tr data-index="1" data-home-id="66" data-away-id="65" data-status="TIMED">
+                              <td>2026-09-13 18:30:00</td>
+                              <td>Manchester United FC<div class="form-display" id="table-form-home-1"><span class="draw" title="09 May 2026 vs Sunderland AFC (A): 0-0">D</span><span class="win" title="17 May 2026 vs Nottingham Forest FC (H): 3-2">W</span><span class="win" title="24 May 2026 vs Brighton &amp; Hove Albion FC (A): 3-0">W</span><span class="loss" title="22 Aug 2026 vs Hull City AFC (A): 0-2">L</span><span class="win" title="30 Aug 2026 vs Ipswich Town FC (H): 5-2">W</span><span class="draw latest" title="06 Sep 2026 vs Everton FC (A): 2-2">D</span></div></td>
+                              <td>-</td>
+                              <td>Manchester City FC<div class="form-display" id="table-form-away-1"><span class="draw" title="19 May 2026 vs AFC Bournemouth (A): 1-1">D</span><span class="loss" title="24 May 2026 vs Aston Villa FC (H): 1-2">L</span><span class="win" title="23 Aug 2026 vs AFC Bournemouth (H): 2-1">W</span><span class="win" title="28 Aug 2026 vs Crystal Palace FC (A): 4-1">W</span><span class="win" title="05 Sep 2026 vs Coventry City FC (H): 1-0">W</span><span class="win latest" title="08 Sep 2026 vs FC Porto (A): 2-0">W</span></div></td>
+                              <td id="table-prediction-1">MCI to win </td>
+                              <td id="table-confidence-1">45.3%</td>
+                              <td id="table-predicted-score-1">0-2</td>
+                              <td>DWLWWD / WWWWLD</td>
                               </tr>        </tbody>
     </table>
     </div>                  
@@ -3144,7 +3243,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr class="upper-table"><td>1</td><td>AFC Bournemouth</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Arsenal FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Aston Villa FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Brentford FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Brighton &amp; Hove Albion FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Chelsea FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Coventry City FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Crystal Palace FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Everton FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Fulham FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Hull City AFC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Ipswich Town FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Leeds United FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Liverpool FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Manchester City FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Manchester United FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Newcastle United FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Nottingham Forest FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Sunderland AFC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr><tr class="upper-table"><td>1</td><td>Tottenham Hotspur FC</td><td>0</td><td class="win-col">0</td><td>0</td><td class="loss-col">0</td><td>0</td><td>0</td><td>0</td><td class="pts-col">0</td></tr>        </tbody>
+            <tr class="upper-table"><td>1</td><td>Manchester City FC</td><td>3</td><td class="win-col">3</td><td>0</td><td class="loss-col">0</td><td>7</td><td>2</td><td>5</td><td class="pts-col">9</td></tr><tr class="upper-table"><td>2</td><td>Hull City AFC</td><td>3</td><td class="win-col">2</td><td>1</td><td class="loss-col">0</td><td>3</td><td>0</td><td>3</td><td class="pts-col">7</td></tr><tr class="upper-table"><td>3</td><td>Arsenal FC</td><td>2</td><td class="win-col">2</td><td>0</td><td class="loss-col">0</td><td>4</td><td>0</td><td>4</td><td class="pts-col">6</td></tr><tr class="upper-table"><td>4</td><td>Chelsea FC</td><td>2</td><td class="win-col">2</td><td>0</td><td class="loss-col">0</td><td>7</td><td>5</td><td>2</td><td class="pts-col">6</td></tr><tr class="upper-table"><td>5</td><td>Brentford FC</td><td>3</td><td class="win-col">1</td><td>2</td><td class="loss-col">0</td><td>5</td><td>2</td><td>3</td><td class="pts-col">5</td></tr><tr class="mid-table"><td>6</td><td>Liverpool FC</td><td>3</td><td class="win-col">1</td><td>2</td><td class="loss-col">0</td><td>6</td><td>4</td><td>2</td><td class="pts-col">5</td></tr><tr class="mid-table"><td>6</td><td>Newcastle United FC</td><td>3</td><td class="win-col">1</td><td>2</td><td class="loss-col">0</td><td>6</td><td>4</td><td>2</td><td class="pts-col">5</td></tr><tr class="mid-table"><td>8</td><td>Leeds United FC</td><td>3</td><td class="win-col">1</td><td>2</td><td class="loss-col">0</td><td>3</td><td>2</td><td>1</td><td class="pts-col">5</td></tr><tr class="mid-table"><td>9</td><td>Brighton &amp; Hove Albion FC</td><td>3</td><td class="win-col">1</td><td>1</td><td class="loss-col">1</td><td>8</td><td>5</td><td>3</td><td class="pts-col">4</td></tr><tr class="mid-table"><td>10</td><td>Everton FC</td><td>2</td><td class="win-col">1</td><td>1</td><td class="loss-col">0</td><td>3</td><td>1</td><td>2</td><td class="pts-col">4</td></tr><tr class="mid-table"><td>11</td><td>Sunderland AFC</td><td>3</td><td class="win-col">1</td><td>1</td><td class="loss-col">1</td><td>3</td><td>3</td><td>0</td><td class="pts-col">4</td></tr><tr class="mid-table"><td>12</td><td>Manchester United FC</td><td>2</td><td class="win-col">1</td><td>0</td><td class="loss-col">1</td><td>5</td><td>4</td><td>1</td><td class="pts-col">3</td></tr><tr class="mid-table"><td>13</td><td>Crystal Palace FC</td><td>3</td><td class="win-col">1</td><td>0</td><td class="loss-col">2</td><td>4</td><td>8</td><td>-4</td><td class="pts-col">3</td></tr><tr class="mid-table"><td>13</td><td>Ipswich Town FC</td><td>3</td><td class="win-col">1</td><td>0</td><td class="loss-col">2</td><td>4</td><td>8</td><td>-4</td><td class="pts-col">3</td></tr><tr class="mid-table"><td>15</td><td>AFC Bournemouth</td><td>3</td><td class="win-col">0</td><td>2</td><td class="loss-col">1</td><td>4</td><td>5</td><td>-1</td><td class="pts-col">2</td></tr><tr class="lower-table"><td>16</td><td>Nottingham Forest FC</td><td>3</td><td class="win-col">0</td><td>2</td><td class="loss-col">1</td><td>2</td><td>3</td><td>-1</td><td class="pts-col">2</td></tr><tr class="lower-table"><td>17</td><td>Aston Villa FC</td><td>3</td><td class="win-col">0</td><td>1</td><td class="loss-col">2</td><td>0</td><td>5</td><td>-5</td><td class="pts-col">1</td></tr><tr class="lower-table"><td>17</td><td>Tottenham Hotspur FC</td><td>3</td><td class="win-col">0</td><td>1</td><td class="loss-col">2</td><td>0</td><td>5</td><td>-5</td><td class="pts-col">1</td></tr><tr class="lower-table"><td>19</td><td>Fulham FC</td><td>3</td><td class="win-col">0</td><td>0</td><td class="loss-col">3</td><td>4</td><td>7</td><td>-3</td><td class="pts-col">0</td></tr><tr class="lower-table"><td>20</td><td>Coventry City FC</td><td>3</td><td class="win-col">0</td><td>0</td><td class="loss-col">3</td><td>0</td><td>5</td><td>-5</td><td class="pts-col">0</td></tr>        </tbody>
     </table>
 </div>
           <div class="top-scorers-table" id="top-scorers-table" style="display: none;">
@@ -3166,7 +3265,7 @@
             </tr>
         </thead>
         <tbody>
-                    </tbody>
+            <tr><td>1</td><td>Erling Haaland</td><td>Manchester City FC</td><td>3</td><td>N/A</td><td>3</td></tr><tr><td>2</td><td>Alexander Isak</td><td>Liverpool FC</td><td>3</td><td>N/A</td><td>3</td></tr><tr><td>3</td><td>Bruno Fernandes</td><td>Manchester United FC</td><td>3</td><td>1</td><td>2</td></tr><tr><td>4</td><td>Bukayo Saka</td><td>Arsenal FC</td><td>2</td><td>N/A</td><td>2</td></tr><tr><td>5</td><td>Vitaly Janelt</td><td>Brentford FC</td><td>2</td><td>N/A</td><td>3</td></tr><tr><td>6</td><td>Marcus Tavernier</td><td>AFC Bournemouth</td><td>2</td><td>N/A</td><td>3</td></tr><tr><td>7</td><td>Jack Hinshelwood</td><td>Brighton &amp; Hove Albion FC</td><td>2</td><td>N/A</td><td>1</td></tr><tr><td>8</td><td>Anthony Elanga</td><td>Newcastle United FC</td><td>2</td><td>N/A</td><td>3</td></tr><tr><td>9</td><td>João Pedro</td><td>Chelsea FC</td><td>2</td><td>2</td><td>2</td></tr><tr><td>10</td><td>Joshua King</td><td>Fulham FC</td><td>2</td><td>N/A</td><td>3</td></tr>        </tbody>
     </table>
 </div>     
          <!-- Closing .container -->
@@ -3924,7 +4023,22 @@ function enforceClientRateLimit(callback, args) {
         const targetElement = callback.name === 'fetchTeamData' 
             ? document.getElementById(`form-${args[2] ? 'home' : 'away'}-${index}`) // isHome is args[2]
             : document.getElementById(`prediction-${index}`);
-        targetElement.innerHTML = `<p>Queued, retrying in ${(delay / 1000).toFixed(1)}s</p>`;
+        const countdownId = `cdtimer-${index}-${Date.now()}`;
+        targetElement.innerHTML = `
+            <div class="countdown-box">
+                <span class="cps-spinner"></span>
+                <span class="retry-text">Queued, retrying in</span>
+                <span class="countdown-timer" id="${countdownId}">${Math.ceil(delay / 1000)}</span>
+                <span class="retry-text">s</span>
+            </div>`;
+        const cdEl = document.getElementById(countdownId);
+        const cdEnd = Date.now() + delay;
+        const cdInterval = setInterval(() => {
+            const left = Math.ceil((cdEnd - Date.now()) / 1000);
+            if (!cdEl || !cdEl.isConnected) { clearInterval(cdInterval); return; }
+            if (left <= 0) { clearInterval(cdInterval); return; }
+            cdEl.textContent = left;
+        }, 1000);
         
         // Persist timestamps even when queueing (though unchanged here, for consistency)
         localStorage.setItem('requestTimestamps', JSON.stringify(requestTimestamps));
@@ -5131,10 +5245,26 @@ function fetchPredictionImpl(index, homeId, awayId, attempt, maxAttempts) {
             setTimeout(() => fetchPrediction(index, homeId, awayId, 0, maxAttempts), 30000);
         } else if (data.queued) {
             showToast(`Prediction queued, retrying in ${data.delay}s`, 'info');
-            predictionElement.innerHTML = `<p>Prediction queued, retrying in ${data.delay}s</p>`;
-            tablePrediction.innerHTML = `Queued (${data.delay}s)`;
+            const predCdId = `cdtimer-pred-${index}-${Date.now()}`;
+            predictionElement.innerHTML = `
+                <div class="countdown-box">
+                    <span class="cps-spinner"></span>
+                    <span class="retry-text">Queued, retrying in</span>
+                    <span class="countdown-timer" id="${predCdId}">${data.delay}</span>
+                    <span class="retry-text">s</span>
+                </div>`;
+            tablePrediction.innerHTML = `<span class="cps-spinner cps-spinner--sm"></span> Queued (<span id="${predCdId}-tbl">${data.delay}</span>s)`;
             tableConfidence.innerHTML = '';
             tablePredictedScore.innerHTML = '';
+            const predCdEl = document.getElementById(predCdId);
+            const predCdElTbl = document.getElementById(`${predCdId}-tbl`);
+            const predCdEnd = Date.now() + data.delay * 1000;
+            const predCdInterval = setInterval(() => {
+                const left = Math.ceil((predCdEnd - Date.now()) / 1000);
+                if (left <= 0) { clearInterval(predCdInterval); return; }
+                if (predCdEl && predCdEl.isConnected) predCdEl.textContent = left;
+                if (predCdElTbl && predCdElTbl.isConnected) predCdElTbl.textContent = left;
+            }, 1000);
             setTimeout(() => fetchPrediction(index, homeId, awayId, attempt), data.delay * 1000);
         } else if (data.success) {
             // Defensive guard: if this element already shows a valid tick/cross,
@@ -5517,7 +5647,7 @@ function startMatchPolling() {
                         });
                 });
 
-                const lastUpdated = document.getElementById('last-updated');
+                const lastUpdated = document.getElementById('lu-text');
                 if (lastUpdated) {
                     lastUpdated.textContent = `Last updated: ${new Date().toLocaleTimeString('en-US', { timeZone: 'Africa/Nairobi' })}`;
                 }
@@ -6075,7 +6205,7 @@ const debouncedFetchPrediction = debounce((index, homeId, awayId, attempt = 0, m
 window.onload = function() {
     const statusLight = document.getElementById('status_light');
     const isAdmin = false;
-            // Theme setup
+                // Theme setup
             // Theme setup - Defaulting to Dark
 const theme = document.cookie.split('; ')
     .find(row => row.startsWith('theme='))
@@ -6582,11 +6712,14 @@ window.addEventListener('DOMContentLoaded', function() {
     white-space: normal;
     word-break: break-word;
     opacity: 0;
-    transition: opacity .18s ease;
-    will-change: opacity;
+    transform: translateY(4px) scale(0.97);
+    transition: opacity .22s cubic-bezier(.25,.8,.25,1),
+                transform .22s cubic-bezier(.25,.8,.25,1);
+    will-change: opacity, transform;
   }
   #cps-touch-tooltip.cps-tt-visible {
     opacity: 1;
+    transform: translateY(0) scale(1);
   }
 </style>
 <script>
@@ -7477,7 +7610,7 @@ document.addEventListener("DOMContentLoaded", function () {
     <div class="toast-container"><div class="toast info show">
                 <div>
                     <div class="toast-title">10000</div>
-                    <p class="toast-message">✅ Cached: FL1 (from 2026-09-04 to 2026-09-04, Last updated: 04/09/2026, 00:50, Age: 310 mins)</p>
+                    <p class="toast-message">✅ Cached: ELC (from 2026-09-13 to 2026-09-13, Last updated: 09/09/2026, 18:11, Age: 5789 mins)</p>
                 </div>
                 <span class="close-btn">×</span>
             </div></div></body></html><!-- ── COMMUNITY MODAL ── -->
