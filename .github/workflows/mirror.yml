@@ -44,7 +44,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No content changes."
           else
-            git commit -m "Mirror update $(date -u '+%Y-%m-%d %H:%M') UTC"
+            git commit -m "Mirror update $(TZ=Africa/Nairobi date '+%Y-%m-%d %H:%M') EAT"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
