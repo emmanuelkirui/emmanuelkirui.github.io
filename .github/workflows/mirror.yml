@@ -1,96 +1,50 @@
-name: Mirror Portfolio with AdSense and Retry Logic
+name: Mirror Portfolio
 
 on:
   schedule:
     - cron: '0 */6 * * *'
   workflow_dispatch:
+  repository_dispatch:
+    types: [portfolio-updated]
+
+# One run at a time; a newer request queues instead of colliding
+concurrency:
+  group: mirror
+  cancel-in-progress: false
+
+permissions:
+  contents: write
 
 jobs:
   mirror-site:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install Puppeteer
-        run: npm install puppeteer
+        run: npm install --no-save --no-audit --no-fund puppeteer
 
-      - name: Process, Mirror, and Inject AdSense
-        run: |
-          node -e "
-          const puppeteer = require('puppeteer');
-          const fs = require('fs');
+      - name: Mirror pages (consent-gated AdSense)
+        env:
+          BASE_URL: https://creativepulse.42web.io/cps/
+          ADSENSE_PUB: pub-9638774372490271
+          PAGES: port_kirui.php,liv.php,valmanu.php
+        run: node .github/scripts/mirror.js
 
-          const PAGES = ['port_kirui.php', 'liv.php', 'valmanu.php'];
-          const BASE_URL = 'https://creativepulse.42web.io/cps/';
-          
-          // Create ads.txt file
-          fs.writeFileSync('ads.txt', 'google.com, pub-9638774372490271, DIRECT, f08c47fec0942fa0');
-
-          let failed = [];
-
-          (async () => {
-            const browser = await puppeteer.launch({ 
-              args: ['--no-sandbox', '--disable-setuid-sandbox'] 
-            });
-            
-            async function processPage(pageName) {
-              const page = await browser.newPage();
-              const outName = (pageName === 'port_kirui.php') ? 'index.html' : pageName.replace('.php', '.html');
-              
-              await page.goto(BASE_URL + pageName, { waitUntil: 'networkidle2', timeout: 60000 });
-              
-              // Apply path fixes
-              await page.evaluate((base) => {
-                document.querySelectorAll('[src],[href],[action]').forEach(el => {
-                  ['src','href','action'].forEach(attr => {
-                    const val = el.getAttribute(attr);
-                    if (val && !val.startsWith('http') && !val.startsWith('//') && !val.startsWith('#') && !val.startsWith('mailto:') && !val.startsWith('tel:') && !val.startsWith('data:') && !val.startsWith('javascript:')) {
-                      el.setAttribute(attr, base + val);
-                    }
-                  });
-                });
-              }, BASE_URL);
-
-              // Inject AdSense tags
-              await page.evaluate(() => {
-                const meta = document.createElement('meta');
-                meta.name = 'google-adsense-account';
-                meta.content = 'ca-pub-9638774372490271';
-                document.head.appendChild(meta);
-
-                const script = document.createElement('script');
-                script.async = true;
-                script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271';
-                script.crossOrigin = 'anonymous';
-                document.head.appendChild(script);
-              });
-
-              fs.writeFileSync(outName, await page.content());
-              await page.close();
-            }
-
-            for (const pageName of PAGES) {
-              try { await processPage(pageName); } catch (e) { failed.push(pageName); }
-            }
-            
-            for (const pageName of failed) {
-              try { await processPage(pageName); } catch (e) { console.log('FAIL: ' + pageName); }
-            }
-            await browser.close();
-          })();"
-
-      - name: Commit and push
+      - name: Commit and push (only if content changed)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add *.html ads.txt
-          git diff --cached --quiet || git commit -m "Mirror update with AdSense $(date -u '+%Y-%m-%d %H:%M')"
-          git push origin main
+          git add -A -- '*.html' ads.txt
+          if git diff --cached --quiet; then
+            echo "No content changes."
+          else
+            git commit -m "Mirror update $(date -u '+%Y-%m-%d %H:%M') UTC"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
