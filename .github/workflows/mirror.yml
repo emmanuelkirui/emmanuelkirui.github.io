@@ -40,7 +40,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A -- '*.html' ads.txt
+          git add -A -- . ':(exclude)node_modules' ':(exclude)package.json' ':(exclude)package-lock.json'
           if git diff --cached --quiet; then
             echo "No content changes."
           else
