@@ -1,4 +1,24 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en"><head><script>
+(function(){
+  window.__MIRROR_BASE__ = "https://creativepulse.42web.io/cps/";
+  var KEY='ek_cookie_consent', loaded=false;
+  function accepted(){
+    try{var d=JSON.parse(localStorage.getItem(KEY));
+      return !!d && d.choice==='accepted' && new Date()<=new Date(d.expires);}catch(e){return false;}
+  }
+  function loadAds(){
+    if(loaded||window.__adsLoaded) return; loaded=window.__adsLoaded=true;
+    var s=document.createElement('script'); s.async=true; s.crossOrigin='anonymous';
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271';
+    document.head.appendChild(s);
+  }
+  if(accepted()) loadAds();
+  window.addEventListener('ek:consent',function(e){ if(e.detail&&e.detail.choice==='accepted') loadAds(); });
+  document.addEventListener('click',function(e){            // works even if a page lacks the event
+    if(e.target.closest('#cookieAccept,.cookie-accept')) setTimeout(function(){ if(accepted()) loadAds(); },50);
+  });
+})();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EMMANUEL KIPROTICH KIRUI – Portfolio | ICT Officer &amp; Web Developer</title>
@@ -8,7 +28,7 @@
 <meta property="og:title" content="EMMANUEL KIPROTICH KIRUI – Portfolio">
 <meta property="og:description" content="I am an IT professional with a background in cybersecurity, cloud technologies, and prompt design in AI. I am passionate about building secure and scalable applications, leveraging my skills in Vertex">
 <meta property="og:type" content="website">
-<link rel="canonical" href="https://creativepulse.42web.io/cps/port_kirui.php?i=1">
+<link rel="canonical" href="https://creativepulse.42web.io/cps/port_kirui.php?mirror=1791841161216&amp;i=1">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -16,7 +36,7 @@
   "name": "EMMANUEL KIPROTICH KIRUI",
   "jobTitle": "IT Professional & Software Developer",
   "description": "I am an IT professional with a background in cybersecurity, cloud technologies, and prompt design in AI. I am passionate about building secure and scalable applications, leveraging my skills in Vertex",
-  "url": "https://creativepulse.42web.io/cps/port_kirui.php?i=1",
+  "url": "https://creativepulse.42web.io/cps/port_kirui.php?mirror=1791841161216&i=1",
   "email": "emmanuelkirui042@gmail.com",
   "address": {"@type":"PostalAddress","addressCountry":"KE","addressRegion":"Nairobi, Kenya"},
   "knowsAbout": ["Web Development","ICT Support","Google Cloud Platform","Systems Administration","Network Engineering","Cybersecurity","Python","PHP","MySQL","Linux"],
@@ -25,12 +45,12 @@
 }
 </script>
 <!-- Performance: pre-warm all external connections before browser needs them -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="">
-<link rel="preconnect" href="https://cdn.credly.com" crossorigin="">
-<link rel="dns-prefetch" href="https://www.credly.com">
-<link rel="dns-prefetch" href="https://api.badgr.io">
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com/" crossorigin="">
+<link rel="preconnect" href="https://cdn.credly.com/" crossorigin="">
+<link rel="dns-prefetch" href="https://www.credly.com/">
+<link rel="dns-prefetch" href="https://api.badgr.io/">
 
 <!-- Fonts: swap so text renders immediately in system font, replaces when loaded -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
@@ -932,12 +952,12 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
 </style>
 <!-- PDF.js deferred — loads after page is interactive, not before -->
 <script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" onload="pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';"></script>
-<meta name="google-adsense-account" content="ca-pub-9638774372490271"><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script></head>
+<meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
 <body>
 <!-- ══════════════════════════════════════════════
      ANIMATED BACKGROUND
 ══════════════════════════════════════════════ -->
-<canvas id="bg-canvas" width="800" height="600"></canvas>
+<canvas id="bg-canvas" width="1280" height="900"></canvas>
 
 <div class="page-wrap">
 <!-- ══════════════════════════════════════════════
@@ -1275,7 +1295,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
           <p>PHP Blog system with admin  panel</p>
           <div class="tech-tags">
             <span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">JavaScript</span><span class="tech-tag">Bootstrap</span>          </div>
-                    <a href="https://topnotch.kesug.com" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;width:fit-content;">
+                    <a href="https://topnotch.kesug.com/" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;width:fit-content;">
             <i class="fas fa-external-link-alt"></i> View Live Project
           </a>
                   </div>
@@ -1307,7 +1327,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
           <p>Hospital management system with admin panel</p>
           <div class="tech-tags">
             <span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">JavaScript</span><span class="tech-tag">Bootstrap</span>          </div>
-                    <a href="https://rexusmedicalcenter.kesug.com" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;width:fit-content;">
+                    <a href="https://rexusmedicalcenter.kesug.com/" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;width:fit-content;">
             <i class="fas fa-external-link-alt"></i> View Live Project
           </a>
                   </div>
@@ -1341,7 +1361,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
     </div>
         <div class="proj-card fade-in">
             <div class="proj-card-img">
-                  <a href="https://topnotch.kesug.com" target="_blank" rel="noopener" class="proj-img-link">          <img src="https://creativepulse.42web.io/cps/uploads/6a1e901311005_1866.png" alt="PHP Blog system" loading="lazy">
+                  <a href="https://topnotch.kesug.com/" target="_blank" rel="noopener" class="proj-img-link">          <img src="https://creativepulse.42web.io/cps/uploads/6a1e901311005_1866.png" alt="PHP Blog system" loading="lazy">
           <div class="proj-img-hover"><span><i class="fas fa-external-link-alt"></i> View Project</span></div>
           </a>              </div>
       <div class="proj-card-body">
@@ -1352,7 +1372,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="tech-tags" style="margin-bottom:14px;">
           <span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">JavaScript</span><span class="tech-tag">Bootstrap</span>        </div>
         <div class="proj-card-footer">
-                    <a href="https://topnotch.kesug.com" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
+                    <a href="https://topnotch.kesug.com/" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
                     <span class="proj-idx">02</span>
         </div>
       </div>
@@ -1387,7 +1407,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="tech-tags" style="margin-bottom:14px;">
           <span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">JavaScript</span><span class="tech-tag">Bootstrap</span>        </div>
         <div class="proj-card-footer">
-                    <a href="https://rexusmedicalcenter.kesug.com" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
+                    <a href="https://rexusmedicalcenter.kesug.com/" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
                     <span class="proj-idx">04</span>
         </div>
       </div>
@@ -1449,11 +1469,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="cert-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> ICT Prefect</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a1845d75cb4a_epson050_ict-prefect.pdf",="" "ict="" prefect")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF&quot;, &quot;ICT Prefect&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
             <a href="https://creativepulse.42web.io/cps/uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="cert-pdf-canvas-wrap" data-pdf="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="cert-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
         <div class="cert-card fade-in cert-has-pdf">
@@ -1469,11 +1489,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="cert-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> FIRST AID</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a18460b0a1dd_epson048_st_john_s.pdf",="" "first="" aid")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF&quot;, &quot;FIRST AID&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
             <a href="https://creativepulse.42web.io/cps/uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="cert-pdf-canvas-wrap" data-pdf="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="cert-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
       </div>
@@ -1572,11 +1592,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="testi-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> NHIF – Recommendation</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a1847ea02931_recomentation_nhif.pdf",="" "recommendation="" \u2013="" nhif")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a1847ea02931_Recomentation_NHIF.pdf&quot;, &quot;Recommendation – NHIF&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
             <a href="https://creativepulse.42web.io/cps/uploads/6a1847ea02931_Recomentation_NHIF.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a1847ea02931_Recomentation_NHIF.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="testi-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a1847ea02931_Recomentation_NHIF.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
         <div class="testi-card fade-in testi-has-pdf">
@@ -1596,11 +1616,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="testi-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> JUMKINO – Recommendation</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a18485f9fb18_kirui-recmd.pdf",="" "recommendation="" \u2013="" jumkino")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a18485f9fb18_KIRUI-RECMD.pdf&quot;, &quot;Recommendation – JUMKINO&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
             <a href="https://creativepulse.42web.io/cps/uploads/6a18485f9fb18_KIRUI-RECMD.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="testi-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a18485f9fb18_KIRUI-RECMD.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
         <div class="testi-card fade-in testi-has-pdf">
@@ -1620,11 +1640,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="testi-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> Kapkoros Sub-County Hospital – Recommendation</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a27c329395c3_scan.pdf",="" "recommendation="" \u2013="" kapkoros="" sub-county="" hospital")"=""><i class="fas fa-expand-alt"></i> Full View</button>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a27c329395c3_Scan.pdf&quot;, &quot;Recommendation – Kapkoros Sub-County Hospital&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
             <a href="https://creativepulse.42web.io/cps/uploads/6a27c329395c3_Scan.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a27c329395c3_Scan.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="testi-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a27c329395c3_Scan.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
       </div>
@@ -1717,7 +1737,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
   <h2 class="section-title">My <span class="grad">Documents</span></h2>
   <div class="files-list">
         <div class="file-item fade-in">
-            <div class="file-item-bar file-item-pdf" onclick="openPdfModal(" uploads\="" 6a67be9cea354_ekk_cv_kirui.pdf",="" "cv")"="">
+            <div class="file-item-bar file-item-pdf" onclick="openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a67be9cea354_EKK_CV_Kirui.pdf&quot;, &quot;CV&quot;)">
               <div class="ficon ficon-pdf"><i class="fas fa-file-pdf"></i></div>
         <div class="file-item-info">
           <h4>CV</h4>
@@ -1725,11 +1745,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         </div>
         <div class="file-item-actions">
           <span class="file-expand-icon"><i class="fas fa-chevron-down"></i></span>          <a href="https://creativepulse.42web.io/cps/uploads/6a67be9cea354_EKK_CV_Kirui.pdf" download="" onclick="event.stopPropagation()" class="file-dl-btn" title="Download"><i class="fas fa-download"></i></a>
-                    <button type="button" class="file-open-btn" title="Preview PDF" onclick="event.stopPropagation();openPdfModal(" uploads\="" 6a67be9cea354_ekk_cv_kirui.pdf",="" "cv")"=""><i class="fas fa-eye"></i></button>
+                    <button type="button" class="file-open-btn" title="Preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a67be9cea354_EKK_CV_Kirui.pdf&quot;, &quot;CV&quot;)"><i class="fas fa-eye"></i></button>
                   </div>
       </div>
             <div class="file-pdf-preview" style="display:none;">
-        <div class="file-pdf-canvas-wrap" data-pdf="uploads/6a67be9cea354_EKK_CV_Kirui.pdf" style="width:100%;min-height:220px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="file-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a67be9cea354_EKK_CV_Kirui.pdf" style="width:100%;min-height:220px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
       </div>
@@ -1977,7 +1997,7 @@ function toggleTestiPdf(inner) {
   if (!isOpen) card.style.transform = 'none';
 }
 
-/* ── PDF MODAL ── */
+/* ── PDF / IMAGE MODAL ── (detects the real file type from its first bytes) */
 function openPdfModal(src, title) {
   src = _absUrl(src);
   var overlay = document.getElementById('pdf-modal-overlay');
@@ -1985,40 +2005,84 @@ function openPdfModal(src, title) {
   var loading = document.getElementById('pdf-modal-loading');
   var nameEl  = document.getElementById('pdf-modal-name');
   var dlBtn   = document.getElementById('pdf-modal-dl');
-  nameEl.textContent = title || 'PDF Preview';
+  nameEl.textContent = title || 'Preview';
   dlBtn.href = src;
-  dlBtn.setAttribute('download', (title || 'document') + '.pdf');
+  dlBtn.setAttribute('download', title || 'document');
   wrap.style.display = 'none';
   wrap.innerHTML = '';
+  loading.innerHTML = '<i class="fas fa-file-pdf"></i><span>Loading…</span>';
   loading.style.display = 'flex';
   overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
-  if (typeof pdfjsLib === 'undefined') {
-    loading.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:2rem;color:#f59e0b;"></i><span>PDF.js not loaded. <a href="'+src+'" target="_blank" style="color:var(--cyan);">Open PDF directly</a></span>';
-    return;
+
+  function fail(msg){
+    loading.style.display = 'flex';
+    loading.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:2rem;color:#f59e0b;"></i><span>'+msg+' <a href="'+src+'" target="_blank" style="color:var(--cyan);">Open directly</a></span>';
   }
-  pdfjsLib.getDocument({url:src,withCredentials:false,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',cMapPacked:true}).promise.then(function(pdf){
-    loading.style.display = 'none';
-    wrap.style.display = 'flex';
-    var total = pdf.numPages;
-    var rendered = 0;
-    function renderPage(num){
-      pdf.getPage(num).then(function(page){
-        var vp = page.getViewport({scale:1.5});
-        var canvas = document.createElement('canvas');
-        canvas.width = vp.width; canvas.height = vp.height;
-        canvas.style.cssText = 'max-width:100%;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.4);';
-        wrap.appendChild(canvas);
-        page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise.then(function(){
-          rendered++;
-          if(rendered < total) renderPage(rendered+1);
+  function showImage(buf, mime){
+    var url = URL.createObjectURL(new Blob([buf], {type: mime}));
+    var img = new Image();
+    img.onload = function(){
+      loading.style.display = 'none';
+      wrap.style.display = 'flex';
+      img.style.cssText = 'max-width:100%;height:auto;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.4);';
+      wrap.appendChild(img);
+    };
+    img.onerror = function(){ fail('Could not display image.'); };
+    img.src = url;
+  }
+  function showPdf(buf){
+    if (typeof pdfjsLib === 'undefined') { fail('PDF.js not loaded.'); return; }
+    pdfjsLib.getDocument({data:new Uint8Array(buf),cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/cmaps/',cMapPacked:true}).promise.then(function(pdf){
+      loading.style.display = 'none';
+      wrap.style.display = 'flex';
+      var total = pdf.numPages, rendered = 0;
+      function renderPage(num){
+        pdf.getPage(num).then(function(page){
+          var vp = page.getViewport({scale:1.5});
+          var canvas = document.createElement('canvas');
+          canvas.width = vp.width; canvas.height = vp.height;
+          canvas.style.cssText = 'max-width:100%;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.4);';
+          wrap.appendChild(canvas);
+          page.render({canvasContext:canvas.getContext('2d'), viewport:vp}).promise.then(function(){
+            rendered++;
+            if(rendered < total) renderPage(rendered+1);
+          });
         });
-      });
-    }
-    renderPage(1);
+      }
+      renderPage(1);
+    }).catch(function(err){
+      console.error('PDF.js modal error:', err);
+      fail('This file is not a valid PDF.');
+    });
+  }
+
+  fetch(src, {credentials:'same-origin'}).then(function(r){
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    return r.arrayBuffer();
+  }).then(function(buf){
+    var b = new Uint8Array(buf.slice(0,12));
+    if (b[0]===0x89 && b[1]===0x50 && b[2]===0x4E && b[3]===0x47) return showImage(buf,'image/png');
+    if (b[0]===0xFF && b[1]===0xD8)                               return showImage(buf,'image/jpeg');
+    if (b[0]===0x47 && b[1]===0x49 && b[2]===0x46)                return showImage(buf,'image/gif');
+    if (b[0]===0x52 && b[1]===0x49 && b[2]===0x46 && b[3]===0x46) return showImage(buf,'image/webp');
+    showPdf(buf);
   }).catch(function(err){
-    console.error('PDF.js modal error:', err);
-    loading.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:2rem;color:#f59e0b;"></i><span>Could not load PDF. <a href="'+src+'" target="_blank" style="color:var(--cyan);">Open directly</a></span>';
+    console.warn('Preview fetch blocked, trying direct embed:', err);
+    // Cross-origin without CORS: <img> works for images, <iframe> for PDFs on most desktops
+    var probe = new Image();
+    probe.onload = function(){
+      loading.style.display = 'none'; wrap.style.display = 'flex';
+      probe.style.cssText = 'max-width:100%;height:auto;border-radius:4px;box-shadow:0 2px 12px rgba(0,0,0,.4);';
+      wrap.appendChild(probe);
+    };
+    probe.onerror = function(){
+      if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) { fail('Preview is not available here.'); return; }
+      var fr = document.createElement('iframe');
+      fr.src = src; fr.style.cssText = 'width:100%;height:80vh;border:0;border-radius:4px;background:#fff;';
+      loading.style.display = 'none'; wrap.style.display = 'flex'; wrap.appendChild(fr);
+    };
+    probe.src = src;
   });
 }
 function closePdfModal() {
@@ -2046,6 +2110,9 @@ function _absUrl(src){
   if(!src) return src;
   if(src.match(/^https?:\/\//)) return src;
   // Build absolute URL from current page location
+  if (window.__MIRROR_BASE__ && !/^(\/\/|data:|blob:)/.test(src)) {
+    try { return new URL(src, window.__MIRROR_BASE__).href; } catch(e){}
+  }
   var a = document.createElement('a');
   a.href = src;
   return a.href;
@@ -2117,7 +2184,7 @@ function renderInlinePdfNow(container){
 })();
 </script>
 <!-- ══ COOKIE CONSENT ══ -->
-<div id="cookie-consent" role="dialog" aria-live="polite" aria-label="Cookie consent">
+<div id="cookie-consent" role="dialog" aria-live="polite" aria-label="Cookie consent" class="">
   <span class="cookie-icon"><i class="fas fa-cookie-bite"></i></span>
   <p class="cookie-text">
     We use cookies to improve your experience and analyse traffic.
@@ -2149,13 +2216,23 @@ function renderInlinePdfNow(container){
     var exp = new Date();
     exp.setDate(exp.getDate() + EXPIRY_DAYS);
     localStorage.setItem(COOKIE_KEY, JSON.stringify({ choice: choice, expires: exp.toISOString() }));
+    announce(choice);
+  }
+
+  // Let other scripts (e.g. consent-gated AdSense on the GitHub mirror) react to the choice
+  function announce(choice){
+    try { window.dispatchEvent(new CustomEvent('ek:consent', { detail: { choice: choice } })); } catch(e){}
   }
 
   function hideBanner(){
     var b = document.getElementById('cookie-consent');
+    if (!b) return;
     b.classList.remove('visible');
     setTimeout(function(){ b.style.display = 'none'; }, 400);
   }
+
+  window.ekConsent = getConsent;   // 'accepted' | 'declined' | null
+  if (getConsent()) announce(getConsent());
 
   // Only show if no decision stored
   if (getConsent() === null) {

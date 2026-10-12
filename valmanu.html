@@ -1,4 +1,24 @@
-<!DOCTYPE html><html lang="en"><head><meta http-equiv="origin-trial" content="A7vZI3v+Gz7JfuRolKNM4Aff6zaGuT7X0mf3wtoZTnKv6497cVMnhy03KDqX7kBz/q/iidW7srW31oQbBt4VhgoAAACUeyJvcmlnaW4iOiJodHRwczovL3d3dy5nb29nbGUuY29tOjQ0MyIsImZlYXR1cmUiOiJEaXNhYmxlVGhpcmRQYXJ0eVN0b3JhZ2VQYXJ0aXRpb25pbmczIiwiZXhwaXJ5IjoxNzU3OTgwODAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ==">
+<!DOCTYPE html>
+<html lang="en"><head><script>
+(function(){
+  window.__MIRROR_BASE__ = "https://creativepulse.42web.io/cps/";
+  var KEY='ek_cookie_consent', loaded=false;
+  function accepted(){
+    try{var d=JSON.parse(localStorage.getItem(KEY));
+      return !!d && d.choice==='accepted' && new Date()<=new Date(d.expires);}catch(e){return false;}
+  }
+  function loadAds(){
+    if(loaded||window.__adsLoaded) return; loaded=window.__adsLoaded=true;
+    var s=document.createElement('script'); s.async=true; s.crossOrigin='anonymous';
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271';
+    document.head.appendChild(s);
+  }
+  if(accepted()) loadAds();
+  window.addEventListener('ek:consent',function(e){ if(e.detail&&e.detail.choice==='accepted') loadAds(); });
+  document.addEventListener('click',function(e){            // works even if a page lacks the event
+    if(e.target.closest('#cookieAccept,.cookie-accept')) setTimeout(function(){ if(accepted()) loadAds(); },50);
+  });
+})();</script><meta http-equiv="origin-trial" content="A7vZI3v+Gz7JfuRolKNM4Aff6zaGuT7X0mf3wtoZTnKv6497cVMnhy03KDqX7kBz/q/iidW7srW31oQbBt4VhgoAAACUeyJvcmlnaW4iOiJodHRwczovL3d3dy5nb29nbGUuY29tOjQ0MyIsImZlYXR1cmUiOiJEaXNhYmxlVGhpcmRQYXJ0eVN0b3JhZ2VQYXJ0aXRpb25pbmczIiwiZXhwaXJ5IjoxNzU3OTgwODAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ==">
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>creativepulse.42web.io - Security Verification</title>
@@ -105,11 +125,11 @@
                     text-decoration: underline;
                 }
             </style>
-        <meta name="google-adsense-account" content="ca-pub-9638774372490271"><script async="" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271" crossorigin="anonymous"></script></head>
+        <meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
         <body>
             <div id="recaptcha-overlay" role="dialog" aria-labelledby="recaptcha-title">
                 <div class="recaptcha-box">
-                    <img src="https://creativepulse.42web.io/cps//images/logo.png" alt="Site Logo" style="max-width: 150px; margin-bottom: 20px; display: none;" onerror="this.style.display='none'; document.getElementById('site-name-fallback').style.display='block';">
+                    <img src="https://creativepulse.42web.io/images/logo.png" alt="Site Logo" style="max-width: 150px; margin-bottom: 20px; display: none;" onerror="this.style.display='none'; document.getElementById('site-name-fallback').style.display='block';">
                     <div id="site-name-fallback" style="display: block; font-size: 20px; font-weight: 600; margin-bottom: 20px;">creativepulse.42web.io</div>
                     <h2 id="recaptcha-title">Security Check</h2>
                     <div id="initial-message" style="display: none;">
@@ -126,9 +146,9 @@
                     </div>
                     <div id="recaptcha-container" style="display: block;">
                         <input type="text" name="hp_field" style="display:none;">
-                        <input type="hidden" name="nonce" value="4dd2d8dbf66a92d759a041d6aaf59993">
-                        <input type="hidden" name="redirect" value="/cps/liv.php">
-                        <div class="g-recaptcha" data-sitekey="6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN" data-callback="onRecaptchaSuccess"><div style="width: 304px; height: 78px;"><div><iframe title="reCAPTCHA" width="304" height="78" role="presentation" name="a-n851sk329g3q" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN&amp;co=aHR0cHM6Ly9jcmVhdGl2ZXB1bHNlLjQyd2ViLmlvOjQ0Mw..&amp;hl=en&amp;v=nY0xPItgwtktOA7U0o-VsaLz&amp;size=normal&amp;anchor-ms=20000&amp;execute-ms=30000&amp;ovv=CAB5am5W&amp;cb=eb08ly3y6dm3"></iframe></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div>
+                        <input type="hidden" name="nonce" value="6abdf518b7f0e9433243a556834864dc">
+                        <input type="hidden" name="redirect" value="/cps/liv.php?mirror=1791841164969">
+                        <div class="g-recaptcha" data-sitekey="6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN" data-callback="onRecaptchaSuccess"><div style="width: 304px; height: 78px;"><div><iframe title="reCAPTCHA" width="304" height="78" role="presentation" name="a-8z3z3lynpeyv" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN&amp;co=aHR0cHM6Ly9jcmVhdGl2ZXB1bHNlLjQyd2ViLmlvOjQ0Mw..&amp;hl=en&amp;v=nY0xPItgwtlvjEjk2TqdwOQz&amp;size=normal&amp;anchor-ms=20000&amp;execute-ms=30000&amp;cb=dyx69kkjgw4b"></iframe></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div>
                     </div>
                     <div id="recaptcha-message"></div>
                     <div id="refresh-text" style="display:none; margin-top: 10px;">
@@ -140,7 +160,7 @@
                     </div>
                 </div>
             </div>
-            <script type="text/javascript" async="" charset="utf-8" src="https://www.gstatic.com/recaptcha/releases/nY0xPItgwtktOA7U0o-VsaLz/recaptcha__en.js" crossorigin="anonymous" integrity="sha384-88bTkC32bHSEj3JzGZ5Snlb/QXqHgsYONeEJVd0y0GiYiK+IqqRw5+98K7YDjMDj" nonce=""></script><script nonce="" src="https://www.google.com/recaptcha/api.js" async="" defer=""></script>
+            <script type="text/javascript" async="" charset="utf-8" src="https://www.gstatic.com/recaptcha/releases/nY0xPItgwtlvjEjk2TqdwOQz/recaptcha__en.js" crossorigin="anonymous" integrity="sha384-Kt1i/5gBObCvMXB/a7GvZUElKpjCg0ZvOYHqbaCbuEa+xwyOQ3474yVQP0XEfD36" nonce=""></script><script nonce="" src="https://www.google.com/recaptcha/api.js" async="" defer=""></script>
             <script nonce="">
                 // Check if cookies are enabled
                 function areCookiesEnabled() {
@@ -206,4 +226,4 @@
                 }
             </script>
         
-        <div style="background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 3px; position: absolute; transition: visibility linear 0.3s, opacity 0.3s linear; opacity: 0; visibility: hidden; z-index: 2000000000; left: 0px; top: -10000px;"><div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.05;"></div><div class="g-recaptcha-bubble-arrow" style="border: 11px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -11px; z-index: 2000000000;"></div><div class="g-recaptcha-bubble-arrow" style="border: 10px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -10px; z-index: 2000000000;"></div><div style="z-index: 2000000000; position: relative;"><iframe title="recaptcha challenge expires in two minutes" name="c-n851sk329g3q" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/bframe?hl=en&amp;v=nY0xPItgwtktOA7U0o-VsaLz&amp;k=6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN&amp;bft=0dAFcWeA7cn5sNmJgk3-QTigx72PqlunQV0Y5QTM0uukktsl8Nap_RPG33i4caewni9-Kc2iFGw79nG9mdG1WhMXAxyab73PDajA" style="width: 100%; height: 100%;"></iframe></div></div></body></html>
+        <div style="background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 3px; position: absolute; transition: visibility linear 0.3s, opacity 0.3s linear; opacity: 0; visibility: hidden; z-index: 2000000000; left: 0px; top: -10000px;"><div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.05;"></div><div class="g-recaptcha-bubble-arrow" style="border: 11px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -11px; z-index: 2000000000;"></div><div class="g-recaptcha-bubble-arrow" style="border: 10px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -10px; z-index: 2000000000;"></div><div style="z-index: 2000000000; position: relative;"><iframe title="recaptcha challenge expires in two minutes" name="c-8z3z3lynpeyv" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/bframe?hl=en&amp;v=nY0xPItgwtlvjEjk2TqdwOQz&amp;k=6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN&amp;bft=0dAFcWeA5uP8KK5FmSyX6EVJqzfLAZ03_vdnr7mYmcpjA7qUaptbm9rRpT16PgbLaJ7IPZiUr0sLwa6Lgt9Vvvf6bskahSZ41BWg" style="width: 100%; height: 100%;"></iframe></div></div></body></html>
