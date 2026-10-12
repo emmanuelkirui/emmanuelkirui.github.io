@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en"><head><script>
+(function(){
+  var KEY='ek_cookie_consent', loaded=false;
+  function accepted(){
+    try{var d=JSON.parse(localStorage.getItem(KEY));
+      return !!d && d.choice==='accepted' && new Date()<=new Date(d.expires);}catch(e){return false;}
+  }
+  function loadAds(){
+    if(loaded||window.__adsLoaded) return; loaded=window.__adsLoaded=true;
+    var s=document.createElement('script'); s.async=true; s.crossOrigin='anonymous';
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271';
+    document.head.appendChild(s);
+  }
+  if(accepted()) loadAds();
+  window.addEventListener('ek:consent',function(e){ if(e.detail&&e.detail.choice==='accepted') loadAds(); });
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#cookieAccept,.cookie-accept')) setTimeout(function(){ if(accepted()) loadAds(); },50);
+  });
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy for Emmanuel Kirui's website - Understand how we collect, use, protect, and share your personal information while ensuring transparency and compliance with applicable laws.">
+    <meta name="author" content="Emmanuel Kirui">
+    <meta name="keywords" content="privacy policy, Emmanuel Kirui, data protection, personal information, cookies, user rights">
+    <meta name="robots" content="index, follow">
+    <title>Privacy Policy | Emmanuel Kirui</title>
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com/">
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&amp;display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1vW6TfH6PfnEX7uL9r6Qz1D8rW9V8eB5eJ5eJ7eK9rL6rW8eL5fJ6eJ7rW9V8eB5eJ5eJ7eK9rL6r==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --accent-color: #ff4d4d;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+        
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #f4f6f9, #dfe4ea);
+            color: #2d3436;
+            line-height: 1.8;
+            padding: 60px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease-in-out;
+        }
+        .container:hover {
+            transform: translateY(-8px);
+        }
+        
+
+        /* Typography */
+        h1 {
+            color: #d35400;
+            font-size: 38px;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        h2 {
+            color: #e67e22;
+            font-size: 24px;
+            margin: 20px 0 10px;
+            font-weight: 700;
+        }
+        h3 {
+            color: #2d3436;
+            font-size: 20px;
+            margin: 15px 0 10px;
+            font-weight: 600;
+        }
+        p {
+            font-size: 16px;
+            margin: 12px 0;
+            text-align: justify;
+        }
+        ul {
+            margin: 12px 0 20px 20px;
+            padding-left: 15px;
+        }
+        li {
+            font-size: 16px;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 15px;
+        }
+        li::before {
+            content: "•";
+            color: #d35400;
+            position: absolute;
+            left: 0;
+            font-size: 18px;
+        }
+        .cps-badge {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* Accordion Styles */
+        details {
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        summary {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3436;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        summary:hover {
+            background: #e9ecef;
+        }
+        summary::after {
+            content: "▼";
+            color: #d35400;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        details[open] summary::after {
+            content: "▲";
+            transform: rotate(0deg);
+        }
+        details[open] {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .section-content {
+            padding: 20px;
+            background: #fff;
+        }
+
+        /* Links and Buttons */
+        a {
+            color: #d35400;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #e67e22;
+            text-decoration: underline;
+        }
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #d35400;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 40px;
+        }
+        .back-button i {
+            margin-right: 8px;
+        }
+        .back-button:hover {
+            background: #e67e22;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 60px;
+            font-size: 14px;
+            color: #6c757d;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            padding-top: 30px;
+        }
+        .contact-link {
+            color: #d35400;
+            font-weight: 700;
+        }
+        .contact-link:hover {
+            color: #e67e22;
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px;
+                max-width: 100%;
+            }
+            h1 {
+                font-size: 32px;
+            }
+            h2 {
+                font-size: 22px;
+            }
+            p, li {
+                font-size: 15px;
+            }
+            summary {
+                font-size: 16px;
+                padding: 12px 15px;
+            }
+            .back-button {
+                padding: 12px 22px;
+                font-size: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 40px 15px;
+            }
+            .container {
+                padding: 25px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            p, li {
+                font-size: 14px;
+            }
+            summary {
+                font-size: 15px;
+                padding: 10px 12px;
+            }
+        }
+    </style>
+<meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
+<body>
+    <main class="container" role="main">
+        <header>
+            <h1><i class="fas fa-user-shield"></i> Privacy Policy<span class="cps-badge">CPS</span></h1>
+            <p><strong>Last Updated:</strong> March 01, 2025</p>
+        </header>
+
+        <details>
+            <summary>Introduction</summary>
+            <div class="section-content">
+                <p>At Emmanuel Kirui's website (<a href="http://creativepulse.42web.io/" class="contact-link">creativepulse.42web.io</a>) ("Website"), we are committed to protecting your privacy and ensuring transparency in how we handle your personal information. This Privacy Policy ("Policy") explains how we collect, use, disclose, and safeguard your data when you access our Website or interact with our services (collectively, "Services"). By using our Services, you consent to the practices outlined in this Policy, which is designed to comply with applicable data protection laws, including GDPR, CCPA.</p>
+                <p>If you have any questions or concerns about this Policy, please contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>1. Information We Collect</summary>
+            <div class="section-content">
+                <p>We collect various types of information to provide and improve our Services. This includes:</p>
+                <ul>
+                    <li><strong>Personal Information:</strong> Data you voluntarily provide, such as your name, email address, phone number, or other identifiers, when you contact us, subscribe to newsletters, or submit inquiries.</li>
+                    <li><strong>Usage Data:</strong> Automatically collected information about your interaction with our Services, including IP address, browser type, operating system, referral URLs, pages visited, timestamps, and device identifiers.</li>
+                    <li><strong>Cookies and Tracking Technologies:</strong> Small data files or similar technologies (e.g., pixels, web beacons) stored on your device to personalize your experience, analyze usage, and enhance functionality (see Section 5 for details).</li>
+                    <li><strong>Third-Party Data:</strong> Information obtained from third-party services we integrate, such as analytics providers, subject to their privacy policies (see our <a href="https://creativepulse.42web.io/cps/third-party" class="contact-link">Third-Party Services</a> page).</li>
+                </ul>
+                <p>You may choose not to provide certain information, but this could limit your ability to use some features of our Services.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>2. How We Use Your Information</summary>
+            <div class="section-content">
+                <p>We use your information for legitimate purposes to enhance your experience and operate our Services effectively. Specifically, we may use it to:</p>
+                <ul>
+                    <li>Personalize and improve the Website’s content, layout, and functionality based on user preferences and behavior.</li>
+                    <li>Communicate with you, including responding to inquiries, providing customer support, or sending updates, newsletters, or promotional materials (with your consent where required).</li>
+                    <li>Monitor and analyze usage trends, site performance, and security to optimize our Services.</li>
+                    <li>Fulfill legal or regulatory obligations, such as responding to lawful requests from authorities.</li>
+                    <li>Prevent fraud, enforce our <a href="https://creativepulse.42web.io/cps/terms-conditions" class="contact-link">Terms &amp; Conditions</a>, and protect the rights, property, or safety of ourselves and others.</li>
+                </ul>
+                <p>We do not sell, rent, or trade your personal information to third parties for marketing purposes.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>3. Legal Basis for Processing</summary>
+            <div class="section-content">
+                <p>Where applicable (e.g., under GDPR), we process your personal information based on the following legal grounds:</p>
+                <ul>
+                    <li><strong>Consent:</strong> When you voluntarily provide information or opt-in to communications.</li>
+                    <li><strong>Legitimate Interests:</strong> To improve our Services, ensure security, or manage our operations, provided your rights are not overridden.</li>
+                    <li><strong>Contractual Necessity:</strong> To fulfill obligations when you engage with our Services.</li>
+                    <li><strong>Legal Obligation:</strong> To comply with applicable laws or regulations.</li>
+                </ul>
+            </div>
+        </details>
+
+        <details>
+            <summary>4. How We Protect Your Information</summary>
+            <div class="section-content">
+                <p>We employ industry-standard security measures to safeguard your data, including:</p>
+                <ul>
+                    <li>Encryption (e.g., SSL/TLS) for data transmitted between your device and our servers.</li>
+                    <li>Regular security assessments, updates, and monitoring to detect and prevent unauthorized access, loss, or misuse.</li>
+                    <li>Access controls limiting personal data handling to authorized personnel with a strict need-to-know basis.</li>
+                </ul>
+                <p>Despite these efforts, no online transmission or storage method is entirely secure. We cannot guarantee absolute protection against breaches, and you share information with us at your own risk.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>5. Cookies and Tracking Technologies</summary>
+            <div class="section-content">
+                <p>We use cookies and similar technologies to enhance your experience and gather insights. These may include:</p>
+                <ul>
+                    <li><strong>Essential Cookies:</strong> Necessary for basic Website functionality (e.g., session management).</li>
+                    <li><strong>Performance Cookies:</strong> To analyze site usage and improve performance (e.g., Google Analytics).</li>
+                    <li><strong>Preference Cookies:</strong> To remember your settings and personalize your experience.</li>
+                </ul>
+                <p>You can manage cookie preferences via your browser settings or opt-out tools provided by third-party services. Disabling cookies may impact some features of the Website. For more details, review our <a href="https://creativepulse.42web.io/cps/third-party" class="contact-link">Third-Party Services</a> page.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>6. Third-Party Disclosure</summary>
+            <div class="section-content">
+                <p>We may share your information with third parties only under the following circumstances:</p>
+                <ul>
+                    <li><strong>Service Providers:</strong> Trusted partners (e.g., hosting, analytics, email services) who process data on our behalf, bound by confidentiality and data protection agreements.</li>
+                    <li><strong>Legal Requirements:</strong> When compelled by law, court order, or governmental authority to disclose information.</li>
+                    <li><strong>Business Transfers:</strong> In the event of a merger, acquisition, or sale of assets, where your data may be transferred, subject to equivalent privacy protections.</li>
+                    <li><strong>Protection:</strong> To defend our legal rights, prevent fraud, or ensure the safety of our users and the public.</li>
+                </ul>
+                <p>We ensure third parties adhere to applicable privacy laws and limit data sharing to what is necessary.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>7. Data Retention</summary>
+            <div class="section-content">
+                <p>We retain your personal information only as long as necessary to fulfill the purposes outlined in this Policy, comply with legal obligations, or resolve disputes. For example:</p>
+                <ul>
+                    <li>Contact information is kept until you unsubscribe or request deletion.</li>
+                    <li>Usage data may be retained for analysis purposes, typically up to 24 months, then anonymized or deleted.</li>
+                </ul>
+                <p>Once retention periods expire, we securely delete or anonymize your data in accordance with applicable laws.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>8. Your Privacy Rights</summary>
+            <div class="section-content">
+                <p>Depending on your location and applicable laws (e.g., GDPR, CCPA), you have specific rights regarding your personal data. We are committed to ensuring you can exercise these rights easily and transparently.</p>
+                <h3>8.1 Requesting Information We Collect About You</h3>
+                <p>As required by law, you have the right to know what personal information we collect, store, and process about you. To make this process straightforward, we provide a dedicated <a href="data_request.html" class="contact-link">Data Request</a> page where you can request a detailed report of the data we hold. This includes categories of information listed in Section 1, such as personal details you’ve provided and usage data we’ve collected. To submit a request, visit <a href="data_request.html" class="contact-link">data_request</a>, follow the instructions, and we will provide a response within 72 hours, subject to identity verification for your security.</p>
+                <h3>8.2 Additional Rights</h3>
+                <p>In addition to accessing your data, you may also have the following rights:</p>
+                <ul>
+                    <li><strong>Access:</strong> Request a copy of the data we hold about you.</li>
+                    <li><strong>Correction:</strong> Ask us to update or correct inaccurate information.</li>
+                    <li><strong>Deletion:</strong> Request removal of your data (subject to legal retention requirements).</li>
+                    <li><strong>Restriction:</strong> Limit how we process your data in certain circumstances.</li>
+                    <li><strong>Portability:</strong> Receive your data in a structured, machine-readable format.</li>
+                    <li><strong>Opt-Out:</strong> Unsubscribe from marketing communications or object to processing based on legitimate interests.</li>
+                </ul>
+                <p>To exercise any of these rights, use our <a href="data_request.html" class="contact-link">Data Request</a> page or contact us directly at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>. We aim to respond within 72 hours and may require identity verification to protect your privacy.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>9. International Data Transfers</summary>
+            <div class="section-content">
+                <p>If you access our Services from outside Kenya, your data may be transferred to and processed in Kenya. We ensure such transfers comply with applicable data protection laws, using mechanisms like Standard Contractual Clauses where required.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>10. Children’s Privacy</summary>
+            <div class="section-content">
+                <p>Our Services are not intended for individuals under 13 years of age (or the applicable age of consent in your jurisdiction). We do not knowingly collect personal information from children. If we learn that such data has been collected, we will take steps to delete it promptly. Contact us if you believe we have inadvertently collected a child’s information.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>11. Changes to This Privacy Policy</summary>
+            <div class="section-content">
+                <p>We may update this Policy to reflect changes in our practices, technology, or legal requirements. Revised versions will be posted here with an updated "Last Updated" date. Significant changes may be communicated via email or a Website notice. We encourage you to review this Policy periodically to stay informed.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>12. Contact Us</summary>
+            <div class="section-content">
+                <p>For questions, requests, or complaints about this Privacy Policy or our data practices, please reach out to:</p>
+                <ul>
+                    <li><strong>Email:</strong> <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a></li>
+                    <li><strong>City:</strong> Nairobi, Kenya</li>
+                </ul>
+                <p>We are dedicated to resolving your concerns promptly and transparently.</p>
+            </div>
+        </details>
+
+        <!-- Back Button -->
+        <button class="back-button" onclick="history.back()" aria-label="Return to Previous Page">
+            <i class="fas fa-arrow-left"></i> Return to Previous Page
+        </button>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2026 Emmanuel Kirui. All rights reserved.<br>For additional inquiries, contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
+        </footer>
+    </main>
+
+</body></html>

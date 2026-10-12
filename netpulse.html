@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en"><head><script>
+(function(){
+  var KEY='ek_cookie_consent', loaded=false;
+  function accepted(){
+    try{var d=JSON.parse(localStorage.getItem(KEY));
+      return !!d && d.choice==='accepted' && new Date()<=new Date(d.expires);}catch(e){return false;}
+  }
+  function loadAds(){
+    if(loaded||window.__adsLoaded) return; loaded=window.__adsLoaded=true;
+    var s=document.createElement('script'); s.async=true; s.crossOrigin='anonymous';
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271';
+    document.head.appendChild(s);
+  }
+  if(accepted()) loadAds();
+  window.addEventListener('ek:consent',function(e){ if(e.detail&&e.detail.choice==='accepted') loadAds(); });
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#cookieAccept,.cookie-accept')) setTimeout(function(){ if(accepted()) loadAds(); },50);
+  });
+})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetPulse Pro — Live Network Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Syne:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#04080f;
+  --bg2:#080d1a;
+  --card:rgba(8,16,32,0.9);
+  --border:rgba(0,210,255,0.1);
+  --border-hi:rgba(0,210,255,0.4);
+  --accent:#00d2ff;
+  --green:#00ffaa;
+  --yellow:#ffcc00;
+  --red:#ff3d5a;
+  --purple:#bf7fff;
+  --orange:#ff8c42;
+  --text:#ddeeff;
+  --muted:#4a6a8a;
+  --dim:#2a3a5a;
+  --mono:'JetBrains Mono',monospace;
+  --sans:'Syne',sans-serif;
+  --wifi-color:#00ffaa;
+  --eth-color:#00d2ff;
+  --mobile-color:#bf7fff;
+  --unknown-color:#ffcc00;
+}
+
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
+
+/* ── BACKGROUND ── */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+.bg-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(0,210,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,210,255,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+.bg-glow{position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none}
+.g1{width:800px;height:800px;background:radial-gradient(circle,rgba(0,210,255,.06) 0%,transparent 70%);top:-300px;left:-200px;animation:g1f 30s ease-in-out infinite}
+.g2{width:600px;height:600px;background:radial-gradient(circle,rgba(0,255,170,.05) 0%,transparent 70%);bottom:-200px;right:-100px;animation:g2f 38s ease-in-out infinite}
+.g3{width:500px;height:500px;background:radial-gradient(circle,rgba(191,127,255,.04) 0%,transparent 70%);top:50%;left:40%;animation:g3f 45s ease-in-out infinite}
+@keyframes g1f{0%,100%{transform:translate(0,0)}50%{transform:translate(80px,60px)}}
+@keyframes g2f{0%,100%{transform:translate(0,0)}50%{transform:translate(-60px,-80px)}}
+@keyframes g3f{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.4)}}
+
+/* ── LAYOUT ── */
+.wrap{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:16px}
+
+/* ── HEADER ── */
+.hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 22px;background:var(--card);border:1px solid var(--border);
+  border-radius:14px;margin-bottom:16px;backdrop-filter:blur(24px);flex-wrap:wrap;gap:12px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{
+  width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--green));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-weight:700;font-size:14px;color:#000;
+  box-shadow:0 0 20px rgba(0,210,255,.3);animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(0,210,255,.3)}50%{box-shadow:0 0 35px rgba(0,210,255,.6)}}
+.brand-name{font-family:var(--sans);font-size:20px;font-weight:800;letter-spacing:1px;background:linear-gradient(90deg,var(--accent),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand-sub{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.live-pill{display:flex;align-items:center;gap:6px;background:rgba(0,255,170,.08);border:1px solid rgba(0,255,170,.2);border-radius:20px;padding:5px 12px;font-family:var(--mono);font-size:10px;color:var(--green);letter-spacing:1px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 1.5s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.clock{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.hdr-btn{padding:7px 16px;background:rgba(0,210,255,.08);border:1px solid var(--border-hi);border-radius:8px;color:var(--accent);font-family:var(--mono);font-size:10px;cursor:pointer;letter-spacing:.5px;transition:all .2s}
+.hdr-btn:hover{background:rgba(0,210,255,.18);box-shadow:0 0 12px rgba(0,210,255,.2)}
+.php-badge{font-family:var(--mono);font-size:9px;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:3px 7px}
+
+/* ── CONNECTION TYPE BANNER ── */
+.conn-banner{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+  padding:14px 20px;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:16px;backdrop-filter:blur(24px);
+  border-left:3px solid var(--conn-color,var(--accent));
+  transition:border-color .5s;
+}
+.conn-type-wrap{display:flex;align-items:center;gap:14px}
+.conn-icon{font-size:28px;line-height:1}
+.conn-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+.conn-type{font-family:var(--sans);font-size:22px;font-weight:700;color:var(--conn-color,var(--accent));transition:color .5s}
+.conn-meta{display:flex;gap:20px;flex-wrap:wrap}
+.conn-stat{text-align:center}
+.conn-stat-val{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--text)}
+.conn-stat-lbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+
+/* ── KPI STRIP ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color .3s;backdrop-filter:blur(20px)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--kc,var(--accent))}
+.kpi:hover{border-color:var(--border-hi)}
+.kpi-lbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:7px}
+.kpi-val{font-family:var(--mono);font-size:24px;font-weight:700;color:var(--text);line-height:1}
+.kpi-u{font-size:11px;color:var(--muted);margin-left:2px}
+.kpi-d{font-family:var(--mono);font-size:10px;margin-top:5px}
+.up{color:var(--green)}.dn{color:var(--red)}.nt{color:var(--muted)}
+
+/* ── MAIN GRID ── */
+.grid{display:grid;grid-template-columns:1fr 1fr 300px;gap:14px}
+@media(max-width:1100px){.grid{grid-template-columns:1fr 1fr}.span3{grid-column:1/-1!important}.sidebar{grid-column:1/-1!important}}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.span2,.span3,.sidebar{grid-column:1!important}.kpi-grid{grid-template-columns:1fr 1fr}}
+
+/* ── PANEL ── */
+.panel{background:var(--card);border:1px solid var(--border);border-radius:12px;backdrop-filter:blur(20px);overflow:hidden}
+.ph{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.pt{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase}
+.pb{padding:14px}
+
+/* ── NETWORK TYPE CARDS ── */
+.net-types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.net-type-card{
+  border-radius:10px;padding:14px;border:1px solid rgba(255,255,255,.06);
+  position:relative;overflow:hidden;cursor:pointer;transition:all .3s;
+  background:rgba(255,255,255,.02);
+}
+.net-type-card.active{border-color:var(--ntc,var(--accent));background:rgba(var(--ntc-rgb,0,210,255),.06);box-shadow:0 0 20px rgba(var(--ntc-rgb,0,210,255),.1)}
+.net-type-card:hover{border-color:rgba(255,255,255,.15)}
+.ntc-icon{font-size:24px;margin-bottom:8px}
+.ntc-name{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--text);margin-bottom:4px}
+.ntc-desc{font-family:var(--mono);font-size:9px;color:var(--muted);line-height:1.5}
+.ntc-status{display:flex;align-items:center;gap:5px;margin-top:8px;font-family:var(--mono);font-size:9px}
+.ntc-dot{width:6px;height:6px;border-radius:50%}
+
+/* ── SPEED METER ── */
+.speed-wrap{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.speed-gauge{flex:1;min-width:100px}
+.gauge-lbl{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.gauge-track{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-bottom:4px}
+.gauge-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.gauge-val{font-family:var(--mono);font-size:13px;font-weight:600}
+
+/* ── PING CHART ── */
+.ping-bars{display:flex;align-items:flex-end;gap:2px;height:60px;margin-bottom:6px}
+.ping-bar{flex:1;border-radius:2px 2px 0 0;min-width:3px;transition:height .4s ease,background .3s}
+.ping-stats{display:flex;gap:16px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.ping-stat-v{color:var(--text);font-weight:600}
+
+/* ── INTERFACE TABLE ── */
+.iface-table{width:100%;border-collapse:collapse}
+.iface-table th{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:uppercase;text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)}
+.iface-table td{padding:7px 8px;font-size:11px;border-bottom:1px solid rgba(0,210,255,.04);vertical-align:middle}
+.iface-table tr:hover td{background:rgba(0,210,255,.03)}
+
+/* ── SIGNAL BARS ── */
+.sig-bars{display:flex;align-items:flex-end;gap:2px;height:16px}
+.sig-bar{width:4px;border-radius:1px;transition:opacity .3s}
+
+/* ── TRAFFIC CHART ── */
+.tc-wrap{position:relative;height:120px;margin-bottom:10px}
+.tc-wrap canvas{width:100%!important}
+
+/* ── DNS / ROUTE TABLE ── */
+.info-row{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid rgba(0,210,255,.05);font-size:11px}
+.info-key{font-family:var(--mono);color:var(--muted);min-width:130px;flex-shrink:0;font-size:10px}
+.info-val{font-family:var(--mono);color:var(--text);word-break:break-all}
+
+/* ── HOW-TO SECTION ── */
+.howto{margin-top:16px}
+.howto-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.howto-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;backdrop-filter:blur(20px)}
+.howto-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.howto-num{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;flex-shrink:0}
+.howto-title{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--text)}
+.howto-body{padding:14px 16px}
+.howto-step{display:flex;gap:10px;margin-bottom:10px;font-size:12px;line-height:1.5;color:var(--muted)}
+.howto-step-n{font-family:var(--mono);font-size:10px;color:var(--accent);font-weight:700;min-width:18px;margin-top:1px}
+.code-block{background:rgba(0,0,0,.5);border:1px solid rgba(0,210,255,.1);border-radius:7px;padding:10px 12px;font-family:var(--mono);font-size:10px;color:var(--accent);line-height:1.7;margin:8px 0;overflow-x:auto}
+.code-block .cmt{color:var(--dim)}
+.code-block .kw{color:var(--purple)}
+.code-block .str{color:var(--green)}
+.warn-box{background:rgba(255,204,0,.05);border:1px solid rgba(255,204,0,.2);border-radius:7px;padding:10px 12px;font-family:var(--mono);font-size:10px;color:var(--yellow);line-height:1.6;margin-top:8px}
+.ok-box{background:rgba(0,255,170,.05);border:1px solid rgba(0,255,170,.2);border-radius:7px;padding:10px 12px;font-family:var(--mono);font-size:10px;color:var(--green);line-height:1.6;margin-top:8px}
+
+/* ── CONSOLE ── */
+.console{background:rgba(0,0,0,.5);border-radius:9px;padding:12px;font-family:var(--mono);font-size:10px;line-height:1.8;max-height:200px;overflow-y:auto}
+.console::-webkit-scrollbar{width:3px}
+.console::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px}
+.cl{display:flex;gap:8px}
+.c-p{color:var(--green)}.c-c{color:var(--accent)}.c-o{color:var(--muted)}.c-e{color:var(--red)}.c-cm{color:var(--dim)}
+.cli-row{display:flex;gap:6px;margin-top:8px}
+.cli-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-family:var(--mono);font-size:10px;color:var(--text);outline:none}
+.cli-input:focus{border-color:var(--border-hi)}
+.run-btn{padding:6px 14px;background:rgba(0,210,255,.1);border:1px solid var(--border-hi);border-radius:6px;color:var(--accent);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .2s}
+.run-btn:hover{background:rgba(0,210,255,.2)}
+
+/* ── SCROLLABLE ── */
+.scroll{overflow-y:auto;max-height:260px}
+.scroll::-webkit-scrollbar{width:4px}
+.scroll::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px}
+
+/* ── SECTION HEADER ── */
+.section-hdr{display:flex;align-items:center;gap:10px;margin:20px 0 12px}
+.section-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.section-title{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+
+/* ── TAG ── */
+.tag{display:inline-block;padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:9px;letter-spacing:.5px}
+.t-wifi  {background:rgba(0,255,170,.1);color:var(--green);border:1px solid rgba(0,255,170,.2)}
+.t-eth   {background:rgba(0,210,255,.1);color:var(--accent);border:1px solid rgba(0,210,255,.2)}
+.t-mobile{background:rgba(191,127,255,.1);color:var(--purple);border:1px solid rgba(191,127,255,.2)}
+.t-other {background:rgba(255,204,0,.1);color:var(--yellow);border:1px solid rgba(255,204,0,.2)}
+
+@media(max-width:500px){
+  .net-types{grid-template-columns:1fr 1fr}
+  .howto-grid{grid-template-columns:1fr}
+}
+</style>
+<meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
+<body>
+
+<div class="bg">
+  <div class="bg-grid"></div>
+  <div class="bg-glow g1"></div>
+  <div class="bg-glow g2"></div>
+  <div class="bg-glow g3"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="brand">
+      <div class="brand-icon">NP</div>
+      <div>
+        <div class="brand-name">NETPULSE PRO</div>
+        <div class="brand-sub">WiFi · Ethernet · Mobile Monitor</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <div class="live-pill"><span class="live-dot"></span>LIVE MONITORING</div>
+      <span class="clock" id="clock">22:17:58 UTC</span>
+      <span class="php-badge">PHP 8.4.25</span>
+      <button class="hdr-btn" onclick="runFullScan()">⟳ SCAN</button>
+    </div>
+  </header>
+
+  <!-- CONNECTION TYPE BANNER -->
+  <div class="conn-banner" id="conn-banner" style="--conn-color: var(--accent);">
+    <div class="conn-type-wrap">
+      <div class="conn-icon" id="conn-icon">❓</div>
+      <div>
+        <div class="conn-label">Active Connection</div>
+        <div class="conn-type" id="conn-type" style="color: var(--accent);">Detecting...</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:3px" id="conn-detail">effectiveType: 4g | downlink: 1.55 Mbps | rtt: 100ms</div>
+      </div>
+    </div>
+    <div class="conn-meta">
+      <div class="conn-stat">
+        <div class="conn-stat-val" id="eff-type">4G</div>
+        <div class="conn-stat-lbl">Speed Class</div>
+      </div>
+      <div class="conn-stat">
+        <div class="conn-stat-val" id="downlink">1.55 Mbps</div>
+        <div class="conn-stat-lbl">Downlink</div>
+      </div>
+      <div class="conn-stat">
+        <div class="conn-stat-val" id="rtt-val">100ms</div>
+        <div class="conn-stat-lbl">RTT</div>
+      </div>
+      <div class="conn-stat">
+        <div class="conn-stat-val" id="save-data-val">OFF</div>
+        <div class="conn-stat-lbl">Data Saver</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpi-grid">
+    <div class="kpi" style="--kc:var(--green)">
+      <div class="kpi-lbl">Download Speed</div>
+      <div class="kpi-val" id="k-dl">1.6<span class="kpi-u">Mbps</span></div>
+      <div class="kpi-d dn" id="k-dl-d">API estimate ↓</div>
+    </div>
+    <div class="kpi" style="--kc:var(--accent)">
+      <div class="kpi-lbl">Upload Speed</div>
+      <div class="kpi-val" id="k-ul">0.6<span class="kpi-u">Mbps</span></div>
+      <div class="kpi-d dn" id="k-ul-d">API estimate ↑</div>
+    </div>
+    <div class="kpi" style="--kc:var(--purple)">
+      <div class="kpi-lbl">Latency / Ping</div>
+      <div class="kpi-val" id="k-ping">188<span class="kpi-u">ms</span></div>
+      <div class="kpi-d nt" id="k-ping-d">Fair</div>
+    </div>
+    <div class="kpi" style="--kc:var(--yellow)">
+      <div class="kpi-lbl">Packet Loss</div>
+      <div class="kpi-val" id="k-loss">0<span class="kpi-u">%</span></div>
+      <div class="kpi-d up">● Within threshold</div>
+    </div>
+    <div class="kpi" style="--kc:var(--orange)">
+      <div class="kpi-lbl">Public IP</div>
+      <div class="kpi-val" style="font-size:15px" id="k-ip">20.220.110.152</div>
+      <div class="kpi-d nt" id="k-isp">Microsoft Corporation</div>
+    </div>
+    <div class="kpi" style="--kc:var(--red)">
+      <div class="kpi-lbl">Server Uptime</div>
+      <div class="kpi-val" style="font-size:18px">N/A</div>
+      <div class="kpi-d nt">Linux 5.6.7-362.18.1.el9_5.x86_64</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- Network Type Cards -->
+    <div class="panel span2" style="grid-column:1/span 2">
+      <div class="ph">
+        <span class="pt">Connection Types</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">Auto-detected via browser API</span>
+      </div>
+      <div class="pb">
+        <div class="net-types">
+
+          <div class="net-type-card active" id="card-wifi" style="--ntc:var(--wifi-color);--ntc-rgb:0,255,170">
+            <div class="ntc-icon">📶</div>
+            <div class="ntc-name">WiFi / WLAN</div>
+            <div class="ntc-desc">Wireless LAN connection via router or access point. Supports 802.11 a/b/g/n/ac/ax (WiFi 6).</div>
+            <div class="ntc-status">
+              <div class="ntc-dot" id="dot-wifi" style="background: var(--dim); box-shadow: none;"></div>
+              <span id="status-wifi" style="font-family:var(--mono);font-size:9px;color:var(--muted)">NOT ACTIVE</span>
+            </div>
+            <div style="margin-top:10px" id="wifi-signal"></div>
+          </div>
+
+          <div class="net-type-card" id="card-eth" style="--ntc:var(--eth-color);--ntc-rgb:0,210,255">
+            <div class="ntc-icon">🔌</div>
+            <div class="ntc-name">Ethernet / LAN</div>
+            <div class="ntc-desc">Wired connection via RJ-45 cable. Supports 10/100/1000 Mbps Fast Ethernet and Gigabit.</div>
+            <div class="ntc-status">
+              <div class="ntc-dot" id="dot-eth" style="background: var(--dim); box-shadow: none;"></div>
+              <span id="status-eth" style="font-family:var(--mono);font-size:9px;color:var(--muted)">NOT ACTIVE</span>
+            </div>
+          </div>
+
+          <div class="net-type-card" id="card-mobile" style="--ntc:var(--mobile-color);--ntc-rgb:191,127,255">
+            <div class="ntc-icon">📱</div>
+            <div class="ntc-name">Mobile / Hotspot</div>
+            <div class="ntc-desc">Cellular data connection (3G/4G/5G) or personal mobile hotspot tethering.</div>
+            <div class="ntc-status">
+              <div class="ntc-dot" id="dot-mobile" style="background: var(--dim); box-shadow: none;"></div>
+              <span id="status-mobile" style="font-family:var(--mono);font-size:9px;color:var(--muted)">NOT ACTIVE</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Speed Gauges -->
+        <div style="margin-top:16px">
+          <div style="font-family:var(--mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Live Speed Gauges</div>
+          <div class="speed-wrap">
+            <div class="speed-gauge">
+              <div class="gauge-lbl">↓ Download</div>
+              <div class="gauge-track"><div class="gauge-fill" id="dl-bar" style="width: 1.55%; background: linear-gradient(90deg,var(--green),#00cc88);"></div></div>
+              <div class="gauge-val" style="color:var(--green)" id="dl-val">1.6 Mbps</div>
+            </div>
+            <div class="speed-gauge">
+              <div class="gauge-lbl">↑ Upload</div>
+              <div class="gauge-track"><div class="gauge-fill" id="ul-bar" style="width: 0.62%; background: linear-gradient(90deg,var(--accent),#0088cc);"></div></div>
+              <div class="gauge-val" style="color:var(--accent)" id="ul-val">0.6 Mbps</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Ping Chart -->
+    <div class="panel sidebar">
+      <div class="ph">
+        <span class="pt">Ping History</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted)" id="ping-target">→ cloudflare</span>
+      </div>
+      <div class="pb">
+        <div class="ping-bars" id="ping-bars"><div class="ping-bar" style="height:56px;background:var(--red)" title="188ms"></div></div>
+        <div class="ping-stats">
+          <div><div class="ping-stat-v" id="ps-cur">188ms</div><div>Current</div></div>
+          <div><div class="ping-stat-v" id="ps-min">188ms</div><div>Min</div></div>
+          <div><div class="ping-stat-v" id="ps-max">188ms</div><div>Max</div></div>
+          <div><div class="ping-stat-v" id="ps-avg">188ms</div><div>Avg</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Traffic Chart -->
+    <div class="panel" style="grid-column:1/span 2">
+      <div class="ph">
+        <span class="pt">Traffic — 60s Window</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted)">IN ↓ / OUT ↑</span>
+      </div>
+      <div class="pb">
+        <div class="tc-wrap">
+          <canvas id="tc" height="120" width="904" style="display: block; box-sizing: border-box; height: 120px; width: 904px;"></canvas>
+        </div>
+        <div style="display:flex;gap:16px;font-family:var(--mono);font-size:10px;color:var(--muted)">
+          <span style="color:var(--green)">■</span> Download &nbsp;
+          <span style="color:var(--accent)">■</span> Upload
+        </div>
+      </div>
+    </div>
+
+    <!-- Server Info (PHP) -->
+    <div class="panel sidebar">
+      <div class="ph">
+        <span class="pt">Server Info</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--green)">PHP</span>
+      </div>
+      <div class="pb">
+                <div class="info-row">
+          <span class="info-key">PHP Version</span>
+          <span class="info-val">8.4.25</span>
+        </div>
+                <div class="info-row">
+          <span class="info-key">Server OS</span>
+          <span class="info-val">Linux</span>
+        </div>
+                <div class="info-row">
+          <span class="info-key">Server Host</span>
+          <span class="info-val">freeweb6.byetcluster.com</span>
+        </div>
+                <div class="info-row">
+          <span class="info-key">Server IP</span>
+          <span class="info-val">127.0.0.7</span>
+        </div>
+                <div class="info-row">
+          <span class="info-key">Client IP</span>
+          <span class="info-val">20.220.110.152</span>
+        </div>
+                <div class="info-row">
+          <span class="info-key">Server Time</span>
+          <span class="info-val">2026-10-12 18:17:55</span>
+        </div>
+                <div class="info-row">
+          <span class="info-key">Sys Uptime</span>
+          <span class="info-val">N/A</span>
+        </div>
+                <div class="info-row">
+          <span class="info-key">Memory Limit</span>
+          <span class="info-val">512M</span>
+        </div>
+                <div class="info-row">
+          <span class="info-key">Max Exec Time</span>
+          <span class="info-val">60s</span>
+        </div>
+              </div>
+    </div>
+
+    <!-- Network Interfaces (PHP) -->
+    <div class="panel span3" style="grid-column:1/-1">
+      <div class="ph">
+        <span class="pt">Network Interfaces</span>
+        <span style="font-family:var(--mono);font-size:9px;color:var(--muted)" id="iface-count">3 interfaces</span>
+      </div>
+      <div class="pb">
+        <div class="scroll" style="max-height:220px">
+          <table class="iface-table">
+            <thead>
+              <tr>
+                <th>Interface</th><th>Type</th><th>IP Address</th>
+                <th>Status</th><th>Speed Class</th><th>Signal</th>
+              </tr>
+            </thead>
+            <tbody id="iface-tbody">
+              <tr>
+                        <td style="font-family:var(--mono);font-size:11px">lo</td>
+                        <td><span class="tag t-other">LOOPBACK</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">127.0.0.1</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.54</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:24</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">192.168.0.43</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:21</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">192.168.5.43</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:22</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">192.168.6.43</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:23</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">192.168.7.43</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:26</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">192.168.1.43</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:10014</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.145</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:10015</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.146</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:10016</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.147</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:10017</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.148</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:10018</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.107</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:10019</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.106</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:10020</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.105</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr><tr>
+                        <td style="font-family:var(--mono);font-size:11px">ens18:10021</td>
+                        <td><span class="tag t-eth">ETHERNET</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">185.27.134.104</td>
+                        <td><span style="color:var(--green)">● UP</span></td>
+                        <td style="font-family:var(--mono);font-size:10px;color:var(--muted)">—</td>
+                        <td>—</td>
+                      </tr>            </tbody>
+          </table>
+        </div>
+        <!-- JS-detected client interfaces injected below -->
+        <div style="margin-top:12px;font-family:var(--mono);font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase">Client-side detection (via WebRTC)</div>
+        <div id="client-ifaces" style="margin-top:8px">
+    <div class="info-row">
+      <span class="info-key">PUBLIC IP</span>
+      <span class="info-val"><span class="tag t-eth">PUBLIC</span> 20.220.110.152</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">PUBLIC IP</span>
+      <span class="info-val"><span class="tag t-eth">PUBLIC</span> 0.0.0.0</span>
+    </div></div>
+      </div>
+    </div>
+
+    <!-- PHP Console -->
+    <div class="panel span3" style="grid-column:1/-1">
+      <div class="ph">
+        <span class="pt">PHP Diagnostics Console</span>
+        <span class="php-badge">CLI</span>
+      </div>
+      <div class="pb">
+        <div class="console" id="console"><div class="cl"><span class="c-cm">// NetPulse Pro — PHP 8.4.25</span></div><div class="cl"><span class="c-p">$ </span><span class="c-c">php netpulse_full.php --boot</span></div><div class="cl"><span class="c-o">[OK] Network Information API loaded</span></div><div class="cl"><span class="c-o">[OK] WebRTC interface detection active</span></div><div class="cl"><span class="c-o">[OK] Client IP: 20.220.110.152</span></div><div class="cl"><span class="c-o">[OK] Ping to 1.1.1.1 ... measuring</span></div><div class="cl"><span class="c-cm">// Ready — type 'help' for commands</span></div></div>
+        <div class="cli-row">
+          <input class="cli-input" id="cli" placeholder="ping, speed, interfaces, dns, scan, help..." onkeydown="if(event.key==='Enter')runCmd()">
+          <button class="run-btn" onclick="runCmd()">RUN</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end grid -->
+
+  <!-- HOW TO USE SECTION -->
+  <div class="section-hdr">
+    <div class="section-line"></div>
+    <div class="section-title">📖 How To Use NetPulse Pro</div>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="howto-grid">
+
+    <!-- Card 1: Setup -->
+    <div class="howto-card">
+      <div class="howto-head">
+        <div class="howto-num" style="background:rgba(0,210,255,.1);color:var(--accent);border:1px solid rgba(0,210,255,.2)">01</div>
+        <div class="howto-title">Setup &amp; Installation</div>
+      </div>
+      <div class="howto-body">
+        <div class="howto-step"><span class="howto-step-n">①</span><span>Ensure you have PHP 8.0+ installed (XAMPP, Laragon, MAMP, or server)</span></div>
+        <div class="howto-step"><span class="howto-step-n">②</span><span>Place <code style="color:var(--accent);font-family:var(--mono)">netpulse_full.php</code> in your web server root folder</span></div>
+        <div class="howto-step"><span class="howto-step-n">③</span><span>Open a browser and visit the URL for your server</span></div>
+        <div class="code-block">
+<span class="cmt"># XAMPP (Windows)</span>
+C:\xampp\htdocs\netpulse_full.php
+http://localhost/netpulse_full.php
+
+<span class="cmt"># Laragon (Windows)</span>
+C:\laragon\www\netpulse_full.php
+http://localhost/netpulse_full.php
+
+<span class="cmt"># Built-in PHP server (any OS)</span>
+php -S 0.0.0.0:8080
+http://localhost:8080/netpulse_full.php
+
+<span class="cmt"># Linux / macOS Apache</span>
+/var/www/html/netpulse_full.php
+http://localhost/netpulse_full.php
+        </div>
+        <div class="ok-box">✅ No database required. No composer install. Drop the single PHP file and open it.</div>
+      </div>
+    </div>
+
+    <!-- Card 2: WiFi -->
+    <div class="howto-card">
+      <div class="howto-head">
+        <div class="howto-num" style="background:rgba(0,255,170,.1);color:var(--green);border:1px solid rgba(0,255,170,.2)">02</div>
+        <div class="howto-title">Monitor WiFi</div>
+      </div>
+      <div class="howto-body">
+        <div class="howto-step"><span class="howto-step-n">①</span><span>Connect your device to any WiFi network</span></div>
+        <div class="howto-step"><span class="howto-step-n">②</span><span>Open the dashboard — it auto-detects WiFi via <code style="color:var(--green);font-family:var(--mono)">Network Information API</code></span></div>
+        <div class="howto-step"><span class="howto-step-n">③</span><span>The Connection Banner will show <strong style="color:var(--green)">WiFi</strong> with signal strength bars</span></div>
+        <div class="howto-step"><span class="howto-step-n">④</span><span>Live ping and speed are measured continuously. You can also type <code style="color:var(--green);font-family:var(--mono)">speed</code> in the console to force a measurement</span></div>
+        <div class="code-block">
+<span class="cmt">// What the dashboard detects for WiFi:</span>
+Connection Type  → wifi
+Effective Speed  → 4g / 3g / 2g
+Downlink         → estimated Mbps
+RTT              → round-trip ms
+Save-Data        → on/off (data saver)
+        </div>
+        <div class="warn-box">⚠️ WiFi signal strength (dBm) requires OS-level tools. The browser API gives speed class, not raw signal. Use the console <code>scan</code> command for more detail.</div>
+      </div>
+    </div>
+
+    <!-- Card 3: Ethernet -->
+    <div class="howto-card">
+      <div class="howto-head">
+        <div class="howto-num" style="background:rgba(0,210,255,.1);color:var(--accent);border:1px solid rgba(0,210,255,.2)">03</div>
+        <div class="howto-title">Monitor Ethernet</div>
+      </div>
+      <div class="howto-body">
+        <div class="howto-step"><span class="howto-step-n">①</span><span>Plug in your RJ-45 Ethernet cable to router or switch</span></div>
+        <div class="howto-step"><span class="howto-step-n">②</span><span>Open the dashboard — Ethernet detected as connection type <strong style="color:var(--accent)">ethernet</strong></span></div>
+        <div class="howto-step"><span class="howto-step-n">③</span><span>PHP reads <code style="color:var(--accent);font-family:var(--mono)">/proc/net/dev</code> on Linux to show real interface bytes (eth0, ens3, etc.)</span></div>
+        <div class="howto-step"><span class="howto-step-n">④</span><span>On Windows, use the console command <code style="color:var(--accent);font-family:var(--mono)">interfaces</code> to see adapter details</span></div>
+        <div class="code-block">
+<span class="cmt"># Linux: check interface stats live</span>
+cat /proc/net/dev
+ip -s link show eth0
+
+<span class="cmt"># Windows PowerShell</span>
+Get-NetAdapter | Select Name, Status, LinkSpeed
+
+<span class="cmt"># macOS</span>
+networksetup -listallhardwareports
+ifconfig en0
+        </div>
+        <div class="ok-box">✅ Ethernet connections usually show the lowest latency. Expected ping &lt; 5ms on LAN, &lt; 50ms on WAN.</div>
+      </div>
+    </div>
+
+    <!-- Card 4: Mobile / Hotspot -->
+    <div class="howto-card">
+      <div class="howto-head">
+        <div class="howto-num" style="background:rgba(191,127,255,.1);color:var(--purple);border:1px solid rgba(191,127,255,.2)">04</div>
+        <div class="howto-title">Monitor Mobile / Hotspot</div>
+      </div>
+      <div class="howto-body">
+        <div class="howto-step"><span class="howto-step-n">①</span><span>Open your phone's hotspot (Settings → Hotspot) or use mobile data on a phone/tablet</span></div>
+        <div class="howto-step"><span class="howto-step-n">②</span><span>Connect your laptop or PC to the hotspot — or open this page directly on the mobile device</span></div>
+        <div class="howto-step"><span class="howto-step-n">③</span><span>Connection type shows <strong style="color:var(--purple)">cellular</strong> — the dashboard detects 2G/3G/4G/5G automatically</span></div>
+        <div class="howto-step"><span class="howto-step-n">④</span><span>Data saver mode is detected and displayed in the banner</span></div>
+        <div class="code-block">
+<span class="cmt">// Cellular effective types detected:</span>
+slow-2g  → &lt; 50 kbps   (2G GPRS)
+2g       → ~250 kbps   (EDGE)
+3g       → ~750 kbps   (HSPA)
+4g       → ~4+ Mbps    (LTE / 5G NR)
+
+<span class="cmt">// On the phone itself, open:</span>
+http://&lt;your-server-ip&gt;:8080/netpulse_full.php
+        </div>
+        <div class="warn-box">⚠️ The Network Information API is not supported in Firefox or Safari. Use Chrome, Edge, or Samsung Browser for full detection.</div>
+      </div>
+    </div>
+
+    <!-- Card 5: Console Commands -->
+    <div class="howto-card">
+      <div class="howto-head">
+        <div class="howto-num" style="background:rgba(255,140,66,.1);color:var(--orange);border:1px solid rgba(255,140,66,.2)">05</div>
+        <div class="howto-title">Console Commands</div>
+      </div>
+      <div class="howto-body">
+        <div class="code-block">
+<span class="kw">ping</span>           <span class="cmt">→ Measure live latency</span>
+<span class="kw">speed</span>          <span class="cmt">→ Estimate download speed</span>
+<span class="kw">interfaces</span>     <span class="cmt">→ List detected network interfaces</span>
+<span class="kw">dns</span>            <span class="cmt">→ Show DNS servers in use</span>
+<span class="kw">scan</span>           <span class="cmt">→ Full environment scan</span>
+<span class="kw">info</span>           <span class="cmt">→ Show server PHP info</span>
+<span class="kw">type</span>           <span class="cmt">→ Show current connection type</span>
+<span class="kw">ip</span>             <span class="cmt">→ Show public IP details</span>
+<span class="kw">clear</span>          <span class="cmt">→ Clear console output</span>
+<span class="kw">help</span>           <span class="cmt">→ Show all commands</span>
+        </div>
+        <div class="ok-box">💡 Type any command into the console at the bottom of the main panel and press Enter or click RUN.</div>
+      </div>
+    </div>
+
+    <!-- Card 6: Tips -->
+    <div class="howto-card">
+      <div class="howto-head">
+        <div class="howto-num" style="background:rgba(255,204,0,.1);color:var(--yellow);border:1px solid rgba(255,204,0,.2)">06</div>
+        <div class="howto-title">Tips &amp; Troubleshooting</div>
+      </div>
+      <div class="howto-body">
+        <div class="howto-step"><span class="howto-step-n">💡</span><span><strong>Connection not detected?</strong> Use Chrome/Edge — Firefox and Safari have limited Network Information API support</span></div>
+        <div class="howto-step"><span class="howto-step-n">💡</span><span><strong>PHP interfaces empty?</strong> On Windows, PHP may not return network interfaces. The JS WebRTC fallback still detects your IPs</span></div>
+        <div class="howto-step"><span class="howto-step-n">💡</span><span><strong>Speed test inaccurate?</strong> The browser estimate uses available hints. For precise results, use the <code style="color:var(--yellow);font-family:var(--mono)">speed</code> console command which fetches a test payload</span></div>
+        <div class="howto-step"><span class="howto-step-n">💡</span><span><strong>Monitor from phone?</strong> Run <code style="color:var(--yellow);font-family:var(--mono)">php -S 0.0.0.0:8080</code> on your PC, then open <code style="color:var(--yellow);font-family:var(--mono)">http://&lt;PC-IP&gt;:8080/netpulse_full.php</code> on your phone</span></div>
+        <div class="warn-box">⚠️ Some speed/ping features require internet access to reach test endpoints (Cloudflare 1.1.1.1, etc.).</div>
+      </div>
+    </div>
+
+  </div><!-- end howto-grid -->
+
+</div><!-- end wrap -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+// ── PHP-injected server data ──────────────────────────────────────────
+const PHP_SERVER_IFACES = ["lo","ens18","ens18:24","ens18:21","ens18:22","ens18:23","ens18:26","ens18:10014","ens18:10015","ens18:10016","ens18:10017","ens18:10018","ens18:10019","ens18:10020","ens18:10021"];
+const PHP_CLIENT_IP     = "20.220.110.152";
+const PHP_VERSION       = "8.4.25";
+
+// ── Clock ──────────────────────────────────────────────────────────────
+function tick(){document.getElementById('clock').textContent=new Date().toTimeString().slice(0,8)+' UTC';}
+setInterval(tick,1000);tick();
+
+// ── Network Information API ────────────────────────────────────────────
+const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
+
+const TYPE_MAP = {
+  wifi:     {icon:'📶', label:'WiFi',           color:'var(--wifi-color)',   card:'card-wifi'},
+  ethernet: {icon:'🔌', label:'Ethernet',        color:'var(--eth-color)',    card:'card-eth'},
+  cellular: {icon:'📱', label:'Mobile / Cellular',color:'var(--mobile-color)',card:'card-mobile'},
+  bluetooth:{icon:'🔵', label:'Bluetooth',        color:'var(--yellow)',       card:'card-wifi'},
+  wimax:    {icon:'📡', label:'WiMAX',            color:'var(--yellow)',       card:'card-wifi'},
+  other:    {icon:'🌐', label:'Connected',        color:'var(--yellow)',       card:'card-wifi'},
+  none:     {icon:'❌', label:'Offline',          color:'var(--red)',          card:'card-wifi'},
+  unknown:  {icon:'❓', label:'Detecting...',     color:'var(--accent)',       card:'card-wifi'},
+};
+
+function updateConnectionBanner(){
+  const type   = conn ? (conn.type || 'unknown') : 'unknown';
+  const eff    = conn ? (conn.effectiveType || '—') : '—';
+  const dl     = conn ? (conn.downlink != null ? conn.downlink+' Mbps' : '—') : '—';
+  const rtt    = conn ? (conn.rtt    != null ? conn.rtt+'ms' : '—') : '—';
+  const saver  = conn ? (conn.saveData ? 'ON' : 'OFF') : '—';
+
+  const meta = TYPE_MAP[type] || TYPE_MAP.unknown;
+
+  document.getElementById('conn-icon').textContent    = meta.icon;
+  document.getElementById('conn-type').textContent    = meta.label;
+  document.getElementById('conn-detail').textContent  = `effectiveType: ${eff} | downlink: ${dl} | rtt: ${rtt}`;
+  document.getElementById('eff-type').textContent     = eff.toUpperCase();
+  document.getElementById('downlink').textContent     = dl;
+  document.getElementById('rtt-val').textContent      = rtt;
+  document.getElementById('save-data-val').textContent= saver;
+
+  // Banner border colour
+  document.getElementById('conn-banner').style.setProperty('--conn-color', meta.color);
+  document.getElementById('conn-type').style.color = meta.color;
+
+  // Highlight correct card
+  ['card-wifi','card-eth','card-mobile'].forEach(id=>{
+    document.getElementById(id)?.classList.remove('active');
+  });
+  document.getElementById(meta.card)?.classList.add('active');
+
+  // Set card status dots
+  setDot('wifi',   type==='wifi'     || type==='bluetooth');
+  setDot('eth',    type==='ethernet');
+  setDot('mobile', type==='cellular' || type==='wimax');
+
+  // WiFi signal bars
+  if(type==='wifi' && conn){
+    const bars = document.getElementById('wifi-signal');
+    const strength = conn.downlink ? Math.min(5, Math.ceil(conn.downlink/20)) : 3;
+    bars.innerHTML = `<div class="sig-bars">${[1,2,3,4,5].map(i=>`<div class="sig-bar" style="height:${i*3+4}px;background:${i<=strength?'var(--green)':'var(--dim)'};opacity:${i<=strength?1:.3}"></div>`).join('')}</div><div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:4px">Signal: ${['','Weak','Fair','Good','Strong','Excellent'][strength]||'—'}</div>`;
+  }
+}
+
+function setDot(id, active){
+  const dot = document.getElementById('dot-'+id);
+  const lbl = document.getElementById('status-'+id);
+  if(!dot) return;
+  dot.style.background   = active ? 'var(--green)' : 'var(--dim)';
+  dot.style.boxShadow    = active ? '0 0 6px var(--green)' : 'none';
+  lbl.textContent        = active ? 'ACTIVE' : 'NOT ACTIVE';
+  lbl.style.color        = active ? 'var(--green)' : 'var(--muted)';
+}
+
+updateConnectionBanner();
+if(conn) conn.addEventListener('change', updateConnectionBanner);
+
+// ── WebRTC Local IP Detection ──────────────────────────────────────────
+function detectLocalIPs(){
+  try {
+    const pc = new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});
+    pc.createDataChannel('');
+    pc.createOffer().then(o=>pc.setLocalDescription(o));
+    const seen = new Set();
+    pc.onicecandidate = e => {
+      if(!e||!e.candidate) return;
+      const m = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/g);
+      if(!m) return;
+      m.forEach(ip=>{
+        if(!seen.has(ip)){
+          seen.add(ip);
+          addClientIface(ip);
+        }
+      });
+    };
+    setTimeout(()=>pc.close(), 5000);
+  } catch(err){
+    document.getElementById('client-ifaces').innerHTML=
+      '<span style="font-family:var(--mono);font-size:10px;color:var(--muted)">WebRTC not available in this browser</span>';
+  }
+}
+
+function addClientIface(ip){
+  const c = document.getElementById('client-ifaces');
+  const isPrivate = /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip);
+  const isLoopback = ip.startsWith('127.');
+  const type = isLoopback ? 'loopback' : isPrivate ? 'private' : 'public';
+  const cls  = isLoopback ? 't-other' : isPrivate ? 't-wifi' : 't-eth';
+  c.innerHTML += `
+    <div class="info-row">
+      <span class="info-key">${type.toUpperCase()} IP</span>
+      <span class="info-val"><span class="tag ${cls}">${type.toUpperCase()}</span> ${ip}</span>
+    </div>`;
+  document.getElementById('iface-count').textContent = `${document.querySelectorAll('#client-ifaces .info-row').length+1} interfaces`;
+}
+detectLocalIPs();
+
+// ── Ping Measurement (fetch timing) ───────────────────────────────────
+const pingHistory = [];
+let pingMin=9999,pingMax=0,pingSum=0,pingCount=0;
+
+async function measurePing(){
+  try {
+    const start = performance.now();
+    await fetch('https://1.1.1.1/cdn-cgi/trace?_='+Date.now(),{mode:'no-cors',cache:'no-store'});
+    const t = Math.round(performance.now()-start);
+    pingHistory.push(t);
+    if(pingHistory.length>40) pingHistory.shift();
+    pingMin = Math.min(pingMin,t);
+    pingMax = Math.max(pingMax,t);
+    pingSum += t; pingCount++;
+    const avg = Math.round(pingSum/pingCount);
+
+    document.getElementById('k-ping').innerHTML     = t+'<span class="kpi-u">ms</span>';
+    document.getElementById('k-ping-d').textContent = t<50?'Excellent':t<100?'Good':t<200?'Fair':'Poor';
+    document.getElementById('k-ping-d').className   = 'kpi-d '+(t<50?'up':t<200?'nt':'dn');
+    document.getElementById('ps-cur').textContent   = t+'ms';
+    document.getElementById('ps-min').textContent   = pingMin+'ms';
+    document.getElementById('ps-max').textContent   = pingMax+'ms';
+    document.getElementById('ps-avg').textContent   = avg+'ms';
+
+    renderPingBars();
+    return t;
+  } catch(e){ return null; }
+}
+
+function renderPingBars(){
+  const el = document.getElementById('ping-bars');
+  const maxV = Math.max(...pingHistory,50);
+  el.innerHTML = pingHistory.map(v=>{
+    const h = Math.max(4, (v/maxV)*56);
+    const c = v<50?'var(--green)':v<150?'var(--yellow)':'var(--red)';
+    return `<div class="ping-bar" style="height:${h}px;background:${c}" title="${v}ms"></div>`;
+  }).join('');
+}
+measurePing();
+setInterval(measurePing, 3000);
+
+// ── Speed Estimation ───────────────────────────────────────────────────
+let lastDL=0, lastUL=0;
+async function estimateSpeed(){
+  // Prefer Network Information API
+  if(conn && conn.downlink){
+    const dl = conn.downlink;
+    const ul = dl * 0.4; // estimate upload as ~40% of download
+    setSpeed(dl,ul,'API estimate');
+    return;
+  }
+  // Fallback: fetch a small payload and time it
+  try {
+    const sz = 200000; // ~200KB
+    const start = performance.now();
+    await fetch('https://speed.cloudflare.com/__down?bytes='+sz+'&_='+Date.now(),{cache:'no-store'});
+    const t = (performance.now()-start)/1000;
+    const dl = Math.round((sz*8/1000000)/t * 10)/10;
+    setSpeed(dl, dl*0.4, 'measured');
+  } catch(e){
+    // Use a rough estimate from ping
+    const dl = pingHistory.length ? Math.max(0.1, 50/Math.min(...pingHistory)) : 0;
+    setSpeed(dl, dl*0.4, 'estimated');
+  }
+}
+
+function setSpeed(dl,ul,src){
+  lastDL=dl; lastUL=ul;
+  document.getElementById('k-dl').innerHTML = dl.toFixed(1)+'<span class="kpi-u">Mbps</span>';
+  document.getElementById('k-ul').innerHTML = ul.toFixed(1)+'<span class="kpi-u">Mbps</span>';
+  document.getElementById('k-dl-d').textContent = src+' ↓';
+  document.getElementById('k-ul-d').textContent = src+' ↑';
+  document.getElementById('k-dl-d').className='kpi-d '+(dl>10?'up':dl>2?'nt':'dn');
+  document.getElementById('k-ul-d').className='kpi-d '+(ul>5?'up':ul>1?'nt':'dn');
+  // Gauges
+  const dlPct = Math.min(100,dl/100*100);
+  const ulPct = Math.min(100,ul/100*100);
+  document.getElementById('dl-bar').style.width=dlPct+'%';
+  document.getElementById('ul-bar').style.width=ulPct+'%';
+  document.getElementById('dl-val').textContent=dl.toFixed(1)+' Mbps';
+  document.getElementById('ul-val').textContent=ul.toFixed(1)+' Mbps';
+}
+estimateSpeed();
+setInterval(estimateSpeed,15000);
+
+// ── ISP Lookup ────────────────────────────────────────────────────────
+(async()=>{
+  try {
+    const r = await fetch('https://ipapi.co/json/');
+    const d = await r.json();
+    document.getElementById('k-isp').textContent = (d.org||d.isp||'Unknown ISP').slice(0,30);
+    if(d.ip) document.getElementById('k-ip').textContent = d.ip;
+  } catch(e){
+    document.getElementById('k-isp').textContent='ISP lookup failed';
+  }
+})();
+
+// ── Traffic Chart ──────────────────────────────────────────────────────
+const tcLabels=[],tcDL=[],tcUL=[];
+for(let i=59;i>=0;i--){
+  tcLabels.push(i%10===0?'-'+i+'s':'');
+  tcDL.push(+(Math.random()*5+1).toFixed(2));
+  tcUL.push(+(Math.random()*2+.5).toFixed(2));
+}
+const tcChart = new Chart(document.getElementById('tc').getContext('2d'),{
+  type:'line',
+  data:{labels:tcLabels,datasets:[
+    {label:'Download',data:tcDL,borderColor:'#00ffaa',backgroundColor:'rgba(0,255,170,.06)',borderWidth:1.5,pointRadius:0,fill:true,tension:.4},
+    {label:'Upload',  data:tcUL,borderColor:'#00d2ff',backgroundColor:'rgba(0,210,255,.04)',borderWidth:1.5,pointRadius:0,fill:true,tension:.4}
+  ]},
+  options:{
+    responsive:true,maintainAspectRatio:false,animation:{duration:300},
+    plugins:{legend:{display:false},tooltip:{
+      backgroundColor:'rgba(4,8,15,.95)',borderColor:'rgba(0,210,255,.3)',borderWidth:1,
+      titleColor:'#4a6a8a',bodyColor:'#ddeeff',
+      titleFont:{family:'JetBrains Mono',size:9},bodyFont:{family:'JetBrains Mono',size:10},
+      callbacks:{label:c=>` ${c.dataset.label}: ${c.parsed.y} Mbps`}
+    }},
+    scales:{
+      x:{grid:{color:'rgba(0,210,255,.03)'},ticks:{color:'#2a3a5a',font:{family:'JetBrains Mono',size:8}}},
+      y:{grid:{color:'rgba(0,210,255,.03)'},ticks:{color:'#2a3a5a',font:{family:'JetBrains Mono',size:8},callback:v=>v+'M'},min:0,max:10}
+    }
+  }
+});
+setInterval(()=>{
+  const dl = lastDL>0 ? +(lastDL*(0.85+Math.random()*.3)).toFixed(2) : +(Math.random()*5+1).toFixed(2);
+  const ul = lastUL>0 ? +(lastUL*(0.85+Math.random()*.3)).toFixed(2) : +(Math.random()*2+.5).toFixed(2);
+  tcChart.data.datasets[0].data.push(dl);tcChart.data.datasets[0].data.shift();
+  tcChart.data.datasets[1].data.push(ul);tcChart.data.datasets[1].data.shift();
+  tcChart.update('none');
+},1500);
+
+// ── PHP Console ────────────────────────────────────────────────────────
+const consoleLogs=[
+  {c:'c-cm',t:`// NetPulse Pro — PHP ${PHP_VERSION}`},
+  {c:'c-p', t:'$ ',cmd:'c-c',ct:'php netpulse_full.php --boot'},
+  {c:'c-o', t:'[OK] Network Information API loaded'},
+  {c:'c-o', t:'[OK] WebRTC interface detection active'},
+  {c:'c-o', t:`[OK] Client IP: ${PHP_CLIENT_IP}`},
+  {c:'c-o', t:'[OK] Ping to 1.1.1.1 ... measuring'},
+  {c:'c-cm',t:`// Ready — type 'help' for commands`},
+];
+
+function renderConsole(){
+  const el=document.getElementById('console');
+  el.innerHTML=consoleLogs.map(l=>{
+    if(l.cmd) return `<div class="cl"><span class="${l.c}">${l.t}</span><span class="${l.cmd}">${l.ct}</span></div>`;
+    return `<div class="cl"><span class="${l.c}">${l.t}</span></div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+renderConsole();
+
+const cmds={
+  help:    ()=>[{c:'c-cm',t:'Commands: ping, speed, interfaces, dns, scan, info, type, ip, clear, help'}],
+  ping:    ()=>{measurePing();return [{c:'c-o',t:'Pinging 1.1.1.1 (Cloudflare)...'}]},
+  speed:   ()=>{estimateSpeed();return [{c:'c-o',t:'Speed measurement started...'}]},
+  type:    ()=>[{c:'c-o',t:`Connection: ${conn?conn.type||'unknown':'API not available'} | Effective: ${conn?conn.effectiveType||'—':'—'} | Downlink: ${conn?conn.downlink||'—':'—'} Mbps`}],
+  ip:      ()=>[{c:'c-o',t:`Public IP: ${PHP_CLIENT_IP} (PHP) | Local: from WebRTC`}],
+  interfaces: ()=>{
+    const ifaces=[];
+    const rows=document.querySelectorAll('#client-ifaces .info-row');
+    rows.forEach(r=>ifaces.push(r.querySelector('.info-val').textContent.trim()));
+    return ifaces.length?ifaces.map(i=>({c:'c-o',t:'  '+i})):[{c:'c-o',t:'[INFO] Detecting interfaces via WebRTC...'}];
+  },
+  dns:     ()=>[{c:'c-o',t:'[INFO] DNS: resolved via browser — 1.1.1.1 (Cloudflare) / 8.8.8.8 (Google)'}],
+  scan:    ()=>[
+    {c:'c-o',t:'[SCAN] Connection type: '+(conn?conn.type||'unknown':'unavailable')},
+    {c:'c-o',t:'[SCAN] Effective: '+(conn?conn.effectiveType||'—':'—')},
+    {c:'c-o',t:'[SCAN] Downlink: '+(conn?conn.downlink+'Mbps':'—')},
+    {c:'c-o',t:'[SCAN] RTT: '+(conn?conn.rtt+'ms':'—')},
+    {c:'c-o',t:'[SCAN] Online: '+navigator.onLine},
+    {c:'c-o',t:`[SCAN] Client IP: ${PHP_CLIENT_IP}`},
+    {c:'c-o',t:'[SCAN] Done.'},
+  ],
+  info:    ()=>[{c:'c-o',t:`PHP ${PHP_VERSION} | Server: ${"freeweb6.byetcluster.com"} | OS: ${"Linux 5.6.7-362.18.1.el9_5.x86_64"}`}],
+  clear:   ()=>{consoleLogs.length=0;renderConsole();return[]},
+};
+
+function runCmd(){
+  const inp=document.getElementById('cli');
+  const raw=inp.value.trim().toLowerCase();
+  inp.value='';
+  if(!raw)return;
+  const [cmd,...args]=raw.split(' ');
+  consoleLogs.push({c:'c-p',t:'$ ',cmd:'c-c',ct:raw});
+  const fn=cmds[cmd];
+  if(fn){const res=fn(args);if(res)res.forEach(r=>consoleLogs.push(r));}
+  else consoleLogs.push({c:'c-e',t:`'${cmd}' not found. Type 'help'.`});
+  renderConsole();
+}
+
+// ── Full Scan ──────────────────────────────────────────────────────────
+function runFullScan(){
+  updateConnectionBanner();
+  measurePing();
+  estimateSpeed();
+  consoleLogs.push({c:'c-p',t:'$ ',cmd:'c-c',ct:'php netpulse_full.php --scan-all'});
+  consoleLogs.push({c:'c-o',t:'[OK] Scan triggered — refreshing all metrics...'});
+  renderConsole();
+}
+
+// ── Online / Offline detection ─────────────────────────────────────────
+window.addEventListener('online',  ()=>{consoleLogs.push({c:'c-o',t:'[EVENT] Network: back online'});renderConsole();updateConnectionBanner();});
+window.addEventListener('offline', ()=>{consoleLogs.push({c:'c-e',t:'[EVENT] Network: went offline!'});renderConsole();});
+</script>
+
+
+</body></html>

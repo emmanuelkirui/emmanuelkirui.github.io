@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><script>
 (function(){
-  window.__MIRROR_BASE__ = "https://creativepulse.42web.io/cps/";
   var KEY='ek_cookie_consent', loaded=false;
   function accepted(){
     try{var d=JSON.parse(localStorage.getItem(KEY));
@@ -15,7 +14,7 @@
   }
   if(accepted()) loadAds();
   window.addEventListener('ek:consent',function(e){ if(e.detail&&e.detail.choice==='accepted') loadAds(); });
-  document.addEventListener('click',function(e){            // works even if a page lacks the event
+  document.addEventListener('click',function(e){
     if(e.target.closest('#cookieAccept,.cookie-accept')) setTimeout(function(){ if(accepted()) loadAds(); },50);
   });
 })();</script>
@@ -28,7 +27,7 @@
 <meta property="og:title" content="EMMANUEL KIPROTICH KIRUI – Portfolio">
 <meta property="og:description" content="I am an IT professional with a background in cybersecurity, cloud technologies, and prompt design in AI. I am passionate about building secure and scalable applications, leveraging my skills in Vertex">
 <meta property="og:type" content="website">
-<link rel="canonical" href="https://creativepulse.42web.io/cps/port_kirui.php?mirror=1791841161216&amp;i=1">
+<link rel="canonical" href="index.html">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -36,7 +35,7 @@
   "name": "EMMANUEL KIPROTICH KIRUI",
   "jobTitle": "IT Professional & Software Developer",
   "description": "I am an IT professional with a background in cybersecurity, cloud technologies, and prompt design in AI. I am passionate about building secure and scalable applications, leveraging my skills in Vertex",
-  "url": "https://creativepulse.42web.io/cps/port_kirui.php?mirror=1791841161216&i=1",
+  "url": "https://creativepulse.42web.io/cps/port_kirui.php?mirror=1791843260967&i=1",
   "email": "emmanuelkirui042@gmail.com",
   "address": {"@type":"PostalAddress","addressCountry":"KE","addressRegion":"Nairobi, Kenya"},
   "knowsAbout": ["Web Development","ICT Support","Google Cloud Platform","Systems Administration","Network Engineering","Cybersecurity","Python","PHP","MySQL","Linux"],
@@ -1025,7 +1024,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <span class="orbit-dot orbit-dot-4"></span>
       </div>
       <div class="avatar-inner">
-                  <img src="https://creativepulse.42web.io/cps/uploads/avatar_6a1cfd8789737.jpg" alt="EMMANUEL KIPROTICH KIRUI" fetchpriority="high">
+                  <img src="uploads/avatar_6a1cfd8789737.jpg" alt="EMMANUEL KIPROTICH KIRUI" fetchpriority="high">
               </div>
     </div>
   </div>
@@ -1271,7 +1270,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
   <h2 class="section-title">Featured <span class="grad">Projects</span></h2>
   <!-- SLIDESHOW -->
   <div class="slideshow">
-    <div class="slides" id="slides">
+    <div class="slides" id="slides" style="transform: translateX(-100%);">
             <div class="slide">
         <div class="slide-content">
           <div class="slide-number">Project 01 / 04</div>
@@ -1279,12 +1278,12 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
           <p>Football predictions and live scores</p>
           <div class="tech-tags">
             <span class="tech-tag">Python</span><span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">API</span>          </div>
-                    <a href="https://creativepulse.42web.io/cps/liv.php" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;width:fit-content;">
+                    <a href="liv.html" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;width:fit-content;">
             <i class="fas fa-external-link-alt"></i> View Live Project
           </a>
                   </div>
                   <div class="slide-img-panel">
-            <img class="slide-img" src="https://creativepulse.42web.io/cps/uploads/6a1ddb996c753_16720.jpg" alt="Football Predictions System" loading="lazy">
+            <img class="slide-img" src="uploads/6a1ddb996c753_16720.jpg" alt="Football Predictions System" loading="lazy">
             <div class="slide-img-overlay"><i class="fas fa-image"></i> Preview</div>
           </div>
               </div>
@@ -1300,7 +1299,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
           </a>
                   </div>
                   <div class="slide-img-panel">
-            <img class="slide-img" src="https://creativepulse.42web.io/cps/uploads/6a1e901311005_1866.png" alt="PHP Blog system" loading="lazy">
+            <img class="slide-img" src="uploads/6a1e901311005_1866.png" alt="PHP Blog system" loading="lazy">
             <div class="slide-img-overlay"><i class="fas fa-image"></i> Preview</div>
           </div>
               </div>
@@ -1311,12 +1310,12 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
           <p></p>
           <div class="tech-tags">
             <span class="tech-tag">Python</span><span class="tech-tag">React</span><span class="tech-tag">WebSocket</span>          </div>
-                    <a href="https://creativepulse.42web.io/cps/netpulse.php" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;width:fit-content;">
+                    <a href="netpulse.html" target="_blank" class="btn-primary" style="display:inline-flex;padding:11px 22px;font-size:.82rem;gap:8px;width:fit-content;">
             <i class="fas fa-external-link-alt"></i> View Live Project
           </a>
                   </div>
                   <div class="slide-img-panel">
-            <img class="slide-img" src="https://creativepulse.42web.io/cps/uploads/6a216ddb981cc_70203.jpg" alt="Network Monitoring Dashboard" loading="lazy">
+            <img class="slide-img" src="uploads/6a216ddb981cc_70203.jpg" alt="Network Monitoring Dashboard" loading="lazy">
             <div class="slide-img-overlay"><i class="fas fa-image"></i> Preview</div>
           </div>
               </div>
@@ -1336,14 +1335,14 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
           </div>
     <button class="ss-btn ss-prev" onclick="moveSlide(-1)" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
     <button class="ss-btn ss-next" onclick="moveSlide(1)" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
-    <div class="slideshow-nav" id="slideDots"><div class="slide-dot active"></div><div class="slide-dot"></div><div class="slide-dot"></div><div class="slide-dot"></div></div>
-    <div class="ss-progress" id="ssProgress" style="width: 25%;"></div>
+    <div class="slideshow-nav" id="slideDots"><div class="slide-dot"></div><div class="slide-dot active"></div><div class="slide-dot"></div><div class="slide-dot"></div></div>
+    <div class="ss-progress" id="ssProgress" style="width: 50%;"></div>
   </div>
   <!-- GRID -->
   <div class="projects-grid">
         <div class="proj-card fade-in">
             <div class="proj-card-img">
-                  <a href="https://creativepulse.42web.io/cps/liv.php" target="_blank" rel="noopener" class="proj-img-link">          <img src="https://creativepulse.42web.io/cps/uploads/6a1ddb996c753_16720.jpg" alt="Football Predictions System" loading="lazy">
+                  <a href="liv.html" target="_blank" rel="noopener" class="proj-img-link">          <img src="uploads/6a1ddb996c753_16720.jpg" alt="Football Predictions System" loading="lazy">
           <div class="proj-img-hover"><span><i class="fas fa-external-link-alt"></i> View Project</span></div>
           </a>              </div>
       <div class="proj-card-body">
@@ -1354,14 +1353,14 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="tech-tags" style="margin-bottom:14px;">
           <span class="tech-tag">Python</span><span class="tech-tag">PHP</span><span class="tech-tag">MySQL</span><span class="tech-tag">API</span>        </div>
         <div class="proj-card-footer">
-                    <a href="https://creativepulse.42web.io/cps/liv.php" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
+                    <a href="liv.html" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
                     <span class="proj-idx">01</span>
         </div>
       </div>
     </div>
         <div class="proj-card fade-in">
             <div class="proj-card-img">
-                  <a href="https://topnotch.kesug.com/" target="_blank" rel="noopener" class="proj-img-link">          <img src="https://creativepulse.42web.io/cps/uploads/6a1e901311005_1866.png" alt="PHP Blog system" loading="lazy">
+                  <a href="https://topnotch.kesug.com/" target="_blank" rel="noopener" class="proj-img-link">          <img src="uploads/6a1e901311005_1866.png" alt="PHP Blog system" loading="lazy">
           <div class="proj-img-hover"><span><i class="fas fa-external-link-alt"></i> View Project</span></div>
           </a>              </div>
       <div class="proj-card-body">
@@ -1379,7 +1378,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
     </div>
         <div class="proj-card fade-in">
             <div class="proj-card-img">
-                  <a href="https://creativepulse.42web.io/cps/netpulse.php" target="_blank" rel="noopener" class="proj-img-link">          <img src="https://creativepulse.42web.io/cps/uploads/6a216ddb981cc_70203.jpg" alt="Network Monitoring Dashboard" loading="lazy">
+                  <a href="netpulse.html" target="_blank" rel="noopener" class="proj-img-link">          <img src="uploads/6a216ddb981cc_70203.jpg" alt="Network Monitoring Dashboard" loading="lazy">
           <div class="proj-img-hover"><span><i class="fas fa-external-link-alt"></i> View Project</span></div>
           </a>              </div>
       <div class="proj-card-body">
@@ -1390,7 +1389,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="tech-tags" style="margin-bottom:14px;">
           <span class="tech-tag">Python</span><span class="tech-tag">React</span><span class="tech-tag">WebSocket</span>        </div>
         <div class="proj-card-footer">
-                    <a href="https://creativepulse.42web.io/cps/netpulse.php" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
+                    <a href="netpulse.html" target="_blank" class="proj-link"><i class="fas fa-arrow-up-right-from-square"></i> Live Demo</a>
                     <span class="proj-idx">03</span>
         </div>
       </div>
@@ -1469,11 +1468,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="cert-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> ICT Prefect</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF&quot;, &quot;ICT Prefect&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF&quot;, &quot;ICT Prefect&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="cert-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="cert-pdf-canvas-wrap" data-pdf="uploads/6a1845d75cb4a_EPSON050_ICT-PREFECT.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
         <div class="cert-card fade-in cert-has-pdf">
@@ -1489,11 +1488,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="cert-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> FIRST AID</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF&quot;, &quot;FIRST AID&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF&quot;, &quot;FIRST AID&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="cert-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="cert-pdf-canvas-wrap" data-pdf="uploads/6a18460b0a1dd_EPSON048_ST_JOHN_S.PDF" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
       </div>
@@ -1592,11 +1591,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="testi-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> NHIF – Recommendation</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a1847ea02931_Recomentation_NHIF.pdf&quot;, &quot;Recommendation – NHIF&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a1847ea02931_Recomentation_NHIF.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;uploads/6a1847ea02931_Recomentation_NHIF.pdf&quot;, &quot;Recommendation – NHIF&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a1847ea02931_Recomentation_NHIF.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="testi-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a1847ea02931_Recomentation_NHIF.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a1847ea02931_Recomentation_NHIF.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
         <div class="testi-card fade-in testi-has-pdf">
@@ -1616,11 +1615,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="testi-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> JUMKINO – Recommendation</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a18485f9fb18_KIRUI-RECMD.pdf&quot;, &quot;Recommendation – JUMKINO&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a18485f9fb18_KIRUI-RECMD.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;uploads/6a18485f9fb18_KIRUI-RECMD.pdf&quot;, &quot;Recommendation – JUMKINO&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="testi-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a18485f9fb18_KIRUI-RECMD.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a18485f9fb18_KIRUI-RECMD.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
         <div class="testi-card fade-in testi-has-pdf">
@@ -1640,11 +1639,11 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
         <div class="testi-pdf-toolbar">
           <span><i class="fas fa-file-pdf" style="color:#ef4444;"></i> Kapkoros Sub-County Hospital – Recommendation</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a27c329395c3_Scan.pdf&quot;, &quot;Recommendation – Kapkoros Sub-County Hospital&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
-            <a href="https://creativepulse.42web.io/cps/uploads/6a27c329395c3_Scan.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
+            <button type="button" class="testi-pdf-btn testi-pdf-btn-preview" onclick="event.stopPropagation();openPdfModal(&quot;uploads/6a27c329395c3_Scan.pdf&quot;, &quot;Recommendation – Kapkoros Sub-County Hospital&quot;)"><i class="fas fa-expand-alt"></i> Full View</button>
+            <a href="uploads/6a27c329395c3_Scan.pdf" download="" class="testi-pdf-btn testi-pdf-btn-download" onclick="event.stopPropagation()"><i class="fas fa-download"></i></a>
           </div>
         </div>
-        <div class="testi-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a27c329395c3_Scan.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="testi-pdf-canvas-wrap" data-pdf="uploads/6a27c329395c3_Scan.pdf" style="width:100%;min-height:200px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
       </div>
@@ -1737,19 +1736,19 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
   <h2 class="section-title">My <span class="grad">Documents</span></h2>
   <div class="files-list">
         <div class="file-item fade-in">
-            <div class="file-item-bar file-item-pdf" onclick="openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a67be9cea354_EKK_CV_Kirui.pdf&quot;, &quot;CV&quot;)">
+            <div class="file-item-bar file-item-pdf" onclick="openPdfModal(&quot;uploads/6a67be9cea354_EKK_CV_Kirui.pdf&quot;, &quot;CV&quot;)">
               <div class="ficon ficon-pdf"><i class="fas fa-file-pdf"></i></div>
         <div class="file-item-info">
           <h4>CV</h4>
           <small>2026-07-27 · 5762.7 KB · <span class="file-pdf-hint"><i class="fas fa-eye"></i> Click to preview in modal</span></small>
         </div>
         <div class="file-item-actions">
-          <span class="file-expand-icon"><i class="fas fa-chevron-down"></i></span>          <a href="https://creativepulse.42web.io/cps/uploads/6a67be9cea354_EKK_CV_Kirui.pdf" download="" onclick="event.stopPropagation()" class="file-dl-btn" title="Download"><i class="fas fa-download"></i></a>
-                    <button type="button" class="file-open-btn" title="Preview" onclick="event.stopPropagation();openPdfModal(&quot;https://creativepulse.42web.io/cps/uploads/6a67be9cea354_EKK_CV_Kirui.pdf&quot;, &quot;CV&quot;)"><i class="fas fa-eye"></i></button>
+          <span class="file-expand-icon"><i class="fas fa-chevron-down"></i></span>          <a href="uploads/6a67be9cea354_EKK_CV_Kirui.pdf" download="" onclick="event.stopPropagation()" class="file-dl-btn" title="Download"><i class="fas fa-download"></i></a>
+                    <button type="button" class="file-open-btn" title="Preview" onclick="event.stopPropagation();openPdfModal(&quot;uploads/6a67be9cea354_EKK_CV_Kirui.pdf&quot;, &quot;CV&quot;)"><i class="fas fa-eye"></i></button>
                   </div>
       </div>
             <div class="file-pdf-preview" style="display:none;">
-        <div class="file-pdf-canvas-wrap" data-pdf="https://creativepulse.42web.io/cps/uploads/6a67be9cea354_EKK_CV_Kirui.pdf" style="width:100%;min-height:220px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
+        <div class="file-pdf-canvas-wrap" data-pdf="uploads/6a67be9cea354_EKK_CV_Kirui.pdf" style="width:100%;min-height:220px;background:#525659;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px;"><i class="fas fa-spinner fa-spin" style="color:#fff;font-size:1.5rem;"></i><span style="color:#ccc;font-size:.8rem;">Loading preview…</span></div>
       </div>
           </div>
       </div>
@@ -1791,7 +1790,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
     <a href="#insights">ICT Insights</a>
     <a href="#certifications">Certifications</a>
     <a href="#contact">Contact</a>
-    <a href="https://creativepulse.42web.io/cps/privacy-policy.php">Privacy Policy</a>
+    <a href="privacy-policy.html">Privacy Policy</a>
   </div>
   <p class="footer-copy">© 2026 EMMANUEL KIPROTICH KIRUI. All rights reserved.</p>
 </footer>
@@ -2189,7 +2188,7 @@ function renderInlinePdfNow(container){
   <p class="cookie-text">
     We use cookies to improve your experience and analyse traffic.
     By clicking <strong style="color:var(--text);">Accept</strong> you consent to our use of cookies.
-    <a href="https://creativepulse.42web.io/cps/privacy-policy.php">Learn more</a>.
+    <a href="privacy-policy.html">Learn more</a>.
   </p>
   <div class="cookie-btns">
     <button class="cookie-accept" id="cookieAccept">Accept</button>

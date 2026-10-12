@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en"><head><script>
+(function(){
+  var KEY='ek_cookie_consent', loaded=false;
+  function accepted(){
+    try{var d=JSON.parse(localStorage.getItem(KEY));
+      return !!d && d.choice==='accepted' && new Date()<=new Date(d.expires);}catch(e){return false;}
+  }
+  function loadAds(){
+    if(loaded||window.__adsLoaded) return; loaded=window.__adsLoaded=true;
+    var s=document.createElement('script'); s.async=true; s.crossOrigin='anonymous';
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271';
+    document.head.appendChild(s);
+  }
+  if(accepted()) loadAds();
+  window.addEventListener('ek:consent',function(e){ if(e.detail&&e.detail.choice==='accepted') loadAds(); });
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#cookieAccept,.cookie-accept')) setTimeout(function(){ if(accepted()) loadAds(); },50);
+  });
+})();</script><meta http-equiv="origin-trial" content="A7vZI3v+Gz7JfuRolKNM4Aff6zaGuT7X0mf3wtoZTnKv6497cVMnhy03KDqX7kBz/q/iidW7srW31oQbBt4VhgoAAACUeyJvcmlnaW4iOiJodHRwczovL3d3dy5nb29nbGUuY29tOjQ0MyIsImZlYXR1cmUiOiJEaXNhYmxlVGhpcmRQYXJ0eVN0b3JhZ2VQYXJ0aXRpb25pbmczIiwiZXhwaXJ5IjoxNzU3OTgwODAwLCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ==">
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Data Request | Creative Pulse Solutions</title>
+            <style>
+                :root {
+                    --primary: #007bff;
+                    --secondary: #6c757d;
+                    --success: #28a745;
+                    --danger: #dc3545;
+                    --light: #f8f9fa;
+                    --dark: #343a40;
+                }
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                body {
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                    background-color: var(--light);
+                    color: var(--dark);
+                    line-height: 1.6;
+                }
+                .container {
+                    max-width: 480px;
+                    margin: 40px auto;
+                    padding: 30px;
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                }
+                .header h1 {
+                    color: var(--primary);
+                    font-size: 28px;
+                    margin-bottom: 10px;
+                }
+                .header p {
+                    color: var(--secondary);
+                    font-size: 16px;
+                }
+                .form-group {
+                    margin-bottom: 20px;
+                }
+                label {
+                    display: block;
+                    margin-bottom: 8px;
+                    font-weight: 500;
+                    color: var(--dark);
+                }
+                input[type="password"],
+                input[type="email"] {
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #ced4da;
+                    border-radius: 4px;
+                    font-size: 16px;
+                    transition: border-color 0.3s ease;
+                }
+                input[type="password"]:focus,
+                input[type="email"]:focus {
+                    outline: none;
+                    border-color: var(--primary);
+                    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+                }
+                .btn {
+                    display: inline-block;
+                    width: 48%;
+                    padding: 12px;
+                    background: var(--primary);
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    font-size: 16px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: background-color 0.3s ease;
+                }
+                .btn-secondary {
+                    background: var(--secondary);
+                    margin-right: 4%;
+                }
+                .btn:hover {
+                    background: #0056b3;
+                }
+                .btn-secondary:hover {
+                    background: #5a6268;
+                }
+                .btn:disabled {
+                    background: var(--secondary);
+                    cursor: not-allowed;
+                }
+                .message {
+                    margin-top: 20px;
+                    padding: 12px;
+                    border-radius: 4px;
+                    font-size: 14px;
+                    text-align: center;
+                }
+                .success {
+                    background: #d4edda;
+                    color: var(--success);
+                    border: 1px solid #c3e6cb;
+                }
+                .error {
+                    background: #f8d7da;
+                    color: var(--danger);
+                    border: 1px solid #f5c6cb;
+                }
+                .button-group {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 20px;
+                }
+
+                /* ===== valmanu look: same colours and light/dark theme ===== */
+                :root { color-scheme: light dark; --bg-color: #f4f4f4; --card-bg: #ffffff; --text-color: #333333;
+                        --muted: #6b7683; --input-bg: #ffffff; --input-border: #dde3ec; }
+                [data-theme="dark"] { color-scheme: dark; --bg-color: #2c3e50; --card-bg: #34495e; --text-color: #ecf0f1;
+                        --muted: #b8c4d0; --input-bg: #2c3e50; --input-border: #3d5166; --primary: #3399ff; }
+                body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh;
+                       padding: 0 16px; transition: background-color .3s ease, color .3s ease; }
+                .container { background: var(--card-bg); box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 480px; width: 100%; }
+                [data-theme="dark"] .container { box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+                label { color: var(--text-color); }
+                .header p { color: var(--muted); }
+                input[type="password"], input[type="email"] { background: var(--input-bg); color: var(--text-color); border-color: var(--input-border); }
+                input::placeholder { color: var(--muted); opacity: .8; }
+                [data-theme="dark"] .btn { background: #1f78d1; }
+                [data-theme="dark"] .btn:hover { background: #1a66b3; }
+                [data-theme="dark"] .btn-secondary { background: #5d7a96; }
+                [data-theme="dark"] .btn-secondary:hover { background: #4d6882; }
+                [data-theme="dark"] .btn:disabled { background: #5d7a96; }
+                [data-theme="dark"] .success { background: #14532d; color: #bbf7d0; border-color: #166534; }
+                [data-theme="dark"] .error { background: #7f1d1d; color: #fecaca; border-color: #991b1b; }
+                .theme-toggle { position: fixed; top: 1rem; right: 1rem; z-index: 2000; width: 44px; height: 44px; border-radius: 50%;
+                    border: none; background: var(--primary); color: #fff; cursor: pointer; font-size: 1.3rem; line-height: 1;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; padding: 0; }
+                @media (max-width: 520px) { .container { margin: 76px auto 24px; padding: 20px; } }
+            </style>
+        <meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
+        <body data-theme="dark">
+            <script type="text/javascript" async="" charset="utf-8" src="https://www.gstatic.com/recaptcha/releases/nY0xPItgwtlvjEjk2TqdwOQz/recaptcha__en.js" crossorigin="anonymous" integrity="sha384-Kt1i/5gBObCvMXB/a7GvZUElKpjCg0ZvOYHqbaCbuEa+xwyOQ3474yVQP0XEfD36"></script><script>(function(){var m=document.cookie.match(/(?:^|; )theme=([^;]*)/);document.body.setAttribute('data-theme',m?m[1]:'dark');})();</script>
+            <button type="button" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch light or dark theme" title="Switch theme">◐</button>
+            <div class="container">
+                <div class="header">
+                    <h1>Data Request</h1>
+                    <p>Creative Pulse Solutions</p>
+                </div>
+
+                <form id="dataRequestForm" onsubmit="requestData(event)">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required="" placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required="" minlength="8" placeholder="Enter your password">
+                    </div>
+                    <div class="captcha-wrap" id="captchaWrap" style="width: 304px; height: 78px; margin: 14px auto;">
+                        <div class="g-recaptcha" data-sitekey="6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN" data-theme="dark" style="transform: scale(1);"><div style="width: 304px; height: 78px;"><div><iframe title="reCAPTCHA" width="304" height="78" role="presentation" name="a-xdvexzdlkfy6" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/anchor?ar=1&amp;k=6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN&amp;co=aHR0cHM6Ly9jcmVhdGl2ZXB1bHNlLjQyd2ViLmlvOjQ0Mw..&amp;hl=en&amp;v=nY0xPItgwtlvjEjk2TqdwOQz&amp;theme=dark&amp;size=normal&amp;anchor-ms=20000&amp;execute-ms=30000&amp;cb=16bkzmxno604"></iframe></div><textarea id="g-recaptcha-response" name="g-recaptcha-response" class="g-recaptcha-response" style="width: 250px; height: 40px; border: 1px solid rgb(193, 193, 193); margin: 10px 25px; padding: 0px; resize: none; display: none;"></textarea></div><iframe style="display: none;"></iframe></div>
+                    </div>
+                    <div class="button-group">
+                        <button type="button" class="btn btn-secondary" onclick="history.back()">Back</button>
+                        <button type="submit" class="btn" id="submitBtn">Request My Data</button>
+                    </div>
+                    <div id="message" class="message" style="display: none;"></div>
+                </form>
+            </div>
+
+            <style>
+                .captcha-wrap { display: flex; justify-content: center; margin: 14px 0; }
+                .captcha-wrap .g-recaptcha { transform-origin: 0 0; }
+            </style>
+            <script src="https://www.google.com/recaptcha/api.js" async="" defer=""></script>
+            <script>
+            // Dark/light theme (shared cookie with the rest of the site)
+            (function(){ var g=document.querySelector('.g-recaptcha'); if(g && document.body.getAttribute('data-theme')==='dark') g.setAttribute('data-theme','dark'); })();
+            function toggleTheme() {
+                var n = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                document.body.setAttribute('data-theme', n);
+                document.cookie = 'theme=' + n + ';path=/;max-age=31536000';
+            }
+            </script>
+            <script>
+            // reCAPTCHA v2 is 304px wide; shrink it on narrow screens
+            function fitCaptcha() {
+                var wrap = document.getElementById('captchaWrap');
+                var box = wrap && wrap.querySelector('.g-recaptcha');
+                if (!wrap || !box) return;
+                var avail = wrap.parentElement.clientWidth;
+                var scale = Math.min(1, avail / 304);
+                box.style.transform = 'scale(' + scale + ')';
+                wrap.style.width = (304 * scale) + 'px';
+                wrap.style.height = (78 * scale) + 'px';
+                wrap.style.margin = '14px auto';
+            }
+            window.addEventListener('load', fitCaptcha);
+            window.addEventListener('resize', fitCaptcha);
+
+            async function requestData(event) {
+                event.preventDefault();
+                
+                const form = document.getElementById('dataRequestForm');
+                const submitBtn = document.getElementById('submitBtn');
+                const messageDiv = document.getElementById('message');
+                const password = document.getElementById('password').value;
+                const email = document.getElementById('email').value;
+
+                messageDiv.style.display = 'none';
+
+                const captchaToken = (window.grecaptcha && grecaptcha.getResponse) ? grecaptcha.getResponse() : '';
+                if (!captchaToken) {
+                    messageDiv.style.display = 'block';
+                    messageDiv.textContent = 'Please tick the "I\'m not a robot" box first.';
+                    messageDiv.className = 'message error';
+                    return;
+                }
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Processing...';
+
+                try {
+                    const response = await fetch('/cps/data_request.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ 
+                            password: password,
+                            email: email,
+                            captcha_token: captchaToken
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    messageDiv.style.display = 'block';
+                    messageDiv.textContent = data.message;
+                    messageDiv.className = `message ${data.success ? 'success' : 'error'}`;
+                    
+                    if (data.success) {
+                        form.reset();
+                    }
+                } catch (error) {
+                    messageDiv.style.display = 'block';
+                    messageDiv.textContent = 'A network error occurred. Please try again.';
+                    messageDiv.className = 'message error';
+                    console.error('Request failed:', error);
+                } finally {
+                    if (window.grecaptcha) grecaptcha.reset(); // a token can only be used once
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Request My Data';
+                }
+            }
+            </script>
+        
+        
+        <div style="background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 3px; position: absolute; transition: visibility linear 0.3s, opacity 0.3s linear; opacity: 0; visibility: hidden; z-index: 2000000000; left: 0px; top: -10000px;"><div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.05;"></div><div class="g-recaptcha-bubble-arrow" style="border: 11px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -11px; z-index: 2000000000;"></div><div class="g-recaptcha-bubble-arrow" style="border: 10px solid transparent; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -10px; z-index: 2000000000;"></div><div style="z-index: 2000000000; position: relative;"><iframe title="recaptcha challenge expires in two minutes" name="c-xdvexzdlkfy6" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" src="https://www.google.com/recaptcha/api2/bframe?hl=en&amp;v=nY0xPItgwtlvjEjk2TqdwOQz&amp;k=6Les-YkqAAAAAKbEePt6uo07ZvJAw5-_4ProGXtN&amp;bft=0dAFcWeA5s8IXUTJWONad-MiXTM3Up3g_gVJf8R1mXcjs9TK59Iuldkr5pbx3Iqq6OW5do92SSvZguR44uvO2-vxsVYan4FM8fLw" style="width: 100%; height: 100%;"></iframe></div></div></body></html>
