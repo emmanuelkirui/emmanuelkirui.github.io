@@ -256,7 +256,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     </div>
     <div class="hdr-right">
       <div class="live-pill"><span class="live-dot"></span>LIVE MONITORING</div>
-      <span class="clock" id="clock">04:07:42 UTC</span>
+      <span class="clock" id="clock">11:45:09 UTC</span>
       <span class="php-badge">PHP 8.4.27</span>
       <button class="hdr-btn" onclick="runFullScan()">⟳ SCAN</button>
     </div>
@@ -269,7 +269,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
       <div>
         <div class="conn-label">Active Connection</div>
         <div class="conn-type" id="conn-type" style="color: var(--accent);">Detecting...</div>
-        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:3px" id="conn-detail">effectiveType: 4g | downlink: 1.45 Mbps | rtt: 100ms</div>
+        <div style="font-family:var(--mono);font-size:9px;color:var(--muted);margin-top:3px" id="conn-detail">effectiveType: 4g | downlink: 1.65 Mbps | rtt: 0ms</div>
       </div>
     </div>
     <div class="conn-meta">
@@ -278,11 +278,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         <div class="conn-stat-lbl">Speed Class</div>
       </div>
       <div class="conn-stat">
-        <div class="conn-stat-val" id="downlink">1.45 Mbps</div>
+        <div class="conn-stat-val" id="downlink">1.65 Mbps</div>
         <div class="conn-stat-lbl">Downlink</div>
       </div>
       <div class="conn-stat">
-        <div class="conn-stat-val" id="rtt-val">100ms</div>
+        <div class="conn-stat-val" id="rtt-val">0ms</div>
         <div class="conn-stat-lbl">RTT</div>
       </div>
       <div class="conn-stat">
@@ -296,18 +296,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
   <div class="kpi-grid">
     <div class="kpi" style="--kc:var(--green)">
       <div class="kpi-lbl">Download Speed</div>
-      <div class="kpi-val" id="k-dl">1.4<span class="kpi-u">Mbps</span></div>
+      <div class="kpi-val" id="k-dl">1.6<span class="kpi-u">Mbps</span></div>
       <div class="kpi-d dn" id="k-dl-d">API estimate ↓</div>
     </div>
     <div class="kpi" style="--kc:var(--accent)">
       <div class="kpi-lbl">Upload Speed</div>
-      <div class="kpi-val" id="k-ul">0.6<span class="kpi-u">Mbps</span></div>
+      <div class="kpi-val" id="k-ul">0.7<span class="kpi-u">Mbps</span></div>
       <div class="kpi-d dn" id="k-ul-d">API estimate ↑</div>
     </div>
     <div class="kpi" style="--kc:var(--purple)">
       <div class="kpi-lbl">Latency / Ping</div>
-      <div class="kpi-val" id="k-ping">200<span class="kpi-u">ms</span></div>
-      <div class="kpi-d dn" id="k-ping-d">Poor</div>
+      <div class="kpi-val" id="k-ping">184<span class="kpi-u">ms</span></div>
+      <div class="kpi-d nt" id="k-ping-d">Fair</div>
     </div>
     <div class="kpi" style="--kc:var(--yellow)">
       <div class="kpi-lbl">Packet Loss</div>
@@ -316,13 +316,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     </div>
     <div class="kpi" style="--kc:var(--orange)">
       <div class="kpi-lbl">Public IP</div>
-      <div class="kpi-val" style="font-size:15px" id="k-ip">20.55.87.177</div>
+      <div class="kpi-val" style="font-size:15px" id="k-ip">13.86.196.196</div>
       <div class="kpi-d nt" id="k-isp">Microsoft Corporation</div>
     </div>
     <div class="kpi" style="--kc:var(--red)">
       <div class="kpi-lbl">Server Uptime</div>
       <div class="kpi-val" style="font-size:18px">N/A</div>
-      <div class="kpi-d nt">Linux 6.3.7-362.18.1.el9_5.x86_64</div>
+      <div class="kpi-d nt">Linux 6.8.7-362.18.1.el9_5.x86_64</div>
     </div>
   </div>
 
@@ -377,13 +377,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
           <div class="speed-wrap">
             <div class="speed-gauge">
               <div class="gauge-lbl">↓ Download</div>
-              <div class="gauge-track"><div class="gauge-fill" id="dl-bar" style="width: 1.45%; background: linear-gradient(90deg,var(--green),#00cc88);"></div></div>
-              <div class="gauge-val" style="color:var(--green)" id="dl-val">1.4 Mbps</div>
+              <div class="gauge-track"><div class="gauge-fill" id="dl-bar" style="width: 1.65%; background: linear-gradient(90deg,var(--green),#00cc88);"></div></div>
+              <div class="gauge-val" style="color:var(--green)" id="dl-val">1.6 Mbps</div>
             </div>
             <div class="speed-gauge">
               <div class="gauge-lbl">↑ Upload</div>
-              <div class="gauge-track"><div class="gauge-fill" id="ul-bar" style="width: 0.58%; background: linear-gradient(90deg,var(--accent),#0088cc);"></div></div>
-              <div class="gauge-val" style="color:var(--accent)" id="ul-val">0.6 Mbps</div>
+              <div class="gauge-track"><div class="gauge-fill" id="ul-bar" style="width: 0.66%; background: linear-gradient(90deg,var(--accent),#0088cc);"></div></div>
+              <div class="gauge-val" style="color:var(--accent)" id="ul-val">0.7 Mbps</div>
             </div>
           </div>
         </div>
@@ -397,12 +397,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         <span style="font-family:var(--mono);font-size:9px;color:var(--muted)" id="ping-target">→ cloudflare</span>
       </div>
       <div class="pb">
-        <div class="ping-bars" id="ping-bars"><div class="ping-bar" style="height:56px;background:var(--red)" title="200ms"></div></div>
+        <div class="ping-bars" id="ping-bars"><div class="ping-bar" style="height:56px;background:var(--red)" title="184ms"></div></div>
         <div class="ping-stats">
-          <div><div class="ping-stat-v" id="ps-cur">200ms</div><div>Current</div></div>
-          <div><div class="ping-stat-v" id="ps-min">200ms</div><div>Min</div></div>
-          <div><div class="ping-stat-v" id="ps-max">200ms</div><div>Max</div></div>
-          <div><div class="ping-stat-v" id="ps-avg">200ms</div><div>Avg</div></div>
+          <div><div class="ping-stat-v" id="ps-cur">184ms</div><div>Current</div></div>
+          <div><div class="ping-stat-v" id="ps-min">184ms</div><div>Min</div></div>
+          <div><div class="ping-stat-v" id="ps-max">184ms</div><div>Max</div></div>
+          <div><div class="ping-stat-v" id="ps-avg">184ms</div><div>Avg</div></div>
         </div>
       </div>
     </div>
@@ -449,11 +449,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         </div>
                 <div class="info-row">
           <span class="info-key">Client IP</span>
-          <span class="info-val">20.55.87.177</span>
+          <span class="info-val">13.86.196.196</span>
         </div>
                 <div class="info-row">
           <span class="info-key">Server Time</span>
-          <span class="info-val">2026-10-31 00:07:40</span>
+          <span class="info-val">2026-10-31 07:45:06</span>
         </div>
                 <div class="info-row">
           <span class="info-key">Sys Uptime</span>
@@ -599,7 +599,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         <div id="client-ifaces" style="margin-top:8px">
     <div class="info-row">
       <span class="info-key">PUBLIC IP</span>
-      <span class="info-val"><span class="tag t-eth">PUBLIC</span> 20.55.87.177</span>
+      <span class="info-val"><span class="tag t-eth">PUBLIC</span> 13.86.196.196</span>
     </div>
     <div class="info-row">
       <span class="info-key">PUBLIC IP</span>
@@ -615,7 +615,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
         <span class="php-badge">CLI</span>
       </div>
       <div class="pb">
-        <div class="console" id="console"><div class="cl"><span class="c-cm">// NetPulse Pro — PHP 8.4.27</span></div><div class="cl"><span class="c-p">$ </span><span class="c-c">php netpulse_full.php --boot</span></div><div class="cl"><span class="c-o">[OK] Network Information API loaded</span></div><div class="cl"><span class="c-o">[OK] WebRTC interface detection active</span></div><div class="cl"><span class="c-o">[OK] Client IP: 20.55.87.177</span></div><div class="cl"><span class="c-o">[OK] Ping to 1.1.1.1 ... measuring</span></div><div class="cl"><span class="c-cm">// Ready — type 'help' for commands</span></div></div>
+        <div class="console" id="console"><div class="cl"><span class="c-cm">// NetPulse Pro — PHP 8.4.27</span></div><div class="cl"><span class="c-p">$ </span><span class="c-c">php netpulse_full.php --boot</span></div><div class="cl"><span class="c-o">[OK] Network Information API loaded</span></div><div class="cl"><span class="c-o">[OK] WebRTC interface detection active</span></div><div class="cl"><span class="c-o">[OK] Client IP: 13.86.196.196</span></div><div class="cl"><span class="c-o">[OK] Ping to 1.1.1.1 ... measuring</span></div><div class="cl"><span class="c-cm">// Ready — type 'help' for commands</span></div></div>
         <div class="cli-row">
           <input class="cli-input" id="cli" placeholder="ping, speed, interfaces, dns, scan, help..." onkeydown="if(event.key==='Enter')runCmd()">
           <button class="run-btn" onclick="runCmd()">RUN</button>
@@ -786,7 +786,7 @@ http://&lt;your-server-ip&gt;:8080/netpulse_full.php
 <script>
 // ── PHP-injected server data ──────────────────────────────────────────
 const PHP_SERVER_IFACES = ["lo","ens18","ens18:24","ens18:21","ens18:22","ens18:23","ens18:26","ens18:10014","ens18:10015","ens18:10016","ens18:10017","ens18:10018","ens18:10019","ens18:10020","ens18:10021"];
-const PHP_CLIENT_IP     = "20.55.87.177";
+const PHP_CLIENT_IP     = "13.86.196.196";
 const PHP_VERSION       = "8.4.27";
 
 // ── Clock ──────────────────────────────────────────────────────────────
@@ -1075,7 +1075,7 @@ const cmds={
     {c:'c-o',t:`[SCAN] Client IP: ${PHP_CLIENT_IP}`},
     {c:'c-o',t:'[SCAN] Done.'},
   ],
-  info:    ()=>[{c:'c-o',t:`PHP ${PHP_VERSION} | Server: ${"freeweb6.byetcluster.com"} | OS: ${"Linux 6.3.7-362.18.1.el9_5.x86_64"}`}],
+  info:    ()=>[{c:'c-o',t:`PHP ${PHP_VERSION} | Server: ${"freeweb6.byetcluster.com"} | OS: ${"Linux 6.8.7-362.18.1.el9_5.x86_64"}`}],
   clear:   ()=>{consoleLogs.length=0;renderConsole();return[]},
 };
 
