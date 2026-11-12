@@ -41,7 +41,7 @@
   "name": "EMMANUEL KIPROTICH KIRUI",
   "jobTitle": "IT Professional & Software Developer",
   "description": "I am an IT professional with a background in cybersecurity, cloud technologies, and prompt design in AI. I am passionate about building secure and scalable applications, leveraging my skills in Vertex",
-  "url": "https://creativepulse.42web.io/cps/port_kirui.php?mirror=1794441792381&i=1",
+  "url": "https://creativepulse.42web.io/cps/port_kirui.php?mirror=1794488143148&i=1",
   "email": "emmanuelkirui042@gmail.com",
   "address": {"@type":"PostalAddress","addressCountry":"KE","addressRegion":"Nairobi, Kenya"},
   "knowsAbout": ["Web Development","ICT Support","Google Cloud Platform","Systems Administration","Network Engineering","Cybersecurity","Python","PHP","MySQL","Linux"],
@@ -123,17 +123,56 @@ nav.scrolled{box-shadow:0 4px 30px rgba(0,0,0,.4);}
 .nav-admin{background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--cyan);
   padding:6px 16px;border-radius:20px;font-size:.78rem;font-weight:600;transition:all .2s;}
 .nav-admin:hover{background:rgba(0,229,255,.2);}
-.hamburger{display:none;background:none;border:none;color:var(--text);font-size:1.3rem;cursor:pointer;}
-.mobile-nav{display:none;position:fixed;top:60px;left:0;right:0;background:rgba(8,12,20,.97);
-  backdrop-filter:blur(20px);padding:20px;z-index:99;border-bottom:1px solid var(--border);}
-.mobile-nav.open{display:block;}
-.mobile-nav a{display:block;padding:12px 0;color:var(--muted);border-bottom:1px solid var(--border);font-size:.9rem;}
+.nav-links{display:none !important;}   /* links live in the sidebar at every screen size */
+.hamburger{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-size:1.15rem;cursor:pointer;transition:all .2s;}
+.hamburger:hover{background:rgba(0,229,255,.1);border-color:rgba(0,229,255,.35);color:var(--cyan);}
+/* SIDEBAR DRAWER (all screen sizes) */
+.mobile-nav{display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;width:min(300px,86vw);
+  background:rgba(8,12,20,.98);backdrop-filter:blur(20px);border-right:1px solid var(--border);
+  z-index:150;overflow-y:auto;overscroll-behavior:contain;
+  transform:translateX(-102%);visibility:hidden;
+  transition:transform .3s cubic-bezier(.4,0,.2,1),visibility 0s linear .3s;}
+.mobile-nav.open{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.4,0,.2,1),visibility 0s;
+  box-shadow:12px 0 40px rgba(0,0,0,.5);}
+.sb-head{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 14px;border-bottom:1px solid var(--border);}
+.sb-close{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--muted);font-size:1rem;cursor:pointer;}
+.sb-close:hover{color:var(--cyan);border-color:rgba(0,229,255,.4);}
+.mobile-nav .sb-links{display:flex;flex-direction:column;padding:10px 0;flex:1;}
+.mobile-nav a.sb-link{display:flex;align-items:center;gap:14px;padding:13px 22px;color:var(--muted);border:0;border-left:3px solid transparent;
+  font-size:.92rem;font-family:var(--font-head);font-weight:500;transition:all .2s;}
+.mobile-nav a.sb-link i{width:18px;text-align:center;font-size:.95rem;}
+.mobile-nav a.sb-link:hover,.mobile-nav a.sb-link.active{color:var(--cyan);background:rgba(0,229,255,.07);border-left-color:var(--cyan);}
+.sb-foot{padding:16px 18px;border-top:1px solid var(--border);}
+.sb-foot a{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:10px;
+  background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--cyan);font-size:.85rem;font-weight:600;}
+.nav-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);z-index:140;opacity:0;pointer-events:none;transition:opacity .3s;}
+.mobile-nav.open + .nav-backdrop{opacity:1;pointer-events:auto;}
 
 /* ══════════════════════════════════════════════════
    HERO
 ══════════════════════════════════════════════════ */
 .hero{min-height:100vh;display:flex;align-items:center;padding:120px 5% 80px;
   position:relative;}
+.legal-modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);}
+.legal-modal.open{display:flex;}
+.legal-box{width:min(760px,100%);max-height:88vh;display:flex;flex-direction:column;background:#0d1320;border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden;}
+.legal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);}
+.legal-head h2{font-family:var(--font-head);font-size:1.15rem;margin:0;}
+.legal-tabs{display:flex;gap:6px;padding:10px 20px 0;}
+.legal-tabs button{background:none;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:20px;font-size:.8rem;cursor:pointer;}
+.legal-tabs button.on{color:var(--cyan);border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.08);}
+.legal-x{width:36px;height:36px;flex-shrink:0;border-radius:50%;border:1px solid var(--border);background:none;color:var(--muted);cursor:pointer;font-size:1rem;}
+.legal-x:hover{color:var(--cyan);border-color:rgba(0,229,255,.4);}
+.legal-body{padding:8px 20px 24px;overflow-y:auto;overscroll-behavior:contain;font-size:.92rem;line-height:1.7;color:var(--muted);}
+.legal-body h3{font-family:var(--font-head);color:var(--text);font-size:1rem;margin:22px 0 6px;}
+.legal-body p{margin:0 0 10px;}
+.legal-body ul{margin:0 0 12px 20px;}
+.legal-body li{margin-bottom:5px;}
+.legal-doc{display:none;}.legal-doc.on{display:block;}
+.hero-3d{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100vw;height:100%;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.2s ease;}
+.hero-3d.on{opacity:1;}
+.hero>.hero-inner{position:relative;z-index:1;}
 .hero-inner{display:grid;grid-template-columns:1fr auto;gap:60px;align-items:center;justify-items:start;max-width:1200px;margin:0 auto;width:100%;}
 .hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.08);
   border:1px solid rgba(0,229,255,.25);padding:6px 16px;border-radius:20px;
@@ -804,8 +843,6 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
 /* ── Tablet portrait  ≤ 900px ── */
 @media(max-width:900px){
   /* Nav */
-  .nav-links{display:none;}
-  .hamburger{display:block;}
   nav{padding:14px 4%;}
 
   /* Hero — single column, centred */
@@ -957,7 +994,7 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
 </style>
 <!-- PDF.js deferred — loads after page is interactive, not before -->
 <script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" onload="pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';"></script>
-<meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
 <body>
 <!-- ══════════════════════════════════════════════
      ANIMATED BACKGROUND
@@ -970,16 +1007,6 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
 ══════════════════════════════════════════════ -->
 <nav id="navbar">
   <div class="nav-brand">EMMANUEL <span style="-webkit-text-fill-color:var(--muted);background:none;font-weight:400;">KIRUI</span></div>
-  <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#services">Services</a></li>    <li><a href="#skills">Skills</a></li>
-    <li><a href="#experience">Experience</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#insights">Insights</a></li>
-    <li><a href="#certifications">Certs</a></li>
-    <li><a href="#files">Documents</a></li>    <li><a href="#referees">Referees</a></li>
-    <li><a href="#contact">Contact</a></li>
-  </ul>
   <div class="nav-right">
     <a href="https://creativepulse.42web.io/cps/admin.php" target="_self" class="nav-admin"><i class="fas fa-lock"></i> Admin</a>
     <button class="hamburger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
@@ -987,21 +1014,30 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
     </button>
   </div>
 </nav>
-<div class="mobile-nav" id="mobileNav">
-  <a href="#about" onclick="document.getElementById('mobileNav').classList.remove('open')">About</a>
-  <a href="#services" onclick="document.getElementById('mobileNav').classList.remove('open')">Services</a>  <a href="#skills" onclick="document.getElementById('mobileNav').classList.remove('open')">Skills</a>
-  <a href="#experience" onclick="document.getElementById('mobileNav').classList.remove('open')">Experience</a>
-  <a href="#projects" onclick="document.getElementById('mobileNav').classList.remove('open')">Projects</a>
-  <a href="#insights" onclick="document.getElementById('mobileNav').classList.remove('open')">ICT Insights</a>
-  <a href="#education" onclick="document.getElementById('mobileNav').classList.remove('open')">Education</a>  <a href="#certifications" onclick="document.getElementById('mobileNav').classList.remove('open')">Certifications</a>
-  <a href="#files" onclick="document.getElementById('mobileNav').classList.remove('open')">Documents</a>  <a href="#testimonials" onclick="document.getElementById('mobileNav').classList.remove('open')">Testimonials</a>  <a href="#referees" onclick="document.getElementById('mobileNav').classList.remove('open')">Referees</a>
-  <a href="#contact" onclick="document.getElementById('mobileNav').classList.remove('open')">Contact</a>
+<div class="mobile-nav" id="mobileNav" aria-label="Site menu">
+  <div class="sb-head">
+    <div class="nav-brand">EMMANUEL <span style="-webkit-text-fill-color:var(--muted);background:none;font-weight:400;">KIRUI</span></div>
+    <button class="sb-close" type="button" aria-label="Close menu" onclick="document.getElementById('mobileNav').classList.remove('open')"><i class="fas fa-xmark"></i></button>
+  </div>
+  <div class="sb-links">
+    <a class="sb-link active" href="#about"><i class="fas fa-user"></i>About</a>
+    <a class="sb-link" href="#services"><i class="fas fa-briefcase"></i>Services</a>    <a class="sb-link" href="#skills"><i class="fas fa-code"></i>Skills</a>
+    <a class="sb-link" href="#experience"><i class="fas fa-building"></i>Experience</a>
+    <a class="sb-link" href="#projects"><i class="fas fa-diagram-project"></i>Projects</a>
+    <a class="sb-link" href="#insights"><i class="fas fa-lightbulb"></i>ICT Insights</a>
+    <a class="sb-link" href="#education"><i class="fas fa-graduation-cap"></i>Education</a>    <a class="sb-link" href="#certifications"><i class="fas fa-certificate"></i>Certifications</a>
+    <a class="sb-link" href="#files"><i class="fas fa-file-lines"></i>Documents</a>    <a class="sb-link" href="#testimonials"><i class="fas fa-quote-left"></i>Testimonials</a>    <a class="sb-link" href="#referees"><i class="fas fa-user-check"></i>Referees</a>
+    <a class="sb-link" href="#contact"><i class="fas fa-envelope"></i>Contact</a>
+  </div>
+  <div class="sb-foot"><a href="https://creativepulse.42web.io/cps/admin.php"><i class="fas fa-lock"></i> Admin</a></div>
 </div>
+<div class="nav-backdrop" aria-hidden="true"></div>
 
 <!-- ══════════════════════════════════════════════
      HERO
 ══════════════════════════════════════════════ -->
 <section class="hero" id="about">
+  <canvas class="hero-3d" id="hero3d" aria-hidden="true" width="1280" height="900" style="display: none;"></canvas>
   <div class="hero-inner">
     <div class="hero-text">
       <div class="hero-tag"><span class="dot"></span> Available for Opportunities</div>      <h1>Hi, I'm <span class="highlight">EMMANUEL</span><br>KIPROTICH KIRUI</h1>
@@ -1140,6 +1176,22 @@ footer .footer-copy{margin-top:8px;font-size:.75rem;}
 A good first step is to keep the CMS, themes, plugins and PHP version updated. After that, store passwords with modern hashing and never in plain text, and protect admin pages with strong logins and limited attempts. Just as important, back up the site and database on a regular schedule. Finally, enable HTTPS everywhere and set secure cookie options.<br>
 <br>
 My hands-on work as ASSISTANT HRIO at Rexus Medical Centre has taught me to favour simple, repeatable habits over complicated tools. Treat updates and backups as routine maintenance, and most threats lose their chance before they begin.</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);">
+        <span style="color:var(--muted);font-size:.72rem;display:flex;align-items:center;gap:5px;"><i class="far fa-clock"></i> 1 min read</span>
+        <span style="color:var(--cyan);font-size:.75rem;font-weight:600;">By EMMANUEL KIRUI</span>
+      </div>
+    </article>
+        <article class="edu-card fade-in" style="display:flex;flex-direction:column;gap:10px;cursor:default;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+        <div class="edu-icon" style="margin-bottom:0;flex-shrink:0;"><i class="fas fa-shield-halved"></i></div>
+        <span style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--cyan);padding:2px 10px;border-radius:12px;font-size:.68rem;font-weight:700;letter-spacing:.05em;">Cybersecurity</span>
+      </div>
+      <h3 style="font-family:var(--font-head);font-size:.97rem;font-weight:700;line-height:1.4;color:var(--text);">Why Giving Everyone Admin Access Is a Hidden Risk</h3>
+      <p style="color:var(--muted);font-size:.82rem;line-height:1.7;flex:1;">Zero trust sounds complicated, but the idea is simple: never assume a person or device is safe just because it is inside the network. Every request should be checked, and every user should only reach what they need.<br>
+<br>
+Start by deciding to separate administrator accounts from everyday user accounts. It also helps to review who has access to what at least twice a year and to require multi-factor authentication for anything sensitive. Over time, remove access immediately when someone changes role or leaves, and log important actions so unusual activity can be spotted.<br>
+<br>
+My hands-on work as ASSISTANT HRIO at Rexus Medical Centre has taught me to favour simple, repeatable habits over complicated tools. Begin with the most sensitive systems and expand gradually; perfection is not required to make a real difference.</p>
       <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border);">
         <span style="color:var(--muted);font-size:.72rem;display:flex;align-items:center;gap:5px;"><i class="far fa-clock"></i> 1 min read</span>
         <span style="color:var(--cyan);font-size:.75rem;font-weight:600;">By EMMANUEL KIRUI</span>
@@ -1330,7 +1382,7 @@ My hands-on work as ASSISTANT HRIO at Rexus Medical Centre has taught me to favo
   <h2 class="section-title">Featured <span class="grad">Projects</span></h2>
   <!-- SLIDESHOW -->
   <div class="slideshow">
-    <div class="slides" id="slides">
+    <div class="slides" id="slides" style="transform: translateX(-200%);">
             <div class="slide">
         <div class="slide-content">
           <div class="slide-number">Project 01 / 04</div>
@@ -1395,8 +1447,8 @@ My hands-on work as ASSISTANT HRIO at Rexus Medical Centre has taught me to favo
           </div>
     <button class="ss-btn ss-prev" onclick="moveSlide(-1)" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
     <button class="ss-btn ss-next" onclick="moveSlide(1)" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
-    <div class="slideshow-nav" id="slideDots"><div class="slide-dot active"></div><div class="slide-dot"></div><div class="slide-dot"></div><div class="slide-dot"></div></div>
-    <div class="ss-progress" id="ssProgress" style="width: 25%;"></div>
+    <div class="slideshow-nav" id="slideDots"><div class="slide-dot"></div><div class="slide-dot"></div><div class="slide-dot active"></div><div class="slide-dot"></div></div>
+    <div class="ss-progress" id="ssProgress" style="width: 75%;"></div>
   </div>
   <!-- GRID -->
   <div class="projects-grid">
@@ -1899,8 +1951,8 @@ My hands-on work as ASSISTANT HRIO at Rexus Medical Centre has taught me to favo
     <a href="#insights">ICT Insights</a>
     <a href="#certifications">Certifications</a>
     <a href="#contact">Contact</a>
-    <a href="privacy-policy.html">Privacy Policy</a>
-  </div>
+    <a href="#privacy">Privacy Policy</a>
+    <a href="#terms">Terms &amp; Conditions</a>  </div>
   <p class="footer-copy">© 2026 EMMANUEL KIPROTICH KIRUI. All rights reserved.</p>
 </footer>
 
@@ -2005,7 +2057,15 @@ window.addEventListener('scroll',()=>{
   document.addEventListener('click',outside);
   document.addEventListener('touchstart',outside,{passive:true});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
-  window.addEventListener('resize',()=>{if(window.innerWidth>900)close();});
+  menu.addEventListener('click',e=>{if(e.target.closest('a.sb-link'))close();});
+  const links=[...menu.querySelectorAll('a.sb-link')];
+  const map=links.map(a=>[a,document.querySelector(a.getAttribute('href'))]).filter(x=>x[1]);
+  function spy(){
+    let cur=null, y=innerHeight*.35;
+    map.forEach(([a,s])=>{ if(s.getBoundingClientRect().top<=y) cur=a; });
+    links.forEach(a=>a.classList.toggle('active',a===cur));
+  }
+  addEventListener('scroll',spy,{passive:true}); spy();
 })();
 
 /* ─── SLIDESHOW ─── */
@@ -2314,7 +2374,7 @@ function renderInlinePdfNow(container){
   <p class="cookie-text">
     We use cookies to improve your experience and analyse traffic.
     By clicking <strong style="color:var(--text);">Accept</strong> you consent to our use of cookies.
-    <a href="privacy-policy.html">Learn more</a>.
+    <a href="#privacy">Learn more</a>.
   </p>
   <div class="cookie-btns">
     <button class="cookie-accept" id="cookieAccept">Accept</button>
@@ -2441,6 +2501,159 @@ function renderInlinePdfNow(container){
 })();
 </script>
 
+<div class="legal-modal" id="legalModal" role="dialog" aria-modal="true" aria-labelledby="legalTitle">
+  <div class="legal-box">
+    <div class="legal-head"><h2 id="legalTitle"></h2><button class="legal-x" type="button" aria-label="Close" id="legalClose"><i class="fas fa-xmark"></i></button></div>
+        <div class="legal-tabs">
+      <button type="button" data-doc="privacy">Privacy Policy</button><button type="button" data-doc="terms">Terms and Conditions</button>    </div>
+        <div class="legal-body">
+            <div class="legal-doc" id="legal-privacy" data-title="Privacy Policy"><p>Effective date: 12 November 2026</p><p>This Privacy Policy explains how EMMANUEL KIPROTICH KIRUI ("I", "me" or "my") collects, uses, stores and protects personal information when you visit https://creativepulse.42web.io/cps/port_kirui (the "Website"). By using the Website you agree to the practices described here.</p><h3>1. Who is responsible for your data</h3><p>EMMANUEL KIPROTICH KIRUI is the data controller for information collected through this Website and is based in Nairobi, Kenya. You can contact me at any time using: email: emmanuelkirui042@gmail.com.</p><h3>2. Information I collect</h3><ul><li>Information you send me: your name, email address and the message you type into the contact form, plus any details you choose to include.</li><li>Basic visit information: pages viewed, approximate date and time of visit, browser type, device type and referring page. This is used only to understand how the Website is used.</li><li>Cookies and similar storage: small files or browser storage used to remember your cookie choice and to keep the Website working properly.</li><li>Download activity: a count of when documents such as a CV or certificates are viewed or downloaded. No personal details are needed to download them.</li><li>Technical data your browser sends automatically, such as IP address and request headers, which the hosting provider may log for security and reliability.</li></ul><p>I do not knowingly collect sensitive personal data such as health, religion, political views or payment card details through this Website. Please do not send such information in your messages.</p><h3>3. How I use your information</h3><ul><li>To read and reply to your messages and enquiries.</li><li>To operate, secure and improve the Website.</li><li>To understand which content is useful, using anonymous or aggregated statistics.</li><li>To comply with legal obligations and to protect against misuse, spam or fraud.</li></ul><p>I do not sell your personal information, and I do not use it for automated decision-making or profiling.</p><h3>4. Legal basis</h3><p>I process personal data in line with the Data Protection Act, 2019 of Kenya. The basis for processing is your consent (for example when you send a message or accept cookies), my legitimate interest in running and securing this Website, and compliance with legal obligations.</p><h3>5. Cookies</h3><p>The Website shows a cookie notice. Essential storage is used to remember your choice and keep the Website working. You can accept or decline the notice, and you can also delete or block cookies in your browser settings. Declining may affect some features.</p><h3>6. Third-party services</h3><p>To work properly the Website loads resources from third parties, for example content delivery networks for fonts, icons and scripts, and badge or certificate providers such as Credly. These providers may receive your IP address and browser details when your browser loads their files, and they have their own privacy policies. I do not control how they handle that data.</p><h3>7. Sharing your information</h3><p>I only share personal information when it is necessary to run the Website (for example with my hosting provider), when the law requires it, or when you ask me to. Service providers act on my instructions and may not use your information for their own purposes.</p><h3>8. How long I keep your information</h3><p>Messages sent through the Website are kept for up to 12 months, or longer only where needed to continue a conversation or meet a legal requirement. Technical logs are kept for the period set by the hosting provider. After that the information is deleted or anonymised.</p><h3>9. Security</h3><p>I use reasonable technical and organisational measures to protect your information, including password-protected administration, HTTPS where available and regular updates. No method of transmission or storage is completely secure, so I cannot guarantee absolute security.</p><h3>10. Your rights</h3><p>You can ask to access the personal information I hold about you, correct it, delete it, object to or restrict its use, or withdraw your consent at any time. To exercise a right, contact me using the details below. I will respond within a reasonable time and in line with the law. You also have the right to lodge a complaint with the Office of the Data Protection Commissioner (ODPC) in Kenya.</p><h3>11. Children</h3><p>This Website is not directed at children under 18 and I do not knowingly collect their personal information. If you believe a child has sent me personal data, contact me and I will delete it.</p><h3>12. Links to other websites</h3><p>The Website may link to other sites such as GitHub, LinkedIn or Credly. I am not responsible for their content or privacy practices.</p><h3>13. Changes to this policy</h3><p>I may update this Privacy Policy from time to time. The effective date at the top shows when it last changed. Continuing to use the Website after a change means you accept the updated policy.</p><h3>14. Contact</h3><p>Questions or requests about this policy: email: emmanuelkirui042@gmail.com.</p></div>
+            <div class="legal-doc" id="legal-terms" data-title="Terms and Conditions"><p>Effective date: 12 November 2026</p><p>These Terms and Conditions govern your use of https://creativepulse.42web.io/cps/port_kirui (the "Website"), owned and operated by EMMANUEL KIPROTICH KIRUI. By accessing or using the Website you agree to these terms. If you do not agree, please stop using the Website.</p><h3>1. About this Website</h3><p>This Website is a personal professional portfolio. It presents my background, skills, projects, certifications and writing, and lets visitors contact me. It is provided for information purposes only.</p><h3>2. Acceptable use</h3><p>You agree not to:</p><ul><li>use the Website for anything unlawful, harmful or fraudulent;</li><li>attempt to gain unauthorised access to the Website, its administration area, servers or data;</li><li>upload or send malware, spam or content that is abusive, defamatory or infringes the rights of others;</li><li>scrape, copy or republish the Website at scale, or interfere with its normal operation.</li></ul><h3>3. Intellectual property</h3><p>Unless stated otherwise, the text, design, graphics, code and other material on the Website belong to EMMANUEL KIPROTICH KIRUI and are protected by copyright and other laws. You may view the Website and share links to it. You may not copy, modify or reuse its content, including project descriptions, articles and documents, without my written permission. Trademarks, logos and certificates of third parties remain the property of their owners.</p><h3>4. ICT insights and articles</h3><p>Articles and tips published under ICT Insights share general information and personal opinion. They are not professional, legal or security advice for your particular situation. You should seek qualified advice before acting on them, and you use them at your own risk.</p><h3>5. Documents and downloads</h3><p>Documents such as a CV, certificates or reports are provided for personal, non-commercial reference such as recruitment or verification. Do not alter or redistribute them. Details in them reflect my information at the time of publishing and may change.</p><h3>6. Contact and communication</h3><p>When you contact me through the Website you agree to give accurate information and not to send unlawful or abusive content. I will try to respond promptly but do not promise a reply or any particular outcome. Sending a message does not create a client, employment or other contractual relationship. How I handle your details is described in the Privacy Policy.</p><h3>7. Third-party links and services</h3><p>The Website may contain links to third-party websites and load third-party resources. I do not control or endorse them and am not responsible for their content, availability or practices.</p><h3>8. Availability</h3><p>I try to keep the Website available and accurate but do not guarantee uninterrupted or error-free access. I may change, suspend or remove any part of the Website at any time without notice.</p><h3>9. Disclaimer of warranties</h3><p>The Website and its content are provided "as is" and "as available" without warranties of any kind, whether express or implied, including accuracy, fitness for a particular purpose or non-infringement.</p><h3>10. Limitation of liability</h3><p>To the fullest extent permitted by law, EMMANUEL KIPROTICH KIRUI will not be liable for any indirect, incidental or consequential loss, or any loss of data, profit or business, arising from your use of or inability to use the Website or from reliance on its content. Nothing in these terms limits liability that cannot be limited by law.</p><h3>11. Governing law</h3><p>These terms are governed by the laws of Kenya. Any dispute will be handled by the competent courts of Kenya, after the parties have first tried in good faith to resolve it informally.</p><h3>12. Changes to these terms</h3><p>I may update these terms from time to time. The effective date at the top shows when they last changed. Continued use of the Website after an update means you accept the new terms.</p><h3>13. Contact</h3><p>Questions about these terms: email: emmanuelkirui042@gmail.com.</p></div>
+          </div>
+  </div>
+</div>
+<script>
+(function(){
+  var m=document.getElementById('legalModal'); if(!m) return;
+  var docs=[].slice.call(m.querySelectorAll('.legal-doc')), tabs=[].slice.call(m.querySelectorAll('.legal-tabs button'));
+  function show(k){
+    var hit=false;
+    docs.forEach(function(d){var on=d.id==='legal-'+k; d.classList.toggle('on',on); if(on){hit=true; document.getElementById('legalTitle').textContent=d.getAttribute('data-title');}});
+    tabs.forEach(function(b){b.classList.toggle('on',b.getAttribute('data-doc')===k);});
+    return hit;
+  }
+  function open(k){ if(show(k)){ m.classList.add('open'); m.querySelector('.legal-body').scrollTop=0; } }
+  function close(){ m.classList.remove('open'); if(/^#(privacy|terms)$/.test(location.hash)) history.replaceState(null,'',location.pathname+location.search); }
+  function fromHash(){ var k=location.hash.replace('#',''); if(k==='privacy'||k==='terms') open(k); else m.classList.remove('open'); }
+  addEventListener('hashchange',fromHash); fromHash();
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href="#privacy"],a[href="#terms"]');
+    if(a){ e.preventDefault(); open(a.getAttribute('href').slice(1)); return; }
+    var t=e.target.closest&&e.target.closest('.legal-tabs button'); if(t){ show(t.getAttribute('data-doc')); m.querySelector('.legal-body').scrollTop=0; return; }
+    if(e.target===m||(e.target.closest&&e.target.closest('#legalClose'))) close();
+  });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&m.classList.contains('open')) close(); });
+})();
+</script>
+<script>
+/* ─── HERO: floating 3D objects (Three.js) — loads after page load, skipped for reduced-motion / data-saver ─── */
+(function(){
+  var cv=document.getElementById('hero3d'); if(!cv) return;
+  var mq=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)');
+  var conn=navigator.connection||{};
+  if((mq&&mq.matches)||conn.saveData) return;
+  if(/[?&]no3d\b/.test(location.search)) return;                         // ?no3d=1 -> turn the 3D layer off (for A/B checks)
+  if((navigator.hardwareConcurrency||8)<=2||(navigator.deviceMemory||8)<=2) return;   // very weak devices keep the original page only
+  function boot(){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    s.onload=init; s.onerror=function(){}; document.head.appendChild(s);
+  }
+  if(document.readyState==='complete') boot(); else window.addEventListener('load',boot);
+
+  function init(){
+    if(!window.THREE) return;
+    var hero=cv.parentElement, small=innerWidth<700;
+    var renderer;
+    try{ renderer=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:!small}); }catch(e){ return; }
+    renderer.setPixelRatio(Math.min(devicePixelRatio||1, small?1:1.25));   // cheap on purpose: the original background animation must stay smooth
+    var scene=new THREE.Scene();
+    var cam=new THREE.PerspectiveCamera(50,1,.1,100); cam.position.z=14;
+    var group=new THREE.Group(); scene.add(group);
+
+    var C={cyan:0x00e5ff,violet:0x9333ea,pink:0xec4899};
+    function wire(geo,color,op){
+      var m=new THREE.Group();
+      m.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:color,wireframe:true,transparent:true,opacity:op})));
+      m.add(new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:color,transparent:true,opacity:op*.12})));
+      return m;
+    }
+    // nx/ny: anchor inside the visible area (-1..1) for wide screens (w) and tall/narrow screens (t); r: object radius
+    var defs=[
+      {g:new THREE.IcosahedronGeometry(1.7,1),    c:C.cyan,   r:1.7, z:-1, op:.55, w:[ .80, .50], t:[ .85, .55]},
+      {g:new THREE.TorusKnotGeometry(1,.32,90,12),c:C.violet, r:1.5, z: 1, op:.6,  w:[ .92,-.62], t:[ .85,-.70]},
+      {g:new THREE.OctahedronGeometry(1.2),       c:C.pink,   r:1.2, z:-2, op:.5,  w:[-.92, .70], t:[-.85, .30]},
+      {g:new THREE.TorusGeometry(1.1,.3,12,40),   c:C.cyan,   r:1.4, z: 0, op:.5,  w:[-.92,-.62], t:[-.85,-.75]},
+      {g:new THREE.TetrahedronGeometry(.9),       c:C.violet, r:.9,  z: 2, op:.5,  w:[ .10,-.88], t:[ .05,-.92]},
+      {g:new THREE.IcosahedronGeometry(.7,0),     c:C.pink,   r:.7,  z: 1, op:.5,  w:[ .45, .86], t:[ .20, .90]}
+    ];
+    if(small) defs=defs.slice(0,4);
+    var objs=defs.map(function(d,i){
+      var m=wire(d.g,d.c,small?d.op*.45:d.op);
+      m.userData={def:d,by:0,ph:i*1.7,sp:.12+.05*i,d:(i%2?1:-1)};
+      group.add(m); return m;
+    });
+    // Place every object from the CURRENT visible size, so nothing is ever cut off at any screen size
+    function layout(){
+      var tall=cam.aspect<.9, fov=Math.tan(cam.fov*Math.PI/360);
+      var hh0=fov*cam.position.z, hw0=hh0*cam.aspect;
+      var k=Math.max(.42,Math.min(1.1,Math.min(hw0,hh0)/6.5));          // shrink objects on small screens
+      objs.forEach(function(m){
+        var d=m.userData.def, dist=cam.position.z-d.z, hh=fov*dist, hw=hh*cam.aspect;
+        var rr=d.r*k*1.35+.7;                                              // radius incl. rotation + parallax margin
+        var a=tall?d.t:d.w;
+        m.scale.setScalar(k);
+        m.position.x=a[0]*Math.max(0,hw-rr);
+        m.position.y=a[1]*Math.max(0,hh-rr);
+        m.position.z=d.z; m.userData.by=m.position.y;
+        // Fade objects that land over the text column so copy stays readable: left side on wide screens, lower half on tall ones
+        var f=tall?(a[1]<.45?.5:1):(a[0]<0?.4:1), base=small?d.op*.45:d.op;
+        m.children.forEach(function(c,ci){ c.material.opacity=base*f*(ci?.12:1); });
+      });
+      dust.scale.set(Math.max(.3,hw0/10.4),Math.max(.5,hh0/6.5),1);
+    }
+
+    // dust
+    var n=small?40:100, pos=new Float32Array(n*3);
+    for(var i=0;i<n;i++){pos[i*3]=(Math.random()-.5)*28;pos[i*3+1]=(Math.random()-.5)*16;pos[i*3+2]=(Math.random()-.5)*10;}
+    var pg=new THREE.BufferGeometry(); pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    var dust=new THREE.Points(pg,new THREE.PointsMaterial({color:0x7fefff,size:.06,transparent:true,opacity:.6}));
+    scene.add(dust);
+
+    function size(){
+      var w=document.documentElement.clientWidth,h=hero.clientHeight;
+      renderer.setSize(w,h,false); cam.aspect=w/h; cam.updateProjectionMatrix(); layout();
+    }
+    size();
+    if(window.ResizeObserver) new ResizeObserver(size).observe(hero); else addEventListener('resize',size);
+
+    var mx=0,my=0,tx=0,ty=0;
+    function move(x,y){ tx=(x/innerWidth-.5)*2; ty=(y/innerHeight-.5)*2; }
+    addEventListener('mousemove',function(e){move(e.clientX,e.clientY);},{passive:true});
+    addEventListener('touchmove',function(e){var t=e.touches[0]; if(t) move(t.clientX,t.clientY);},{passive:true});
+
+    var visible=true, raf=0, t0=performance.now();
+    if(window.IntersectionObserver) new IntersectionObserver(function(en){
+      visible=en[0].isIntersecting; if(visible&&!raf) raf=requestAnimationFrame(loop);
+    }).observe(hero);
+    document.addEventListener('visibilitychange',function(){ if(!document.hidden&&visible&&!raf) raf=requestAnimationFrame(loop); });
+
+    var last=0, slow=0, frames=0, gap=small?33:0;   // 30fps cap on phones
+    function stop(){ visible=false; cv.classList.remove('on'); try{renderer.dispose();}catch(e){} setTimeout(function(){cv.style.display='none';},1300); }
+    function loop(now){
+      raf=0; if(!visible||document.hidden) return;
+      if(gap&&now-last<gap-2){ raf=requestAnimationFrame(loop); return; }
+      var dt=now-last; last=now;
+      // Auto-protect the page: if the device can't keep ~30fps, drop the 3D layer and leave only the original animations
+      if(frames++>20 && dt<500){ slow+= dt>40?1:-(slow>0?1:0); if(slow>45){ stop(); return; } }
+      var t=(now-t0)/1000;
+      mx+=(tx-mx)*.05; my+=(ty-my)*.05;
+      var sc=Math.min(scrollY/innerHeight,1.5);
+      objs.forEach(function(o){
+        var u=o.userData;
+        o.rotation.x=t*u.sp*u.d+sc*1.2; o.rotation.y=t*u.sp*1.3+sc*.8;
+        o.position.y=u.by+Math.sin(t*.6+u.ph)*.45;
+      });
+      group.rotation.y=mx*.25; group.rotation.x=my*.15;
+      group.position.x=mx*-.5; group.position.y=my*.3+sc*1.5;
+      dust.rotation.y=t*.02+mx*.1; dust.rotation.x=my*.06;
+      renderer.render(scene,cam);
+      raf=requestAnimationFrame(loop);
+    }
+    cv.classList.add('on'); raf=requestAnimationFrame(loop);
+  }
+})();
+</script>
 
 
 </body></html>
