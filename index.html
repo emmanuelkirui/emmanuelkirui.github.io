@@ -41,7 +41,7 @@
   "name": "EMMANUEL KIPROTICH KIRUI",
   "jobTitle": "IT Professional & Software Developer",
   "description": "I am an IT professional with a background in cybersecurity, cloud technologies, and prompt design in AI. I am passionate about building secure and scalable applications, leveraging my skills in Vertex",
-  "url": "https://creativepulse.42web.io/cps/port_kirui.php?mirror=1794488143148&i=1",
+  "url": "https://creativepulse.42web.io/cps/port_kirui.php?mirror=1794525217702&i=1",
   "email": "emmanuelkirui042@gmail.com",
   "address": {"@type":"PostalAddress","addressCountry":"KE","addressRegion":"Nairobi, Kenya"},
   "knowsAbout": ["Web Development","ICT Support","Google Cloud Platform","Systems Administration","Network Engineering","Cybersecurity","Python","PHP","MySQL","Linux"],
@@ -1940,6 +1940,34 @@ My hands-on work as ASSISTANT HRIO at Rexus Medical Centre has taught me to favo
   </div>
 </section>
 
+<section id="data-request">
+  <div class="section-label"><span>Your Data</span></div>
+  <h2 class="section-title">Request <span class="grad">Your Data</span></h2>
+  <div style="max-width:760px;margin:0 auto;background:var(--surf2);border:1px solid var(--border);border-radius:16px;padding:32px;">
+    <p style="color:var(--muted);font-size:.9rem;line-height:1.7;margin-bottom:10px;">If you have sent me a message or your details appear on this site, you can ask what personal data I hold about you, and ask me to correct it, delete it, restrict it, give you a portable copy, or stop using it.</p>
+    <p style="color:var(--muted);font-size:.84rem;line-height:1.7;margin-bottom:20px;"><i class="fas fa-shield-halved" style="color:var(--cyan);"></i> Nothing is shown on this page. I will email you a reference number, check that the request really came from you, then reply within the time the law allows. Requests are free.</p>
+    <form id="dsarForm" class="cf" novalidate="" data-endpoint="https://creativepulse.42web.io/cps/port_kirui.php?api=dsar" data-mailto="emmanuelkirui042@gmail.com">
+      <div class="cf-row">
+        <input type="text" name="name" placeholder="Your full name" maxlength="100" required="" aria-label="Your full name" autocomplete="name">
+        <input type="email" name="email" placeholder="The email you used with me" maxlength="120" required="" aria-label="Your email" autocomplete="email">
+      </div>
+      <select name="type" aria-label="What are you asking for?">
+        <option value="access">Show me the data you hold about me</option>
+        <option value="rectify">Correct data that is wrong</option>
+        <option value="erase">Delete my data</option>
+        <option value="restrict">Restrict how you use my data</option>
+        <option value="portability">Give me a portable copy of my data</option>
+        <option value="object">I object to how my data is used</option>
+        <option value="info">Another data protection question</option>
+      </select>
+      <textarea name="details" rows="3" placeholder="Anything that helps me find your data, e.g. when you contacted me (optional)" maxlength="1000" aria-label="Details"></textarea>
+      <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;">
+      <button type="submit" class="btn-primary" style="justify-content:center;border:none;cursor:pointer;font-family:inherit;"><i class="fas fa-user-shield"></i> Send data request</button>
+      <div class="cf-status" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-brand">EMMANUEL KIPROTICH KIRUI</div>
@@ -1952,7 +1980,7 @@ My hands-on work as ASSISTANT HRIO at Rexus Medical Centre has taught me to favo
     <a href="#certifications">Certifications</a>
     <a href="#contact">Contact</a>
     <a href="#privacy">Privacy Policy</a>
-    <a href="#terms">Terms &amp; Conditions</a>  </div>
+    <a href="#data-request">Your Data</a>    <a href="#terms">Terms &amp; Conditions</a>  </div>
   <p class="footer-copy">© 2026 EMMANUEL KIPROTICH KIRUI. All rights reserved.</p>
 </footer>
 
@@ -2444,6 +2472,8 @@ function renderInlinePdfNow(container){
 .cf input,.cf textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:10px;font:inherit;font-size:.9rem;outline:none;transition:border-color .2s;}
 .cf input:focus,.cf textarea:focus{border-color:var(--cyan);}
 .cf textarea{resize:vertical;min-height:120px;}
+.cf select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:12px 14px;border-radius:10px;font:inherit;font-size:.9rem;outline:none;}
+.cf select:focus{border-color:var(--cyan);}
 .cf-status{font-size:.85rem;min-height:1.2em;line-height:1.5;}
 .cf-status.ok{color:var(--green);}
 .cf-status.err{color:#ff6b6b;}
@@ -2496,6 +2526,27 @@ function renderInlinePdfNow(container){
         else { say((j && j.error) || 'Could not send right now.', 'err'); fallback(); }
       })
       .catch(function () { say('Could not reach the server.', 'err'); fallback(); })
+      .then(function () { btn.disabled = false; });
+  });
+})();
+</script>
+
+<script>
+(function () {
+  var f = document.getElementById('dsarForm'); if (!f) return;
+  var el = f.elements, st = f.querySelector('.cf-status'), btn = f.querySelector('button[type=submit]');
+  function say(t, c) { st.textContent = t; st.className = 'cf-status ' + (c || ''); }
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!el['name'].value.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(el['email'].value.trim())) { say('Please enter your name and a valid email address.', 'err'); return; }
+    btn.disabled = true; say('Sending...');
+    fetch(f.dataset.endpoint, { method: 'POST', body: new FormData(f) })
+      .then(function (r) { return r.json().catch(function () { return { ok: false }; }); })
+      .then(function (j) {
+        if (j && j.ok) { f.reset(); say('Thank you. Your request has been received. Please check your email (and spam folder) for your reference number and reply to it so I can confirm it was you.', 'ok'); }
+        else { say((j && j.error) || 'Could not send right now.', 'err'); if (f.dataset.mailto) { var a = document.createElement('a'); a.href = 'mailto:' + f.dataset.mailto + '?subject=' + encodeURIComponent('Data request'); a.textContent = 'Email me instead'; st.appendChild(document.createTextNode(' ')); st.appendChild(a); } }
+      })
+      .catch(function () { say('Could not reach the server.', 'err'); })
       .then(function () { btn.disabled = false; });
   });
 })();
