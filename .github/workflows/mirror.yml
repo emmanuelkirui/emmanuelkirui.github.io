@@ -36,6 +36,34 @@ jobs:
           PAGES: port_kirui.php,liv.php,valmanu.php
         run: node .github/scripts/mirror.js
 
+      - name: Add visit beacon to mirrored pages
+        env:
+          TRACK_URL: https://creativepulse.42web.io/cps/track.php?i=1
+        run: |
+          node - <<'JS'
+          const fs = require('fs'), path = require('path');
+          const url = process.env.TRACK_URL;
+          const tag = '<script data-visit-beacon>(function(){try{var k="cp_v_"+new Date().toISOString().slice(0,10);'
+            + 'if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");var u="' + url + '";'
+            + 'var b=new Blob(["p="+encodeURIComponent(location.pathname)],{type:"application/x-www-form-urlencoded"});'
+            + 'if(navigator.sendBeacon){navigator.sendBeacon(u,b);}else{fetch(u,{method:"POST",mode:"no-cors",body:b,keepalive:true});}}catch(e){}})();</script>';
+          let n = 0;
+          (function walk(d) {
+            for (const f of fs.readdirSync(d, { withFileTypes: true })) {
+              if (['node_modules', '.git', '.github'].includes(f.name)) continue;
+              const p = path.join(d, f.name);
+              if (f.isDirectory()) walk(p);
+              else if (/\.html?$/i.test(f.name)) {
+                let h = fs.readFileSync(p, 'utf8');
+                if (h.includes('data-visit-beacon')) continue;          // already added: safe to re-run
+                h = /<\/body>/i.test(h) ? h.replace(/<\/body>/i, tag + '</body>') : h + tag;
+                fs.writeFileSync(p, h); n++;
+              }
+            }
+          })('.');
+          console.log('Beacon added to ' + n + ' page(s).');
+          JS
+
       - name: Commit and push (only if content changed)
         run: |
           git config user.name "github-actions[bot]"
