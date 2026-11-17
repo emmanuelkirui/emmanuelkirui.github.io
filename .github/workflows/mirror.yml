@@ -29,6 +29,18 @@ jobs:
       - name: Install Puppeteer
         run: npm install --no-save --no-audit --no-fund puppeteer
 
+      - name: Diagnose site reachability (temporary)
+        continue-on-error: true
+        run: |
+          for p in port_kirui.php liv.php valmanu.php; do
+            echo "=== $p"
+            curl -sS -L -m 40 -A "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36" \
+              -o /tmp/page.html -D /tmp/head.txt -w "HTTP %{http_code} in %{time_total}s, %{size_download} bytes\n" \
+              "https://creativepulse.42web.io/cps/$p" || echo "curl failed with exit code $?"
+            head -n 12 /tmp/head.txt || true
+            echo "--- first 300 bytes of the body:"; head -c 300 /tmp/page.html || true; echo
+          done
+
       - name: Mirror pages (consent-gated AdSense)
         env:
           BASE_URL: https://creativepulse.42web.io/cps/
