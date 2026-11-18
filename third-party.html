@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en"><head><script>
+(function(){
+  var KEY='ek_cookie_consent', loaded=false;
+  function accepted(){
+    try{var d=JSON.parse(localStorage.getItem(KEY));
+      return !!d && d.choice==='accepted' && new Date()<=new Date(d.expires);}catch(e){return false;}
+  }
+  function loadAds(){
+    if(loaded||window.__adsLoaded) return; loaded=window.__adsLoaded=true;
+    var s=document.createElement('script'); s.async=true; s.crossOrigin='anonymous';
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271';
+    document.head.appendChild(s);
+  }
+  if(accepted()) loadAds();
+  window.addEventListener('ek:consent',function(e){ if(e.detail&&e.detail.choice==='accepted') loadAds(); });
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#cookieAccept,.cookie-accept')) setTimeout(function(){ if(accepted()) loadAds(); },50);
+  });
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore the third-party services integrated into Emmanuel Kirui's website, detailing their purposes, data practices, and links to their terms and privacy policies for transparency.">
+    <meta name="author" content="Emmanuel Kirui">
+    <meta name="keywords" content="third-party services, Emmanuel Kirui, privacy, website functionality, terms of service">
+    <meta name="robots" content="index, follow">
+    <title>Third-Party Services | Emmanuel Kirui</title>
+
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com/">
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400&amp;display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1vW6TfH6PfnEX7uL9r6Qz1D8rW9V8eB5eJ5eJ7eK9rL6rW8eL5fJ6eJ7rW9V8eB5eJ5eJ7eK9rL6r==" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <style>
+        :root {
+            --primary-color: #6a11cb;
+            --secondary-color: #2575fc;
+            --accent-color: #ff4d4d;
+            --text-color: #333;
+            --light-bg: #f8f9fa;
+            --dark-bg: #2c3e50;
+        }
+        /* Reset and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(135deg, #f4f6f9, #dfe4ea);
+            color: #2d3436;
+            line-height: 1.8;
+            padding: 60px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 60px;
+            border-radius: 12px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease-in-out;
+        }
+        .container:hover {
+            transform: translateY(-8px);
+        }
+
+        /* Typography */
+        h1 {
+            color: #d35400;
+            font-size: 38px;
+            text-align: center;
+            margin-bottom: 40px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        h2 {
+            color: #e67e22;
+            font-size: 24px;
+            margin: 20px 0 10px;
+            font-weight: 700;
+        }
+        p {
+            font-size: 16px;
+            margin: 12px 0;
+            text-align: justify;
+        }
+        ul {
+            margin: 12px 0 20px 20px;
+            padding-left: 15px;
+        }
+        li {
+            font-size: 16px;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 15px;
+        }
+        li::before {
+            content: "•";
+            color: #d35400;
+            position: absolute;
+            left: 0;
+            font-size: 18px;
+        }
+        .note {
+            color: #0056b3;
+            font-style: italic;
+        }
+        .cps-badge {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        /* Accordion Styles */
+        details {
+            margin: 20px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        summary {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3436;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s ease;
+        }
+        summary:hover {
+            background: #e9ecef;
+        }
+        summary::after {
+            content: "▼";
+            color: #d35400;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        details[open] summary::after {
+            content: "▲";
+            transform: rotate(0deg);
+        }
+        details[open] {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .section-content {
+            padding: 20px;
+            background: #fff;
+        }
+
+        /* Links and Buttons */
+        a {
+            color: #d35400;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #e67e22;
+            text-decoration: underline;
+        }
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #d35400;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 40px;
+        }
+        .back-button i {
+            margin-right: 8px;
+        }
+        .back-button:hover {
+            background: #e67e22;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 60px;
+            font-size: 14px;
+            color: #6c757d;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            padding-top: 30px;
+        }
+        .contact-link {
+            color: #d35400;
+            font-weight: 700;
+        }
+        .contact-link:hover {
+            color: #e67e22;
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px;
+                max-width: 100%;
+            }
+            h1 {
+                font-size: 32px;
+            }
+            h2 {
+                font-size: 22px;
+            }
+            p, li {
+                font-size: 15px;
+            }
+            summary {
+                font-size: 16px;
+                padding: 12px 15px;
+            }
+            .back-button {
+                padding: 12px 22px;
+                font-size: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            body {
+                padding: 40px 15px;
+            }
+            .container {
+                padding: 25px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            h2 {
+                font-size: 20px;
+            }
+            p, li {
+                font-size: 14px;
+            }
+            summary {
+                font-size: 15px;
+                padding: 10px 12px;
+            }
+        }
+    </style>
+<meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
+<body>
+    <main class="container" role="main">
+        <header>
+            <h1><i class="fas fa-handshake"></i> Third-Party Services<span class="cps-badge">CPS</span></h1>
+            <p><strong>Last Updated:</strong> March 01, 2025</p>
+        </header>
+
+        <details>
+            <summary>Introduction</summary>
+            <div class="section-content">
+                <p>Welcome to Emmanuel Kirui's website (<a href="http://creativepulse.42web.io/" class="contact-link">creativepulse.42web.io</a>). To provide you with a robust, secure, and user-friendly experience, we leverage a variety of third-party services. This page outlines these services, their purposes, and how they integrate with our site. It also provides transparency into their respective terms of service and privacy policies, ensuring you understand how your data may be handled when interacting with our platform.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>1. Introduction to Third-Party Services</summary>
+            <div class="section-content">
+                <p>Our website employs third-party tools to enhance functionality, optimize performance, and ensure security. These services are carefully selected to align with our commitment to quality and user satisfaction. Each third-party provider operates under its own legal agreements, which may include data processing terms that apply to your use of our website. We encourage you to familiarize yourself with these policies to make informed decisions about your engagement with our platform.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>2. Third-Party Services We Utilize</summary>
+            <div class="section-content">
+                <p>The following is a detailed list of key third-party services we may integrate, along with their intended purposes:</p>
+                <ul>
+                    <li><strong>Google Analytics:</strong> A web analytics tool that tracks and reports website traffic, user interactions, and behavioral patterns to help us improve our content and services. Learn more in their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                    <li><strong>Google AdSense:</strong> An advertising platform that displays targeted ads on our website, enabling us to monetize content while providing relevant promotions to users. See their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.google.com/adsense/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                    <li><strong>Google reCAPTCHA:</strong> A security service that protects our website from bots and spam by verifying user interactions. Refer to their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                    <li><strong>YouTube:</strong> A video-sharing platform we may embed to provide multimedia content, such as tutorials or promotional videos. Learn more in their <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                    <li><strong>Adsterra:</strong> An advertising network that helps us deliver and monetize ads, offering an alternative to traditional ad platforms. Check their <a href="https://adsterra.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://adsterra.com/terms-and-conditions/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                    <li><strong>Monetag:</strong> A monetization platform that enables us to generate revenue through ads tailored to user preferences. See their <a href="https://monetag.com/privacy-policy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://monetag.com/terms-of-service/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                    <li><strong>Cloudflare:</strong> A service that enhances website security, accelerates load times, and protects against cyber threats. Refer to their <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.cloudflare.com/terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                    <li><strong>Font Awesome:</strong> A library providing scalable vector icons to enhance the visual appeal and usability of our website. See their <a href="https://fontawesome.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://fontawesome.com/terms" target="_blank" rel="noopener noreferrer">Terms of Use</a>.</li>
+                    <li><strong>Football-Data.org:</strong> A sports data API providing football-related statistics, live scores, and match information to enrich our content with real-time sports updates. Learn more in their <a href="https://www.football-data.org/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://www.football-data.org/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>.</li>
+                    <li><strong>Hosting Providers (e.g., AWS, SiteGround):</strong> Infrastructure services that host our website, store data, and ensure uptime and reliability. Policies depend on the specific provider; please contact us for details on our current hosting partner.</li>
+                </ul>
+                <p class="note"><em>Note:</em> This list is representative and subject to change as we adopt new tools or discontinue others. We aim to keep this page updated to reflect our current third-party ecosystem.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>3. Data Handling and Third-Party Integration</summary>
+            <div class="section-content">
+                <p>To enable these services, we may share specific data, such as anonymized usage statistics, IP addresses, or cookies, with third-party providers. Our data-sharing practices are guided by the following principles:</p>
+                <ul>
+                    <li>We do not sell, trade, or otherwise monetize your personal information.</li>
+                    <li>Data shared is strictly limited to what is necessary for each service to function effectively.</li>
+                    <li>Third-party providers are bound by contractual agreements to safeguard your data and comply with relevant data protection regulations, such as GDPR or CCPA, where applicable.</li>
+                </ul>
+                <p>For a comprehensive overview of our data practices, please review our <a href="https://creativepulse.42web.io/cps/privacy-policy" class="contact-link">Privacy Policy</a>.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>4. Your Role and Responsibilities</summary>
+            <div class="section-content">
+                <p>As a user of our website, we recommend the following actions to ensure a transparent and informed experience:</p>
+                <ul>
+                    <li>Examine the terms of service and privacy policies of the third-party providers listed above.</li>
+                    <li>Understand how these services may collect, process, or store your data during your visit.</li>
+                    <li>Reach out to us with any questions or concerns regarding our third-party integrations.</li>
+                </ul>
+            </div>
+        </details>
+
+        <details>
+            <summary>5. Limitation of Liability</summary>
+            <div class="section-content">
+                <p>While we partner with trusted third-party providers, we cannot assume responsibility for:</p>
+                <ul>
+                    <li>The accuracy, content, or operational practices of external services or websites linked herein.</li>
+                    <li>Any disruptions, data breaches, or issues stemming from third-party services outside our direct control.</li>
+                </ul>
+                <p>Your interaction with these third-party services is governed by their terms and undertaken at your discretion.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>6. Updates to This Information</summary>
+            <div class="section-content">
+                <p>We reserve the right to modify this page as our use of third-party services evolves. Any updates will be reflected here, accompanied by a revised "Last Updated" date. We recommend revisiting this page periodically to stay informed of changes.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>7. Contact Information</summary>
+            <div class="section-content">
+                <p>For inquiries regarding our use of third-party services or any other concerns, please contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>. We are committed to addressing your questions promptly and thoroughly.</p>
+            </div>
+        </details>
+
+        <!-- Back Button -->
+        <button class="back-button" onclick="history.back()" aria-label="Return to Previous Page">
+            <i class="fas fa-arrow-left"></i> Return to Previous Page
+        </button>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2026 Emmanuel Kirui. All rights reserved.<br>For further inquiries, reach us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a>.</p>
+        </footer>
+    </main>
+
+<script data-visit-beacon>(function(){try{var k="cp_v_"+new Date().toISOString().slice(0,10);if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");var u="https://creativepulse.42web.io/cps/track.php?i=1";var b=new Blob(["p="+encodeURIComponent(location.pathname)],{type:"application/x-www-form-urlencoded"});if(navigator.sendBeacon){navigator.sendBeacon(u,b);}else{fetch(u,{method:"POST",mode:"no-cors",body:b,keepalive:true});}}catch(e){}})();</script></body></html>

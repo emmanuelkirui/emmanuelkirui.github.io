@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en"><head><script>
+(function(){
+  var KEY='ek_cookie_consent', loaded=false;
+  function accepted(){
+    try{var d=JSON.parse(localStorage.getItem(KEY));
+      return !!d && d.choice==='accepted' && new Date()<=new Date(d.expires);}catch(e){return false;}
+  }
+  function loadAds(){
+    if(loaded||window.__adsLoaded) return; loaded=window.__adsLoaded=true;
+    var s=document.createElement('script'); s.async=true; s.crossOrigin='anonymous';
+    s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9638774372490271';
+    document.head.appendChild(s);
+  }
+  if(accepted()) loadAds();
+  window.addEventListener('ek:consent',function(e){ if(e.detail&&e.detail.choice==='accepted') loadAds(); });
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#cookieAccept,.cookie-accept')) setTimeout(function(){ if(accepted()) loadAds(); },50);
+  });
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team | Creative Pulse</title>
+
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com/">
+
+    <!-- External Stylesheets -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&amp;display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(145deg, #1e3a8a, #7c3aed);
+            line-height: 1.6;
+            padding: 50px 20px;
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 80vw;
+            max-width: 300px;
+            height: 100%;
+            background: linear-gradient(145deg, #1e3a8a, #7c3aed);
+            padding: 20px;
+            transition: left 0.3s ease;
+            z-index: 2000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h2 {
+            color: #fff;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sidebar-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a:focus {
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .sidebar-nav a:focus {
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+
+        .search-bar {
+            margin: 1.5rem 0;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1e3a8a;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+
+        .search-bar input::placeholder {
+            color: #4b5563;
+        }
+
+        /* Overlay for Sidebar */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .hamburger {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 1.8rem;
+            color: #fff;
+            cursor: pointer;
+            z-index: 2500;
+            transition: left 0.3s ease;
+        }
+
+        .hamburger:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+
+        .sidebar.active ~ .hamburger {
+            left: calc(80vw + 20px);
+            max-left: 320px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #4b5563;
+            font-size: 1.2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        /* Progress Bar Styles */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .progress-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #f97316, #ef4444);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .container {
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .sidebar.active ~ .container {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        h1 {
+            color: #f97316;
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            width: 80px;
+            height: 4px;
+            background: #f97316;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 24px;
+            background: linear-gradient(90deg, #f97316, #ef4444);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:hover,
+        .back-button:focus {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+
+        .back-button i {
+            margin-right: 10px;
+        }
+
+        .team-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            padding: 0 1rem;
+        }
+
+        .team-member {
+            background: #fff;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+
+        .team-member:hover,
+        .team-member:focus {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .team-member:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+
+        .team-member::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #f97316, #ef4444);
+            transition: width 0.3s ease;
+        }
+
+        .team-member:hover::before,
+        .team-member:focus::before {
+            width: 100%;
+        }
+
+        .profile-pic-container {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 5px solid #f97316;
+            background: #f8f9fa;
+            transition: transform 0.3s ease;
+        }
+
+        .team-member:hover .profile-pic-container,
+        .team-member:focus .profile-pic-container {
+            transform: scale(1.05);
+        }
+
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        .member-name {
+            color: #1e3a8a;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-role {
+            color: #f97316;
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+
+        .member-bio {
+            color: #4b5563;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            color: #f97316;
+            font-size: 1.5rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-links a:hover,
+        .social-links a:focus {
+            color: #ef4444;
+            transform: scale(1.2);
+        }
+
+        .social-links a:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2.5rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            color: #4b5563;
+            font-size: 0.95rem;
+        }
+
+        .contact-link {
+            color: #f97316;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .contact-link:hover,
+        .contact-link:focus {
+            color: #ef4444;
+            text-decoration: underline;
+        }
+
+        .contact-link:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 70vw;
+                max-width: 250px;
+            }
+
+            .sidebar.active ~ .hamburger {
+                left: calc(70vw + 20px);
+                max-left: 270px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                width: 100vw;
+                max-width: none;
+            }
+
+            .sidebar.active ~ .hamburger {
+                left: calc(100vw - 40px);
+            }
+
+            .container {
+                padding: 30px 15px;
+            }
+
+            .team-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .profile-pic-container {
+                width: 140px;
+                height: 140px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .member-name {
+                font-size: 1.5rem;
+            }
+
+            .member-role {
+                font-size: 1.1rem;
+            }
+
+            .back-button {
+                width: 100%;
+                justify-content: center;
+                font-size: 1rem;
+            }
+        }
+
+        /* Animation for page load */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .team-member, .back-button, h1 {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+<meta name="google-adsense-account" content="ca-pub-9638774372490271"></head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container hidden" id="progressContainer">
+        <div class="progress-bar" id="progressBar" style="width: 100%;"></div>
+    </div>
+
+    <!-- Overlay for Sidebar -->
+    <div class="overlay" id="overlay" tabindex="-1"></div>
+
+    <!-- Hamburger Menu -->
+    <div class="hamburger" id="hamburger" tabindex="0" role="button" aria-label="Toggle navigation menu" aria-expanded="false">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-header">
+            <h2>Creative Pulse</h2>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search team members..." aria-label="Search team members">
+        </div>
+        <div class="sidebar-nav">
+            <a href="" tabindex="0">Home</a>
+            <a href="" tabindex="0">About</a>
+            <a href="" tabindex="0">Our Team</a>
+            <a href="" tabindex="0">Projects</a>
+            <a href="" tabindex="0">Contact</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="javascript:history.back()" class="back-button" aria-label="Go back to previous page">
+            <i class="fas fa-arrow-left"></i> Back to History
+        </a>
+        
+        <h1><i class="fas fa-users"></i> Our Team</h1>
+        
+        <div class="team-container" id="teamContainer">
+                            <div class="team-member" tabindex="0" role="group" aria-label="Team member Emmanuel Kirui" style="animation: 0.6s ease-out 0s 1 normal forwards running fadeIn;">
+                    <div class="profile-pic-container">
+                        <img src="uploads/avatars/logov1.1.png" alt="Emmanuel Kirui's Profile Picture" class="profile-pic">
+                    </div>
+                    <div class="member-name">Emmanuel Kirui</div>
+                    <div class="member-role">Founder &amp; Lead Developer</div>
+                    <div class="member-bio">Passionate about creating innovative solutions and leading the team to success.</div>
+                    <div class="social-links">
+                                                                                    <a href="#" target="_blank" aria-label="Emmanuel Kirui's linkedin profile">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                                            <a href="#" target="_blank" aria-label="Emmanuel Kirui's github profile">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                                            <a href="#" target="_blank" aria-label="Emmanuel Kirui's twitter profile">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                                                        </div>
+                </div>
+                            <div class="team-member" tabindex="0" role="group" aria-label="Team member Hoseah Kipyegon" style="animation: 0.6s ease-out 0s 1 normal forwards running fadeIn;">
+                    <div class="profile-pic-container">
+                        <img src="uploads/avatars/valm.png" alt="Hoseah Kipyegon's Profile Picture" class="profile-pic">
+                    </div>
+                    <div class="member-name">Hoseah Kipyegon</div>
+                    <div class="member-role">Creative Director</div>
+                    <div class="member-bio">Expert in design and branding, bringing creativity to every project.</div>
+                    <div class="social-links">
+                                                                                    <a href="#" target="_blank" aria-label="Hoseah Kipyegon's linkedin profile">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                                            <a href="#" target="_blank" aria-label="Hoseah Kipyegon's behance profile">
+                                    <i class="fab fa-behance"></i>
+                                </a>
+                                                            <a href="#" target="_blank" aria-label="Hoseah Kipyegon's twitter profile">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                                                        </div>
+                </div>
+                            <div class="team-member" tabindex="0" role="group" aria-label="Team member Caleb Kiplangat" style="animation: 0.6s ease-out 0s 1 normal forwards running fadeIn;">
+                    <div class="profile-pic-container">
+                        <img src="https://creativepulse.42web.io/cps/uploads/avatars/alex.png" alt="Caleb Kiplangat's Profile Picture" class="profile-pic">
+                    </div>
+                    <div class="member-name">Caleb Kiplangat</div>
+                    <div class="member-role">UI/UX Designer</div>
+                    <div class="member-bio">Crafting user-friendly and visually stunning interfaces.</div>
+                    <div class="social-links">
+                                                                                    <a href="#" target="_blank" aria-label="Caleb Kiplangat's dribbble profile">
+                                    <i class="fab fa-dribbble"></i>
+                                </a>
+                                                            <a href="#" target="_blank" aria-label="Caleb Kiplangat's linkedin profile">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                                            <a href="#" target="_blank" aria-label="Caleb Kiplangat's twitter profile">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                                                        </div>
+                </div>
+                    </div>
+        <div class="no-results" id="noResults">No team members found.</div>
+
+        <footer class="footer">
+            <p>© 2026 Creative Pulse. All rights reserved.<br>
+            Contact us at <a href="mailto:emmanuelkirui042@gmail.com" class="contact-link">emmanuelkirui042@gmail.com</a></p>
+        </footer>
+    </div>
+
+    <!-- JavaScript for Progress Bar, Sidebar, Search, and Keyboard Navigation -->
+    <script>
+        // Progress Bar Logic
+        window.addEventListener('load', () => {
+            const progressBar = document.getElementById('progressBar');
+            const progressContainer = document.getElementById('progressContainer');
+            let progress = 0;
+
+            const updateProgress = () => {
+                progress += 0.5 + (100 - progress) * 0.05;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressContainer.classList.add('hidden');
+                    }, 500);
+                }
+                progressBar.style.width = `${progress}%`;
+            };
+
+            const interval = setInterval(updateProgress, 50);
+
+            setTimeout(() => {
+                progress += 20;
+                progressBar.style.width = `${progress}%`;
+            }, 100);
+        });
+
+        // Sidebar Toggle and Focus Management
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const container = document.querySelector('.container');
+        const searchInput = document.getElementById('searchInput');
+        const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+        const teamMembers = document.querySelectorAll('.team-member');
+        const backButton = document.querySelector('.back-button');
+
+        function toggleSidebar() {
+            const isActive = sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            hamburger.setAttribute('aria-expanded', isActive);
+            container.style.opacity = isActive ? '0.7' : '1';
+            container.style.pointerEvents = isActive ? 'none' : 'auto';
+
+            if (isActive) {
+                // Focus the search input when sidebar opens
+                searchInput.focus();
+            } else {
+                // Return focus to hamburger when sidebar closes
+                hamburger.focus();
+            }
+        }
+
+        // Toggle sidebar on click
+        hamburger.addEventListener('click', toggleSidebar);
+
+        // Toggle sidebar on Enter/Space key
+        hamburger.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleSidebar();
+            }
+        });
+
+        // Close sidebar on overlay click
+        overlay.addEventListener('click', toggleSidebar);
+
+        // Close sidebar on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        });
+
+        // Focus trapping in sidebar
+        const focusableElements = sidebar.querySelectorAll('a, input, button, [tabindex="0"]');
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+
+        sidebar.addEventListener('keydown', (e) => {
+            if (!sidebar.classList.contains('active')) return;
+
+            if (e.key === 'Tab') {
+                if (e.shiftKey && document.activeElement === firstFocusable) {
+                    e.preventDefault();
+                    lastFocusable.focus();
+                } else if (!e.shiftKey && document.activeElement === lastFocusable) {
+                    e.preventDefault();
+                    firstFocusable.focus();
+                }
+            }
+        });
+
+        // Navigate sidebar links with Arrow keys
+        sidebarLinks.forEach((link, index) => {
+            link.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextIndex = (index + 1) % sidebarLinks.length;
+                    sidebarLinks[nextIndex].focus();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevIndex = (index - 1 + sidebarLinks.length) % sidebarLinks.length;
+                    sidebarLinks[prevIndex].focus();
+                }
+            });
+        });
+
+        // Navigate team members with Arrow keys
+        teamMembers.forEach((member, index) => {
+            member.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    const nextIndex = (index + 1) % teamMembers.length;
+                    teamMembers[nextIndex].focus();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    const prevIndex = (index - 1 + teamMembers.length) % teamMembers.length;
+                    teamMembers[prevIndex].focus();
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    // Focus the first social link within the team member
+                    const firstSocialLink = member.querySelector('.social-links a');
+                    if (firstSocialLink) firstSocialLink.focus();
+                }
+            });
+        });
+
+        // Search Functionality
+        const teamContainer = document.getElementById('teamContainer');
+        const noResults = document.getElementById('noResults');
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase();
+            let hasResults = false;
+
+            teamMembers.forEach(member => {
+                const name = member.querySelector('.member-name').textContent.toLowerCase();
+                const role = member.querySelector('.member-role').textContent.toLowerCase();
+
+                if (name.includes(query) || role.includes(query)) {
+                    member.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    member.style.display = 'none';
+                }
+            });
+
+            noResults.style.display = hasResults ? 'none' : 'block';
+        });
+
+        // Dynamic tab title change
+        const originalTitle = document.title;
+        document.addEventListener('visibilitychange', () => {
+            document.title = document.hidden ? "Miss You! | Creative Pulse" : originalTitle;
+        });
+
+        // Scroll animation for team members
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeIn 0.6s ease-out forwards';
+                }
+            });
+        }, { threshold: 0.2 });
+
+        teamMembers.forEach(member => observer.observe(member));
+    </script>
+
+<script data-visit-beacon>(function(){try{var k="cp_v_"+new Date().toISOString().slice(0,10);if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");var u="https://creativepulse.42web.io/cps/track.php?i=1";var b=new Blob(["p="+encodeURIComponent(location.pathname)],{type:"application/x-www-form-urlencoded"});if(navigator.sendBeacon){navigator.sendBeacon(u,b);}else{fetch(u,{method:"POST",mode:"no-cors",body:b,keepalive:true});}}catch(e){}})();</script></body></html>
