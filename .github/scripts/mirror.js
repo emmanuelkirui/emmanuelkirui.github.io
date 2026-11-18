@@ -17,6 +17,9 @@ const DENY_ASSET = /(^|\/)(data\.json|mirror_config\.php|\.[^/]*)$|\.php$/i;
 
 const htmlName = n => (n === 'port_kirui.php' ? 'index.html' : n.replace(/\.php$/i, '.html'));
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+const CHALLENGE = /slowAES/i;                                  // the free host's "browser check" page
+const NAV_TIMEOUT = 30000;                                    // how long to wait for a page to start loading
 const usedAssets = new Set();                                // local paths kept this run
 
 const CONSENT_LOADER = `
@@ -68,11 +71,11 @@ async function fetchInPage(url, localSize) {
   const b64 = buf => { let s = ''; const C = 0x8000; for (let i = 0; i < buf.length; i += C) s += String.fromCharCode.apply(null, buf.subarray(i, i + C)); return btoa(s); };
   try {
     if (localSize >= 0) {
-      const h = await fetch(url, { method: 'HEAD', credentials: 'include', cache: 'no-store' });
+      const h = await fetch(url, { method: 'HEAD', credentials: 'include', cache: 'no-store', signal: AbortSignal.timeout(30000) });
       const len = parseInt(h.headers.get('content-length') || '-1', 10);
       if (h.ok && len >= 0 && len === localSize) return { skip: true };
     }
-    const r = await fetch(url, { credentials: 'include', cache: 'no-store' });
+    const r = await fetch(url, { credentials: 'include', cache: 'no-store', signal: AbortSignal.timeout(60000) });
     if (!r.ok) return { error: 'HTTP ' + r.status };
     const type = (r.headers.get('content-type') || '').toLowerCase();
     if (type.includes('text/html') && !/\.html?$/i.test(url)) return { error: 'got an HTML page instead of a file' };
@@ -133,9 +136,28 @@ async function processPage(browser, pageName, discover) {
   const page = await browser.newPage();
   try {
     await page.setViewport({ width: 1280, height: 900 });
+    await page.setUserAgent(UA);
     const pageUrl = BASE_URL + pageName;
-    await page.goto(`${pageUrl}?mirror=${Date.now()}`, { waitUntil: 'networkidle2', timeout: 60000 });
-    await sleep(1500);
+    // Do NOT wait for "network idle": the pages pull fonts, scripts and badges from several other sites, and one slow
+    // one used to make every attempt time out. Wait for the page itself, then give it a moment to settle.
+    try {
+      // 'domcontentloaded' also waits for deferred scripts (pdf.js is one), so a single stalled outside file can hold it up.
+      // If that happens, carry on with what has loaded: the checks below make sure the real page is there before saving.
+      const resp = await page.goto(`${pageUrl}?mirror=${Date.now()}`, { waitUntil: 'domcontentloaded', timeout: NAV_TIMEOUT }).catch(e => {
+        if (!/timeout/i.test(e.message)) throw e;
+        console.log(`  ${pageName}: still loading after ${NAV_TIMEOUT / 1000}s (a slow outside resource?), continuing with what has loaded`);
+        return null;
+      });
+      if (resp) console.log(`  HTTP ${resp.status()} for ${pageName}`);
+      // the free host first shows a JavaScript "browser check", sets a cookie and reloads: wait for the real page
+      await page.waitForFunction(re => !new RegExp(re, 'i').test(document.documentElement.innerHTML) && document.documentElement.outerHTML.length > 3000,
+        { timeout: 45000, polling: 500 }, CHALLENGE.source);
+    } catch (e) {
+      let peek = ''; try { peek = (await page.content()).replace(/\s+/g, ' ').slice(0, 220); } catch (_) {}
+      throw new Error(`${e.message} | now at ${page.url()} | page starts: ${peek}`);
+    }
+    await page.waitForFunction(() => document.readyState === 'complete', { timeout: 20000 }).catch(() => {});   // best effort
+    await sleep(3000);
 
     const urls = await page.evaluate(collectInPage, BASE_URL, pageUrl);
     const assetMap = {}, pageMap = {};
@@ -170,6 +192,7 @@ async function processPage(browser, pageName, discover) {
 
     const html = '<!DOCTYPE html>\n' + await page.evaluate(() => document.documentElement.outerHTML);
     if (html.length < 3000) throw new Error(`suspiciously small output (${html.length} bytes)`);
+    if (CHALLENGE.test(html)) throw new Error('got the host\'s browser-check page instead of the site');
     if (/Fatal error|Parse error|Warning:.*on line/i.test(html)) throw new Error('PHP error text found in page');
     fs.writeFileSync(htmlName(pageName), html);
     console.log(`OK   ${pageName} -> ${htmlName(pageName)} (${html.length} bytes, ${Object.keys(assetMap).length} files)`);
@@ -180,7 +203,7 @@ async function processPage(browser, pageName, discover) {
 
 (async () => {
   fs.writeFileSync('ads.txt', `google.com, ${PUB}, DIRECT, f08c47fec0942fa0\n`);
-  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+  const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'] });
   const queue = [...START], seen = new Set(START), failed = [];
   const discover = rel => { if (!seen.has(rel) && seen.size < MAX_PAGES) { seen.add(rel); queue.push(rel); } };
 
