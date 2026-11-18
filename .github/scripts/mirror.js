@@ -19,7 +19,8 @@ const htmlName = n => (n === 'port_kirui.php' ? 'index.html' : n.replace(/\.php$
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 const CHALLENGE = /slowAES/i;                                  // the free host's "browser check" page
-const NAV_TIMEOUT = 30000;                                    // how long to wait for a page to start loading
+const NAV_TIMEOUT = +process.env.NAV_TIMEOUT_MS || 60000;         // how long to wait for a page to start loading
+const CONTENT_TIMEOUT = +process.env.CONTENT_TIMEOUT_MS || 90000;  // how long to wait for the real page (slow host, browser check)
 const usedAssets = new Set();                                // local paths kept this run
 
 const CONSENT_LOADER = `
@@ -151,7 +152,7 @@ async function processPage(browser, pageName, discover) {
       if (resp) console.log(`  HTTP ${resp.status()} for ${pageName}`);
       // the free host first shows a JavaScript "browser check", sets a cookie and reloads: wait for the real page
       await page.waitForFunction(re => !new RegExp(re, 'i').test(document.documentElement.innerHTML) && document.documentElement.outerHTML.length > 3000,
-        { timeout: 45000, polling: 500 }, CHALLENGE.source);
+        { timeout: CONTENT_TIMEOUT, polling: 500 }, CHALLENGE.source);
     } catch (e) {
       let peek = ''; try { peek = (await page.content()).replace(/\s+/g, ' ').slice(0, 220); } catch (_) {}
       throw new Error(`${e.message} | now at ${page.url()} | page starts: ${peek}`);
@@ -205,6 +206,7 @@ async function processPage(browser, pageName, discover) {
   fs.writeFileSync('ads.txt', `google.com, ${PUB}, DIRECT, f08c47fec0942fa0\n`);
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'] });
   const queue = [...START], seen = new Set(START), failed = [];
+  let anyOk = false;
   const discover = rel => { if (!seen.has(rel) && seen.size < MAX_PAGES) { seen.add(rel); queue.push(rel); } };
 
   while (queue.length) {
@@ -214,7 +216,14 @@ async function processPage(browser, pageName, discover) {
       try { await processPage(browser, p, discover); ok = true; }
       catch (e) { console.log(`TRY ${attempt}/3 failed for ${p}: ${e.message}`); await sleep(attempt * 4000); }
     }
-    if (!ok) failed.push(p);
+    if (ok) anyOk = true;
+    else {
+      failed.push(p);
+      if (!anyOk) {   // nothing has worked yet: the site is unreachable from here, so don't spend the rest of the run on more pages
+        console.log('Site looks unreachable from this runner: stopping early. Skipped: ' + (queue.join(', ') || 'none'));
+        failed.push(...queue); queue.length = 0;
+      }
+    }
   }
   await browser.close();
 
